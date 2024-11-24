@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
             themeMode: notifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             theme: theme.light(),
             darkTheme: theme.dark(),
-            home: IntroductionPage(),
+            home: const IntroductionPage(),
           );
         },
       ),

@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/core/theme/theme_provider.dart';
 
 class SettingsPage extends StatelessWidget {
+  static route() {
+    return MaterialPageRoute(builder: (context) => const SettingsPage());
+  }
+
   const SettingsPage({super.key});
 
   @override

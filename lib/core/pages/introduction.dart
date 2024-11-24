@@ -1,12 +1,14 @@
-import 'dart:ffi';
-import 'dart:ui';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:vn_travel_companion/features/auth/presentation/pages/sign_up.dart';
 
 class IntroductionPage extends StatefulWidget {
-  IntroductionPage({super.key});
+  static route() {
+    return MaterialPageRoute(builder: (context) => const IntroductionPage());
+  }
+
+  const IntroductionPage({super.key});
 
   @override
   State<IntroductionPage> createState() => _IntroductionPageState();
@@ -15,9 +17,9 @@ class IntroductionPage extends StatefulWidget {
 class _IntroductionPageState extends State<IntroductionPage> {
   int activeIndex = 0;
   final imgList = [
-    "https://instagram.fhan2-4.fna.fbcdn.net/v/t39.30808-6/458747528_18069344863603805_8003420746203458630_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE4MDAuc2RyLmYzMDgwOC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fhan2-4.fna.fbcdn.net&_nc_cat=105&_nc_ohc=_usLc6igitwQ7kNvgGWGdZ1&_nc_gid=e82fde278a3d415786de6335ed40fa95&edm=ALQROFkAAAAA&ccb=7-5&ig_cache_key=MzQ1MTE2MDQ1MDUxMzUxMjg1MA%3D%3D.3-ccb7-5&oh=00_AYBJzBhO8r_5s9MZaZu3Sfc4EbOfNuG1P_iFGenBZqDMkg&oe=674661BE&_nc_sid=fc8dfb",
-    "https://static.vinwonders.com/production/vietnam-travel-2.jpg",
-    "https://www.traveloffpath.com/wp-content/uploads/2023/01/Asian-Woman-Wearing-A-Traditional-Attire-As-She-Stands-At-The-Tip-Of-A-Long-Tail-Boat-Crossing-A-Lake-In-Vietnam-Southeast-Asia.jpg.webp"
+    "assets/images/intro1.jpg",
+    "assets/images/intro2.jpg",
+    "assets/images/intro3.webp",
   ];
 
   final imgDesc = [
@@ -37,6 +39,7 @@ class _IntroductionPageState extends State<IntroductionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -69,13 +72,24 @@ class _IntroductionPageState extends State<IntroductionPage> {
                 mainAxisAlignment: MainAxisAlignment
                     .spaceBetween, // This will space out the children
                 children: [
-                  slideIndicator(),
+                  slideIndicator(context),
                   ElevatedButton(
                     onPressed: () {
-                      print("Button Pressed");
+                      Navigator.push(context, SignUpPage.route());
                     },
-                    style: ElevatedButtonTheme.of(context).style,
-                    child: const Text("Click Me"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primaryContainer,
+                      foregroundColor: theme.colorScheme.onPrimaryContainer,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: const Text(
+                      "Khám phá",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -86,13 +100,13 @@ class _IntroductionPageState extends State<IntroductionPage> {
     );
   }
 
-  Widget cardImage(int index, context) => Container(
+  Widget cardImage(int index, context) => SizedBox(
         height: double.infinity,
         width: double.infinity,
         child: Stack(
           children: [
             Positioned.fill(
-              child: Image.network(
+              child: Image.asset(
                 imgList[index],
                 fit: BoxFit.cover,
               ),
@@ -145,10 +159,11 @@ class _IntroductionPageState extends State<IntroductionPage> {
         ),
       );
 
-  Widget slideIndicator() => AnimatedSmoothIndicator(
+  Widget slideIndicator(context) => AnimatedSmoothIndicator(
         activeIndex: activeIndex,
         count: imgList.length,
-        effect: const SlideEffect(
+        effect: SlideEffect(
+          activeDotColor: Theme.of(context).colorScheme.primaryContainer,
           dotHeight: 5,
           dotWidth: 40,
           spacing: 10,
