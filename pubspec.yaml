@@ -38,6 +38,7 @@ dependencies:
   provider: ^6.1.2
   carousel_slider: ^5.0.0
   smooth_page_indicator: ^1.2.0+3
+  flutter_bloc: ^8.1.6
 
 dev_dependencies:
   flutter_test:
