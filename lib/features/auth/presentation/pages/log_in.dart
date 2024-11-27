@@ -4,22 +4,22 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/validators.dart';
 import 'package:vn_travel_companion/core/widgets/loader.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/log_in.dart';
+import 'package:vn_travel_companion/features/auth/presentation/pages/sign_up.dart';
 import 'package:vn_travel_companion/features/auth/presentation/widget/auth_field.dart';
 import 'package:vn_travel_companion/features/auth/presentation/widget/auth_submit_btn.dart';
 
-class SignUpPage extends StatefulWidget {
+class LogInPage extends StatefulWidget {
   static route() {
-    return MaterialPageRoute(builder: (context) => const SignUpPage());
+    return MaterialPageRoute(builder: (context) => const LogInPage());
   }
 
-  const SignUpPage({super.key});
+  const LogInPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<LogInPage> createState() => _LogInPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _LogInPageState extends State<LogInPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final nameController = TextEditingController();
@@ -56,7 +56,7 @@ class _SignUpPageState extends State<SignUpPage> {
             children: [
               RichText(
                 text: TextSpan(
-                  text: 'Đăng ký tài khoản ', // Normal text
+                  text: 'Chào mừng đến với ', // Normal text
                   style: Theme.of(context).textTheme.headlineMedium,
                   children: [
                     TextSpan(
@@ -76,12 +76,6 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 30),
               AuthField(
-                hintText: 'Họ và Tên',
-                controller: nameController,
-                validators: const [Validators.checkEmpty],
-              ),
-              const SizedBox(height: 15),
-              AuthField(
                 hintText: 'Email',
                 controller: emailController,
                 validators: const [Validators.checkEmail],
@@ -93,23 +87,11 @@ class _SignUpPageState extends State<SignUpPage> {
                 isObscureText: true,
                 validators: const [
                   Validators.checkPassword,
-                  Validators.checkPasswordSpecialChar
                 ],
-              ),
-              const SizedBox(height: 15),
-              Text(
-                "x Ít nhất 8 ký tự",
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.secondary),
-              ),
-              Text(
-                "x Bao gồm một ký tự đặc biệt",
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.secondary),
               ),
               const SizedBox(height: 30),
               AuthSubmitBtn(
-                btnText: "Đăng ký",
+                btnText: "Đăng Nhập",
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     // call signUpWithEmailAndPassword
@@ -123,15 +105,15 @@ class _SignUpPageState extends State<SignUpPage> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(context, LogInPage.route());
+                    Navigator.push(context, SignUpPage.route());
                   },
                   child: RichText(
                     text: TextSpan(
-                        text: 'Đã có tài khoản? ',
+                        text: 'Chưa có tài khoản? ',
                         style: Theme.of(context).textTheme.titleMedium,
                         children: [
                           TextSpan(
-                            text: 'Đăng nhập',
+                            text: 'Đăng ký',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium

@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:vn_travel_companion/features/auth/presentation/pages/log_in.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/sign_up.dart';
 
 class IntroductionPage extends StatefulWidget {
@@ -75,7 +76,7 @@ class _IntroductionPageState extends State<IntroductionPage> {
                   slideIndicator(context),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(context, SignUpPage.route());
+                      Navigator.push(context, LogInPage.route());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primaryContainer,

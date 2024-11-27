@@ -21,7 +21,7 @@ class AuthSubmitBtn extends StatelessWidget {
           begin: Alignment.bottomLeft,
           end: Alignment.topRight,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(50),
       ),
       child: ElevatedButton(
         onPressed: onPressed,
