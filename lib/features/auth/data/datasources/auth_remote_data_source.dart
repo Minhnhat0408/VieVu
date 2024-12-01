@@ -24,7 +24,15 @@ abstract interface class AuthRemoteDataSource {
 
   Future<UserModel> logInWithGoogle();
 
-  Stream<UserModel?> listenToAuthChanges();
+  Stream<AuthState> listenToAuthChanges();
+
+  Future<void> sendPasswordResetEmail({
+    required String email,
+  });
+
+  Future<void> updatePassword({
+    required String password,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -149,15 +157,36 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Stream<UserModel?> listenToAuthChanges() =>
-      supabaseClient.auth.onAuthStateChange.map((event) {
-        if (event.session == null) {
-          return null;
-        } else {
-          return UserModel.fromJson(event.session!.user.toJson()).copyWith(
-            firstName: event.session!.user.userMetadata?["first_name"],
-            lastName: event.session!.user.userMetadata?["last_name"],
-          );
-        }
-      });
+  Stream<AuthState> listenToAuthChanges() =>
+      supabaseClient.auth.onAuthStateChange.map(
+        (event) {
+          print(event.toString());
+          return event;
+        },
+      );
+
+  @override
+  Future<void> sendPasswordResetEmail({
+    required String email,
+  }) async {
+    try {
+      await supabaseClient.auth.resetPasswordForEmail(email,
+          redirectTo: 'vntravelcompanion://reset-password');
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> updatePassword({
+    required String password,
+  }) async {
+    try {
+      await supabaseClient.auth.updateUser(UserAttributes(
+        password: password,
+      ));
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
 }

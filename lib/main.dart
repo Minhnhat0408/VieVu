@@ -5,9 +5,11 @@ import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.d
 import 'package:vn_travel_companion/core/common/pages/introduction.dart';
 import 'package:vn_travel_companion/core/theme/theme.dart';
 import 'package:vn_travel_companion/core/theme/theme_provider.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/text_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:vn_travel_companion/features/auth/presentation/pages/change_password.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
@@ -39,8 +41,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    super.initState();
     context.read<AuthBloc>().add(AuthUserLoggedIn());
+    super.initState();
   }
 
   @override
@@ -61,17 +63,23 @@ class _MyAppState extends State<MyApp> {
             themeMode: notifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             theme: theme.light(),
             darkTheme: theme.dark(),
-            home: BlocSelector<AppUserCubit, AppUserState, bool>(
-              selector: (state) {
-                print(state.toString() + 'state');
-                return state is AppUserLoggedIn;
-              },
-              builder: (context, isLoggedIn) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
+            home: BlocConsumer<AppUserCubit, AppUserState>(
+              listener: (context, state) {
+                if (state is AppUserPasswordRecovery) {
+                  showSnackbar(context, 'Tài khoản của bạn đã được khôi phục');
+                }
+
+                if (state is AppUserLoggedIn) {
                   Navigator.popUntil(context, (route) => route.isFirst);
-                });
-                if (isLoggedIn) {
+                }
+              },
+              builder: (context, state) {
+                if (state is AppUserLoggedIn) {
                   return const SettingsPage();
+                }
+
+                if (state is AppUserPasswordRecovery) {
+                  return const ChangePasswordPage();
                 }
 
                 return const IntroductionPage();

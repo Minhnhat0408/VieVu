@@ -39,7 +39,11 @@ class _AuthFieldState extends State<AuthField> {
     return TextFormField(
       controller: widget.controller,
       decoration: InputDecoration(
-        hintText: widget.hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        labelText: widget.hintText,
+        
         suffixIcon: widget.isObscureText
             ? IconButton(
                 icon: Icon(

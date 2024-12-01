@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
@@ -108,7 +109,39 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Stream<User?> listenToAuthChanges() {
+  Stream<supabase.AuthState> listenToAuthChanges() {
     return remoteDataSource.listenToAuthChanges();
+  }
+
+  @override
+  Future<Either<Failure, Unit>> sendPasswordResetEmail({
+    required String email,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+
+      await remoteDataSource.sendPasswordResetEmail(email: email);
+      return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> updatePassword({
+    required String password,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+
+      await remoteDataSource.updatePassword(password: password);
+      return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
   }
 }

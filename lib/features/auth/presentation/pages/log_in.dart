@@ -5,6 +5,7 @@ import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/validators.dart';
 import 'package:vn_travel_companion/core/common/widgets/loader.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:vn_travel_companion/features/auth/presentation/pages/password_forgot.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/sign_up.dart';
 import 'package:vn_travel_companion/features/auth/presentation/widget/auth_field.dart';
 import 'package:vn_travel_companion/features/auth/presentation/widget/auth_submit_btn.dart';
@@ -47,161 +48,179 @@ class _LogInPageState extends State<LogInPage> {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthFailure) {
-              showSnackbar(context, state.message);
-            }
-            if (state is AuthSuccess) {
-              showSnackbar(context, 'Đăng nhập thành công');
-            }
-          },
-          builder: (context, state) {
-            if (state is AuthLoading) {
-              return const Loader();
-            }
-            return Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      text: 'Chào mừng đến với ', // Normal text
-                      style: Theme.of(context).textTheme.headlineMedium,
-                      children: [
-                        TextSpan(
-                          text: 'TravelCompanion', // Styled text
-                          style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary, // Custom color
-                            fontWeight:
-                                FontWeight.bold, // Optional: adjust weight
-                          ),
-                        ),
-                        const TextSpan(
-                          text: '.', // Trailing text
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  AuthField(
-                    hintText: 'Email',
-                    controller: emailController,
-                    validators: const [Validators.checkEmail],
-                  ),
-                  const SizedBox(height: 15),
-                  AuthField(
-                    hintText: 'Mật khẩu',
-                    controller: passwordController,
-                    isObscureText: true,
-                    validators: const [
-                      Validators.checkPassword,
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  AuthSubmitBtn(
-                    btnText: "Đăng Nhập",
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        context.read<AuthBloc>().add(
-                              AuthLogin(
-                                email: emailController.text.trim(),
-                                password: passwordController.text.trim(),
-                              ),
-                            );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(context, SignUpPage.route());
-                      },
-                      child: RichText(
-                        text: TextSpan(
-                            text: 'Chưa có tài khoản? ',
-                            style: Theme.of(context).textTheme.titleMedium,
-                            children: [
-                              TextSpan(
-                                text: 'Đăng ký',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                            ]),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Row(
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthFailure) {
+            showSnackbar(
+                context, 'Email hoặc mật khẩu không đúng', SnackBarState.error);
+          }
+          if (state is AuthSuccess) {
+            showSnackbar(context, 'Đăng nhập thành công');
+          }
+        },
+        builder: (context, state) {
+          return Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 1,
+                      RichText(
+                        text: TextSpan(
+                          text: 'Chào mừng đến với ', // Normal text
+                          style: Theme.of(context).textTheme.headlineMedium,
+                          children: [
+                            TextSpan(
+                              text: 'TravelCompanion', // Styled text
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary, // Custom color
+                                fontWeight:
+                                    FontWeight.bold, // Optional: adjust weight
+                              ),
+                            ),
+                            const TextSpan(
+                              text: '.', // Trailing text
+                            ),
+                          ],
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      const SizedBox(height: 30),
+                      AuthField(
+                        hintText: 'Email',
+                        controller: emailController,
+                        validators: const [Validators.checkEmail],
+                      ),
+                      const SizedBox(height: 15),
+                      AuthField(
+                        hintText: 'Mật khẩu',
+                        controller: passwordController,
+                        isObscureText: true,
+                        validators: const [
+                          Validators.checkPassword,
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, PasswordForgotPage.route());
+                        },
                         child: Text(
-                          "Hình thức khác",
+                          'Quên mật khẩu?',
                           style: TextStyle(
-                            fontSize: 14,
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 1,
+                      const SizedBox(height: 15),
+                      AuthSubmitBtn(
+                        btnText: "Đăng Nhập",
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            context.read<AuthBloc>().add(
+                                  AuthLogin(
+                                    email: emailController.text.trim(),
+                                    password: passwordController.text.trim(),
+                                  ),
+                                );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, SignUpPage.route());
+                          },
+                          child: RichText(
+                            text: TextSpan(
+                                text: 'Chưa có tài khoản? ',
+                                style: Theme.of(context).textTheme.titleMedium,
+                                children: [
+                                  TextSpan(
+                                    text: 'Đăng ký',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ]),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              thickness: 1,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              "Hình thức khác",
+                              style: TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              thickness: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      OutlinedButton(
+                        onPressed: () {
+                          context.read<AuthBloc>().add(AuthLoginWithGoogle());
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.surface,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 50,
+                              vertical: 16,
+                            )),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/google-icon.svg',
+                              width: 20,
+                              height: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            const Text(
+                              'Tiếp tục bằng Google',
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthBloc>().add(AuthLoginWithGoogle());
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 50,
-                          vertical: 16,
-                        )),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/google-icon.svg',
-                          width: 20,
-                          height: 20,
-                        ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'Tiếp tục bằng Google',
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            );
-          },
-        ),
+              if (state is AuthLoading) const Positioned.fill(child: Loader())
+            ],
+          );
+        },
       ),
     );
   }

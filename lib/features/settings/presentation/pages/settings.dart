@@ -79,8 +79,9 @@ class SettingsPage extends StatelessWidget {
                       child: Text(
                         "Đăng xuất",
                         style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onInverseSurface),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer),
                       )),
                 )
               ],

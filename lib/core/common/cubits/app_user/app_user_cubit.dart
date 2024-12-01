@@ -5,7 +5,9 @@ part 'app_user_state.dart';
 
 class AppUserCubit extends Cubit<AppUserState> {
   AppUserCubit() : super(AppUserInitial());
-
+  void resetPassword() {
+    emit(AppUserPasswordRecovery());
+  }
   void updateUser(User? user) {
     if (user != null) {
       emit(AppUserLoggedIn(user));

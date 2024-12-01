@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 
@@ -20,5 +21,13 @@ abstract interface class AuthRepository {
 
   Future<Either<Failure, User>> logInWithGoogle();
 
-  Stream<User?> listenToAuthChanges();
+  Stream<supabase.AuthState> listenToAuthChanges();
+
+  Future<Either<Failure, Unit>> sendPasswordResetEmail({
+    required String email,
+  });
+
+  Future<Either<Failure, Unit>> updatePassword({
+    required String password,
+  });
 }

@@ -32,3 +32,19 @@ final class AuthLogout extends AuthEvent {}
 final class AuthLoginWithGoogle extends AuthEvent {}
 
 final class AuthStateRealtimeCheck extends AuthEvent {}
+
+final class AuthSendResetPasswordEmail extends AuthEvent {
+  final String email;
+
+  AuthSendResetPasswordEmail({
+    required this.email,
+  });
+}
+
+final class AuthUpdatePassword extends AuthEvent {
+  final String password;
+
+  AuthUpdatePassword({
+    required this.password,
+  });
+}

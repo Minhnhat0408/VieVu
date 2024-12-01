@@ -6,6 +6,8 @@ import 'package:vn_travel_companion/features/auth/data/repositories/auth_reposit
 import 'package:vn_travel_companion/features/auth/domain/repository/auth_repository.dart';
 import 'package:vn_travel_companion/features/auth/domain/usecases/current_user.dart';
 import 'package:vn_travel_companion/features/auth/domain/usecases/listen_auth_change.dart';
+import 'package:vn_travel_companion/features/auth/domain/usecases/send_reset_password_email.dart';
+import 'package:vn_travel_companion/features/auth/domain/usecases/update_password.dart';
 import 'package:vn_travel_companion/features/auth/domain/usecases/user_login.dart';
 import 'package:vn_travel_companion/features/auth/domain/usecases/user_logout.dart';
 import 'package:vn_travel_companion/features/auth/domain/usecases/user_signup.dart';
@@ -77,6 +79,16 @@ void _initAuth() {
         serviceLocator(),
       ),
     )
+    ..registerFactory(
+      () => SendResetPasswordEmail(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => UpdatePassword(
+        serviceLocator(),
+      ),
+    )
     ..registerLazySingleton(
       () => AuthBloc(
         userSignUp: serviceLocator(),
@@ -85,6 +97,8 @@ void _initAuth() {
         userLogout: serviceLocator(),
         appUserCubit: serviceLocator(),
         listenToAuthChanges: serviceLocator(),
+        sendEmailReset: serviceLocator(),
+        updatePassword: serviceLocator(),
       ),
     );
 }
