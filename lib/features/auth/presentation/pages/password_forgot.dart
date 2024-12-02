@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/send_email_reset.dart';
 
 class PasswordForgotPage extends StatelessWidget {
@@ -10,17 +11,7 @@ class PasswordForgotPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left),
-          iconSize: 36,
-          padding: const EdgeInsets.all(4),
-          onPressed: () {
-            Navigator.of(context).pop(); // Navigate back
-          },
-        ),
-      ),
+    return CustomAppbar(
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(

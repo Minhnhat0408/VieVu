@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/common/widgets/loader.dart';
+import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/validators.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
@@ -8,18 +9,18 @@ import 'package:vn_travel_companion/features/auth/presentation/widget/auth_submi
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 
-class ChangePasswordPage extends StatefulWidget {
+class ResetPasswordPage extends StatefulWidget {
   static route() {
-    return MaterialPageRoute(builder: (context) => const ChangePasswordPage());
+    return MaterialPageRoute(builder: (context) => const ResetPasswordPage());
   }
 
-  const ChangePasswordPage({super.key});
+  const ResetPasswordPage({super.key});
 
   @override
-  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
 }
 
-class _ChangePasswordPageState extends State<ChangePasswordPage> {
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -32,26 +33,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left),
-          iconSize: 36,
-          padding: const EdgeInsets.all(4),
-          onPressed: () {
-            Navigator.of(context).pop(); // Navigate back
-          },
-        ),
-      ),
+    return CustomAppbar(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           // TODO: implement listener
           if (state is AuthFailure) {
             showSnackbar(
                 context, 'Đặt lại mật khẩu thất bại', SnackBarState.error);
-            }
-            if (state is AuthUpdatePasswordSuccess) {
-              showSnackbar(context, 'Mật khẩu của bạn đã được cập nhật',
+          }
+          if (state is AuthUpdatePasswordSuccess) {
+            showSnackbar(context, 'Mật khẩu của bạn đã được cập nhật',
                 SnackBarState.success);
             Navigator.pushAndRemoveUntil(
                 context, SettingsPage.route(), (route) => false);

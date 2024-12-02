@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/validators.dart';
 import 'package:vn_travel_companion/core/common/widgets/loader.dart';
@@ -37,17 +38,7 @@ class _LogInPageState extends State<LogInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left),
-          iconSize: 36,
-          padding: const EdgeInsets.all(4),
-          onPressed: () {
-            Navigator.of(context).pop(); // Navigate back
-          },
-        ),
-      ),
+    return CustomAppbar(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {

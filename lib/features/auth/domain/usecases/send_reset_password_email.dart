@@ -3,6 +3,7 @@ import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/usecases/usecase.dart';
 import 'package:vn_travel_companion/features/auth/domain/repository/auth_repository.dart';
 
+
 class SendResetPasswordEmail implements UseCase<Unit, ResetEmailParams> {
   final AuthRepository authRepository;
 
@@ -14,7 +15,7 @@ class SendResetPasswordEmail implements UseCase<Unit, ResetEmailParams> {
 }
 
 class ResetEmailParams {
-  final String email; // nullable for Google login
+  final String email;
 
   const ResetEmailParams({
     required this.email,

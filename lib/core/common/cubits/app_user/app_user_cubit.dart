@@ -8,6 +8,7 @@ class AppUserCubit extends Cubit<AppUserState> {
   void resetPassword() {
     emit(AppUserPasswordRecovery());
   }
+
   void updateUser(User? user) {
     if (user != null) {
       emit(AppUserLoggedIn(user));

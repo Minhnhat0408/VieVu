@@ -1,16 +1,20 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/common/pages/introduction.dart';
+import 'package:vn_travel_companion/core/common/routes.dart';
 import 'package:vn_travel_companion/core/theme/theme.dart';
 import 'package:vn_travel_companion/core/theme/theme_provider.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/text_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/change_password.dart';
+import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/pages/initial_preferences.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 void main() async {
@@ -63,6 +67,7 @@ class _MyAppState extends State<MyApp> {
             themeMode: notifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             theme: theme.light(),
             darkTheme: theme.dark(),
+            routes: routes,
             home: BlocConsumer<AppUserCubit, AppUserState>(
               listener: (context, state) {
                 if (state is AppUserPasswordRecovery) {
@@ -75,11 +80,11 @@ class _MyAppState extends State<MyApp> {
               },
               builder: (context, state) {
                 if (state is AppUserLoggedIn) {
-                  return const SettingsPage();
+                  return const InitialPreferences();
                 }
 
                 if (state is AppUserPasswordRecovery) {
-                  return const ChangePasswordPage();
+                  return const ResetPasswordPage();
                 }
 
                 return const IntroductionPage();

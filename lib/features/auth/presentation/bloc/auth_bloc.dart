@@ -59,15 +59,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _onAuthSignUp(AuthSignUp event, Emitter<AuthState> emit) async {
     final res = await _userSignUp(UserSignUpParams(
         email: event.email, password: event.password, name: event.name));
-    res.fold((e) => emit(AuthFailure(e.message)),
-        (user) => _emitAuthSuccess(user, emit));
+    res.fold((e) => emit(AuthFailure(e.message)), (user) => AuthSuccess(user));
   }
 
   void _onAuthLogin(AuthLogin event, Emitter<AuthState> emit) async {
     final res = await _userLogin(UserLoginParams.emailPassword(
         email: event.email, password: event.password));
-    res.fold((e) => emit(AuthFailure(e.message)),
-        (user) => _emitAuthSuccess(user, emit));
+    res.fold((e) => emit(AuthFailure(e.message)), (user) => AuthSuccess(user));
   }
 
   void _startUserSubscription() =>
@@ -94,7 +92,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _onAuthLogout(AuthLogout event, Emitter<AuthState> emit) async {
     final res = await _userLogout(NoParams());
     res.fold((e) => emit(AuthFailure(e.message)), (_) {
-      _appUserCubit.updateUser(null);
       emit(AuthLogoutSuccess());
     });
   }
@@ -103,8 +100,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthLoginWithGoogle event, Emitter<AuthState> emit) async {
     final res = await _userLogin(const UserLoginParams.google());
 
-    res.fold((e) => emit(AuthFailure(e.message)),
-        (user) => _emitAuthSuccess(user, emit));
+    res.fold((e) => emit(AuthFailure(e.message)), (user) => AuthSuccess(user));
   }
 
   void _onSendResetPasswordEmail(
