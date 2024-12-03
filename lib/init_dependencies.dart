@@ -15,12 +15,19 @@ import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.da
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
+import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
+import 'package:vn_travel_companion/features/user_preference/data/repositories/preference_repository_implementation.dart';
+import 'package:vn_travel_companion/features/user_preference/data/repositories/travel_type_repository_implementation.dart';
+import 'package:vn_travel_companion/features/user_preference/domain/repositories/preference_repository.dart';
+import 'package:vn_travel_companion/features/user_preference/domain/repositories/travel_type_repository.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
   _initAuth();
-
+  _initPreference();
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -99,6 +106,38 @@ void _initAuth() {
         listenToAuthChanges: serviceLocator(),
         sendEmailReset: serviceLocator(),
         updatePassword: serviceLocator(),
+      ),
+    );
+}
+
+void _initPreference() {
+  serviceLocator
+    ..registerFactory<PreferencesRemoteDataSource>(
+      () => PreferencesRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<PreferenceRepository>(
+      () => PreferenceRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<TravelTypeRemoteDatasource>(
+      () => TravelTypeRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<TravelTypeRepository>(
+      () => TravelTypeRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => PreferencesBloc(
+        preferenceRepository: serviceLocator(),
+        travelTypeRepository: serviceLocator(),
       ),
     );
 }

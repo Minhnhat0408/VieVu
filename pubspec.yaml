@@ -47,6 +47,7 @@ dependencies:
   get_it: ^8.0.2
   flutter_dotenv: ^5.2.1
   easy_stepper: ^0.8.5+1
+  intl: ^0.20.1
 
 dev_dependencies:
   flutter_test:

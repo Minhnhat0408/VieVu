@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,7 +11,6 @@ import 'package:vn_travel_companion/core/utils/text_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
-import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/pages/initial_preferences.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
