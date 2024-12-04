@@ -36,7 +36,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return CustomAppbar(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          // TODO: implement listener
           if (state is AuthFailure) {
             showSnackbar(
                 context, 'Đặt lại mật khẩu thất bại', SnackBarState.error);

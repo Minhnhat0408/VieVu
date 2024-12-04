@@ -25,6 +25,16 @@ class SettingsPage extends StatelessWidget {
                 },
                 icon: Icon(
                     notifier.isDarkMode ? Icons.dark_mode : Icons.light_mode));
+          }),
+          Consumer<ThemeProvider>(builder: (context, notifier, child) {
+            return IconButton(
+                onPressed: () {
+                  context.read<ThemeProvider>().themeSystemOnChanged();
+                },
+                icon: Icon(
+                  Icons.computer,
+                  color: notifier.isSystemOn ? Colors.green : Colors.grey,
+                ));
           })
         ],
       ),

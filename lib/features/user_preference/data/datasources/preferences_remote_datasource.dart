@@ -9,17 +9,17 @@ abstract interface class PreferencesRemoteDataSource {
 
   Future<PreferenceModel> updateUserPreference({
     required String userId,
-    String? budget,
-    String? avgRating,
-    String? ratingCount,
+    double? budget,
+    double? avgRating,
+    int? ratingCount,
     Map<String, dynamic>? prefsDF,
   });
 
   Future<PreferenceModel> insertUserPreference({
     required String userId,
-    required String budget,
-    required String avgRating,
-    required String ratingCount,
+    required double budget,
+    required double avgRating,
+    required int ratingCount,
     required Map<String, dynamic> prefsDF,
   });
 }
@@ -55,9 +55,9 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
   @override
   Future<PreferenceModel> updateUserPreference({
     required String userId,
-    String? budget,
-    String? avgRating,
-    String? ratingCount,
+    double? budget,
+    double? avgRating,
+    int? ratingCount,
     Map<String, dynamic>? prefsDF,
   }) async {
     try {
@@ -86,9 +86,9 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
   @override
   Future<PreferenceModel> insertUserPreference({
     required String userId,
-    required String budget,
-    required String avgRating,
-    required String ratingCount,
+    required double budget,
+    required double avgRating,
+    required int ratingCount,
     required Map<String, dynamic> prefsDF,
   }) async {
     try {
@@ -97,7 +97,7 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
         'budget': budget,
         'avg_rating': avgRating,
         'rating_count': ratingCount,
-        'prefs_df': prefsDF,
+        'prefs_df': prefsDF.toString(),
       }).select();
 
       return PreferenceModel.fromJson({

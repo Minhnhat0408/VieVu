@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/common/pages/introduction.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/password_forgot.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/log_in.dart';

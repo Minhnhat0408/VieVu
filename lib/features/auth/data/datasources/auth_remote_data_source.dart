@@ -160,7 +160,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Stream<AuthState> listenToAuthChanges() =>
       supabaseClient.auth.onAuthStateChange.map(
         (event) {
-          print(event.toString());
           return event;
         },
       );

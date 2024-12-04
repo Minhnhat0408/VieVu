@@ -21,14 +21,3 @@ final class PreferencesFailure extends PreferencesState {
   PreferencesFailure(this.message);
 }
 
-final class TravelTypesLoadedSuccess extends PreferencesState {
-  final List<TravelType> travelTypes;
-
-  TravelTypesLoadedSuccess(this.travelTypes);
-}
-
-final class TravelTypesFailure extends PreferencesState {
-  final String message;
-
-  TravelTypesFailure(this.message);
-}

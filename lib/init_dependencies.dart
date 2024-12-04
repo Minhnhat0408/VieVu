@@ -21,7 +21,8 @@ import 'package:vn_travel_companion/features/user_preference/data/repositories/p
 import 'package:vn_travel_companion/features/user_preference/data/repositories/travel_type_repository_implementation.dart';
 import 'package:vn_travel_companion/features/user_preference/domain/repositories/preference_repository.dart';
 import 'package:vn_travel_companion/features/user_preference/domain/repositories/travel_type_repository.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -137,6 +138,10 @@ void _initPreference() {
     ..registerLazySingleton(
       () => PreferencesBloc(
         preferenceRepository: serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => TravelTypesBloc(
         travelTypeRepository: serviceLocator(),
       ),
     );

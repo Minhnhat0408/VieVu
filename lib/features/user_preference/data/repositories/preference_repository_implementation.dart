@@ -32,9 +32,9 @@ class PreferenceRepositoryImpl implements PreferenceRepository {
   @override
   Future<Either<Failure, Preference>> insertUserPreference({
     required String userId,
-    required String budget,
-    required String avgRating,
-    required String ratingCount,
+    required double budget,
+    required double avgRating,
+    required int ratingCount,
     required Map<String, dynamic> prefsDF,
   }) async {
     try {
@@ -58,9 +58,9 @@ class PreferenceRepositoryImpl implements PreferenceRepository {
   @override
   Future<Either<Failure, Preference>> updateUserPreference({
     required String userId,
-    String? budget,
-    String? avgRating,
-    String? ratingCount,
+    double? budget,
+    double? avgRating,
+    int? ratingCount,
     Map<String, dynamic>? prefsDF,
   }) async {
     try {

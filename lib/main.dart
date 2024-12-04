@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/common/pages/introduction.dart';
+import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
 import 'package:vn_travel_companion/core/common/routes.dart';
 import 'package:vn_travel_companion/core/theme/theme.dart';
 import 'package:vn_travel_companion/core/theme/theme_provider.dart';
@@ -11,6 +12,9 @@ import 'package:vn_travel_companion/core/utils/text_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
+import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/pages/initial_preferences.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
@@ -21,12 +25,10 @@ void main() async {
 
   runApp(MultiBlocProvider(
     providers: [
-      BlocProvider(
-        create: (_) => serviceLocator<AppUserCubit>(),
-      ),
-      BlocProvider(
-        create: (_) => serviceLocator<AuthBloc>(),
-      ),
+      BlocProvider(create: (_) => serviceLocator<AppUserCubit>()),
+      BlocProvider(create: (_) => serviceLocator<AuthBloc>()),
+      BlocProvider(create: (_) => serviceLocator<PreferencesBloc>()),
+      BlocProvider(create: (_) => serviceLocator<TravelTypesBloc>()),
     ],
     child: const MyApp(),
   ));
@@ -53,7 +55,7 @@ class _MyAppState extends State<MyApp> {
         createTextTheme(context, "Be Vietnam Pro", "Be Vietnam Pro");
 
     MaterialTheme theme = MaterialTheme(textTheme);
-
+    final brightness = MediaQuery.of(context).platformBrightness;
     return ChangeNotifierProvider(
       create: (BuildContext context) => ThemeProvider(),
       child: Consumer<ThemeProvider>(
@@ -61,7 +63,13 @@ class _MyAppState extends State<MyApp> {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'VietNam Travel Companion App',
-            themeMode: notifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            themeMode: notifier.isSystemOn
+                ? brightness == Brightness.dark
+                    ? ThemeMode.dark
+                    : ThemeMode.light
+                : notifier.isDarkMode
+                    ? ThemeMode.dark
+                    : ThemeMode.light,
             theme: theme.light(),
             darkTheme: theme.dark(),
             routes: routes,
@@ -72,12 +80,28 @@ class _MyAppState extends State<MyApp> {
                 }
 
                 if (state is AppUserLoggedIn) {
+                  context
+                      .read<PreferencesBloc>()
+                      .add(GetUserPreference(state.user.id));
                   Navigator.popUntil(context, (route) => route.isFirst);
                 }
               },
               builder: (context, state) {
+                if (state is AppUserInitial) {
+                  return const SplashScreenPage();
+                }
                 if (state is AppUserLoggedIn) {
-                  return const InitialPreferences();
+                  return BlocBuilder<PreferencesBloc, PreferencesState>(
+                    builder: (context, state) {
+                      if (state is PreferencesInitial) {
+                        return const SplashScreenPage();
+                      }
+                      if (state is NoPreferencesExits) {
+                        return const InitialPreferences();
+                      }
+                      return const SettingsPage();
+                    },
+                  );
                 }
 
                 if (state is AppUserPasswordRecovery) {

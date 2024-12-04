@@ -11,9 +11,9 @@ class GetUserPreference extends PreferencesEvent {
 
 class UpdatePreference extends PreferencesEvent {
   final String userId;
-  final String? budget;
-  final String? avgRating;
-  final String? ratingCount;
+  final double? budget;
+  final double? avgRating;
+  final int? ratingCount;
   final Map<String, dynamic>? prefsDF;
 
   UpdatePreference(
@@ -26,9 +26,9 @@ class UpdatePreference extends PreferencesEvent {
 
 class InsertPreference extends PreferencesEvent {
   final String userId;
-  final String budget;
-  final String avgRating;
-  final String ratingCount;
+  final double budget;
+  final double avgRating;
+  final int ratingCount;
   final Map<String, dynamic> prefsDF;
 
   InsertPreference({
@@ -40,9 +40,3 @@ class InsertPreference extends PreferencesEvent {
   });
 }
 
-class GetParentTravelTypes extends PreferencesEvent {}
-
-class GetTravelTypesByParentIds extends PreferencesEvent {
-  final List<String> parentIds;
-  GetTravelTypesByParentIds(this.parentIds);
-}

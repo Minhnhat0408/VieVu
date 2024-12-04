@@ -35,7 +35,6 @@ class _SendEmailResetPageState extends State<SendEmailResetPage> {
     return CustomAppbar(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          // TODO: implement listener
           if (state is AuthFailure) {
             showSnackbar(context, 'Gửi email thất bại', SnackBarState.error);
           }
