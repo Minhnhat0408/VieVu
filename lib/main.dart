@@ -85,13 +85,23 @@ class _MyAppState extends State<MyApp> {
                       .add(GetUserPreference(state.user.id));
                   Navigator.popUntil(context, (route) => route.isFirst);
                 }
+
+                if (state is AppUserInitial) {
+                  context.read<PreferencesBloc>().add(UserPreferenceSignOut());
+                  showSnackbar(context, 'Tài khoản của bạn đã đăng xuất');
+                }
               },
               builder: (context, state) {
                 if (state is AppUserInitial) {
                   return const SplashScreenPage();
                 }
                 if (state is AppUserLoggedIn) {
-                  return BlocBuilder<PreferencesBloc, PreferencesState>(
+                  return BlocConsumer<PreferencesBloc, PreferencesState>(
+                    listener: (context, state) {
+                      if (state is PreferencesFailure) {
+                        showSnackbar(context, state.message);
+                      }
+                    },
                     builder: (context, state) {
                       if (state is PreferencesInitial) {
                         return const SplashScreenPage();
@@ -99,7 +109,10 @@ class _MyAppState extends State<MyApp> {
                       if (state is NoPreferencesExits) {
                         return const InitialPreferences();
                       }
-                      return const SettingsPage();
+                      if (state is PreferencesLoadedSuccess) {
+                        return const SettingsPage();
+                      }
+                      return const SplashScreenPage();
                     },
                   );
                 }

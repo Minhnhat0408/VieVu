@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
@@ -16,6 +15,7 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
     on<GetUserPreference>(_onGetPreference);
     on<UpdatePreference>(_onUpdatePreference);
     on<InsertPreference>(_onInsertPreference);
+    on<UserPreferenceSignOut>(_onSignOut);
   }
 
   void _onGetPreference(
@@ -32,6 +32,10 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
         }
       },
     );
+  }
+
+  void _onSignOut(UserPreferenceSignOut event, Emitter<PreferencesState> emit) {
+    emit(PreferencesInitial());
   }
 
   void _onUpdatePreference(

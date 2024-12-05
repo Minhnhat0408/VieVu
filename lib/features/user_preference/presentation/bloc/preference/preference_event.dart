@@ -3,6 +3,7 @@ part of 'preference_bloc.dart';
 @immutable
 sealed class PreferencesEvent {}
 
+class UserPreferenceSignOut extends PreferencesEvent {} //sign out user
 class GetUserPreference extends PreferencesEvent {
   final String userId;
 

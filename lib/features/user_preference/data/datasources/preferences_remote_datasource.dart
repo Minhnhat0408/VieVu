@@ -1,3 +1,4 @@
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
@@ -48,7 +49,7 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
 
       return PreferenceModel.fromJson(response);
     } catch (e) {
-      throw const ServerException('Error getting user preferences');
+      throw ServerException(e.toString());
     }
   }
 
@@ -71,13 +72,13 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
       if (prefsDF != null) data['prefs_df'] = prefsDF;
 
       // Update the database with only the fields present in the data map
-      await supabaseClient
+      final response = await supabaseClient
           .from('user_preferences')
           .update(data)
           .eq('user_id', userId)
           .select();
 
-      return PreferenceModel.fromJson(data);
+      return PreferenceModel.fromJson(response.first);
     } catch (e) {
       throw ServerException('Error updating user preferences: $e');
     }
@@ -92,21 +93,15 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
     required Map<String, dynamic> prefsDF,
   }) async {
     try {
-      await supabaseClient.from('user_preferences').insert({
-        'user_id': userId,
-        'budget': budget,
-        'avg_rating': avgRating,
-        'rating_count': ratingCount,
-        'prefs_df': prefsDF.toString(),
-      }).select();
-
-      return PreferenceModel.fromJson({
+      final response = await supabaseClient.from('user_preferences').insert({
         'user_id': userId,
         'budget': budget,
         'avg_rating': avgRating,
         'rating_count': ratingCount,
         'prefs_df': prefsDF,
-      });
+      }).select();
+
+      return PreferenceModel.fromJson(response.first);
     } catch (e) {
       throw ServerException('Error inserting user preferences: $e');
     }

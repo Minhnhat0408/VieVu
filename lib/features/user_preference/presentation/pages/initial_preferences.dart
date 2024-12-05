@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:easy_stepper/easy_stepper.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/common/widgets/loader.dart';
+import 'package:vn_travel_companion/core/utils/generate_pref_map.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
-import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
 import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -182,8 +182,7 @@ class _InitialPreferencesState extends State<InitialPreferences> {
             avgRating: 0,
             budget: budget,
             ratingCount: 0,
-            prefsDF: PreferenceModel.generatePref(
-                travelTypes: _childTravelTypes, point: 3)));
+            prefsDF: generatePref(travelTypes: _childTravelTypes, point: 3)));
       };
     } else {
       return () {
