@@ -39,10 +39,7 @@ class _SendEmailResetPageState extends State<SendEmailResetPage> {
             showSnackbar(context, 'Gửi email thất bại', SnackBarState.error);
           }
           if (state is AuthSendResetPasswordEmailSuccess) {
-            showSnackbar(
-                context,
-                'Email xác nhận đã được gửi đến hòm thư của bạn',
-                SnackBarState.success);
+            _emailSentAnnouncer(context);
           }
         },
         builder: (context, state) {
@@ -71,17 +68,16 @@ class _SendEmailResetPageState extends State<SendEmailResetPage> {
                       ),
                       const SizedBox(height: 30),
                       AuthSubmitBtn(
-                        btnText: "Xác nhận",
-                        onPressed: () {
-                          if (formKey.currentState!.validate()) {
-                            context.read<AuthBloc>().add(
-                                  AuthSendResetPasswordEmail(
-                                    email: emailController.text,
-                                  ),
-                                );
-                          }
-                        },
-                      ),
+                          btnText: "Xác nhận",
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              context.read<AuthBloc>().add(
+                                    AuthSendResetPasswordEmail(
+                                      email: emailController.text,
+                                    ),
+                                  );
+                            }
+                          }),
                     ],
                   ),
                 ),
@@ -91,6 +87,40 @@ class _SendEmailResetPageState extends State<SendEmailResetPage> {
           );
         },
       ),
+    );
+  }
+
+  Future<void> _emailSentAnnouncer(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+          title: Text('Email đã được gửi!!',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  fontSize: 20)),
+          icon: Icon(
+            Icons.email,
+            size: 100,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          content: const Text(
+            'Vui lòng kiểm tra hòm thư của bạn để thay đổi mật khẩu.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Đóng'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
