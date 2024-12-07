@@ -5,6 +5,7 @@ import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.d
 import 'package:vn_travel_companion/core/common/pages/introduction.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
 import 'package:vn_travel_companion/core/common/routes.dart';
+import 'package:vn_travel_companion/core/layouts/bottom_nav_scaffold.dart';
 import 'package:vn_travel_companion/core/theme/theme.dart';
 import 'package:vn_travel_companion/core/theme/theme_provider.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
@@ -15,7 +16,6 @@ import 'package:vn_travel_companion/features/auth/presentation/pages/reset_passw
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/pages/initial_preferences.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 void main() async {
@@ -107,10 +107,42 @@ class _MyAppState extends State<MyApp> {
                         return const SplashScreenPage();
                       }
                       if (state is NoPreferencesExits) {
-                        return const InitialPreferences();
+                        return const SettingsPage();
                       }
                       if (state is PreferencesLoadedSuccess) {
-                        return const SettingsPage();
+                        return BottomNavScaffold(
+                          appBarTitle: "Settings",
+                          body: const SettingsPage(),
+                          actions: [
+                            Consumer<ThemeProvider>(
+                                builder: (context, notifier, child) {
+                              return IconButton(
+                                  onPressed: () {
+                                    context
+                                        .read<ThemeProvider>()
+                                        .themeOnChanged();
+                                  },
+                                  icon: Icon(notifier.isDarkMode
+                                      ? Icons.dark_mode
+                                      : Icons.light_mode));
+                            }),
+                            Consumer<ThemeProvider>(
+                                builder: (context, notifier, child) {
+                              return IconButton(
+                                  onPressed: () {
+                                    context
+                                        .read<ThemeProvider>()
+                                        .themeSystemOnChanged();
+                                  },
+                                  icon: Icon(
+                                    Icons.computer,
+                                    color: notifier.isSystemOn
+                                        ? Colors.green
+                                        : Colors.grey,
+                                  ));
+                            })
+                          ],
+                        );
                       }
                       return const SplashScreenPage();
                     },

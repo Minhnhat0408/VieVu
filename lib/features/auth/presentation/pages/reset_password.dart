@@ -43,8 +43,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           if (state is AuthUpdatePasswordSuccess) {
             showSnackbar(context, 'Mật khẩu của bạn đã được cập nhật',
                 SnackBarState.success);
-            Navigator.pushAndRemoveUntil(
-                context, SettingsPage.route(), (route) => false);
+            Navigator.pushNamedAndRemoveUntil(
+                context, 'settings', (route) => false);
           }
         },
         builder: (context, state) {

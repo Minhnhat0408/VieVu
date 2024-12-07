@@ -48,6 +48,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   easy_stepper: ^0.8.5+1
   intl: ^0.20.1
+  curved_navigation_bar: ^1.0.6
 
 dev_dependencies:
   flutter_test:

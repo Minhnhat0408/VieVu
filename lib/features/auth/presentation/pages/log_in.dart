@@ -99,7 +99,7 @@ class _LogInPageState extends State<LogInPage> {
                       const SizedBox(height: 15),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, PasswordForgotPage.route());
+                          Navigator.pushNamed(context, '/password-forgot');
                         },
                         child: Text(
                           'Quên mật khẩu?',
@@ -127,7 +127,7 @@ class _LogInPageState extends State<LogInPage> {
                       Center(
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.push(context, SignUpPage.route());
+                            Navigator.pushNamed(context, '/sign-up');
                           },
                           child: RichText(
                             text: TextSpan(

@@ -29,7 +29,7 @@ class PasswordForgotPage extends StatelessWidget {
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () {
-                  Navigator.push(context, SendEmailResetPage.route());
+                  Navigator.pushNamed(context, '/send-email-reset');
                 },
                 icon: const Icon(
                   Icons.email,

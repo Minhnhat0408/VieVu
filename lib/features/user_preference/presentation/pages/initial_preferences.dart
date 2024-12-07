@@ -43,8 +43,8 @@ class _InitialPreferencesState extends State<InitialPreferences> {
             if (state is PreferencesFailure) {
               showSnackbar(context, state.message);
             } else if (state is PreferencesLoadedSuccess) {
-              Navigator.pushAndRemoveUntil(
-                  context, SettingsPage.route(), (route) => false);
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/settings', (route) => false);
             }
           },
           builder: (context, state) {

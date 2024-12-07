@@ -11,15 +11,14 @@ void showSnackbar(BuildContext context, String message, [String? state]) {
     ..hideCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
-        content: Text(message,
-            style: const TextStyle(
-              color: Colors.white,
-            )),
+        content: Text(message),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
+        behavior: SnackBarBehavior.floating,
         backgroundColor: state == SnackBarState.warning
             ? const Color.fromARGB(255, 209, 131, 15)
             : state == SnackBarState.error
                 ? const Color.fromARGB(255, 172, 46, 37)
-                : const Color.fromARGB(255, 49, 117, 51),
+                : Theme.of(context).colorScheme.primary,
       ),
     );
 }

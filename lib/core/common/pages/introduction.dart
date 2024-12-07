@@ -75,7 +75,7 @@ class _IntroductionPageState extends State<IntroductionPage> {
                   slideIndicator(context),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(context, LogInPage.route());
+                      Navigator.pushNamed(context, '/login');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primaryContainer,

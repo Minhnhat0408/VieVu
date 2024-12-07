@@ -129,7 +129,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       Center(
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.push(context, LogInPage.route());
+                            Navigator.pushNamed(context, '/login');
                           },
                           child: RichText(
                             text: TextSpan(
