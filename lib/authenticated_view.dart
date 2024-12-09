@@ -2,6 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/log_in.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/explore.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 
 class AuthenticatedView extends StatefulWidget {
@@ -22,11 +23,9 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
   }
 
   final screens = [
-    Navigator(
-      onGenerateRoute: (settings) => SettingsPage.route(),
-    ),
-    const SplashScreenPage(),
     const SettingsPage(),
+    const SplashScreenPage(),
+    const ExplorePage(),
     const SplashScreenPage(),
     const SettingsPage(),
   ];
@@ -57,7 +56,6 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
     ];
 
     return Scaffold(
-      extendBody: true,
       body: screens[_selectedIndex],
       bottomNavigationBar: CurvedNavigationBar(
         key: _bottomNavigationKey,
@@ -73,6 +71,5 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
         },
       ),
     );
-    ;
   }
 }

@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // final brightness = View.of(context).platformDispatcher.platformBrightness;
     TextTheme textTheme =
-        createTextTheme(context, "Be Vietnam Pro", "Be Vietnam Pro");
+        createTextTheme(context, "Merriweather", "Merriweather");
 
     MaterialTheme theme = MaterialTheme(textTheme);
     final brightness = MediaQuery.of(context).platformBrightness;
