@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:vn_travel_companion/authenticated_view.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/common/pages/introduction.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
 import 'package:vn_travel_companion/core/common/routes.dart';
-import 'package:vn_travel_companion/core/layouts/bottom_nav_scaffold.dart';
 import 'package:vn_travel_companion/core/theme/theme.dart';
 import 'package:vn_travel_companion/core/theme/theme_provider.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
@@ -110,39 +110,7 @@ class _MyAppState extends State<MyApp> {
                         return const SettingsPage();
                       }
                       if (state is PreferencesLoadedSuccess) {
-                        return BottomNavScaffold(
-                          appBarTitle: "Settings",
-                          body: const SettingsPage(),
-                          actions: [
-                            Consumer<ThemeProvider>(
-                                builder: (context, notifier, child) {
-                              return IconButton(
-                                  onPressed: () {
-                                    context
-                                        .read<ThemeProvider>()
-                                        .themeOnChanged();
-                                  },
-                                  icon: Icon(notifier.isDarkMode
-                                      ? Icons.dark_mode
-                                      : Icons.light_mode));
-                            }),
-                            Consumer<ThemeProvider>(
-                                builder: (context, notifier, child) {
-                              return IconButton(
-                                  onPressed: () {
-                                    context
-                                        .read<ThemeProvider>()
-                                        .themeSystemOnChanged();
-                                  },
-                                  icon: Icon(
-                                    Icons.computer,
-                                    color: notifier.isSystemOn
-                                        ? Colors.green
-                                        : Colors.grey,
-                                  ));
-                            })
-                          ],
-                        );
+                        return const AuthenticatedView();
                       }
                       return const SplashScreenPage();
                     },

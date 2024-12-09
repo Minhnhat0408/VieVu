@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/layouts/bottom_nav_scaffold.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/password_forgot.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/log_in.dart';
@@ -8,7 +7,7 @@ import 'package:vn_travel_companion/features/auth/presentation/pages/sign_up.dar
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 
 Map<String, Widget Function(BuildContext)> routes = {
-  '/settings': (context) => const BottomNavScaffold(body: SettingsPage()),
+  '/settings': (context) => const SettingsPage(),
   '/send-email-reset': (context) => const SendEmailResetPage(),
   '/login': (context) => const LogInPage(),
   '/sign-up': (context) => const SignUpPage(),
