@@ -6,8 +6,6 @@ import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/validators.dart';
 import 'package:vn_travel_companion/core/common/widgets/loader.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/password_forgot.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/sign_up.dart';
 import 'package:vn_travel_companion/features/auth/presentation/widget/auth_field.dart';
 import 'package:vn_travel_companion/features/auth/presentation/widget/auth_submit_btn.dart';
 

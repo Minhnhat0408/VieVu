@@ -7,7 +7,6 @@ import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.da
 import 'package:vn_travel_companion/features/auth/presentation/widget/auth_field.dart';
 import 'package:vn_travel_companion/features/auth/presentation/widget/auth_submit_btn.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   static route() {

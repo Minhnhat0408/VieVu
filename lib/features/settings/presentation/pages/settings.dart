@@ -112,7 +112,7 @@ class SettingsPage extends StatelessWidget {
                           child: const Text('Test Animation'));
                     },
                     closedElevation: 0,
-                    transitionDuration: Duration(milliseconds: 2000),
+                    transitionDuration: const Duration(milliseconds: 2000),
                     closedShape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     openBuilder: (context, _) => const SettingsPage(),

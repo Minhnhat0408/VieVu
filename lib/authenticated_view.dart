@@ -1,7 +1,7 @@
+import 'package:animations/animations.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/log_in.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 
@@ -15,9 +15,14 @@ class AuthenticatedView extends StatefulWidget {
 class _AuthenticatedViewState extends State<AuthenticatedView> {
   final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
   int _selectedIndex = 0;
-
+  bool reversedTrans = false;
   void _onItemTapped(int index) {
     setState(() {
+      if (_selectedIndex > index) {
+        reversedTrans = true;
+      } else {
+        reversedTrans = false;
+      }
       _selectedIndex = index;
     });
   }
@@ -56,7 +61,25 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
     ];
 
     return Scaffold(
-      body: screens[_selectedIndex],
+      extendBody: true,
+      body: PageTransitionSwitcher(
+        // reverse: true, // uncomment to see transition in reverse
+        transitionBuilder: (
+          Widget child,
+          Animation<double> primaryAnimation,
+          Animation<double> secondaryAnimation,
+        ) {
+          return SharedAxisTransition(
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
+            child: child,
+          );
+        },
+        reverse: reversedTrans,
+        duration: const Duration(milliseconds: 1000),
+        child: screens[_selectedIndex],
+      ),
       bottomNavigationBar: CurvedNavigationBar(
         key: _bottomNavigationKey,
         index: _selectedIndex,
@@ -67,6 +90,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
         height: 54,
         onTap: (index) {
           //Handle button tap
+
           _onItemTapped(index);
         },
       ),

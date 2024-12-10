@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/send_email_reset.dart';
 
 class PasswordForgotPage extends StatelessWidget {
   static route() {

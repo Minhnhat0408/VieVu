@@ -4,7 +4,6 @@ import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.d
 import 'package:vn_travel_companion/core/common/widgets/loader.dart';
 import 'package:vn_travel_companion/core/utils/generate_pref_map.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
