@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/explore_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_appbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_attractions_section.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ExplorePage extends StatefulWidget {
   static route() {
@@ -58,12 +60,12 @@ class _ExplorePageState extends State<ExplorePage> {
           const SliverPadding(
               padding: EdgeInsets.only(bottom: 40.0),
               sliver: SliverToBoxAdapter(child: HotAttractionsSection())),
-          const SliverPadding(
-              padding: EdgeInsets.only(bottom: 40.0),
-              sliver: SliverToBoxAdapter(child: HotAttractionsSection())),
-          const SliverPadding(
-              padding: EdgeInsets.only(bottom: 40.0),
-              sliver: SliverToBoxAdapter(child: HotAttractionsSection())),
+          // const SliverPadding(
+          //     padding: EdgeInsets.only(bottom: 40.0),
+          //     sliver: SliverToBoxAdapter(child: HotAttractionsSection())),
+          // const SliverPadding(
+          //     padding: EdgeInsets.only(bottom: 40.0),
+          //     sliver: SliverToBoxAdapter(child: HotAttractionsSection())),
           const SliverPadding(padding: EdgeInsets.only(bottom: 80))
         ],
       ),

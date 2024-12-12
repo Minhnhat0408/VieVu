@@ -78,7 +78,10 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
         },
         reverse: reversedTrans,
         duration: const Duration(milliseconds: 1000),
-        child: screens[_selectedIndex],
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: screens,
+        ),
       ),
       bottomNavigationBar: CurvedNavigationBar(
         key: _bottomNavigationKey,

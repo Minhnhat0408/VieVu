@@ -4,7 +4,7 @@ class User {
   final String email;
   final String firstName;
   final String lastName;
-  final String? gender;
+  final String? gender; //TODO: Change to ENUM
   final String? phoneNumber;
   final String? avatarUrl;
   final String? dob;

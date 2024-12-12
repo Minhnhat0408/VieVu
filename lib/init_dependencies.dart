@@ -15,6 +15,11 @@ import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.da
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
+import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
+import 'package:vn_travel_companion/features/explore/data/repositories/explore_repository_implementation.dart';
+import 'package:vn_travel_companion/features/explore/domain/repositories/explore_repository.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/explore_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/repositories/preference_repository_implementation.dart';
@@ -29,6 +34,7 @@ final serviceLocator = GetIt.instance;
 Future<void> initDependencies() async {
   _initAuth();
   _initPreference();
+  _initExplore();
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -143,6 +149,32 @@ void _initPreference() {
     ..registerLazySingleton(
       () => TravelTypesBloc(
         travelTypeRepository: serviceLocator(),
+      ),
+    );
+}
+
+void _initExplore() {
+  serviceLocator
+    ..registerFactory<AttractionRemoteDatasource>(
+      () => AttractionRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<LocationRemoteDatasource>(
+      () => LocationRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<ExploreRepository>(
+      () => ExploreRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => ExploreBloc(
+        exploreRepository: serviceLocator(),
       ),
     );
 }

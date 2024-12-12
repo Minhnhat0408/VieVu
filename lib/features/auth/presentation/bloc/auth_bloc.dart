@@ -71,11 +71,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _startUserSubscription() =>
       _listenToAuthChanges(NoParams()).listen((res) {
         if (res.event == supabase.AuthChangeEvent.passwordRecovery) {
-          log("Password recovery");
+      
           _appUserCubit.resetPassword();
         } else if (res.event == supabase.AuthChangeEvent.signedIn ||
             res.event == supabase.AuthChangeEvent.userUpdated) {
-          log("User logged in");
+    
           add(AuthUserLoggedIn());
         } else if (res.event == supabase.AuthChangeEvent.signedOut) {
           _appUserCubit.updateUser(null);
@@ -84,7 +84,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _isUserLoggedIn(AuthUserLoggedIn event, Emitter<AuthState> emit) async {
     final res = await _currentUser(NoParams());
-    log('res: $res');
+
 
     res.fold((e) {
       _appUserCubit.updateUser(null);

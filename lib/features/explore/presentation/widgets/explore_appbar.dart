@@ -47,14 +47,14 @@ class _ExploreAppbarState extends State<ExploreAppbar> {
             tag: 'exploreSearch',
 
             child:
-                ExploreSearch(showNotification: false), // Your hero widget here
+                ExploreSearch(showNotification: false),
           ),
           expandedTitleScale: 1,
           background: Stack(
             fit: StackFit.expand,
             children: [
               ClipPath(
-                clipper: CurvedBottomClipper(curveOffset: 20),
+                clipper: CurvedBottomClipper(curveOffset: 30),
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
