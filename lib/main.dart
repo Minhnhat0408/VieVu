@@ -13,7 +13,8 @@ import 'package:vn_travel_companion/core/utils/text_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/explore_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
@@ -30,7 +31,8 @@ void main() async {
       BlocProvider(create: (_) => serviceLocator<AuthBloc>()),
       BlocProvider(create: (_) => serviceLocator<PreferencesBloc>()),
       BlocProvider(create: (_) => serviceLocator<TravelTypesBloc>()),
-      BlocProvider(create: (_) => serviceLocator<ExploreBloc>()),
+      BlocProvider(create: (_) => serviceLocator<AttractionBloc>()),
+      BlocProvider(create: (_) => serviceLocator<LocationBloc>()),
     ],
     child: const MyApp(),
   ));

@@ -2,10 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/explore_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attraction_big_card.dart';
 
 class HotAttractionsSection extends StatefulWidget {
@@ -19,12 +17,11 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
   @override
   void initState() {
     super.initState();
-    context.read<ExploreBloc>().add(GetHotAttractions(limit: 10, offset: 0));
+    context.read<AttractionBloc>().add(GetHotAttractions(limit: 10, offset: 0));
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,21 +35,21 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
                 .copyWith(fontWeight: FontWeight.bold),
           ),
         ),
-        BlocConsumer<ExploreBloc, ExploreState>(
+        BlocConsumer<AttractionBloc, AttractionState>(
           listener: (context, state) {
             // TODO: implement listener
-            if (state is ExploreFailure) {
+            if (state is AttractionFailure) {
               showSnackbar(context, state.message, 'error');
             }
           },
           builder: (context, state) {
-            if (state is ExploreLoading) {
+            if (state is AttractionLoading) {
               return const Center(child: CircularProgressIndicator());
             }
 
             if (state is AttractionsLoadedSuccess) {
               return SizedBox(
-                height: 410, // Height for the horizontal list
+                height: 390, // Height for the horizontal list
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: state.attractions.length, // Number of items
@@ -66,7 +63,7 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
                             ? 20.0
                             : 4.0, // Extra padding for the last item
                       ),
-                      child: AttractionCard(
+                      child: AttractionBigCard(
                         attraction: state.attractions[index],
                       ),
                     );

@@ -23,8 +23,7 @@ class LocationModel extends Location {
       cover: jsonn['cover'],
       latitude: jsonn['latitude'].toDouble(),
       longitude: jsonn['longitude'].toDouble(),
-      parentId:
-          jsonn['parent_id'] ? int.parse(jsonn['parent_id'].toString()) : null,
+      parentId: jsonn['parent_id'],
     );
   }
 

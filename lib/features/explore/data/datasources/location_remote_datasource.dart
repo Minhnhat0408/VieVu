@@ -1,6 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
 import 'package:vn_travel_companion/features/explore/data/models/location_model.dart';
 
 abstract interface class LocationRemoteDatasource {

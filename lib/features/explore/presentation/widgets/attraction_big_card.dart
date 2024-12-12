@@ -4,10 +4,10 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 
-class AttractionCard extends StatelessWidget {
+class AttractionBigCard extends StatelessWidget {
   final Attraction attraction;
 
-  const AttractionCard({required this.attraction, super.key});
+  const AttractionBigCard({required this.attraction, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,16 +26,22 @@ class AttractionCard extends StatelessWidget {
             // Image and Icon
             Stack(
               children: [
-                CachedNetworkImage(
-                  imageUrl: attraction.cover,
-                  fadeInDuration: const Duration(milliseconds: 200),
-                  width: double.infinity,
-                  height: 220,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
+                ClipRRect(
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(10),
                   ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  child: CachedNetworkImage(
+                    imageUrl: attraction.cover,
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    width: double.infinity,
+                    height: 220,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
                 ),
                 Positioned(
                   top: 8,
@@ -100,6 +106,7 @@ class AttractionCard extends StatelessWidget {
                         ),
                         child: Text(
                           travelType['type_name'] ?? '',
+                          maxLines: 1,
                           style: TextStyle(
                               fontSize: 12,
                               color: Theme.of(context).colorScheme.primary),

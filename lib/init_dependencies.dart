@@ -17,9 +17,12 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
-import 'package:vn_travel_companion/features/explore/data/repositories/explore_repository_implementation.dart';
-import 'package:vn_travel_companion/features/explore/domain/repositories/explore_repository.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/explore_bloc.dart';
+import 'package:vn_travel_companion/features/explore/data/repositories/attraction_repository_implementation.dart';
+import 'package:vn_travel_companion/features/explore/data/repositories/location_repository_implementation.dart';
+import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
+import 'package:vn_travel_companion/features/explore/domain/repositories/location_repository.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/repositories/preference_repository_implementation.dart';
@@ -35,6 +38,7 @@ Future<void> initDependencies() async {
   _initAuth();
   _initPreference();
   _initExplore();
+  _initLocation();
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -160,21 +164,35 @@ void _initExplore() {
         serviceLocator(),
       ),
     )
-    ..registerFactory<LocationRemoteDatasource>(
-      () => LocationRemoteDatasourceImpl(
-        serviceLocator(),
-      ),
-    )
-    ..registerFactory<ExploreRepository>(
-      () => ExploreRepositoryImpl(
-        serviceLocator(),
+    ..registerFactory<AttractionRepository>(
+      () => AttractionRepositoryImpl(
         serviceLocator(),
         serviceLocator(),
       ),
     )
     ..registerLazySingleton(
-      () => ExploreBloc(
-        exploreRepository: serviceLocator(),
+      () => AttractionBloc(
+        attractionRepository: serviceLocator(),
+      ),
+    );
+}
+
+void _initLocation() {
+  serviceLocator
+    ..registerFactory<LocationRemoteDatasource>(
+      () => LocationRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<LocationRepository>(
+      () => LocationRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => LocationBloc(
+        repository: serviceLocator(),
       ),
     );
 }
