@@ -92,4 +92,30 @@ class AttractionRepositoryImpl implements AttractionRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Attraction>>> getNearbyAttractions({
+    required double latitude,
+    required double longitude,
+    required int limit,
+    required int offset,
+    required int radius,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final attractions = await attractionRemoteDatasource.getNearbyAttractions(
+        latitude: latitude,
+        longitude: longitude,
+        limit: limit,
+        offset: offset,
+        radius: radius,
+      );
+
+      return right(attractions);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

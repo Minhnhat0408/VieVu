@@ -21,6 +21,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     on<GetHotLocations>(_onGetHotLocations);
     on<GetRecentViewedLocations>(_onGetRecentViewedLocations);
     on<UpsertRecentViewedLocations>(_onUpsertRecentViewedLocations);
+    
   }
 
   void _onGetLocation(GetLocation event, Emitter<LocationState> emit) async {

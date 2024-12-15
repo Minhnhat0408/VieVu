@@ -45,9 +45,7 @@ class _ExploreAppbarState extends State<ExploreAppbar> {
               bottom: calculatePadding(appBarHeight), left: 20, right: 20),
           title: const Hero(
             tag: 'exploreSearch',
-
-            child:
-                ExploreSearch(showNotification: false),
+            child: ExploreSearch(showNotification: false),
           ),
           expandedTitleScale: 1,
           background: Stack(

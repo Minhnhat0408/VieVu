@@ -12,7 +12,7 @@ class AttractionModel extends Attraction {
       required super.longitude,
       required super.locationId,
       required super.description,
-      required super.travelTypes,
+      super.travelTypes,
       super.ename,
       super.images,
       super.price,
@@ -21,7 +21,8 @@ class AttractionModel extends Attraction {
       super.openTimeRule,
       super.phone,
       super.avgRating,
-      super.ratingCount});
+      super.ratingCount,
+      super.distance});
 
   factory AttractionModel.fromJson(Map<String, dynamic> jsonn) {
     return AttractionModel(
@@ -46,6 +47,7 @@ class AttractionModel extends Attraction {
           jsonn['avg_rating'] != null ? jsonn['avg_rating'].toDouble() : 0,
       ratingCount: jsonn['rating_count'],
       travelTypes: jsonn['attraction_types'],
+      distance: jsonn['distance'] != null ? jsonn['distance'].toDouble() : 0,
     );
   }
 
@@ -69,6 +71,7 @@ class AttractionModel extends Attraction {
       'avg_rating': avgRating,
       'rating_count': ratingCount,
       'travel_types': travelTypes,
+      'distance': distance,
     };
   }
 
@@ -91,6 +94,7 @@ class AttractionModel extends Attraction {
     int? ratingCount,
     String? phone,
     List<Map<String, String>>? travelTypes,
+    double? distance,
   }) {
     return AttractionModel(
       id: id ?? this.id,
@@ -111,6 +115,7 @@ class AttractionModel extends Attraction {
       avgRating: avgRating ?? this.avgRating,
       ratingCount: ratingCount ?? this.ratingCount,
       travelTypes: travelTypes ?? this.travelTypes,
+      distance: distance ?? this.distance,
     );
   }
 }

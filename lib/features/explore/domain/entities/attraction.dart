@@ -16,7 +16,8 @@ class Attraction {
   final String? phone;
   final double? avgRating;
   final int? ratingCount;
-  final List<dynamic> travelTypes;
+  final List<dynamic>? travelTypes;
+  final double? distance;
 
   const Attraction({
     required this.id,
@@ -25,7 +26,7 @@ class Attraction {
     required this.cover,
     this.images,
     required this.hotScore,
-    required this.travelTypes,
+    this.travelTypes,
     this.price,
     this.rankInfo,
     required this.latitude,
@@ -37,5 +38,6 @@ class Attraction {
     this.phone,
     this.avgRating,
     this.ratingCount,
+    this.distance,
   });
 }

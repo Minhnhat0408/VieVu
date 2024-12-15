@@ -28,6 +28,14 @@ abstract interface class AttractionRemoteDatasource {
     required int attractionId,
     required String userId,
   });
+
+  Future<List<AttractionModel>> getNearbyAttractions({
+    required double latitude,
+    required double longitude,
+    required int limit,
+    required int offset,
+    required int radius,
+  });
 }
 
 class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
@@ -70,8 +78,8 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
           .order('hot_score', ascending: false)
           .range(offset, offset + limit);
 
+      log(response[0].toString());
       return response.map((e) {
-
         return AttractionModel.fromJson(e);
       }).toList();
     } catch (e) {
@@ -110,6 +118,32 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         'viewed_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<AttractionModel>> getNearbyAttractions({
+    required double latitude,
+    required double longitude,
+    required int limit,
+    required int offset,
+    required int radius,
+  }) async {
+    try {
+      final response = await supabaseClient.rpc('fetch_nearby_places', params: {
+        'lat': latitude,
+        'long': longitude,
+        'lim': limit,
+        'off_set': offset,
+        'proximity': radius,
+      });
+      final List<Map<String, dynamic>> data =
+          List<Map<String, dynamic>>.from(response);
+
+      return data.map((e) => AttractionModel.fromJson(e)).toList();
+    } catch (e) {
+      log("${e}hellloooo");
       throw ServerException(e.toString());
     }
   }

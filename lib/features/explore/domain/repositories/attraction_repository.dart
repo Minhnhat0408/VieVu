@@ -21,5 +21,13 @@ abstract interface class AttractionRepository {
     required String userId,
   });
 
+  Future<Either<Failure, List<Attraction>>> getNearbyAttractions({
+    required double latitude,
+    required double longitude,
+    required int limit,
+    required int offset,
+    required int radius,
+  });
+
   
 }

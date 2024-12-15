@@ -16,13 +16,18 @@ import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
+import 'package:vn_travel_companion/features/explore/data/datasources/event_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/repositories/attraction_repository_implementation.dart';
+import 'package:vn_travel_companion/features/explore/data/repositories/event_repository_implementation.dart';
 import 'package:vn_travel_companion/features/explore/data/repositories/location_repository_implementation.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
+import 'package:vn_travel_companion/features/explore/domain/repositories/event_repository.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/location_repository.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions_cubit.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/repositories/preference_repository_implementation.dart';
@@ -31,6 +36,7 @@ import 'package:vn_travel_companion/features/user_preference/domain/repositories
 import 'package:vn_travel_companion/features/user_preference/domain/repositories/travel_type_repository.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
+import 'package:http/http.dart' as http;
 
 final serviceLocator = GetIt.instance;
 
@@ -39,6 +45,7 @@ Future<void> initDependencies() async {
   _initPreference();
   _initExplore();
   _initLocation();
+  _initEvent();
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -47,10 +54,14 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(() => supabase.client);
 
   serviceLocator.registerFactory(() => InternetConnection());
-
+  serviceLocator.registerLazySingleton(() => http.Client());
   // core
   serviceLocator.registerLazySingleton(
     () => AppUserCubit(),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => NearbyAttractionsCubit(attractionRepository: serviceLocator()),
   );
   serviceLocator.registerFactory<ConnectionChecker>(
     () => ConnectionCheckerImpl(
@@ -192,6 +203,26 @@ void _initLocation() {
     )
     ..registerLazySingleton(
       () => LocationBloc(
+        repository: serviceLocator(),
+      ),
+    );
+}
+
+void _initEvent() {
+  serviceLocator
+    ..registerFactory<EventRemoteDatasource>(
+      () => EventRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<EventRepository>(
+      () => EventRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => EventBloc(
         repository: serviceLocator(),
       ),
     );

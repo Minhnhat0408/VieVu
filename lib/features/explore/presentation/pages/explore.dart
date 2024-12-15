@@ -3,7 +3,9 @@ import 'package:vn_travel_companion/features/explore/presentation/bloc/attractio
 import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_appbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_attractions_section.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_events.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_locations.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_attraction.dart';
 
 class ExplorePage extends StatefulWidget {
   static route() {
@@ -63,10 +65,13 @@ class _ExplorePageState extends State<ExplorePage> {
               sliver: SliverToBoxAdapter(child: HotAttractionsSection())),
           const SliverPadding(
               padding: EdgeInsets.only(bottom: 40.0),
+              sliver: SliverToBoxAdapter(child: NearbyAttractionSection())),
+          const SliverPadding(
+              padding: EdgeInsets.only(bottom: 40.0),
+              sliver: SliverToBoxAdapter(child: HotEventsSection())),
+          const SliverPadding(
+              padding: EdgeInsets.only(bottom: 40.0),
               sliver: SliverToBoxAdapter(child: HotLocationsSection())),
-          // const SliverPadding(
-          //     padding: EdgeInsets.only(bottom: 40.0),
-          //     sliver: SliverToBoxAdapter(child: HotAttractionsSection())),
           const SliverPadding(padding: EdgeInsets.only(bottom: 80))
         ],
       ),

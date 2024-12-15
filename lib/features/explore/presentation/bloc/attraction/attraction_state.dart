@@ -24,3 +24,4 @@ final class AttractionsLoadedSuccess extends AttractionState {
 
   AttractionsLoadedSuccess(this.attractions);
 }
+

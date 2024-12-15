@@ -59,4 +59,6 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
       (r) => () {},
     );
   }
+
+  
 }

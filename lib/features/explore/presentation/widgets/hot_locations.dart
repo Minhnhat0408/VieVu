@@ -15,7 +15,7 @@ class _HotLocationsSectionState extends State<HotLocationsSection> {
   @override
   void initState() {
     super.initState();
-    context.read<LocationBloc>().add(GetHotLocations(limit: 4, offset: 0));
+    context.read<LocationBloc>().add(GetHotLocations(limit: 3, offset: 0));
   }
 
   @override

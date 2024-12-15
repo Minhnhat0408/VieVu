@@ -55,6 +55,23 @@ class AttractionBigCard extends StatelessWidget {
                     icon: const Icon(Icons.favorite_border),
                   ),
                 ),
+                if (attraction.rankInfo != null)
+                  Positioned(
+                    bottom: 8,
+                    left: 8,
+                    child: Container(
+                      padding: EdgeInsets.zero,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white),
+                      clipBehavior: Clip.hardEdge,
+                      child: Image.asset(
+                        'assets/images/tripbest.png',
+                        width: 75,
+                        height: 25,
+                      ),
+                    ),
+                  ),
               ],
             ),
             Padding(
@@ -94,7 +111,7 @@ class AttractionBigCard extends StatelessWidget {
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
-                    children: attraction.travelTypes.map<Widget>((travelType) {
+                    children: attraction.travelTypes!.map<Widget>((travelType) {
                       return Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 2),
@@ -118,8 +135,12 @@ class AttractionBigCard extends StatelessWidget {
                   // Price
                   if (attraction.price != null)
                     Text(
-                      'Giá: ${NumberFormat('#,###').format(attraction.price)} VND',
-                      style: Theme.of(context).textTheme.labelMedium,
+                      'Từ: ${NumberFormat('#,###').format(attraction.price)} VND',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                 ],
               ),
