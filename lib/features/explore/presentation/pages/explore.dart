@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_appbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_attractions_section.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_events.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_locations.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_attraction.dart';

@@ -13,7 +13,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   })  : _locationRepository = repository,
         super(LocationInitial()) {
     on<LocationEvent>((event, emit) {
-      // TODO: implement event handler
       return emit(LocationLoading());
     });
 

@@ -4,10 +4,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attraction_big_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attraction_small_card.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class NearbyAttractionSection extends StatefulWidget {
   const NearbyAttractionSection({super.key});
@@ -20,6 +19,7 @@ class NearbyAttractionSection extends StatefulWidget {
 class _NearbyAttractionSectionState extends State<NearbyAttractionSection> {
   LocationPermission locationPermission = LocationPermission.denied;
   List<double>? userPos;
+  final nearbyAttractionsCubit = serviceLocator<NearbyAttractionsCubit>();
 
   @override
   void initState() {
@@ -31,16 +31,9 @@ class _NearbyAttractionSectionState extends State<NearbyAttractionSection> {
     await Hive.initFlutter();
     await Hive.openBox('locationBox');
     await _checkLocationPermissionAndHandle();
-    if (userPos != null &&
-            locationPermission == LocationPermission.whileInUse ||
-        locationPermission == LocationPermission.always) {
-      // Load nearby attractions
-      context.read<NearbyAttractionsCubit>().fetchNearbyAttractions(
-          latitude: userPos![0],
-          longitude: userPos![1],
-          limit: 5,
-          offset: 0,
-          radius: 30);
+
+    if (_hasLocationPermission() && userPos != null) {
+      _fetchNearbyAttractions();
     }
   }
 
@@ -108,18 +101,34 @@ class _NearbyAttractionSectionState extends State<NearbyAttractionSection> {
       return;
     }
 
-    // Permission granted: Update and store location
-    await _updateAndStoreCurrentLocation();
-    context.read<NearbyAttractionsCubit>().fetchNearbyAttractions(
-          latitude: userPos![0],
-          longitude: userPos![1],
-          limit: 5,
-          offset: 0,
-          radius: 30,
-        );
     setState(() {
       locationPermission = permission;
     });
+
+    await _updateAndStoreCurrentLocation();
+
+    if (userPos != null) {
+      _fetchNearbyAttractions();
+    }
+  }
+
+  void _fetchNearbyAttractions() {
+    if (userPos != null) {
+      nearbyAttractionsCubit.fetchNearbyAttractions(
+        latitude: userPos![0],
+        longitude: userPos![1],
+        limit: 5,
+        offset: 0,
+        radius: 30,
+      );
+    } else {
+      log('User position is null. Skipping fetching attractions.');
+    }
+  }
+
+  bool _hasLocationPermission() {
+    return locationPermission == LocationPermission.whileInUse ||
+        locationPermission == LocationPermission.always;
   }
 
   @override

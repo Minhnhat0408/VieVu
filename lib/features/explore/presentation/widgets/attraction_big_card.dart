@@ -33,6 +33,7 @@ class AttractionBigCard extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: attraction.cover,
                     fadeInDuration: const Duration(milliseconds: 200),
+                    filterQuality: FilterQuality.medium,
                     width: double.infinity,
                     height: 220,
                     fit: BoxFit.cover,

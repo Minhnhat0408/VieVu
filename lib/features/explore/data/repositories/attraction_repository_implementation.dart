@@ -3,9 +3,7 @@ import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
-import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
 
 class AttractionRepositoryImpl implements AttractionRepository {

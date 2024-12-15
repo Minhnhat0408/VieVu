@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,7 +36,6 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
         ),
         BlocConsumer<AttractionBloc, AttractionState>(
           listener: (context, state) {
-            // TODO: implement listener
             if (state is AttractionFailure) {
               showSnackbar(context, state.message, 'error');
             }

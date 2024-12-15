@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 
