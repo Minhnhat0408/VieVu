@@ -6,6 +6,7 @@ class ExploreSearchResultModel extends ExploreSearchResult {
     super.address,
     required super.id,
     required super.type,
+    super.cover,
   });
 
   factory ExploreSearchResultModel.fromJson(Map<String, dynamic> json) {
@@ -14,6 +15,7 @@ class ExploreSearchResultModel extends ExploreSearchResult {
       address: json['address'],
       id: json['id'],
       type: json['table_name'],
+      cover: json['cover'],
     );
   }
 
@@ -23,6 +25,7 @@ class ExploreSearchResultModel extends ExploreSearchResult {
       'address': address,
       'id': id,
       'type': type,
+      'cover': cover,
     };
   }
 

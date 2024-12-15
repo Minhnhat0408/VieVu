@@ -28,6 +28,10 @@ import 'package:vn_travel_companion/features/explore/presentation/bloc/attractio
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions_cubit.dart';
+import 'package:vn_travel_companion/features/search/data/datasources/search_remote_datasource.dart';
+import 'package:vn_travel_companion/features/search/data/repositories/explore_search_repository_implementation.dart';
+import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
+import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/repositories/preference_repository_implementation.dart';
@@ -46,6 +50,7 @@ Future<void> initDependencies() async {
   _initExplore();
   _initLocation();
   _initEvent();
+  _initSearch();
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -223,6 +228,26 @@ void _initEvent() {
     )
     ..registerLazySingleton(
       () => EventBloc(
+        repository: serviceLocator(),
+      ),
+    );
+}
+
+void _initSearch() {
+  serviceLocator
+    ..registerFactory<SearchRemoteDataSource>(
+      () => SearchRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<ExploreSearchRepository>(
+      () => ExploreSearchRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => SearchBloc(
         repository: serviceLocator(),
       ),
     );

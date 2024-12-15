@@ -1,0 +1,33 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
+
+part 'search_event.dart';
+part 'search_state.dart';
+
+class SearchBloc extends Bloc<SearchEvent, SearchState> {
+  final ExploreSearchRepository _exploreSearchRepository;
+  SearchBloc({
+    required ExploreSearchRepository repository,
+  })  : _exploreSearchRepository = repository,
+        super(SearchInitial()) {
+    on<SearchEvent>((event, emit) {
+      return emit(SearchLoading());
+    });
+
+    on<ExploreSearch>(_onExploreSearch);
+  }
+
+  void _onExploreSearch(ExploreSearch event, Emitter<SearchState> emit) async {
+    final res = await _exploreSearchRepository.exploreSearch(
+      searchText: event.searchText,
+      limit: event.limit,
+      offset: event.offset,
+    );
+    res.fold(
+      (l) => emit(SearchError(message: l.message)),
+      (r) => emit(SearchSuccess(results: r)),
+    );
+  }
+}

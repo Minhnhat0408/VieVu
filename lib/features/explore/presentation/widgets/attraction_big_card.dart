@@ -31,11 +31,12 @@ class AttractionBigCard extends StatelessWidget {
                     Radius.circular(10),
                   ),
                   child: CachedNetworkImage(
-                    imageUrl: attraction.cover,
+                    imageUrl: "${attraction.cover}?w=90&h=90",
                     fadeInDuration: const Duration(milliseconds: 200),
-                    filterQuality: FilterQuality.medium,
+                    filterQuality: FilterQuality.low,
                     width: double.infinity,
                     height: 220,
+                    useOldImageOnUrlChange: true,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(),

@@ -1,6 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vn_travel_companion/features/search/presentation/widgets/explore_search_item.dart';
 
 class ExploreSearchPage extends StatefulWidget {
   static route() {
@@ -27,37 +32,19 @@ class ExploreSearchPage extends StatefulWidget {
 
 class _ExploreSearchState extends State<ExploreSearchPage> {
   final TextEditingController _searchController = TextEditingController();
-  Timer? _debounce; // Timer for debouncing
-  bool _isLoading = false; // Loading state
-  List<Map<String, dynamic>> _results = []; // Store search results
-
-  // Simulate search API call
-  Future<List<Map<String, dynamic>>> _search(String keyword) async {
-    await Future.delayed(const Duration(seconds: 1)); // Simulated delay
-    // Example response similar to your API
-    return [
-      {'type': 'travel_types', 'name': 'Núi', 'score': 2.06},
-      {'type': 'attractions', 'name': 'núi Bà Đen', 'score': 0.086},
-      {'type': 'attractions', 'name': 'Đồn Pháp', 'score': 0.082},
-      {'type': 'locations', 'name': 'P. Núi Sam', 'score': 0.060},
-    ]
-        .where((item) => (item['name'] as String)
-            .toLowerCase()
-            .contains(keyword.toLowerCase()))
-        .toList();
-  }
+  Timer? _debounce; 
+  List<ExploreSearchResult> _results = []; 
 
   // Handle text changes with debounce
   void _onSearchChanged(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
+    _debounce = Timer(const Duration(milliseconds: 1000), () async {
       if (keyword.isNotEmpty) {
-        setState(() => _isLoading = true);
-        final results = await _search(keyword);
-        setState(() {
-          _results = results;
-          _isLoading = false;
-        });
+        context.read<SearchBloc>().add(ExploreSearch(
+              searchText: keyword,
+              limit: 10,
+              offset: 0,
+            ));
       } else {
         setState(() => _results = []);
       }
@@ -77,19 +64,6 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
     _searchController.dispose();
     _debounce?.cancel();
     super.dispose();
-  }
-
-  IconData _getIconForType(String type) {
-    switch (type) {
-      case 'attractions':
-        return Icons.attractions;
-      case 'locations':
-        return Icons.place;
-      case 'travel_types':
-        return Icons.terrain;
-      default:
-        return Icons.help_outline;
-    }
   }
 
   @override
@@ -126,30 +100,51 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          if (_isLoading)
-            const LinearProgressIndicator(), // Show loading indicator
-          Expanded(
-            child: _results.isEmpty
-                ? const Center(child: Text('No results found'))
-                : Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: ListView.builder(
-                      itemCount: _results.length,
-                      itemBuilder: (context, index) {
-                        final result = _results[index];
-                        return ListTile(
-                          leading: Icon(_getIconForType(result['type'])),
-                          title: Text(result['name']),
-                          subtitle: Text(
-                              'Type: ${result['type']} | Score: ${result['score']}'),
-                        );
-                      },
-                    ),
-                  ),
-          ),
-        ],
+      body: BlocConsumer<SearchBloc, SearchState>(
+        listener: (context, state) {
+          if (state is SearchSuccess) {
+            setState(() {
+              _results = state.results;
+            });
+          }
+          if (state is SearchError) {
+            showSnackbar(
+              context,
+              state.message,
+              'error',
+            );
+          }
+        },
+        builder: (context, state) {
+          return Column(
+            children: [
+              if (state is SearchLoading)
+                const LinearProgressIndicator(), // Show loading indicator
+              Expanded(
+                child: _results.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Column(children: [
+                          ExploreSearchItem(),
+                          SizedBox(height: 20),
+                        ]),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: ListView.builder(
+                          itemCount: _results.length,
+                          itemBuilder: (context, index) {
+                            final result = _results[index];
+                            return ExploreSearchItem(
+                              result: result,
+                            );
+                          },
+                        ),
+                      ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
