@@ -4,6 +4,9 @@ class ExploreSearchResult {
   final String id;
   final String type;
   final String? cover;
+  final int? ratingCount;
+  final double? avgRating;
+  final double? hotScore;
 
   ExploreSearchResult({
     required this.title,
@@ -11,5 +14,8 @@ class ExploreSearchResult {
     required this.id,
     required this.type,
     this.cover,
+    this.ratingCount,
+    this.avgRating,
+    this.hotScore,
   });
 }

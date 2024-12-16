@@ -7,5 +7,18 @@ abstract interface class ExploreSearchRepository {
     required String searchText,
     required int limit,
     required int offset,
+    String searchType = 'all',
+  });
+
+  Future<Either<Failure,List<ExploreSearchResult>>> searchEvents({
+    required String searchText,
+    required int limit,
+    required int page,
+  });
+
+  Future<Either<Failure,List<ExploreSearchResult>>> searchAll({
+    required String searchText,
+    required int limit,
+    required int offset,
   });
 }

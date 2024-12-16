@@ -238,6 +238,7 @@ void _initSearch() {
     ..registerFactory<SearchRemoteDataSource>(
       () => SearchRemoteDataSourceImpl(
         serviceLocator(),
+        serviceLocator(),
       ),
     )
     ..registerFactory<ExploreSearchRepository>(

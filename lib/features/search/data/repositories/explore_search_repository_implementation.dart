@@ -18,6 +18,7 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
     required String searchText,
     required int limit,
     required int offset,
+    String searchType = 'all',
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -25,6 +26,54 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
       }
       final List<ExploreSearchResult> searchResults =
           await searchRemoteDataSource.exploreSearch(
+        searchText: searchText,
+        limit: limit,
+        offset: offset,
+        searchType: searchType,
+      );
+
+      return right(searchResults);
+    } catch (e) {
+      throw left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ExploreSearchResult>>> searchEvents({
+    required String searchText,
+    required int limit,
+    required int page,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final List<ExploreSearchResult> searchResults =
+          await searchRemoteDataSource.searchEvents(
+        searchText: searchText,
+        limit: limit,
+        page: page,
+      );
+
+      return right(searchResults);
+    } catch (e) {
+      throw left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ExploreSearchResult>>>
+      searchAll({
+    required String searchText,
+    required int limit,
+    required int offset,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final List<ExploreSearchResult> searchResults =
+          await searchRemoteDataSource.searchAll(
         searchText: searchText,
         limit: limit,
         offset: offset,

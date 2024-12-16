@@ -80,7 +80,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
         duration: const Duration(milliseconds: 1000),
         child: IndexedStack(
           index: _selectedIndex,
-          children: screens,
+          children: screens as List<Widget>,
         ),
       ),
       bottomNavigationBar: CurvedNavigationBar(

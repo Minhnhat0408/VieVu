@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_search.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_search_button.dart';
 
 class ExploreAppbar extends StatefulWidget {
   const ExploreAppbar({super.key});
@@ -45,7 +45,7 @@ class _ExploreAppbarState extends State<ExploreAppbar> {
               bottom: calculatePadding(appBarHeight), left: 20, right: 20),
           title: const Hero(
             tag: 'exploreSearch',
-            child: ExploreSearch(showNotification: false),
+            child: ExploreSearchButton(showNotification: false),
           ),
           expandedTitleScale: 1,
           background: Stack(

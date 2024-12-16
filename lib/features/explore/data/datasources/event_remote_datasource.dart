@@ -14,9 +14,9 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
 
   @override
   Future<List<EventModel>> getHotEvents() async {
-    final url = Uri.parse(
-        'https://api-v2.ticketbox.vn/gin/api/v2/discovery/categories');
-    try {
+   
+ final url = Uri.parse(
+        'https://api-v2.ticketbox.vn/gin/api/v2/discovery/categories');    try {
       // Fetch trending events
       final response = await client.get(url);
  

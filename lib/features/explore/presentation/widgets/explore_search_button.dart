@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/features/search/presentation/pages/explore_search_page.dart';
 
-class ExploreSearch extends StatefulWidget {
+class ExploreSearchButton extends StatelessWidget {
   final bool showNotification;
-  const ExploreSearch({super.key, required this.showNotification});
+  const ExploreSearchButton({super.key, required this.showNotification});
 
-  @override
-  State<ExploreSearch> createState() => _ExploreSearchState();
-}
-
-class _ExploreSearchState extends State<ExploreSearch> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -36,9 +31,9 @@ class _ExploreSearchState extends State<ExploreSearch> {
           ),
           AnimatedOpacity(
             duration: const Duration(milliseconds: 500),
-            opacity: widget.showNotification ? 1.0 : 0.0,
+            opacity: showNotification ? 1.0 : 0.0,
             child: IconButton(
-              onPressed: widget.showNotification ? () {} : null,
+              onPressed: showNotification ? () {} : null,
               icon: const Icon(Icons.notifications_none),
               color: Theme.of(context).colorScheme.primary,
             ),

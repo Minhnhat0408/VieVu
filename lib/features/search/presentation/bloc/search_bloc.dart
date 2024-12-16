@@ -16,7 +16,23 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       return emit(SearchLoading());
     });
 
+    on<SearchAll>(_onSearchAll);
     on<ExploreSearch>(_onExploreSearch);
+    on<EventsSearch>(_onEventsSearch);
+
+
+  }
+
+  void _onSearchAll(SearchAll event, Emitter<SearchState> emit) async {
+    final res = await _exploreSearchRepository.searchAll(
+      searchText: event.searchText,
+      limit: event.limit,
+      offset: event.offset,
+    );
+    res.fold(
+      (l) => emit(SearchError(message: l.message)),
+      (r) => emit(SearchSuccess(results: r)),
+    );
   }
 
   void _onExploreSearch(ExploreSearch event, Emitter<SearchState> emit) async {
@@ -24,6 +40,19 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       searchText: event.searchText,
       limit: event.limit,
       offset: event.offset,
+      searchType: event.searchType,
+    );
+    res.fold(
+      (l) => emit(SearchError(message: l.message)),
+      (r) => emit(SearchSuccess(results: r)),
+    );
+  }
+
+  void _onEventsSearch(EventsSearch event, Emitter<SearchState> emit) async {
+    final res = await _exploreSearchRepository.searchEvents(
+      searchText: event.searchText,
+      limit: event.limit,
+      page: event.page,
     );
     res.fold(
       (l) => emit(SearchError(message: l.message)),
