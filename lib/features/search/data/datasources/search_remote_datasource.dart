@@ -93,7 +93,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
           decodedBody,
         );
         for (var event in eventData['data']['results']) {
-          final eventId = event['id'];
+          final eventId = event['originalId'];
           final detailsUrl = Uri.parse(
               'https://api-v2.ticketbox.vn/gin/api/v1/events/$eventId');
           final detailEvent = await client.get(
@@ -105,6 +105,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
             final details = json.decode(
               decodedBodyDetails,
             );
+       
             data.add({
               'title': event['name'],
               'address': details['data']['result']['address'],
