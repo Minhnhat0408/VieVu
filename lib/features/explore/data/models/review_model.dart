@@ -37,13 +37,13 @@ class ReviewModel extends Review {
     }
 
     return ReviewModel(
-      id: json['id'],
-      title: json['title'],
-      nickName: json['nickName'],
+      id: json['commentId'],
+      title: json['translateTitle'],
+      nickName: json['nickname'],
       avatar: json['headPhoto'],
       tripType: json['tripType'],
       contentSize: json['contentSize'],
-      content: json['content'],
+      content: json['translateContent'],
       score: json['score'],
       createdAt: dateTime,
     );

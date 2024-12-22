@@ -4,7 +4,7 @@ import 'package:vn_travel_companion/features/explore/domain/entities/review.dart
 
 abstract interface class ReviewRepository {
   Future<Either<Failure, List<Review>>> getAttractionReviews({
-    required String attractionId,
+    required int attractionId,
     required int limit,
     required int pageIndex,
   });

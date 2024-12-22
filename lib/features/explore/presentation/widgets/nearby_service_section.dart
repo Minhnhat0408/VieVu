@@ -126,14 +126,26 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                 services[_selectedFilter] != null &&
                 services[_selectedFilter]!.length == 5)
               Center(
-                child: OutlinedButton(
+                child: Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  width: 300,
+                  child: OutlinedButton(
                     onPressed: () {},
                     style: OutlinedButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer,
-                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        width: 1.5,
+                      ),
                     ),
-                    child: const Text('Xem tất cả')),
+                    child: Text(
+                      'Xem tất cả $_selectedFilter',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
               ),
             if (state is NearbyServicesLoadedSuccess &&
                     services[_selectedFilter]!.isEmpty ||

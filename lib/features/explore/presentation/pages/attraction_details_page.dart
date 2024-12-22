@@ -18,6 +18,7 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/filter
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/service_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_service_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/open_time_display.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/slider_pagination.dart';
 
 class AttractionDetailsPage extends StatefulWidget {
@@ -275,15 +276,70 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
                             ],
                           ),
                         const SizedBox(height: 20),
-                        NearbyServiceSection(attractionId: widget.attractionId),
-                        Text(
-                          'Đánh giá',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(fontWeight: FontWeight.bold),
+                        const Divider(
+                          thickness: 1.5,
+                          height: 40,
                         ),
-                        const SizedBox(height: 10),
+                        NearbyServiceSection(attractionId: widget.attractionId),
+                        const SizedBox(height: 20),
+                        const Divider(
+                          thickness: 1.5,
+                          height: 40,
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Đánh giá từ cộng đồng',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondaryContainer,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    FaIcon(
+                                      FontAwesomeIcons.heartCirclePlus,
+                                      size: 20,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      "${attraction.avgRating}/5",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        ReviewsSection(
+                          serviceId: widget.attractionId,
+                          totalReviews: state.attraction.ratingCount ?? 0,
+                        ),
                       ],
                     ),
                   ),

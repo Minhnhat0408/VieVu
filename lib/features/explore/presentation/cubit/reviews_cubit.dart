@@ -13,7 +13,7 @@ class ReviewsCubit extends Cubit<ReviewsState> {
         super(ReviewsInitial());
 
   Future<void> fetchReviews({
-    required String attractionId,
+    required int attractionId,
     required int limit,
     required int pageIndex,
   }) async {

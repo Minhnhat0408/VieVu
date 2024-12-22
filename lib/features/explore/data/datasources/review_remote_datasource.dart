@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
@@ -7,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 abstract interface class ReviewRemoteDataSource {
   Future<List<ReviewModel>> getAttractionReviews({
-    required String attractionId,
+    required int attractionId,
     required int limit,
     required int pageIndex,
   });
@@ -20,7 +21,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
 
   @override
   Future<List<ReviewModel>> getAttractionReviews({
-    required String attractionId,
+    required int attractionId,
     required int limit,
     required int pageIndex,
   }) async {
@@ -61,10 +62,13 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
       );
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        final reviewList =
-            jsonResponse['result']['commentInfoTypes'] as List<dynamic>;
+        final reviewList = jsonResponse['result'];
+        if (reviewList == null) {
+          throw ServerException("Failed to fetch data: ${response.statusCode}");
+        }
+        final reviews = reviewList['commentInfoTypes'] as List;
 
-        return reviewList
+        return reviews
             .map((item) => ReviewModel.fromJson(item as Map<String, dynamic>))
             .toList();
       } else {

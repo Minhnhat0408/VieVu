@@ -9,11 +9,12 @@ import 'package:vn_travel_companion/features/explore/domain/repositories/review_
 class ReviewRepositoryImpl implements ReviewRepository {
   final ReviewRemoteDataSource reviewRemoteDataSource;
   final ConnectionChecker connectionChecker;
-  const ReviewRepositoryImpl(this.reviewRemoteDataSource, this.connectionChecker);
+  const ReviewRepositoryImpl(
+      this.reviewRemoteDataSource, this.connectionChecker);
 
   @override
   Future<Either<Failure, List<Review>>> getAttractionReviews({
-    required String attractionId,
+    required int attractionId,
     required int limit,
     required int pageIndex,
   }) async {
@@ -32,5 +33,4 @@ class ReviewRepositoryImpl implements ReviewRepository {
       return left(Failure(e.message));
     }
   }
-  
 }

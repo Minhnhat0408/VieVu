@@ -1,5 +1,5 @@
 class Review {
-  final String id;
+  final int id;
   final String title;
   final String nickName;
   final String avatar;
