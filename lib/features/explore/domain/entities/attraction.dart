@@ -1,4 +1,4 @@
-class Attraction {
+class Attraction  {
   final int id;
   final String name;
   final String? ename;

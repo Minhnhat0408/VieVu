@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/widgets/explore_search_item.dart';
@@ -96,35 +98,18 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        centerTitle: true,
-        scrolledUnderElevation: 0.0,
-        leading: Navigator.canPop(context)
-            ? IconButton(
-                icon: const Icon(Icons.chevron_left),
-                iconSize: 36,
-                padding: const EdgeInsets.all(4),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Navigate back
-                },
-              )
-            : null,
-        title: Text(
-          '"${widget.keyword}"',
-          style: const TextStyle(fontSize: 20),
+    return CustomAppbar(
+      appBarTitle: '"${widget.keyword}"',
+      centerTitle: true,
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/search-page',
+                arguments: widget.keyword);
+          },
+          icon: const Icon(Icons.search),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/search-page',
-                  arguments: widget.keyword);
-            },
-            icon: const Icon(Icons.search),
-          ),
-        ],
-      ),
+      ],
       body: BlocConsumer<SearchBloc, SearchState>(
         listener: (context, state) {
           if (state is SearchSuccess) {
@@ -158,59 +143,12 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 30.0),
-                  child: SizedBox(
-                    height: 40,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _filterOptions.length,
-                      itemBuilder: (context, index) {
-                        final filter = _filterOptions[index];
-                        final isSelected = filter == _selectedFilter;
-                        return Padding(
-                          padding: EdgeInsets.only(
-                            left: index == 0 ? 20 : 4.0,
-                            right:
-                                index == _filterOptions.length - 1 ? 20 : 4.0,
-                          ),
-                          child: OutlinedButton(
-                            onPressed: state is SearchLoading
-                                ? null // Disable button when state is SearchLoading
-                                : () => _onFilterChanged(
-                                    filter), // Enable button when state is not SearchLoading
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                  width: 2,
-                                  color: state is SearchLoading
-                                      ? Colors.grey
-                                      : Theme.of(context).primaryColor),
-                              backgroundColor: isSelected
-                                  ? Theme.of(context).primaryColor
-                                  : null,
-                              // Add disabled style
-                              foregroundColor: state is SearchLoading
-                                  ? Colors
-                                      .grey // Change text color to grey when disabled
-                                  : null,
-                            ),
-                            child: Text(
-                              filter,
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : state is SearchLoading
-                                        ? Colors
-                                            .grey // Change text color to grey when disabled
-                                        : Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                    padding: const EdgeInsets.only(bottom: 30.0),
+                    child: FilterOptionsBig(
+                        options: _filterOptions,
+                        selectedOption: _selectedFilter,
+                        onOptionSelected: _onFilterChanged,
+                        isFiltering: state is SearchLoading)),
               ),
               SliverPadding(
                 padding: const EdgeInsets.only(bottom: 70.0),

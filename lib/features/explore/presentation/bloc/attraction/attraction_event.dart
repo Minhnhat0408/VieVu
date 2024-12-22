@@ -3,11 +3,6 @@ part of 'attraction_bloc.dart';
 @immutable
 sealed class AttractionEvent {}
 
-class GetAttraction extends AttractionEvent {
-  final int attractionId;
-
-  GetAttraction(this.attractionId);
-}
 
 class GetHotAttractions extends AttractionEvent {
   final int limit;

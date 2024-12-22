@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/event_big_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/events/event_big_card.dart';
 
 class HotEventsSection extends StatefulWidget {
   const HotEventsSection({super.key});

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_appbar.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_attractions_section.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_events.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/hot_locations.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_attraction.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/hot_attractions_section.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/events/hot_events.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/hot_locations.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/nearby_attraction.dart';
 import 'package:vn_travel_companion/features/search/presentation/pages/search_results_page.dart';
 
 class ExploreMainPage extends StatefulWidget {

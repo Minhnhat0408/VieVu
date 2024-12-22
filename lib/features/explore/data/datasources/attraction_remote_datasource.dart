@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
-
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
+import 'package:vn_travel_companion/features/explore/data/models/service_model.dart';
 
 abstract interface class AttractionRemoteDatasource {
   Future<AttractionModel?> getAttraction({
@@ -36,6 +38,15 @@ abstract interface class AttractionRemoteDatasource {
     required int offset,
     required int radius,
   });
+
+  Future<List<ServiceModel>> getServicesNearAttraction({
+    required int attractionId,
+    int limit = 20,
+    int offset = 1,
+    required int
+        serviceType, // 1 for restaurant, 2 for poi,3 for shop, 4 for hotel
+    required String filterType, // 43;true 42;true nearbyDistance nearby10KM
+  });
 }
 
 class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
@@ -52,7 +63,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
     try {
       final response = await supabaseClient
           .from('attractions')
-          .select('*')
+          .select('*, attraction_types(id, type_name)')
           .eq('id', attractionId)
           .maybeSingle();
 
@@ -78,7 +89,6 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
           .order('hot_score', ascending: false)
           .range(offset, offset + limit);
 
-      log(response[0].toString());
       return response.map((e) {
         return AttractionModel.fromJson(e);
       }).toList();
@@ -143,7 +153,91 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
       return data.map((e) => AttractionModel.fromJson(e)).toList();
     } catch (e) {
-      log("${e}hellloooo");
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<ServiceModel>> getServicesNearAttraction({
+    required int attractionId,
+    int limit = 20,
+    int offset = 1,
+    required int serviceType,
+    required String filterType,
+  }) async {
+    final url = Uri.parse(
+        'https://vn.trip.com/restapi/soa2/19913/getTripNearbyModuleList');
+
+    final body = {
+      "moduleList": [
+        {
+          "count": limit,
+          "index": offset,
+          "quickFilterType": filterType,
+          "type": serviceType,
+          "distance": 100
+        }
+      ],
+      "poiId": attractionId,
+      "head": {
+        "locale": "vi-VN",
+        "cver": "3.0",
+        "cid": "1730100685388.e15dmCQTWglp",
+        "syscode": "999",
+        "sid": "",
+        "extension": [
+          {"name": "locale", "value": "vi-VN"},
+          {"name": "platform", "value": "Online"},
+          {"name": "currency", "value": "VND"},
+          {"name": "aid", "value": ""}
+        ]
+      }
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json", // Specify the content type
+        },
+        body: jsonEncode(body), // Convert the body to JSON
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        final nearbyModuleList =
+            jsonResponse['nearbyModuleList'] as List<dynamic>?;
+        if (nearbyModuleList != null && nearbyModuleList.isNotEmpty) {
+          final itemList = nearbyModuleList[0]['itemList'] as List<dynamic>;
+          if (serviceType == 1) {
+            return itemList
+                .map((item) => ServiceModel.fromRestaurantJson(
+                    item as Map<String, dynamic>))
+                .toList();
+          } else if (serviceType == 2) {
+            return itemList
+                .map((item) => ServiceModel.fromAttractionJson(
+                    item as Map<String, dynamic>))
+                .toList();
+          } else if (serviceType == 3) {
+            return itemList
+                .map((item) =>
+                    ServiceModel.fromShopJson(item as Map<String, dynamic>))
+                .toList();
+          } else {
+            return itemList
+                .map((item) =>
+                    ServiceModel.fromHotelJson(item as Map<String, dynamic>))
+                .toList();
+          }
+        } else {
+          return [];
+        }
+      } else {
+        throw ServerException("Failed to fetch data: ${response.statusCode}");
+      }
+    } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

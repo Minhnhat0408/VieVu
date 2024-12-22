@@ -50,6 +50,7 @@ class AttractionModel extends Attraction {
     );
   }
 
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

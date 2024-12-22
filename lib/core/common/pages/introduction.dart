@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:vn_travel_companion/core/common/widgets/slide_indicator.dart';
 
 class IntroductionPage extends StatefulWidget {
   static route() {
@@ -71,7 +72,10 @@ class _IntroductionPageState extends State<IntroductionPage> {
                 mainAxisAlignment: MainAxisAlignment
                     .spaceBetween, // This will space out the children
                 children: [
-                  slideIndicator(context),
+                  SlideIndicator(
+                    activeIndex: activeIndex,
+                    size: imgList.length,
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/login');
@@ -155,17 +159,6 @@ class _IntroductionPageState extends State<IntroductionPage> {
               ),
             ),
           ],
-        ),
-      );
-
-  Widget slideIndicator(context) => AnimatedSmoothIndicator(
-        activeIndex: activeIndex,
-        count: imgList.length,
-        effect: SlideEffect(
-          activeDotColor: Theme.of(context).colorScheme.primaryContainer,
-          dotHeight: 5,
-          dotWidth: 40,
-          spacing: 10,
         ),
       );
 }

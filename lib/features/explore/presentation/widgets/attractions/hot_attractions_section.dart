@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attraction_big_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
 
 class HotAttractionsSection extends StatefulWidget {
   const HotAttractionsSection({super.key});

@@ -4,8 +4,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attraction_small_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_small_card.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class NearbyAttractionSection extends StatefulWidget {
@@ -73,7 +73,7 @@ class _NearbyAttractionSectionState extends State<NearbyAttractionSection> {
       locationBox.put('latitude', position.latitude);
       locationBox.put('longitude', position.longitude);
     } catch (e) {
-      log('Error getting location: $e');
+      showSnackbar(context, 'Không thể xác định vị trí của bạn.', 'error');
     }
   }
 
@@ -193,7 +193,6 @@ class _NearbyAttractionSectionState extends State<NearbyAttractionSection> {
                     state.attractions.length,
                     (index) => Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
                             vertical: 4,
                           ),
                           child: AttractionSmallCard(

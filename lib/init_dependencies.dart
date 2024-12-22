@@ -18,16 +18,22 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/event_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
+import 'package:vn_travel_companion/features/explore/data/datasources/review_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/repositories/attraction_repository_implementation.dart';
 import 'package:vn_travel_companion/features/explore/data/repositories/event_repository_implementation.dart';
 import 'package:vn_travel_companion/features/explore/data/repositories/location_repository_implementation.dart';
+import 'package:vn_travel_companion/features/explore/data/repositories/review_repository_implementation.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/event_repository.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/location_repository.dart';
+import 'package:vn_travel_companion/features/explore/domain/repositories/review_repository.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews_cubit.dart';
 import 'package:vn_travel_companion/features/search/data/datasources/search_remote_datasource.dart';
 import 'package:vn_travel_companion/features/search/data/repositories/explore_search_repository_implementation.dart';
 import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
@@ -51,6 +57,7 @@ Future<void> initDependencies() async {
   _initLocation();
   _initEvent();
   _initSearch();
+  _initReview();
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -67,6 +74,18 @@ Future<void> initDependencies() async {
 
   serviceLocator.registerLazySingleton(
     () => NearbyAttractionsCubit(attractionRepository: serviceLocator()),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => NearbyServicesCubit(attractionRepository: serviceLocator()),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => AttractionDetailsCubit(attractionRepository: serviceLocator()),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => ReviewsCubit(reviewRepository: serviceLocator()),
   );
   serviceLocator.registerFactory<ConnectionChecker>(
     () => ConnectionCheckerImpl(
@@ -250,6 +269,21 @@ void _initSearch() {
     ..registerLazySingleton(
       () => SearchBloc(
         repository: serviceLocator(),
+      ),
+    );
+}
+
+void _initReview() {
+  serviceLocator
+    ..registerFactory<ReviewRepository>(
+      () => ReviewRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<ReviewRemoteDataSource>(
+      () => ReviewRemoteDataSourceImpl(
+        serviceLocator(),
       ),
     );
 }

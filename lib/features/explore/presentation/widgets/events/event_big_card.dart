@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/event.dart';
 
 class EventBigCard extends StatelessWidget {
@@ -9,20 +9,11 @@ class EventBigCard extends StatelessWidget {
   const EventBigCard({super.key, required this.event});
 
   // Helper function to launch the deep link
-  void _openDeepLink(String url) async {
-    try {
-      final String encodedUrl = Uri.encodeFull(url);
-      final Uri uri = Uri.parse(encodedUrl);
-      await launchUrl(uri);
-    } catch (e) {
-      debugPrint('Error launching $url: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _openDeepLink(event.deepLink), // Navigate to deep link
+      onTap: () => openDeepLink(event.deepLink), // Navigate to deep link
       child: Card(
         elevation: 0,
         color: Colors.transparent,

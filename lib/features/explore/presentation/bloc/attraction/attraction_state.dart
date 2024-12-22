@@ -13,11 +13,7 @@ final class AttractionFailure extends AttractionState {
   AttractionFailure(this.message);
 }
 
-final class AttractionDetailsLoadedSuccess extends AttractionState {
-  final Attraction attraction;
 
-  AttractionDetailsLoadedSuccess(this.attraction);
-}
 
 final class AttractionsLoadedSuccess extends AttractionState {
   final List<Attraction> attractions;

@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 
 class CustomAppbar extends StatelessWidget {
-  final Widget body; // Accepts a widget for the body
-  final String? appBarTitle; // Optional title for the app bar
-  final List<Widget>? actions; // Optional actions for the app bar
-
+  final Widget body;
+  final String? appBarTitle;
+  final List<Widget>? actions;
+  final bool centerTitle;
+  final bool extendBodyBehindAppBar;
   const CustomAppbar({
     super.key,
-    required this.body, // The body is required
-    this.appBarTitle, // AppBar title is optional
-    this.actions, // AppBar actions are optional
+    required this.body,
+    this.appBarTitle,
+    this.actions,
+    this.centerTitle = false,
+    this.extendBodyBehindAppBar = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: extendBodyBehindAppBar,
       appBar: AppBar(
+        scrolledUnderElevation: 0.0,
+        backgroundColor: Colors.transparent,
         leading: Navigator.canPop(context)
             ? IconButton(
                 icon: const Icon(Icons.chevron_left),
@@ -28,6 +34,7 @@ class CustomAppbar extends StatelessWidget {
             : null,
         title: appBarTitle != null ? Text(appBarTitle!) : null,
         actions: actions,
+        centerTitle: centerTitle,
       ),
       body: body,
     );

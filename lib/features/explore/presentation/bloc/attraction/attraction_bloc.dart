@@ -14,20 +14,10 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
   })  : _attractionRepository = attractionRepository,
         super(AttractionInitial()) {
     on<AttractionEvent>((event, emit) => emit(AttractionLoading()));
-    on<GetAttraction>(_onGetAttraction);
+
     on<GetHotAttractions>(_onGetHotAttractions);
     on<GetRecentViewedAttractions>(_onGetRecentViewedAttractions);
     on<UpsertRecentViewedAttractions>(_onUpsertRecentViewedAttractions);
-  }
-
-  void _onGetAttraction(
-      GetAttraction event, Emitter<AttractionState> emit) async {
-    final res = await _attractionRepository.getAttraction(
-        attractionId: event.attractionId);
-    res.fold(
-      (l) => emit(AttractionFailure(l.message)),
-      (r) => emit(AttractionDetailsLoadedSuccess(r)),
-    );
   }
 
   void _onGetHotAttractions(
@@ -59,6 +49,4 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
       (r) => () {},
     );
   }
-
-  
 }
