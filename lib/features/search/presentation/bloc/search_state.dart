@@ -22,3 +22,11 @@ final class SearchSuccess extends SearchState {
     required this.results,
   });
 }
+
+final class SearchOverAllSuccess extends SearchState {
+  final List<ExploreSearchResult> results;
+
+  SearchOverAllSuccess({
+    required this.results,
+  });
+}

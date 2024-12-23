@@ -16,3 +16,8 @@ final class ReviewsFailure extends ReviewsState {
   final String message;
   ReviewsFailure(this.message);
 }
+
+final class ReviewsAllLoadedSuccess extends ReviewsState {
+  final List<Review> reviews;
+  ReviewsAllLoadedSuccess(this.reviews);
+}

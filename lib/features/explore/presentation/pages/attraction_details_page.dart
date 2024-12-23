@@ -1,25 +1,17 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:vn_travel_companion/core/common/widgets/slide_indicator.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/service_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_service_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/open_time_display.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews_section.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews/reviews_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/slider_pagination.dart';
 
 class AttractionDetailsPage extends StatefulWidget {
@@ -134,7 +126,7 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
-                        left: 20, right: 20, top: 20, bottom: 60),
+                        left: 20, right: 20, top: 20, bottom: 80),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -339,60 +331,11 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
                           height: 40,
                         ),
                         const SizedBox(height: 12),
-                        SizedBox(
-                          key: _reviewsSectionKey,
-                          width: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Đánh giá từ cộng đồng',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .secondaryContainer,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 6),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    FaIcon(
-                                      FontAwesomeIcons.heartCirclePlus,
-                                      size: 20,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      "${attraction.avgRating}/5",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelMedium!
-                                          .copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 30),
                         ReviewsSection(
                           serviceId: widget.attractionId,
                           totalReviews: state.attraction.ratingCount ?? 0,
+                          reviewsSectionKey: _reviewsSectionKey,
+                          avgRating: attraction.avgRating,
                         ),
                       ],
                     ),

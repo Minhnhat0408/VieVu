@@ -31,7 +31,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     );
     res.fold(
       (l) => emit(SearchError(message: l.message)),
-      (r) => emit(SearchSuccess(results: r)),
+      (r) => emit(SearchOverAllSuccess(results: r)),
     );
   }
 

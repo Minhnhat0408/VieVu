@@ -5,12 +5,14 @@ class FilterOptionsBig extends StatelessWidget {
   final String selectedOption;
   final Function(String) onOptionSelected;
   final bool isFiltering;
+  final double outerPadding;
   const FilterOptionsBig({
     super.key,
     required this.options,
     required this.selectedOption,
     required this.onOptionSelected,
     required this.isFiltering,
+    this.outerPadding = 20,
   });
 
   @override
@@ -25,8 +27,8 @@ class FilterOptionsBig extends StatelessWidget {
           final isSelected = filter == selectedOption;
           return Padding(
             padding: EdgeInsets.only(
-              left: index == 0 ? 0 : 4.0,
-              right: index == options.length - 1 ? 0 : 4.0,
+              left: index == 0 ? outerPadding : 4.0,
+              right: index == options.length - 1 ? outerPadding : 4.0,
             ),
             child: OutlinedButton(
               onPressed: isFiltering

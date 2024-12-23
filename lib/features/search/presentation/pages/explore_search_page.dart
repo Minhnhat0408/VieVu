@@ -134,7 +134,7 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
       ),
       body: BlocConsumer<SearchBloc, SearchState>(
         listener: (context, state) {
-          if (state is SearchSuccess) {
+          if (state is SearchOverAllSuccess) {
             setState(() {
               _results = state.results;
             });

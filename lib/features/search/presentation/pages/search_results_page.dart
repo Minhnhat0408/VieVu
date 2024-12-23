@@ -167,7 +167,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                     newPageProgressIndicatorBuilder: (_) =>
                         const Center(child: CircularProgressIndicator()),
                     noItemsFoundIndicatorBuilder: (_) =>
-                        const Center(child: Text('No results found')),
+                        const Center(child: Text('Không có kết quả nào.')),
                     newPageErrorIndicatorBuilder: (context) => Center(
                       child: TextButton(
                         onPressed: () =>

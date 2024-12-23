@@ -29,6 +29,19 @@ class _ImageCarouselPageState extends State<ImageCarouselPage> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(
+                  Icons.chevron_left,
+                  color: Colors.white,
+                ),
+                iconSize: 36,
+                padding: const EdgeInsets.all(4),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Navigate back
+                },
+              )
+            : null,
       ),
       body: Column(
         children: [

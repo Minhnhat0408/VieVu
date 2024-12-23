@@ -99,6 +99,7 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                 child: FilterOptionsBig(
                     options: _filterOptions,
                     selectedOption: _selectedFilter,
+                    outerPadding: 0,
                     onOptionSelected: _onFilterChanged,
                     isFiltering: state is NearbyServicesLoading)),
             if (state is NearbyServicesLoading)
@@ -151,7 +152,7 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                     services[_selectedFilter]!.isEmpty ||
                 state is NearbyServicesFailure)
               const SizedBox(
-                height: 300,
+                height: 200,
                 width: double.infinity,
                 child: Center(
                   child: Text('Không tìm thấy dữ liệu'),
