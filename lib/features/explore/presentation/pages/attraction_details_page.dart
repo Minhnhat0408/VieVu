@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -35,6 +36,10 @@ class AttractionDetailsPage extends StatefulWidget {
 
 class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
   int activeIndex = 0;
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _reviewsSectionKey = GlobalKey();
+
+  bool _showFullDescription = false;
   @override
   void initState() {
     super.initState();
@@ -42,6 +47,12 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
     context
         .read<AttractionDetailsCubit>()
         .fetchAttractionDetails(widget.attractionId);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -158,13 +169,24 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
                             ),
                             const SizedBox(width: 8),
                             GestureDetector(
+                                onTap: () {
+                                  final context =
+                                      _reviewsSectionKey.currentContext;
+                                  if (context != null) {
+                                    Scrollable.ensureVisible(
+                                      context,
+                                      duration: const Duration(seconds: 1),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                },
                                 child: Text(
-                              '${NumberFormat('#,###').format(attraction.ratingCount)} đánh giá',
-                              style: const TextStyle(
-                                decoration: TextDecoration.underline,
-                                fontSize: 16,
-                              ),
-                            )),
+                                  '${NumberFormat('#,###').format(attraction.ratingCount)} đánh giá',
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    fontSize: 16,
+                                  ),
+                                )),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -206,11 +228,40 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
                           }).toList(),
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          attraction.description,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context).colorScheme.secondary,
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: _showFullDescription
+                                    ? attraction.description
+                                    : attraction.description.length > 100
+                                        ? '${attraction.description.substring(0, 100)}...'
+                                        : attraction
+                                            .description, // Adjust length
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                ),
+                              ),
+                              if (!_showFullDescription &&
+                                  attraction.description.length > 100)
+                                TextSpan(
+                                  text: ' Xem thêm',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      setState(() {
+                                        _showFullDescription = true;
+                                      });
+                                    },
+                                ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -280,13 +331,16 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
                           thickness: 1.5,
                           height: 40,
                         ),
+                        const SizedBox(height: 20),
                         NearbyServiceSection(attractionId: widget.attractionId),
                         const SizedBox(height: 20),
                         const Divider(
                           thickness: 1.5,
                           height: 40,
                         ),
+                        const SizedBox(height: 12),
                         SizedBox(
+                          key: _reviewsSectionKey,
                           width: double.infinity,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

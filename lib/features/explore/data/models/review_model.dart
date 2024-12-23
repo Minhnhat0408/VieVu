@@ -1,51 +1,36 @@
+import 'dart:developer';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/review.dart';
 
 class ReviewModel extends Review {
   ReviewModel({
     required super.id,
-    required super.title,
     required super.nickName,
     required super.avatar,
-    required super.tripType,
-    required super.contentSize,
     required super.content,
     required super.score,
     required super.createdAt,
+    required super.images,
+    required super.scoreName,
+    super.tagName,
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
-    final dateString = json['publishTime'] as String;
-    final regex = RegExp(r"\/Date\((\d+)([+-]\d{4})?\)\/");
-    final match = regex.firstMatch(dateString);
-    if (match == null) {
-      throw Exception('Invalid date string: $dateString');
-    }
-    final timestamp = int.parse(match.group(1)!);
-    final offsetString = match.group(2);
-
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    if (offsetString != null) {
-      final offsetHours = int.parse(offsetString.substring(1, 3));
-      final offsetMinutes = int.parse(offsetString.substring(3, 5));
-      final offset = Duration(
-        hours: offsetHours,
-        minutes: offsetMinutes,
-      );
-      dateTime = offsetString.startsWith('+')
-          ? dateTime.add(offset)
-          : dateTime.subtract(offset);
-    }
-
+    int createTime = json['createTime']; // Timestamp in milliseconds
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(createTime);
+    final unescape = HtmlUnescape();
+    String encodedText = json['translateContent'] ?? json['content'];
+    String decodedText = unescape.convert(encodedText);
     return ReviewModel(
-      id: json['commentId'],
-      title: json['translateTitle'],
-      nickName: json['nickname'],
-      avatar: json['headPhoto'],
-      tripType: json['tripType'],
-      contentSize: json['contentSize'],
-      content: json['translateContent'],
-      score: json['score'],
+      id: json['reviewId'],
+      nickName: json['username'] ?? '',
+      avatar: json['headImage'] ?? '',
+      content: decodedText,
+      score: json['userRating'],
       createdAt: dateTime,
+      images: json['reviewImages'].cast<String>(),
+      scoreName: json['scoreName'] ?? '',
+      tagName: json['tagName'],
     );
   }
 }

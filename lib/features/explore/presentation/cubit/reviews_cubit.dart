@@ -16,12 +16,14 @@ class ReviewsCubit extends Cubit<ReviewsState> {
     required int attractionId,
     required int limit,
     required int pageIndex,
+    required int commentTagId,
   }) async {
     emit(ReviewsLoading());
     final result = await _reviewRepository.getAttractionReviews(
       attractionId: attractionId,
       limit: limit,
       pageIndex: pageIndex,
+      commentTagId: commentTagId,
     );
     result.fold(
       (failure) => emit(ReviewsFailure(failure.message)),

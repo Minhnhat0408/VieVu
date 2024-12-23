@@ -7,5 +7,6 @@ abstract interface class ReviewRepository {
     required int attractionId,
     required int limit,
     required int pageIndex,
+    required int commentTagId,
   });
 }

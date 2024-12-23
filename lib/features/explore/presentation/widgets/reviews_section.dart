@@ -1,8 +1,10 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:vn_travel_companion/core/common/widgets/image_carousel_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -25,27 +27,19 @@ class _ReviewsSectionState extends State<ReviewsSection> {
   void initState() {
     super.initState();
     timeago.setLocaleMessages('vi', timeago.ViMessages());
-    context
-        .read<ReviewsCubit>()
-        .fetchReviews(attractionId: widget.serviceId, limit: 3, pageIndex: 1);
-  }
-
-  String _translateTripType(String tripType) {
-    return tripType == 'Solo'
-        ? 'Du lịch một mình'
-        : tripType == 'Couples'
-            ? 'Du lịch cặp đôi'
-            : tripType == 'Family'
-                ? 'Du lịch gia đình'
-                : 'Du lịch nhóm';
+    context.read<ReviewsCubit>().fetchReviews(
+        attractionId: widget.serviceId,
+        limit: 3,
+        pageIndex: 1,
+        commentTagId: 0);
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ReviewsCubit, ReviewsState>(
       listener: (context, state) {
-        if (state is ReviewsLoadedSuccess) {
-          log(state.reviews.toString());
+        if (state is ReviewsFailure) {
+          log(state.message.toString());
         }
       },
       builder: (context, state) {
@@ -59,13 +53,11 @@ class _ReviewsSectionState extends State<ReviewsSection> {
               child: Text("Không có đánh giá nào."),
             );
           }
-          // Use a Column instead of ListView.builder for non-scrollable content
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // use 3 reviews for now
-
-              ...state.reviews.take(4).map((review) {
+              
+              ...state.reviews.take(3).map((review) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -118,31 +110,92 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 8),
-                    Text(
-                      review.title,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                    //
+                    if (review.tagName != null)
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        child: Text(
+                          review.tagName!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 8),
+
                     Text(
                       review.content,
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
                         const Text(
-                          'Loại chuyến đi: ',
+                          'Đánh giá: ',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _translateTripType(review.tripType),
+                          review.scoreName,
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.primary),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 8),
+
+                    // Row list of images
+                    if (review.images.isNotEmpty)
+                      SizedBox(
+                        height: 150,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: review.images.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ImageCarouselPage(
+                                        images: review.images,
+                                        initialIndex: index,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: CachedNetworkImage(
+                                    imageUrl: review.images[index],
+                                    width: 150,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     const Divider(
                       thickness: 1.5,
                       height: 60,

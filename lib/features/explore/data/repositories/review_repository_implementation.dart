@@ -17,6 +17,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
     required int attractionId,
     required int limit,
     required int pageIndex,
+    required int commentTagId,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -26,6 +27,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
         attractionId: attractionId,
         limit: limit,
         pageIndex: pageIndex,
+        commentTagId: commentTagId,
       );
 
       return right(reviews);
