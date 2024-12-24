@@ -45,6 +45,7 @@ class ExploreSearchItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // log('result: ${result?.title}');
     return InkWell(
       onTap: () {
         // Navigate to the detail page
@@ -54,8 +55,17 @@ class ExploreSearchItem extends StatelessWidget {
         } else if (result?.type == 'attractions') {
           Navigator.pushNamed(context, '/attraction',
               arguments: int.parse(result!.id));
+        } else if (result?.type == 'hotel' ||
+            result?.type == 'restaurant' ||
+            result?.type == 'shop') {
+          // check if result.id contains http or https if not add https://vn.trip.com
+          if (result!.id.contains('http') || result!.id.contains('https')) {
+            openDeepLink(result!.id);
+          } else {
+            openDeepLink('https://vn.trip.com${result!.id}');
+          }
         } else {
-          log('Unknown type: ${result?.type}');
+          log('result: ${result?.id}');
         }
       },
       child: Padding(
@@ -77,11 +87,13 @@ class ExploreSearchItem extends StatelessWidget {
               clipBehavior: Clip.antiAliasWithSaveLayer,
               child: (result == null ||
                       (result!.type != 'attractions' &&
-                          result!.type != 'event'))
+                          result!.type != 'event' &&
+                          result!.type != 'hotel' &&
+                          result!.type != 'restaurant' &&
+                          result!.type != 'shop'))
                   ? _getIconForType(result == null ? 'nearby' : result!.type)
                   : CachedNetworkImage(
-                      imageUrl:
-                          "${result!.cover}?w=90&h=90", // Use optimized size
+                      imageUrl: "${result!.cover}", // Use optimized size
                       placeholder: (context, url) => const Center(
                         child: CircularProgressIndicator(),
                       ),
@@ -116,7 +128,11 @@ class ExploreSearchItem extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    if (isDetailed && result!.type == 'attractions')
+                    if (isDetailed &&
+                        (result!.type == 'attractions' ||
+                            result!.type == 'hotel' ||
+                            result!.type == 'restaurant' ||
+                            result!.type == 'shop'))
                       Row(
                         children: [
                           RatingBarIndicator(
@@ -136,37 +152,39 @@ class ExploreSearchItem extends StatelessWidget {
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
                           const SizedBox(width: 10),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .secondaryContainer,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            child: Row(
-                              children: [
-                                FaIcon(
-                                  FontAwesomeIcons.fire,
-                                  size: 16,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  result?.hotScore.toString() ?? '0',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium!
-                                      .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          )
+                          if (result?.hotScore != null)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              child: Row(
+                                children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.fire,
+                                    size: 16,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    result?.hotScore.toString() ?? '0',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                            fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            )
                         ],
                       ),
                     if (result != null && result!.address != null)

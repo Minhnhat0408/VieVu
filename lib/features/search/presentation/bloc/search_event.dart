@@ -41,4 +41,16 @@ class EventsSearch extends SearchEvent {
   });
 }
 
+class SearchExternalApi extends SearchEvent {
+  final String searchText;
+  final int limit;
+  final int page;
+  final String searchType;
 
+  SearchExternalApi({
+    required this.searchText,
+    required this.limit,
+    required this.page,
+    required this.searchType,
+  });
+}

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/search/data/models/explore_search_result_model.dart';
@@ -22,6 +23,13 @@ abstract interface class SearchRemoteDataSource {
     required String searchText,
     required int limit,
     required int offset,
+  });
+
+  Future<List<ExploreSearchResultModel>> searchExternalApi({
+    required String searchText,
+    required int limit,
+    required int page,
+    required String searchType,
   });
 }
 
@@ -68,7 +76,6 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
       });
       final List<Map<String, dynamic>> data =
           List<Map<String, dynamic>>.from(response);
-
       return data.map((e) => ExploreSearchResultModel.fromJson(e)).toList();
     } catch (e) {
       throw Exception(e.toString());
@@ -105,7 +112,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
             final details = json.decode(
               decodedBodyDetails,
             );
-       
+
             data.add({
               'title': event['name'],
               'address': details['data']['result']['address'],
@@ -118,6 +125,64 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
       }
 
       return data.map((e) => ExploreSearchResultModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<List<ExploreSearchResultModel>> searchExternalApi({
+    required String searchText,
+    required int limit,
+    required int page,
+    required String searchType,
+  }) async {
+    try {
+      final url = Uri.parse(
+          'https://www.trip.com/restapi/soa2/20400/getGsMainResultForTripOnline');
+      final body = {
+        "keyword": searchText,
+        "lang": "vn",
+        "locale": "vi-VN",
+        "currency": "VND",
+        "pageIndex": page,
+        "pageSize": limit,
+        "tab": searchType,
+        "head": {
+          "cver": "3.0",
+          "syscode": "999",
+          "locale": "vi-VN",
+          "extension": [
+            {"name": "locale", "value": "vi-VN"},
+            {"name": "platform", "value": "Online"},
+            {"name": "currency", "value": "VND"}
+          ]
+        }
+      };
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json", // Specify the content type
+        },
+        body: jsonEncode(body), // Convert the body to JSON
+      );
+
+      final jsonResponse = jsonDecode(response.body);
+
+      final data = jsonResponse['data'];
+      if (data == null) {
+        throw Exception('No data found');
+      }
+
+      final reviews = data[0]['itemList'] as List;
+      final filteredReviews = reviews
+          .where((item) => item['districtName'].contains('Việt Nam'))
+          .toList();
+
+      return filteredReviews
+          .map((item) => ExploreSearchResultModel.fromExternalJson(
+              item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception(e.toString());
     }

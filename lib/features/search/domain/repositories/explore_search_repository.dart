@@ -21,4 +21,12 @@ abstract interface class ExploreSearchRepository {
     required int limit,
     required int offset,
   });
+
+  Future<Either<Failure,List<ExploreSearchResult>>> searchExternalApi({
+    required String searchText,
+    required int limit,
+    required int page,
+    required String searchType,
+  });
+  
 }

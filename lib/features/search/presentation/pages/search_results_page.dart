@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
@@ -27,6 +29,9 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
     'Sự kiện',
     'Địa điểm du lịch', // Attractions
     'Điểm đến', // Locations
+    'Khách sạn', // Hotels
+    'Nhà hàng', // Restaurants
+    'Cửa hàng', // Shops
     'Loại hình du lịch', // Travel Types
   ];
 
@@ -47,6 +52,16 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
               searchText: widget.keyword,
               limit: pageSize,
               page: (pageKey ~/ pageSize) + 1,
+            ));
+      } else if (_selectedFilter == 'Khách sạn' ||
+          _selectedFilter == 'Nhà hàng' ||
+          _selectedFilter == 'Cửa hàng') {
+        log('calling external api');
+        context.read<SearchBloc>().add(SearchExternalApi(
+              searchText: widget.keyword,
+              limit: pageSize,
+              page: (pageKey ~/ pageSize) + 1,
+              searchType: _mapFilterToSearchType(_selectedFilter),
             ));
       } else {
         context.read<SearchBloc>().add(ExploreSearch(
@@ -75,6 +90,12 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
         return 'events';
       case 'Loại hình du lịch':
         return 'travel_types';
+      case 'Khách sạn':
+        return 'hotel';
+      case 'Nhà hàng':
+        return 'restaurant';
+      case 'Cửa hàng':
+        return 'shop';
       default:
         return 'all';
     }

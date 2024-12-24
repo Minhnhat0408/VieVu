@@ -152,6 +152,7 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
             children: [
               if (state is SearchLoading)
                 const LinearProgressIndicator(), // Show loading indicator
+              const SizedBox(height: 10),
               Expanded(
                 child: _results.isEmpty
                     ? const Column(children: [

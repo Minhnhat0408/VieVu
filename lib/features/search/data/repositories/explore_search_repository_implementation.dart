@@ -84,4 +84,29 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
       throw left(Failure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<ExploreSearchResult>>> searchExternalApi({
+    required String searchText,
+    required int limit,
+    required int page,
+    required String searchType,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final List<ExploreSearchResult> searchResults =
+          await searchRemoteDataSource.searchExternalApi(
+        searchText: searchText,
+        limit: limit,
+        page: page,
+        searchType: searchType,
+      );
+
+      return right(searchResults);
+    } catch (e) {
+      throw left(Failure(e.toString()));
+    }
+  }
 }

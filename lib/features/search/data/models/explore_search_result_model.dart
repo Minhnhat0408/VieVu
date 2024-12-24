@@ -25,6 +25,19 @@ class ExploreSearchResultModel extends ExploreSearchResult {
     );
   }
 
+  factory ExploreSearchResultModel.fromExternalJson(Map<String, dynamic> json) {
+    return ExploreSearchResultModel(
+      title: json['word'],
+      address: json['districtName'],
+      id: json['url'],
+      type: json['type'],
+      cover: json['imageUrl'],
+      ratingCount: json['commentCount'],
+      avgRating: json['commentScore']?.toDouble(),
+      hotScore: json['hot_score']?.toDouble(),
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'title': title,
