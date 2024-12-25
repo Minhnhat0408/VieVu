@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/widgets/explore_search_item.dart';
-import 'package:vn_travel_companion/features/search/presentation/widgets/search_keyword.dart';
 
 class ExploreSearchPage extends StatefulWidget {
   static route() {
@@ -35,23 +36,33 @@ class ExploreSearchPage extends StatefulWidget {
 class _ExploreSearchState extends State<ExploreSearchPage> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
-  List<ExploreSearchResult> _results = [];
   String _keyword = '';
+  final PagingController<int, ExploreSearchResult> _pagingController =
+      PagingController(firstPageKey: 0);
+  final List<String> _filterOptions = [
+    'Sự kiện',
+    'Địa điểm du lịch', // Attractions
+    'Điểm đến', // Locations
+    'Khách sạn', // Hotels
+    'Nhà hàng', // Restaurants
+    'Cửa hàng', // Shops
+    'Loại hình du lịch', // Travel Types
+  ];
+  int totalRecordCount = 0;
+  final int pageSize = 10;
+  String _selectedFilter = ''; // Default filter is 'All'
 
   // Handle text changes with debounce
   void _onSearchChanged(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 1000), () async {
-      if (keyword.isNotEmpty) {
+      log('searching for $keyword');
+      setState(() {
         _keyword = keyword;
-        context.read<SearchBloc>().add(SearchAll(
-              searchText: keyword,
-              limit: 5,
-              offset: 0,
-            ));
-      } else {
-        setState(() => _results = []);
-      }
+      });
+      _keyword = keyword;
+
+      _pagingController.refresh();
     });
   }
 
@@ -64,13 +75,77 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
     _searchController.addListener(() {
       _onSearchChanged(_searchController.text);
     });
+    _pagingController.addPageRequestListener((pageKey) {
+      if (_selectedFilter == 'Sự kiện') {
+        context.read<SearchBloc>().add(EventsSearch(
+              searchText: _keyword,
+              limit: pageSize,
+              page: (pageKey ~/ pageSize) + 1,
+            ));
+      } else if (_selectedFilter == 'Khách sạn' ||
+          _selectedFilter == 'Nhà hàng' ||
+          _selectedFilter == 'Cửa hàng') {
+        log('calling external api');
+        context.read<SearchBloc>().add(SearchExternalApi(
+              searchText: _keyword,
+              limit: pageSize,
+              page: (pageKey ~/ pageSize) + 1,
+              searchType: _mapFilterToSearchType(_selectedFilter),
+            ));
+      } else {
+        context.read<SearchBloc>().add(ExploreSearch(
+              searchText: _keyword,
+              limit: pageSize,
+              offset: pageKey,
+              searchType: _mapFilterToSearchType(_selectedFilter),
+            ));
+      }
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _debounce?.cancel();
+    _pagingController.dispose();
     super.dispose();
+  }
+
+  String _mapFilterToSearchType(String filter) {
+    switch (filter) {
+      case 'Địa điểm du lịch':
+        return 'attractions';
+      case 'Điểm đến':
+        return 'locations';
+      case 'Sự kiện':
+        return 'events';
+      case 'Loại hình du lịch':
+        return 'travel_types';
+      case 'Khách sạn':
+        return 'hotel';
+      case 'Nhà hàng':
+        return 'restaurant';
+      case 'Cửa hàng':
+        return 'shop';
+      default:
+        return 'all';
+    }
+  }
+
+  void _onFilterChanged(String selectedFilter) {
+    setState(() {
+      if (_selectedFilter == selectedFilter) {
+        _selectedFilter =
+            ''; // Reset to '' if the same filter is selected again
+      } else {
+        _selectedFilter = selectedFilter;
+      }
+
+      totalRecordCount = 0; // Reset total record count for new search
+    });
+
+    // Reset paging controller to fetch new data based on selected filter
+    _pagingController.refresh();
   }
 
   @override
@@ -120,9 +195,9 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         _searchController.clear();
-                        setState(() {
-                          _results = [];
-                        });
+                        // setState(() {
+                        //   _results = [];
+                        // });
                       },
                     )
                   ],
@@ -134,80 +209,70 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
       ),
       body: BlocConsumer<SearchBloc, SearchState>(
         listener: (context, state) {
-          if (state is SearchOverAllSuccess) {
-            setState(() {
-              _results = state.results;
-            });
+          if (state is SearchSuccess) {
+            totalRecordCount += state.results.length;
+            final next = totalRecordCount;
+
+            final isLastPage = state.results.length < pageSize;
+            if (isLastPage) {
+              _pagingController.appendLastPage(state.results);
+            } else {
+              _pagingController.appendPage(state.results, next);
+            }
           }
           if (state is SearchError) {
-            showSnackbar(
-              context,
-              state.message,
-              'error',
-            );
+            _pagingController.error = state.message;
           }
         },
         builder: (context, state) {
-          return Column(
-            children: [
-              if (state is SearchLoading)
-                const LinearProgressIndicator(), // Show loading indicator
-              const SizedBox(height: 10),
-              Expanded(
-                child: _results.isEmpty
-                    ? const Column(children: [
-                        ExploreSearchItem(),
-                        SizedBox(height: 20),
-                      ])
-                    : ListView.builder(
-                        itemCount: _results.length,
-                        itemBuilder: (context, index) {
-                          final result = _results[index];
-                          // Check if this is the first 'event' type item
-                          if (result.type == 'event') {
-                            // Add a header above the first event type item
-                            if (index == 0 ||
-                                _results[index - 1].type != 'event') {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SearchKeyword(keyword: _keyword),
-                                  const Padding(
-                                    padding: EdgeInsets.only(
-                                        top: 20.0,
-                                        bottom: 10,
-                                        left: 20,
-                                        right: 20),
-                                    child: Text(
-                                      'Kết quả tìm kiếm trên TicketBox',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  ExploreSearchItem(
-                                    result: result,
-                                  ),
-                                  if (index == _results.length - 1)
-                                    SearchKeyword(
-                                        keyword: _keyword, ticketBox: true)
-                                ],
-                              );
-                            }
-                          }
-
-                          if (index == _results.length - 1) {
-                            return SearchKeyword(
-                                keyword: _keyword, ticketBox: true);
-                          }
-                          // Render other items normally
-                          return ExploreSearchItem(
-                            result: result,
-                          );
-                        },
-                      ),
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                    padding: const EdgeInsets.only(top: 20, bottom: 30.0),
+                    child: FilterOptionsBig(
+                        options: _keyword.isEmpty
+                            ? ["Tìm kiếm gần đây"]
+                            : _filterOptions,
+                        selectedOption: _keyword.isEmpty
+                            ? "Tìm kiếm gần đây"
+                            : _selectedFilter,
+                        onOptionSelected: _onFilterChanged,
+                        isFiltering: state is SearchLoading)),
               ),
+              if (_keyword.isEmpty)
+                const SliverToBoxAdapter(
+                  child: ExploreSearchItem(),
+                ),
+              if (_keyword.isNotEmpty)
+                SliverPadding(
+                  padding: const EdgeInsets.only(bottom: 70.0),
+                  sliver: PagedSliverList<int, ExploreSearchResult>(
+                    pagingController: _pagingController,
+                    builderDelegate:
+                        PagedChildBuilderDelegate<ExploreSearchResult>(
+                      itemBuilder: (context, item, index) {
+                        return ExploreSearchItem(
+                          result: item,
+                          isDetailed: true,
+                        );
+                      },
+                      firstPageProgressIndicatorBuilder: (_) =>
+                          const Center(child: CircularProgressIndicator()),
+                      newPageProgressIndicatorBuilder: (_) =>
+                          const Center(child: CircularProgressIndicator()),
+                      noItemsFoundIndicatorBuilder: (_) =>
+                          const Center(child: Text('Không có kết quả nào.')),
+                      newPageErrorIndicatorBuilder: (context) => Center(
+                        child: TextButton(
+                          onPressed: () =>
+                              _pagingController.retryLastFailedRequest(),
+                          child: const Text('Retry'),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           );
         },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:vn_travel_companion/core/utils/format_distance.dart';
+import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 
 class ServiceCard extends StatelessWidget {
@@ -15,11 +15,22 @@ class ServiceCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         // Navigate to the detail page
-        // Navigator.pushNamed(
-        //   context,
-        //   '/attraction',
-        //   arguments: attraction.id,
-        // );
+        if (type == 'Điểm du lịch') {
+          Navigator.pushNamed(
+            context,
+            '/attraction',
+            arguments: service.id,
+          );
+        } else {
+          //check if service.jumpUrl contains http or https if not add https://vn.trip.com
+          if (service.jumpUrl.contains('http') ||
+              service.jumpUrl.contains('https')) {
+            openDeepLink(service.jumpUrl);
+          } else {
+            final String url = 'https://vn.trip.com${service.jumpUrl}';
+            openDeepLink(url);
+          }
+        }
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
