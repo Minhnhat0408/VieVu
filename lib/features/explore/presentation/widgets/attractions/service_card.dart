@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -15,7 +17,8 @@ class ServiceCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         // Navigate to the detail page
-        if (type == 'Điểm du lịch') {
+        log(type);
+        if (type == 'Địa điểm du lịch') {
           Navigator.pushNamed(
             context,
             '/attraction',

@@ -76,15 +76,15 @@ Future<void> initDependencies() async {
     () => NearbyAttractionsCubit(attractionRepository: serviceLocator()),
   );
 
-  serviceLocator.registerLazySingleton(
+  serviceLocator.registerFactory(
     () => NearbyServicesCubit(attractionRepository: serviceLocator()),
   );
 
-  serviceLocator.registerLazySingleton(
+  serviceLocator.registerFactory(
     () => AttractionDetailsCubit(attractionRepository: serviceLocator()),
   );
 
-  serviceLocator.registerLazySingleton(
+  serviceLocator.registerFactory(
     () => ReviewsCubit(reviewRepository: serviceLocator()),
   );
   serviceLocator.registerFactory<ConnectionChecker>(
@@ -205,7 +205,7 @@ void _initExplore() {
         serviceLocator(),
       ),
     )
-    ..registerLazySingleton(
+    ..registerFactory(
       () => AttractionBloc(
         attractionRepository: serviceLocator(),
       ),

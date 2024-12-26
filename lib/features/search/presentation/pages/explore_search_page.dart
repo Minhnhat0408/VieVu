@@ -213,7 +213,7 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
             totalRecordCount += state.results.length;
             final next = totalRecordCount;
 
-            final isLastPage = state.results.length < pageSize;
+            final isLastPage = state.results.isEmpty;
             if (isLastPage) {
               _pagingController.appendLastPage(state.results);
             } else {

@@ -23,3 +23,10 @@ class UpsertRecentViewedAttractions extends AttractionEvent {
 
   UpsertRecentViewedAttractions(this.attractionId, this.userId);
 }
+
+class GetRecommendedAttraction extends AttractionEvent {
+  final int limit;
+  final String userId;
+
+  GetRecommendedAttraction({required this.limit, required this.userId});
+}

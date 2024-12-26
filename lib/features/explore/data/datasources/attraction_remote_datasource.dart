@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
@@ -46,6 +47,11 @@ abstract interface class AttractionRemoteDatasource {
     required int
         serviceType, // 1 for restaurant, 2 for poi,3 for shop, 4 for hotel
     required String filterType, // 43;true 42;true nearbyDistance nearby10KM
+  });
+
+  Future<List<AttractionModel>> getRecommendedAttraction({
+    required int limit,
+    required String userId,
   });
 }
 
@@ -238,6 +244,57 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
       }
     } catch (e) {
       log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<AttractionModel>> getRecommendedAttraction({
+    required int limit,
+    required String userId,
+  }) async {
+    final Uri url =
+        Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/recommendations');
+
+    try {
+      final response = await supabaseClient
+          .from('user_preferences')
+          .select()
+          .eq('user_id', userId)
+          .single();
+      // log(response.toString());
+      final body = {
+        "user_preferences": {
+          "user_id": 1,
+          "price": response['budget'],
+          "avg_rating": response['avg_rating'],
+          "rating_count": response['rating_count'],
+          ...response['prefs_df'],
+        },
+        "attraction_ids": [],
+        "top_n": limit,
+      };
+      final responseRecommendation = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(body),
+      );
+
+      if (responseRecommendation.statusCode == 200) {
+        final jsonResponse =
+            jsonDecode(utf8.decode(responseRecommendation.bodyBytes));
+        final data = jsonResponse['recommendations'] as List<dynamic>;
+
+        return data.map((e) {
+          return AttractionModel.fromJson(e);
+        }).toList();
+      } else {
+        throw ServerException(
+            "Failed to fetch data: ${responseRecommendation.statusCode}");
+      }
+    } catch (e) {
       throw ServerException(e.toString());
     }
   }

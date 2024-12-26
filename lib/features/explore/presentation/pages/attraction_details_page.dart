@@ -9,24 +9,49 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_service_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/open_time_display.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews/reviews_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/slider_pagination.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
-class AttractionDetailsPage extends StatefulWidget {
+class AttractionDetailPage extends StatelessWidget {
   final int attractionId;
 
-  const AttractionDetailsPage({
+  const AttractionDetailPage({super.key, required this.attractionId});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => serviceLocator<AttractionDetailsCubit>(),
+        ),
+        BlocProvider(create: (_) => serviceLocator<NearbyServicesCubit>()),
+        BlocProvider(create: (_) => serviceLocator<ReviewsCubit>()),
+      ],
+      child: Scaffold(
+        body: AttractionDetailView(attractionId: attractionId),
+      ),
+    );
+  }
+}
+
+class AttractionDetailView extends StatefulWidget {
+  final int attractionId;
+
+  const AttractionDetailView({
     super.key,
     required this.attractionId,
   });
 
   @override
-  State<AttractionDetailsPage> createState() => _AttractionDetailsPageState();
+  State<AttractionDetailView> createState() => _AttractionDetailViewState();
 }
 
-class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
+class _AttractionDetailViewState extends State<AttractionDetailView> {
   int activeIndex = 0;
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _reviewsSectionKey = GlobalKey();
@@ -36,6 +61,7 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
   void initState() {
     super.initState();
     // Fetch attraction details
+
     context
         .read<AttractionDetailsCubit>()
         .fetchAttractionDetails(widget.attractionId);
@@ -333,7 +359,7 @@ class _AttractionDetailsPageState extends State<AttractionDetailsPage> {
                         const SizedBox(height: 12),
                         ReviewsSection(
                           serviceId: widget.attractionId,
-                          totalReviews: state.attraction.ratingCount ?? 0,
+                          totalReviews: attraction.ratingCount ?? 0,
                           reviewsSectionKey: _reviewsSectionKey,
                           avgRating: attraction.avgRating,
                         ),

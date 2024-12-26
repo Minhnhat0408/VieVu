@@ -144,4 +144,24 @@ class AttractionRepositoryImpl implements AttractionRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Attraction>>> getRecommendedAttraction({
+    required int limit,
+    required String userId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final attractions = await attractionRemoteDatasource.getRecommendedAttraction(
+        limit: limit,
+        userId: userId,
+      );
+
+      return right(attractions);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

@@ -1,4 +1,3 @@
-
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 
 class AttractionModel extends Attraction {
@@ -32,24 +31,26 @@ class AttractionModel extends Attraction {
       images: jsonn['images'] != null
           ? (jsonn['images'] as List<dynamic>).map((v) => v.toString()).toList()
           : <String>[],
-      hotScore: jsonn['hot_score'].toDouble(),
-      price: jsonn['price'],
-      rankInfo: jsonn['rank_info'],
-      latitude: jsonn['latitude'].toDouble(),
-      longitude: jsonn['longitude'].toDouble(),
+      hotScore:
+          jsonn['hot_score'] != null ? jsonn['hot_score'].toDouble() : 0.0,
+      price: _parseInt(jsonn['price']),
+      rankInfo: null,
+      latitude: jsonn['latitude'] != null ? jsonn['latitude'].toDouble() : 0.0,
+      longitude:
+          jsonn['longitude'] != null ? jsonn['longitude'].toDouble() : 0.0,
       address: jsonn['address'],
       locationId: jsonn['location_id'],
-      openTimeRule: jsonn['open_time_rule'],
-      description: jsonn['description'].toString(),
+      openTimeRule:jsonn['open_time_rule'] is List ? jsonn['open_time_rule'] : [],
+      description: jsonn['description']?.toString() ?? '',
       phone: jsonn['phone'],
       avgRating:
-          jsonn['avg_rating'] != null ? jsonn['avg_rating'].toDouble() : 0,
-      ratingCount: jsonn['rating_count'],
-      travelTypes: jsonn['attraction_types'],
-      distance: jsonn['distance'] != null ? jsonn['distance'].toDouble() : 0,
+          jsonn['avg_rating'] != null ? jsonn['avg_rating'].toDouble() : 0.0,
+      ratingCount: _parseInt(jsonn['rating_count']),
+      travelTypes:
+          jsonn['attraction_types'] is List ? jsonn['attraction_types'] : [],
+      distance: jsonn['distance'] != null ? jsonn['distance'].toDouble() : 0.0,
     );
   }
-
 
   Map<String, dynamic> toJson() {
     return {
@@ -118,4 +119,14 @@ class AttractionModel extends Attraction {
       distance: distance ?? this.distance,
     );
   }
+}
+
+int? _parseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is String) {
+    final parsed = int.tryParse(value);
+    if (parsed != null) return parsed;
+  }
+  return null; // Return null if parsing fails
 }

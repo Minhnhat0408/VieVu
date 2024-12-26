@@ -174,7 +174,10 @@ class AttractionBigCard extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            travelType['type_name'] ?? '',
+                            //check if travelType is object or string
+                            travelType is String
+                                ? travelType
+                                : travelType['type_name'],
                             maxLines: 1,
                             style: TextStyle(
                                 fontSize: 12,

@@ -23,16 +23,9 @@ class ExplorePage extends StatelessWidget {
                 ticketBox: keyword['ticketBox'],
               );
               break;
-            case '/search-page':
-              final keyword = settings.arguments as String;
-
-              page = ExploreSearchPage(
-                initialKeyword: keyword,
-              );
-              break;
             case '/attraction':
               final attractionId = settings.arguments as int;
-              page = AttractionDetailsPage(attractionId: attractionId);
+              page = AttractionDetailPage(attractionId: attractionId);
             default:
               page = const ExploreMainPage();
           }

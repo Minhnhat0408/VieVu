@@ -18,6 +18,7 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
     on<GetHotAttractions>(_onGetHotAttractions);
     on<GetRecentViewedAttractions>(_onGetRecentViewedAttractions);
     on<UpsertRecentViewedAttractions>(_onUpsertRecentViewedAttractions);
+    on<GetRecommendedAttraction>(_onGetRecommendedAttraction);
   }
 
   void _onGetHotAttractions(
@@ -47,6 +48,16 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
     res.fold(
       (l) => emit(AttractionFailure(l.message)),
       (r) => () {},
+    );
+  }
+
+  void _onGetRecommendedAttraction(
+      GetRecommendedAttraction event, Emitter<AttractionState> emit) async {
+    final res = await _attractionRepository.getRecommendedAttraction(
+        limit: event.limit, userId: event.userId);
+    res.fold(
+      (l) => emit(AttractionFailure(l.message)),
+      (r) => emit(AttractionsLoadedSuccess(r)),
     );
   }
 }

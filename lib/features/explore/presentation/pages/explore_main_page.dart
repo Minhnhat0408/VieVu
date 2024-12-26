@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/recommended_attractions_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_appbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/hot_attractions_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/events/hot_events.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/hot_locations.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/nearby_attraction.dart';
 import 'package:vn_travel_companion/features/search/presentation/pages/search_results_page.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class ExploreMainPage extends StatefulWidget {
   const ExploreMainPage({super.key});
@@ -76,9 +80,20 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
                 ),
               ),
             ),
-            const SliverPadding(
-                padding: EdgeInsets.only(bottom: 40.0),
-                sliver: SliverToBoxAdapter(child: HotAttractionsSection())),
+            SliverPadding(
+                padding: const EdgeInsets.only(bottom: 40.0),
+                sliver: SliverToBoxAdapter(
+                    child: BlocProvider(
+                  create: (context) => serviceLocator<AttractionBloc>(),
+                  child: const HotAttractionsSection(),
+                ))),
+            SliverPadding(
+                padding: const EdgeInsets.only(bottom: 40.0),
+                sliver: SliverToBoxAdapter(
+                    child: BlocProvider(
+                  create: (context) => serviceLocator<AttractionBloc>(),
+                  child: const RecommendedAttractionSection(),
+                ))),
             const SliverPadding(
                 padding: EdgeInsets.only(bottom: 40.0),
                 sliver: SliverToBoxAdapter(child: NearbyAttractionSection())),
