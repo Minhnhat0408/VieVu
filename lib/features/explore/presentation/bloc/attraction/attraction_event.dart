@@ -30,3 +30,10 @@ class GetRecommendedAttraction extends AttractionEvent {
 
   GetRecommendedAttraction({required this.limit, required this.userId});
 }
+
+class GetRelatedAttractions extends AttractionEvent {
+  final int attractionId;
+  final int limit;
+
+  GetRelatedAttractions({required this.attractionId, required this.limit});
+}

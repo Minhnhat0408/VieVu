@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -129,13 +130,18 @@ class AttractionBigCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    AutoSizeText(
                       attraction.name,
+                      minFontSize: 14, // inimum font size to shrink to
+                      maxLines: 2, // Allow up to 2 lines for wrapping
+                      overflow: TextOverflow
+                          .ellipsis, // Add ellipsis if it exceeds maxLines
                       style: const TextStyle(
-                        fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        fontSize: 18, // Default starting font size
                       ),
                     ),
+
                     const SizedBox(height: 6),
                     // Rating
                     Row(

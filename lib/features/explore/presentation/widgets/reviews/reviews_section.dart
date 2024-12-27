@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:vn_travel_companion/features/explore/presentation/pages/reviews_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews/review_item.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class ReviewsSection extends StatefulWidget {
   final int serviceId;
@@ -137,8 +138,12 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => ReviewsPage(
-                                  attractionId: widget.serviceId,
+                                builder: (context) => BlocProvider(
+                                  create: (context) =>
+                                      serviceLocator<ReviewsCubit>(),
+                                  child: ReviewsPage(
+                                    attractionId: widget.serviceId,
+                                  ),
                                 ),
                               ),
                             );

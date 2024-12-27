@@ -8,9 +8,11 @@ import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/related_attraction_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_service_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/open_time_display.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews/reviews_section.dart';
@@ -31,6 +33,7 @@ class AttractionDetailPage extends StatelessWidget {
         ),
         BlocProvider(create: (_) => serviceLocator<NearbyServicesCubit>()),
         BlocProvider(create: (_) => serviceLocator<ReviewsCubit>()),
+        
       ],
       child: Scaffold(
         body: AttractionDetailView(attractionId: attractionId),
@@ -89,7 +92,7 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
       ],
       body: BlocConsumer<AttractionDetailsCubit, AttractionDetailsState>(
         listener: (context, state) {
-          if (state is AttractionDetailsFailure) {
+          if (state is  AttractionDetailsFailure) {
             // Show error message
             showSnackbar(context, state.message, 'error');
           }
@@ -362,6 +365,12 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
                           totalReviews: attraction.ratingCount ?? 0,
                           reviewsSectionKey: _reviewsSectionKey,
                           avgRating: attraction.avgRating,
+                        ),
+                        const SizedBox(height: 20),
+                        BlocProvider(
+                          create: (_) => serviceLocator<AttractionBloc>(),
+                          child: RelatedAttractionSection(
+                              attractionId: widget.attractionId),
                         ),
                       ],
                     ),

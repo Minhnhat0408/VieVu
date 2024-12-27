@@ -12,7 +12,7 @@ class EventBigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: () => openDeepLink(event.deepLink), // Navigate to deep link
       child: Card(
         elevation: 0,

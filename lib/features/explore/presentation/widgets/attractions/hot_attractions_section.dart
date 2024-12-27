@@ -46,7 +46,7 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
 
             if (state is AttractionsLoadedSuccess) {
               return SizedBox(
-                height: 390, // Height for the horizontal list
+                height: 400, // Height for the horizontal list
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: state.attractions.length, // Number of items
@@ -68,7 +68,8 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
                 ),
               );
             }
-            return const Center(child: Text('Không có dữ liệu'));
+            return const SizedBox(
+                height: 120, child: Center(child: Text('Không có dữ liệu')));
           },
         ),
       ],

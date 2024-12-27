@@ -49,9 +49,14 @@ abstract interface class AttractionRemoteDatasource {
     required String filterType, // 43;true 42;true nearbyDistance nearby10KM
   });
 
-  Future<List<AttractionModel>> getRecommendedAttraction({
+  Future<List<AttractionModel>> getRecommendedAttractions({
     required int limit,
     required String userId,
+  });
+
+  Future<List<AttractionModel>> getRelatedAttractions({
+    required int limit,
+    required int attractionId,
   });
 }
 
@@ -213,7 +218,9 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         final jsonResponse = jsonDecode(response.body);
         final nearbyModuleList =
             jsonResponse['nearbyModuleList'] as List<dynamic>?;
-        if (nearbyModuleList != null && nearbyModuleList.isNotEmpty) {
+        if (nearbyModuleList != null &&
+            nearbyModuleList.isNotEmpty &&
+            nearbyModuleList[0]['totalCount'] > 0) {
           final itemList = nearbyModuleList[0]['itemList'] as List<dynamic>;
           if (serviceType == 1) {
             return itemList
@@ -249,7 +256,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
   }
 
   @override
-  Future<List<AttractionModel>> getRecommendedAttraction({
+  Future<List<AttractionModel>> getRecommendedAttractions({
     required int limit,
     required String userId,
   }) async {
@@ -286,6 +293,44 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         final jsonResponse =
             jsonDecode(utf8.decode(responseRecommendation.bodyBytes));
         final data = jsonResponse['recommendations'] as List<dynamic>;
+
+        return data.map((e) {
+          return AttractionModel.fromJson(e);
+        }).toList();
+      } else {
+        throw ServerException(
+            "Failed to fetch data: ${responseRecommendation.statusCode}");
+      }
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<AttractionModel>> getRelatedAttractions({
+    required int limit,
+    required int attractionId,
+  }) async {
+    final Uri url = Uri.parse(
+        '${dotenv.env['RECOMMENDATION_API_URL']!}/related_attractions');
+    try {
+      final body = {
+        "attraction_id": attractionId,
+        "similarity_weight": 0.7,
+        "top_n": limit,
+      };
+      final responseRecommendation = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(body),
+      );
+
+      if (responseRecommendation.statusCode == 200) {
+        final jsonResponse =
+            jsonDecode(utf8.decode(responseRecommendation.bodyBytes));
+        final data = jsonResponse['related_attractions'] as List<dynamic>;
 
         return data.map((e) {
           return AttractionModel.fromJson(e);

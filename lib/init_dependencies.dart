@@ -225,7 +225,7 @@ void _initLocation() {
         serviceLocator(),
       ),
     )
-    ..registerLazySingleton(
+    ..registerFactory(
       () => LocationBloc(
         repository: serviceLocator(),
       ),

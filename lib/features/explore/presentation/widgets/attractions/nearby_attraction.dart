@@ -187,18 +187,21 @@ class _NearbyAttractionSectionState extends State<NearbyAttractionSection> {
           }
         }, builder: (context, state) {
           if (state is NearbyAttractionsLoadedSuccess) {
-            return SingleChildScrollView(
-              child: Column(
-                children: List.generate(
-                    state.attractions.length,
-                    (index) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 4,
-                          ),
-                          child: AttractionSmallCard(
-                            attraction: state.attractions[index],
-                          ),
-                        )),
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(
+                      state.attractions.length,
+                      (index) => Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 4,
+                            ),
+                            child: AttractionSmallCard(
+                              attraction: state.attractions[index],
+                            ),
+                          )),
+                ),
               ),
             );
           }

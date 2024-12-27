@@ -52,7 +52,7 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
           limit: 5,
           offset: 1,
           serviceType: _convertFilterToServiceType(filter),
-          filterType: '43;true');
+          filterType: 'nearby10KM');
     }
   }
 
@@ -64,7 +64,7 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
         limit: 5,
         offset: 1,
         serviceType: 2,
-        filterType: '43;true');
+        filterType: 'nearby10KM');
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/recommended_attractions_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_appbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/hot_attractions_section.dart';
@@ -100,9 +101,13 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
             const SliverPadding(
                 padding: EdgeInsets.only(bottom: 40.0),
                 sliver: SliverToBoxAdapter(child: HotEventsSection())),
-            const SliverPadding(
-                padding: EdgeInsets.only(bottom: 40.0),
-                sliver: SliverToBoxAdapter(child: HotLocationsSection())),
+            SliverPadding(
+                padding: const EdgeInsets.only(bottom: 40.0),
+                sliver: SliverToBoxAdapter(
+                    child: BlocProvider(
+                  create: (context) => serviceLocator<LocationBloc>(),
+                  child: const HotLocationsSection(),
+                ))),
             const SliverPadding(padding: EdgeInsets.only(bottom: 80))
           ],
         ),

@@ -40,7 +40,8 @@ class AttractionModel extends Attraction {
           jsonn['longitude'] != null ? jsonn['longitude'].toDouble() : 0.0,
       address: jsonn['address'],
       locationId: jsonn['location_id'],
-      openTimeRule:jsonn['open_time_rule'] is List ? jsonn['open_time_rule'] : [],
+      openTimeRule:
+          jsonn['open_time_rule'] is List ? jsonn['open_time_rule'] : [],
       description: jsonn['description']?.toString() ?? '',
       phone: jsonn['phone'],
       avgRating:
@@ -124,6 +125,12 @@ class AttractionModel extends Attraction {
 int? _parseInt(dynamic value) {
   if (value == null) return null;
   if (value is int) return value;
+  if (value is double) {
+    if (value == 0.0) {
+      return null;
+    }
+    return value.toInt();
+  }
   if (value is String) {
     final parsed = int.tryParse(value);
     if (parsed != null) return parsed;

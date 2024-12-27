@@ -39,8 +39,14 @@ abstract interface class AttractionRepository {
     required String filterType, // 43;true 42;true nearbyDistance nearby10KM
   });
 
-  Future<Either<Failure, List<Attraction>>> getRecommendedAttraction({
+  Future<Either<Failure, List<Attraction>>> getRecommendedAttractions({
     required int limit,
     required String userId,
+  });
+
+  Future<Either<Failure, List<Attraction>>>
+      getRelatedAttractions({
+    required int attractionId,
+    required int limit,
   });
 }

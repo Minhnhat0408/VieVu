@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/location_big_card.dart';
 
 class HotLocationsSection extends StatefulWidget {
   const HotLocationsSection({super.key});
@@ -61,52 +62,8 @@ class _HotLocationsSectionState extends State<HotLocationsSection> {
                   ),
                   itemCount: state.locations.length,
                   itemBuilder: (context, index) {
-                    return ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(12), // Rounded corners
-                      child: Stack(
-                        children: [
-                          CachedNetworkImage(
-                            imageUrl: state.locations[index].cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                          ),
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
-                                  colors: [
-                                    Colors.black.withOpacity(0.5),
-                                    Colors.transparent,
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                state.locations[index].name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    return LocationBigCard(
+                      location: state.locations[index],
                     );
                   },
                 ),

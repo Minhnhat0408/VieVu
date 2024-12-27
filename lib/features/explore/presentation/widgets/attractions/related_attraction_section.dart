@@ -1,30 +1,29 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
 
-class RecommendedAttractionSection extends StatefulWidget {
-  const RecommendedAttractionSection({super.key});
+class RelatedAttractionSection extends StatefulWidget {
+  final int attractionId;
+  const RelatedAttractionSection({
+    super.key,
+    required this.attractionId,
+  });
 
   @override
-  State<RecommendedAttractionSection> createState() =>
-      _RecommendedAttractionSectionState();
+  State<RelatedAttractionSection> createState() =>
+      _RelatedAttractionSectionState();
 }
 
-class _RecommendedAttractionSectionState
-    extends State<RecommendedAttractionSection> {
+class _RelatedAttractionSectionState extends State<RelatedAttractionSection> {
   @override
   void initState() {
     super.initState();
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
-    context
-        .read<AttractionBloc>()
-        .add(GetRecommendedAttraction(limit: 10, userId: userId));
+
+    context.read<AttractionBloc>().add(
+        GetRelatedAttractions(limit: 10, attractionId: widget.attractionId));
   }
 
   @override
@@ -33,9 +32,9 @@ class _RecommendedAttractionSectionState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(vertical: 20),
           child: Text(
-            'Gợi ý cho bạn',
+            'Có thể bạn quan tâm',
             style: Theme.of(context)
                 .textTheme
                 .titleLarge!
@@ -60,14 +59,15 @@ class _RecommendedAttractionSectionState
                   scrollDirection: Axis.horizontal,
                   itemCount: state.attractions.length, // Number of items
                   itemBuilder: (context, index) {
-                    log(state.attractions[index].name);
+                    log(state.attractions[index].price.toString());
+
                     return Padding(
                       padding: EdgeInsets.only(
                         left: index == 0
-                            ? 20.0
+                            ? 0
                             : 4.0, // Extra padding for the first item
                         right: index == 9
-                            ? 20.0
+                            ? 0
                             : 4.0, // Extra padding for the last item
                       ),
                       child: AttractionBigCard(
