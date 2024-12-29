@@ -39,6 +39,7 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
               expandedHeight: 350,
               pinned: true,
               leading: null,
+              automaticallyImplyLeading: false,
               scrolledUnderElevation: 0,
               collapsedHeight: 70,
               foregroundColor: Theme.of(context).colorScheme.surface,

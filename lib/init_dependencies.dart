@@ -31,6 +31,7 @@ import 'package:vn_travel_companion/features/explore/presentation/bloc/attractio
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews_cubit.dart';
@@ -86,6 +87,10 @@ Future<void> initDependencies() async {
 
   serviceLocator.registerFactory(
     () => ReviewsCubit(reviewRepository: serviceLocator()),
+  );
+
+  serviceLocator.registerFactory(
+    () => LocationInfoCubit(locationRepository: serviceLocator()),
   );
   serviceLocator.registerFactory<ConnectionChecker>(
     () => ConnectionCheckerImpl(

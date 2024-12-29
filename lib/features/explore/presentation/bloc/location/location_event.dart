@@ -21,16 +21,6 @@ final class GetHotLocations extends LocationEvent {
   });
 }
 
-// final class GetAttractionsByCategory extends LocationEvent {
-//   final String category;
-
-//   GetAttractionsByCategory({
-
-//   });
-
-// }
-
-
 final class GetRecentViewedLocations extends LocationEvent {
   final int limit;
 

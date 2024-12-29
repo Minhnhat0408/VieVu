@@ -9,10 +9,12 @@ class LocationModel extends Location {
     required super.cover,
     required super.latitude,
     required super.longitude,
+    required super.address,
     super.parentId,
   });
 
   factory LocationModel.fromJson(Map<String, dynamic> jsonn) {
+
     return LocationModel(
       id: jsonn['id'],
       name: jsonn['name'],
@@ -24,6 +26,8 @@ class LocationModel extends Location {
       latitude: jsonn['latitude'].toDouble(),
       longitude: jsonn['longitude'].toDouble(),
       parentId: jsonn['parent_id'],
+      address: jsonn['address'] ?? '',
+
     );
   }
 
@@ -37,6 +41,7 @@ class LocationModel extends Location {
       'latitude': latitude,
       'longitude': longitude,
       'parent_id': parentId,
+      'address': address,
     };
   }
 
@@ -49,6 +54,7 @@ class LocationModel extends Location {
     double? latitude,
     double? longitude,
     int? parentId,
+    String? address,
   }) {
     return LocationModel(
       id: id ?? this.id,
@@ -59,6 +65,9 @@ class LocationModel extends Location {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       parentId: parentId ?? this.parentId,
+      address: address ?? this.address,
     );
   }
 }
+
+

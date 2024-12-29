@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vn_travel_companion/core/utils/open_url.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 
 class ExploreSearchItem extends StatelessWidget {
@@ -64,8 +65,13 @@ class ExploreSearchItem extends StatelessWidget {
           } else {
             openDeepLink('https://vn.trip.com${result!.id}');
           }
-        } else {
-          log('result: ${result?.id}');
+        } else if (result?.type == 'locations') {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => LocationDetailPage(
+              locationId: int.parse(result!.id),
+              locationName: result!.title,
+            ),
+          ));
         }
       },
       child: Padding(

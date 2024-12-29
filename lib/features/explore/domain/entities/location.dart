@@ -1,3 +1,9 @@
+import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/comment.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/tripbest.dart';
+
 class Location {
   final int id;
   final String name;
@@ -7,6 +13,7 @@ class Location {
   final double latitude;
   final double longitude;
   final int? parentId;
+  final String address;
 
   const Location({
     required this.id,
@@ -17,5 +24,42 @@ class Location {
     required this.latitude,
     required this.longitude,
     this.parentId,
+    required this.address,
   });
+}
+
+class GenericLocationInfo {
+   List<Attraction> attractions;
+   List<Hotel> hotels;
+   List<Restaurant> restaurants;
+   List<TripBest>? tripbestModule;
+   List<Comment>? comments;
+   List<Location>? locations;
+
+  GenericLocationInfo({
+    required this.attractions,
+    required this.hotels,
+    required this.restaurants,
+    this.comments,
+    this.tripbestModule,
+    this.locations,
+  });
+
+  GenericLocationInfo copyWith({
+    List<Attraction>? attractions,
+    List<Hotel>? hotels,
+    List<Restaurant>? restaurants,
+    List<TripBest>? tripbestModule,
+    List<Comment>? comments,
+    List<Location>? locations,
+  }) {
+    return GenericLocationInfo(
+      attractions: attractions ?? this.attractions,
+      hotels: hotels ?? this.hotels,
+      restaurants: restaurants ?? this.restaurants,
+      tripbestModule: tripbestModule ?? this.tripbestModule,
+      comments: comments ?? this.comments,
+      locations: locations ?? this.locations,
+    );
+  }
 }

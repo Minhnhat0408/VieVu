@@ -19,4 +19,8 @@ abstract interface class LocationRepository {
     required int locationId,
     required String userId,
   });
+
+  Future<Either<Failure, GenericLocationInfo>> getLocationGeneralInfo({
+    required int locationId,
+  });
 }

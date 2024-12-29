@@ -28,7 +28,7 @@ class ServiceModel extends Service {
       longitude: json['coordinate']['longitude'],
       cover: json['image'],
       score: json['score'],
-      commentCount: json['commentCount'],
+      commentCount: json[' commentCount'],
       aggreationCommentCount: json['aggreationCommentCount'],
       tagInfoList: json['tagInfoList'],
       avgPrice: json['avgPrice'],
