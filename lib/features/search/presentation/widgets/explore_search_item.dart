@@ -3,18 +3,23 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 
 class ExploreSearchItem extends StatelessWidget {
   final ExploreSearchResult? result;
+  final Function changeSearchText;
   final bool isDetailed;
 
   const ExploreSearchItem({
     super.key,
     this.result,
     this.isDetailed = false,
+    required this.changeSearchText,
   });
 
   Widget _getIconForType(String type) {
@@ -27,6 +32,11 @@ class ExploreSearchItem extends StatelessWidget {
       case 'locations':
         return const Icon(
           Icons.place,
+          size: 40,
+        );
+      case 'keyword':
+        return const Icon(
+          Icons.search,
           size: 40,
         );
       case 'travel_types':
@@ -48,10 +58,25 @@ class ExploreSearchItem extends StatelessWidget {
     return InkWell(
       onTap: () {
         // Navigate to the detail page
-
+        final userId =
+            (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
         if (result?.type == 'event') {
+          context.read<SearchBloc>().add(SearchHistory(
+                cover: result!.cover,
+                userId: userId,
+                title: result!.title,
+                address: result!.address,
+                externalLink: result!.id,
+              ));
           openDeepLink(result!.id);
         } else if (result?.type == 'attractions') {
+          context.read<SearchBloc>().add(SearchHistory(
+                cover: result!.cover,
+                userId: userId,
+                title: result!.title,
+                address: result!.address,
+                linkId: result!.id,
+              ));
           Navigator.pushNamed(context, '/attraction',
               arguments: int.parse(result!.id));
         } else if (result?.type == 'hotel' ||
@@ -60,16 +85,43 @@ class ExploreSearchItem extends StatelessWidget {
           // check if result.id contains http or https if not add https://vn.trip.com
           if (result!.id.contains('http') || result!.id.contains('https')) {
             openDeepLink(result!.id);
+
+            context.read<SearchBloc>().add(SearchHistory(
+                  cover: result!.cover,
+                  userId: userId,
+                  title: result!.title,
+                  address: result!.address,
+                  externalLink: result!.id,
+                ));
           } else {
             openDeepLink('https://vn.trip.com${result!.id}');
+            context.read<SearchBloc>().add(SearchHistory(
+                  cover: result!.cover,
+                  userId: userId,
+                  title: result!.title,
+                  address: result!.address,
+                  externalLink: 'https://vn.trip.com${result!.id}',
+                ));
           }
         } else if (result?.type == 'locations') {
+          context.read<SearchBloc>().add(SearchHistory(
+                userId: userId,
+                title: result!.title,
+                address: result!.address,
+                linkId: result!.id,
+              ));
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => LocationDetailPage(
               locationId: int.parse(result!.id),
               locationName: result!.title,
             ),
           ));
+        } else {
+          context.read<SearchBloc>().add(SearchHistory(
+                userId: userId,
+                searchText: result!.title,
+              ));
+          changeSearchText(result!.title);
         }
       },
       child: Padding(
@@ -121,7 +173,11 @@ class ExploreSearchItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AutoSizeText(
-                      result == null ? 'Lân cận' : result!.title,
+                      result == null
+                          ? 'Lân cận'
+                          : result!.type == 'keyword'
+                              ? '"${result!.title}"'
+                              : result!.title,
                       minFontSize: 14, // Minimum font size to shrink to
                       maxLines: 2, // Allow up to 2 lines for wrapping
                       overflow: TextOverflow

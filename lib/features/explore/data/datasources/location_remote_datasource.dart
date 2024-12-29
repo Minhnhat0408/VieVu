@@ -200,8 +200,9 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
             log('classicRecommendSight');
             returnData.attractions = (item['classicRecommendSightModule']
                     ['sightList'][0]['sightList'] as List)
-                .map((e) => AttractionModel.fromGeneralLocationInfo(e))
-                .toList();
+                .map((e) {
+              return AttractionModel.fromGeneralLocationInfo(e);
+            }).toList();
           } else if (item['typeName'] == 'classicRecommendHotel') {
             log('classicRecommendHotel');
             returnData.hotels = (item['classicRecommendHotelModule']

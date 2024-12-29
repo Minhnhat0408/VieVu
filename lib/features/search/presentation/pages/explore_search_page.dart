@@ -4,9 +4,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
 import 'package:vn_travel_companion/features/search/presentation/widgets/explore_search_item.dart';
 
 class ExploreSearchPage extends StatefulWidget {
@@ -69,6 +71,8 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
   @override
   void initState() {
     super.initState();
+    context.read<SearchHistoryCubit>().getSearchHistory(
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id);
     if (widget.initialKeyword != null) {
       _searchController.text = widget.initialKeyword!;
     }
@@ -148,6 +152,12 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
     _pagingController.refresh();
   }
 
+  void changeSearchText(String text) {
+    log(text);
+    _searchController.text = text;
+    _onSearchChanged(text);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,8 +191,17 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
             leading: const Icon(Icons.search),
             onSubmitted: (value) {
               if (value.isNotEmpty) {
-                Navigator.pushNamed(context, '/search-results',
-                    arguments: {'keyword': value, 'ticketBox': false});
+                // Navigator.pushNamed(context, '/search-results',
+                //     arguments: {'keyword': value, 'ticketBox': false});
+                final userId =
+                    (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                        .user
+                        .id;
+                log(userId);
+                context.read<SearchBloc>().add(SearchHistory(
+                      searchText: value,
+                      userId: userId,
+                    ));
               }
             },
             onChanged: (value) {
@@ -241,8 +260,29 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
                         isFiltering: state is SearchLoading)),
               ),
               if (_keyword.isEmpty)
-                const SliverToBoxAdapter(
-                  child: ExploreSearchItem(),
+                SliverToBoxAdapter(
+                  child: BlocBuilder<SearchHistoryCubit, SearchHistoryState>(
+                    builder: (context, state) {
+                      if (state is SearchHistoryLoading) {
+                        return const Center(
+                            child: CircularProgressIndicator.adaptive());
+                      }
+
+                      if (state is SearchHistorySuccess) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ExploreSearchItem(
+                              changeSearchText: changeSearchText,
+                            ),
+                            ...state.searchHistory.map((e) => ExploreSearchItem(
+                                result: e, changeSearchText: changeSearchText)),
+                          ],
+                        );
+                      }
+                      return const SizedBox();
+                    },
+                  ),
                 ),
               if (_keyword.isNotEmpty)
                 SliverPadding(
@@ -253,9 +293,9 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
                         PagedChildBuilderDelegate<ExploreSearchResult>(
                       itemBuilder: (context, item, index) {
                         return ExploreSearchItem(
-                          result: item,
-                          isDetailed: true,
-                        );
+                            result: item,
+                            isDetailed: true,
+                            changeSearchText: changeSearchText);
                       },
                       firstPageProgressIndicatorBuilder: (_) =>
                           const Center(child: CircularProgressIndicator()),

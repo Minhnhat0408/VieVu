@@ -62,27 +62,26 @@ class AttractionModel extends Attraction {
       images: json['images'] != null
           ? (json['images'] as List<dynamic>).map((v) => v.toString()).toList()
           : null,
-      hotScore:
-          json['hot_score'] != null ? json['hot_score'].toDouble() : 0.0,
+      hotScore: json['hot_score'] != null ? json['hot_score'].toDouble() : 0.0,
       price: _parseInt(json['price']),
       rankInfo: null,
       latitude: json['latitude'] != null ? json['latitude'].toDouble() : 0.0,
-      longitude:
-          json['longitude'] != null ? json['longitude'].toDouble() : 0.0,
+      longitude: json['longitude'] != null ? json['longitude'].toDouble() : 0.0,
       address: json['address'],
       locationId: json['location_id'] ?? 0,
       openTimeRule:
           json['open_time_rule'] is List ? json['open_time_rule'] : null,
       description: json['description']?.toString() ?? '',
       phone: json['phone'],
-      avgRating:
-          json['score'] != null ? json['score'].toDouble() : 0.0,
-      ratingCount: _parseInt(json['commentNum']),
-      travelTypes:
-          json['tags'] is List ? json['tags'] : [],
-      distance: json['distance'],
+      avgRating: json['score'] ?? 0.0,
+      ratingCount: _parseInt(json['commentNum']) ?? 0,
+      travelTypes: json['tags'] is List
+          ? json['tags']
+          : json['distance'] != null
+              ? [json['distance']]
+              : [],
     );
-  } 
+  }
 
   Map<String, dynamic> toJson() {
     return {

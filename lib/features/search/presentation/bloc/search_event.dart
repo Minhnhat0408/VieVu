@@ -54,3 +54,23 @@ class SearchExternalApi extends SearchEvent {
     required this.searchType,
   });
 }
+
+class SearchHistory extends SearchEvent {
+  final String? searchText;
+  final String userId;
+  final String? cover;
+  final String? title;
+  final String? address;
+  final String? linkId;
+  final String? externalLink;
+
+  SearchHistory({
+    this.searchText,
+    required this.userId,
+    this.cover,
+    this.title,
+    this.address,
+    this.linkId,
+    this.externalLink,
+  });
+}

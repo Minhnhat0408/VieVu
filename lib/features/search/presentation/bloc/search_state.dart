@@ -30,3 +30,4 @@ final class SearchOverAllSuccess extends SearchState {
     required this.results,
   });
 }
+

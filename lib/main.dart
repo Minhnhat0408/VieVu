@@ -16,6 +16,7 @@ import 'package:vn_travel_companion/features/auth/presentation/pages/reset_passw
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
@@ -35,6 +36,7 @@ void main() async {
       BlocProvider(create: (_) => serviceLocator<EventBloc>()),
       BlocProvider(create: (_) => serviceLocator<NearbyAttractionsCubit>()),
       BlocProvider(create: (_) => serviceLocator<SearchBloc>()),
+      BlocProvider(create: (_) => serviceLocator<SearchHistoryCubit>()),
     ],
     child: const MyApp(),
   ));

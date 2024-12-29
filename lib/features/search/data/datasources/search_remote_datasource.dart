@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/search/data/models/explore_search_result_model.dart';
 import 'package:http/http.dart' as http;
@@ -28,6 +29,20 @@ abstract interface class SearchRemoteDataSource {
     required int limit,
     required int page,
     required String searchType,
+  });
+
+  Future upsertSearchHistory({
+    String? searchText,
+    String? cover,
+    required String userId,
+    String? title,
+    String? address,
+    String? linkId,
+    String? externalLink,
+  });
+
+  Future<List<ExploreSearchResultModel>> getSearchHistory({
+    required String userId,
   });
 }
 
@@ -180,6 +195,67 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
       return filteredReviews
           .map((item) => ExploreSearchResultModel.fromExternalJson(
               item as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future upsertSearchHistory({
+    String? searchText,
+    String? cover,
+    required String userId,
+    String? title,
+    String? address,
+    String? linkId,
+    String? externalLink,
+  }) async {
+    try {
+      final response = await supabaseClient
+          .from('search_history')
+          .select('id')
+          .eq('user_id', userId)
+          .or('keyword.eq.$searchText, title.eq.$title');
+
+      log(response.toString());
+      if (response.isEmpty) {
+        await supabaseClient.from('search_history').insert({
+          'keyword': searchText,
+          'cover': cover,
+          'user_id': userId,
+          'title': title,
+          'created_at': DateTime.now().toIso8601String(), 
+          'address': address,
+          'has_detail': cover != null,
+          'link_id': linkId != null ? int.parse(linkId) : null,
+          'external_link': externalLink,
+        });
+      } else {
+        await supabaseClient.from('search_history').update({
+          'created_at': DateTime.now().toIso8601String(),
+        }).eq('id', response[0]['id']);
+      }
+    } catch (e) {
+      log(e.toString());
+
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<List<ExploreSearchResultModel>> getSearchHistory({
+    required String userId,
+  }) async {
+    try {
+      final response = await supabaseClient
+          .from('search_history')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', ascending: false);
+
+      return response
+          .map((e) => ExploreSearchResultModel.fromSearchHistoryJson(e))
           .toList();
     } catch (e) {
       throw Exception(e.toString());

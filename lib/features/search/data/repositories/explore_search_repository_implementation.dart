@@ -62,8 +62,7 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
   }
 
   @override
-  Future<Either<Failure, List<ExploreSearchResult>>>
-      searchAll({
+  Future<Either<Failure, List<ExploreSearchResult>>> searchAll({
     required String searchText,
     required int limit,
     required int offset,
@@ -102,6 +101,55 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
         limit: limit,
         page: page,
         searchType: searchType,
+      );
+
+      return right(searchResults);
+    } catch (e) {
+      throw left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> upsertSearchHistory({
+    String? searchText,
+    String? cover,
+    required String userId,
+    String? title,
+    String? address,
+    String? linkId,
+    String? externalLink,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      await searchRemoteDataSource.upsertSearchHistory(
+        searchText: searchText,
+        cover: cover,
+        userId: userId,
+        title: title,
+        address: address,
+        linkId: linkId,
+        externalLink: externalLink,
+      );
+
+      return right(true);
+    } catch (e) {
+      throw left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ExploreSearchResult>>> getSearchHistory({
+    required String userId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final List<ExploreSearchResult> searchResults =
+          await searchRemoteDataSource.getSearchHistory(
+        userId: userId,
       );
 
       return right(searchResults);

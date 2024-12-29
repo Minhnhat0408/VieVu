@@ -28,5 +28,19 @@ abstract interface class ExploreSearchRepository {
     required int page,
     required String searchType,
   });
+
+  Future<Either<Failure,bool>> upsertSearchHistory({
+    String? searchText,
+    String? cover,
+    required String userId,
+    String? title,
+    String? address,
+    String? linkId,
+    String? externalLink,
+  });
+
+  Future<Either<Failure,List<ExploreSearchResult>>> getSearchHistory({
+    required String userId,
+  });
   
 }

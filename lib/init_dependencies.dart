@@ -39,6 +39,7 @@ import 'package:vn_travel_companion/features/search/data/datasources/search_remo
 import 'package:vn_travel_companion/features/search/data/repositories/explore_search_repository_implementation.dart';
 import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/repositories/preference_repository_implementation.dart';
@@ -87,6 +88,10 @@ Future<void> initDependencies() async {
 
   serviceLocator.registerFactory(
     () => ReviewsCubit(reviewRepository: serviceLocator()),
+  );
+
+  serviceLocator.registerLazySingleton(
+    () => SearchHistoryCubit(repository: serviceLocator()),
   );
 
   serviceLocator.registerFactory(

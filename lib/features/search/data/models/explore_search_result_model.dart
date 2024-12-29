@@ -38,6 +38,25 @@ class ExploreSearchResultModel extends ExploreSearchResult {
     );
   }
 
+  factory ExploreSearchResultModel.fromSearchHistoryJson(
+      Map<String, dynamic> json) {
+    return ExploreSearchResultModel(
+      title: json['title'] ?? json['keyword'],
+      address: json['address'],
+      id: json['link_id'] != null
+          ? json['link_id'].toString()
+          : json['external_link'] ?? json['keyword'],
+      type: json['has_detail']
+          ? json['link_id'] != null
+              ? 'attractions'
+              : 'restaurant'
+          : json['keyword'] != null
+              ? 'keyword'
+              : 'locations',
+      cover: json['cover'],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'title': title,

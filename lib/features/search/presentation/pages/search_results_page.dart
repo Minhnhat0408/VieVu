@@ -178,10 +178,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                   builderDelegate:
                       PagedChildBuilderDelegate<ExploreSearchResult>(
                     itemBuilder: (context, item, index) {
-                      return ExploreSearchItem(
-                        result: item,
-                        isDetailed: true,
-                      );
+                      return const SizedBox();
                     },
                     firstPageProgressIndicatorBuilder: (_) =>
                         const Center(child: CircularProgressIndicator()),

@@ -133,14 +133,15 @@ class RestaurantBigCard extends StatelessWidget {
 
                     const SizedBox(height: 6),
                     // Price
-                    Text(
-                      'Từ: ${NumberFormat('#,###').format(restaurant.price)} VND',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
+                    if (restaurant.price > 0)
+                      Text(
+                        'Từ: ${NumberFormat('#,###').format(restaurant.price)} VND',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
