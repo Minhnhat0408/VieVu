@@ -14,7 +14,6 @@ import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';

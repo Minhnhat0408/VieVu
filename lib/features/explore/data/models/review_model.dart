@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/review.dart';
 

@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/search/data/models/explore_search_result_model.dart';
 import 'package:http/http.dart' as http;

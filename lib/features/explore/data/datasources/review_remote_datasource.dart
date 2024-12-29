@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';

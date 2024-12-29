@@ -102,9 +102,6 @@ class LocationRepositoryImpl implements LocationRepository {
       final location = await locationRemoteDatasource.getLocationGeneralInfo(
         locationId: locationId,
       );
-      if (location == null) {
-        return left(Failure("Không tìm thấy địa điểm"));
-      }
 
       return right(location);
     } on ServerException catch (e) {

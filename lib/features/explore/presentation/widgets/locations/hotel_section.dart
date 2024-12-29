@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/hotel_big_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/restaurant_big_card.dart';
 
 class HotelSection extends StatelessWidget {
   final List<Hotel> hotels;

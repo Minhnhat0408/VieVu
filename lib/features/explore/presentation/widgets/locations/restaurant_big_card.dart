@@ -93,7 +93,7 @@ class RestaurantBigCard extends StatelessWidget {
                     Row(
                       children: [
                         RatingBarIndicator(
-                          rating: restaurant.avgRating ?? 0,
+                          rating: restaurant.avgRating,
                           itemSize: 20,
                           direction: Axis.horizontal,
                           itemCount: 5,
