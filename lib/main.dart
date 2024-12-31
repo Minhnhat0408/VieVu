@@ -20,6 +20,7 @@ import 'package:vn_travel_companion/features/search/presentation/cubit/search_hi
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/pages/initial_preferences.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 void main() async {
@@ -115,7 +116,7 @@ class _MyAppState extends State<MyApp> {
                         return const SplashScreenPage();
                       }
                       if (state is NoPreferencesExits) {
-                        return const SettingsPage();
+                        return const InitialPreferences();
                       }
                       if (state is PreferencesLoadedSuccess) {
                         return const AuthenticatedView();

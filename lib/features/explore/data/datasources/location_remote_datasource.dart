@@ -64,6 +64,19 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
         return null;
       }
 
+      final childLoc = await supabaseClient
+          .from('locations')
+          .select('*')
+          .eq('parent_id', locationId)
+          .limit(6)
+          .order('cover', ascending: true);
+      if (childLoc.isNotEmpty) {
+        response['childLoc'] = childLoc.map((e) {
+          log(e.toString());
+          return LocationModel.fromJson(e);
+        }).toList();
+      }
+
       final address = [];
       if (response['parent'] != null) {
         address.add(response['parent']['name']);
@@ -78,6 +91,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
           address.add(subParentResponse!['name']);
         }
       }
+
       address.add('Việt Nam');
       final cleanAddress = address.join(', ');
 

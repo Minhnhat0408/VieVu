@@ -37,3 +37,28 @@ class GetRelatedAttractions extends AttractionEvent {
 
   GetRelatedAttractions({required this.attractionId, required this.limit});
 }
+
+
+class GetAttractionsWithFilter extends AttractionEvent {
+  final String? categoryId1;
+  final List<String>? categoryId2;
+  final int limit;
+  final int offset;
+  final int? budget;
+  final int? rating;
+  final int locationId;
+  final String sortType;
+  final bool topRanked;
+
+  GetAttractionsWithFilter({
+    this.categoryId1,
+    this.categoryId2,
+    required this.limit,
+    required this.offset,
+    this.budget,
+    this.rating,
+    required this.locationId,
+    required this.sortType,
+    required this.topRanked,
+  });
+}

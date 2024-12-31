@@ -58,6 +58,19 @@ abstract interface class AttractionRemoteDatasource {
     required int limit,
     required int attractionId,
   });
+
+  Future<List<AttractionModel>> getAttractionsWithFilter({
+    String? categoryId1,
+    List<String>? categoryId2,
+    required int limit,
+    required int offset,
+    int? budget, // 1 for low, 2 for medium, 3 for high , 0 for free
+    int?
+        rating, // 1 for below, 2 for 2 stars, 3 for 3 stars, 4 for 4 stars, 5 for 5 stars
+    required int locationId,
+    required String sortType,
+    required bool topRanked,
+  });
 }
 
 class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
@@ -339,6 +352,61 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         throw ServerException(
             "Failed to fetch data: ${responseRecommendation.statusCode}");
       }
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<AttractionModel>> getAttractionsWithFilter({
+    String? categoryId1,
+    List<String>? categoryId2,
+    required int limit,
+    required int offset,
+    int? budget,
+    int? rating,
+    required int locationId,
+    required String sortType,
+    required bool topRanked,
+  }) async {
+    try {
+      log(categoryId1.toString());
+      var query = supabaseClient.rpc('get_attractions', params: {
+        'loc_id': locationId,
+        'partraveltype_id': categoryId1,
+        'traveltype_ids': categoryId2,
+        'sorttype': sortType,
+      });
+      if (topRanked) {
+        query = query.not('rank_info', 'is', null);
+      }
+      if (rating != null) {
+        if (rating == 2) {
+          query = query.gte('avg_rating', 0.0).lte('avg_rating', rating + 0.5);
+        }
+        query = query
+            .gte('avg_rating', rating - 0.5)
+            .lte('avg_rating', rating + 0.5);
+      }
+      if (budget != null) {
+        if (budget == 0) {
+          query = query.isFilter('price', null);
+        } else if (budget == 1) {
+          query = query.or('price.is.null, price.lte.200000');
+        } else if (budget == 2) {
+          query = query.gte('price', 200000).lte('price', 500000);
+        } else {
+          query = query.gte('price', 500000);
+        }
+      }
+
+      final response = await query.range(offset, offset + limit);
+
+      // log(response.toString());
+
+      return (response as List).map((e) {
+        return AttractionModel.fromJson(e);
+      }).toList();
     } catch (e) {
       throw ServerException(e.toString());
     }

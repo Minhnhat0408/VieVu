@@ -16,6 +16,8 @@ class ExploreSearchPage extends StatefulWidget {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
           const ExploreSearchPage(),
+      fullscreenDialog: true,
+
       reverseTransitionDuration: const Duration(milliseconds: 500),
       transitionDuration: const Duration(milliseconds: 500),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -153,7 +155,6 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
   }
 
   void changeSearchText(String text) {
-    log(text);
     _searchController.text = text;
     _onSearchChanged(text);
   }
@@ -175,13 +176,13 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
             : null,
         centerTitle: true,
         toolbarHeight: 90,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0), // Thickness of the line
-          child: Container(
-            color: Theme.of(context).colorScheme.primaryContainer, // Line color
-            height: 1.0, // Line thickness
-          ),
-        ),
+        // bottom: PreferredSize(
+        //   preferredSize: const Size.fromHeight(1.0), // Thickness of the line
+        //   child: Container(
+        //     color: Theme.of(context).colorScheme.primaryContainer, // Line color
+        //     height: 1.0, // Line thickness
+        //   ),
+        // ),
         title: Hero(
           tag: 'exploreSearch',
           child: SearchBar(
@@ -191,16 +192,12 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
             leading: const Icon(Icons.search),
             onSubmitted: (value) {
               if (value.isNotEmpty) {
-                // Navigator.pushNamed(context, '/search-results',
-                //     arguments: {'keyword': value, 'ticketBox': false});
-                final userId =
-                    (context.read<AppUserCubit>().state as AppUserLoggedIn)
-                        .user
-                        .id;
-                log(userId);
                 context.read<SearchBloc>().add(SearchHistory(
                       searchText: value,
-                      userId: userId,
+                      userId: (context.read<AppUserCubit>().state
+                              as AppUserLoggedIn)
+                          .user
+                          .id,
                     ));
               }
             },
@@ -214,9 +211,6 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         _searchController.clear();
-                        // setState(() {
-                        //   _results = [];
-                        // });
                       },
                     )
                   ],
@@ -248,7 +242,7 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                    padding: const EdgeInsets.only(top: 20, bottom: 30.0),
+                    padding: const EdgeInsets.only(bottom: 4.0),
                     child: FilterOptionsBig(
                         options: _keyword.isEmpty
                             ? ["Tìm kiếm gần đây"]
@@ -259,25 +253,40 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
                         onOptionSelected: _onFilterChanged,
                         isFiltering: state is SearchLoading)),
               ),
+              SliverToBoxAdapter(
+                child: Divider(
+                  height: 20,
+                  thickness: 1,
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+              ),
               if (_keyword.isEmpty)
                 SliverToBoxAdapter(
                   child: BlocBuilder<SearchHistoryCubit, SearchHistoryState>(
                     builder: (context, state) {
                       if (state is SearchHistoryLoading) {
-                        return const Center(
-                            child: CircularProgressIndicator.adaptive());
+                        return const SizedBox(
+                          height: 600,
+                          child: Center(
+                              child: CircularProgressIndicator.adaptive()),
+                        );
                       }
 
                       if (state is SearchHistorySuccess) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ExploreSearchItem(
-                              changeSearchText: changeSearchText,
-                            ),
-                            ...state.searchHistory.map((e) => ExploreSearchItem(
-                                result: e, changeSearchText: changeSearchText)),
-                          ],
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 60.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ExploreSearchItem(
+                                changeSearchText: changeSearchText,
+                              ),
+                              ...state.searchHistory.map((e) =>
+                                  ExploreSearchItem(
+                                      result: e,
+                                      changeSearchText: changeSearchText)),
+                            ],
+                          ),
                         );
                       }
                       return const SizedBox();

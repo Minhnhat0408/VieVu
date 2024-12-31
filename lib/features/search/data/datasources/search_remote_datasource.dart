@@ -212,11 +212,14 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
     String? externalLink,
   }) async {
     try {
+      final compareLinkId = linkId != null
+          ? "link_id.eq.${int.parse(linkId)}"
+          : "link_id.is.null";
       final response = await supabaseClient
           .from('search_history')
           .select('id')
           .eq('user_id', userId)
-          .or('keyword.eq.$searchText, title.eq.$title');
+          .or('keyword.eq.$searchText,and( title.eq.$title, $compareLinkId)');
 
       log(response.toString());
       if (response.isEmpty) {
@@ -225,7 +228,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
           'cover': cover,
           'user_id': userId,
           'title': title,
-          'created_at': DateTime.now().toIso8601String(), 
+          'created_at': DateTime.now().toIso8601String(),
           'address': address,
           'has_detail': cover != null,
           'link_id': linkId != null ? int.parse(linkId) : null,
@@ -252,6 +255,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
           .from('search_history')
           .select('*')
           .eq('user_id', userId)
+          .limit(10)
           .order('created_at', ascending: false);
 
       return response

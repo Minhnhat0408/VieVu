@@ -184,4 +184,39 @@ class AttractionRepositoryImpl implements AttractionRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Attraction>>>
+      getAttractionsWithFilter({
+    String? categoryId1,
+    List<String>? categoryId2,
+    required int limit,
+    required int offset,
+    int? budget,
+    int? rating,
+    required int locationId,
+    required String sortType,
+    required bool topRanked,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final attractions = await attractionRemoteDatasource.getAttractionsWithFilter(
+        categoryId1: categoryId1,
+        categoryId2: categoryId2,
+        limit: limit,
+        offset: offset,
+        budget: budget,
+        rating: rating,
+        locationId: locationId,
+        sortType: sortType,
+        topRanked: topRanked,
+      );
+
+      return right(attractions);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

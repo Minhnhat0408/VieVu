@@ -13,6 +13,7 @@ class Location {
   final double latitude;
   final double longitude;
   final int? parentId;
+  final List<Location> childLoc;
   final String address;
 
   const Location({
@@ -23,6 +24,7 @@ class Location {
     required this.cover,
     required this.latitude,
     required this.longitude,
+    required this.childLoc,
     this.parentId,
     required this.address,
   });

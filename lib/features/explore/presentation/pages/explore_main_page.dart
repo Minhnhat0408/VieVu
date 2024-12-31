@@ -8,7 +8,6 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/attrac
 import 'package:vn_travel_companion/features/explore/presentation/widgets/events/hot_events.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/hot_locations.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/nearby_attraction.dart';
-import 'package:vn_travel_companion/features/search/presentation/pages/search_results_page.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class ExploreMainPage extends StatefulWidget {
@@ -62,17 +61,7 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
                           right: index == 9 ? 20 : 4.0, // Padding for last item
                         ),
                         child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SearchResultsPage(
-                                  keyword: 'faefse',
-                                  ticketBox: false,
-                                ),
-                              ),
-                            );
-                          },
+                          onPressed: () {},
                           child: const Hero(
                               tag: 'nope', child: Text('Xem gần đây')),
                         ),

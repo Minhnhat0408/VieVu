@@ -43,11 +43,11 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
         size: _selectedIndex == 0 ? 36 : 30,
       ),
       Icon(
-        Icons.tour_outlined,
+        Icons.card_travel,
         size: _selectedIndex == 1 ? 36 : 30,
       ),
       Icon(
-        Icons.search,
+        Icons.travel_explore,
         size: _selectedIndex == 2 ? 36 : 30,
       ),
       Icon(

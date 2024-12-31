@@ -44,9 +44,20 @@ abstract interface class AttractionRepository {
     required String userId,
   });
 
-  Future<Either<Failure, List<Attraction>>>
-      getRelatedAttractions({
+  Future<Either<Failure, List<Attraction>>> getRelatedAttractions({
     required int attractionId,
     required int limit,
+  });
+
+  Future<Either<Failure, List<Attraction>>> getAttractionsWithFilter({
+    String? categoryId1,
+    List<String>? categoryId2,
+    required int limit,
+    required int offset,
+    int? budget,
+    int? rating,
+    required int locationId,
+    required String sortType,
+    required bool topRanked,
   });
 }

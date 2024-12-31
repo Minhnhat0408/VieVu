@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/restaurant_section.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/sub_location_section.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/tripbest_section.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/slider_pagination.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/attraction_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/comment_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/hotel_section.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/restaurant_section.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/tripbest_section.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/slider_pagination.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
 
 class LocationDetailPage extends StatelessWidget {
   final int locationId;
@@ -31,7 +34,7 @@ class LocationDetailPage extends StatelessWidget {
         ),
       ],
       child: Scaffold(
-        body: LocationDetailView(
+        body: LocationDetailMain(
           locationId: locationId,
           locationName: locationName,
         ),
@@ -40,26 +43,62 @@ class LocationDetailPage extends StatelessWidget {
   }
 }
 
-class LocationDetailView extends StatefulWidget {
+class LocationDetailMain extends StatefulWidget {
   final int locationId;
   final String locationName;
 
-  const LocationDetailView(
+  const LocationDetailMain(
       {super.key, required this.locationId, required this.locationName});
 
   @override
-  State<LocationDetailView> createState() => LocationDetailViewState();
+  State<LocationDetailMain> createState() => LocationDetailMainState();
 }
 
-class LocationDetailViewState extends State<LocationDetailView> {
+class LocationDetailMainState extends State<LocationDetailMain> {
+  int _selectedIndex = 0;
+  bool reversedTrans = false;
+
   @override
   void initState() {
     super.initState();
-
     context
         .read<LocationBloc>()
         .add(GetLocation(locationId: widget.locationId));
     context.read<LocationInfoCubit>().fetchLocationInfo(widget.locationId);
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      if (_selectedIndex > index) {
+        reversedTrans = true;
+      } else {
+        reversedTrans = false;
+      }
+      _selectedIndex = index;
+    });
+  }
+
+  final options = [
+    "Tổng quan",
+    "Địa điểm du lịch",
+    "Nhà hàng",
+    "Khách sạn",
+  ];
+
+  // Replace with the desired icons
+  IconData _convertIcon(int index) {
+    switch (index) {
+      case 0:
+        return Icons.info_outline;
+      case 1:
+        return Icons.attractions;
+      case 2:
+        return Icons.restaurant;
+      case 3:
+        return Icons.hotel;
+      default:
+        return Icons.info;
+    }
   }
 
   @override
@@ -79,172 +118,253 @@ class LocationDetailViewState extends State<LocationDetailView> {
           IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border)),
         ],
       ),
-      body: NestedScrollView(
-        floatHeaderSlivers: true,
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar(
-            floating: true,
-            leading: null,
-            automaticallyImplyLeading: false,
-            snap: true,
-            scrolledUnderElevation: 0,
-            flexibleSpace: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
-                child: Row(
-                  children: List.generate(
-                    10, // Number of buttons
-                    (index) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // Add behavior for buttons if needed
-                        },
-                        child: Text('Button ${index + 1}'),
+      body: Stack(
+        children: [
+          NestedScrollView(
+            floatHeaderSlivers: true,
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverAppBar(
+                floating: true,
+                leading: null,
+                automaticallyImplyLeading: false,
+                snap: true,
+                scrolledUnderElevation: 0,
+                flexibleSpace: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 6),
+                    child: Row(
+                      children: List.generate(
+                        options.length, // Number of buttons
+                        (index) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Hero(
+                            tag: options[index],
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        BlocProvider(
+                                      create: (context) =>
+                                          serviceLocator<AttractionBloc>(),
+                                      child: AttractionListPage(
+                                        locationId: widget.locationId,
+                                        locationName: widget.locationName,
+                                      ),
+                                    ),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      return child; // No transition for the rest of the page
+                                    },
+                                  ),
+                                );
+                              },
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: _selectedIndex == index
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.surface,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize
+                                    .min, // Ensures the button size matches the content
+                                children: [
+                                  Icon(
+                                    _convertIcon(
+                                        index), // Replace with the desired icon
+                                    size: 20, // Adjust size as needed
+                                    color: _selectedIndex == index
+                                        ? Theme.of(context).colorScheme.surface
+                                        : Theme.of(context).colorScheme.primary,
+                                  ),
+                                  const SizedBox(
+                                      width:
+                                          8), // Spacing between the icon and text
+                                  Text(
+                                    options[index],
+                                    style: TextStyle(
+                                      color: _selectedIndex == index
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .surface
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          )
-        ],
-        body: BlocConsumer<LocationBloc, LocationState>(
-          listener: (context, state) {
-            if (state is LocationFailure) {
-              // Show error message
-              showSnackbar(context, state.message, 'error');
-            }
-          },
-          builder: (context, state) {
-            if (state is LocationLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (state is LocationDetailsLoadedSuccess) {
-              final Location location = state.location;
-              final imgList = [...location.images, location.cover];
+              )
+            ],
+            body: BlocConsumer<LocationBloc, LocationState>(
+              listener: (context, state) {
+                if (state is LocationFailure) {
+                  // Show error message
+                  showSnackbar(context, state.message, 'error');
+                }
+              },
+              builder: (context, state) {
+                if (state is LocationLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (state is LocationDetailsLoadedSuccess) {
+                  final Location location = state.location;
+                  final imgList = [...location.images, location.cover];
 
-              return BlocConsumer<LocationInfoCubit, LocationInfoState>(
-                listener: (context, state2) {
-                  // Listener if needed
-                },
-                builder: (context, state2) {
-                  if (state2 is LocationInfoLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (state2 is LocationInfoFailure) {
-                    return const Center(
-                      child: Text('Không có dữ liệu'),
-                    );
-                  }
-                  final locationInfo =
-                      (state2 as LocationInfoLoaded).locationInfo;
-                  return SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Stack(
+                  return BlocBuilder<LocationInfoCubit, LocationInfoState>(
+                    builder: (context, state2) {
+                      if (state2 is LocationInfoLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (state2 is LocationInfoFailure) {
+                        return const Center(
+                          child: Text('Không có dữ liệu'),
+                        );
+                      }
+                      final locationInfo =
+                          (state2 as LocationInfoLoaded).locationInfo;
+                      return SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SliderPagination(imgList: imgList),
+                            Stack(
+                              children: [
+                                SliderPagination(imgList: imgList),
+                              ],
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 20, bottom: 80),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0),
+                                    child: Text(
+                                      location.name,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 32),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondaryContainer,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          width: 40,
+                                          height: 40,
+                                          alignment: Alignment.center,
+                                          child: const FaIcon(
+                                              FontAwesomeIcons.locationDot,
+                                              size: 18),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Flexible(
+                                          child: Text(
+                                            location.address,
+                                            softWrap: true,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (location.childLoc.isNotEmpty)
+                                    SubLocationSection(
+                                        locations: location.childLoc,
+                                        locationName: location.name),
+                                  const Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 20.0,
+                                        bottom: 0,
+                                        left: 20,
+                                        right: 20),
+                                    child: Divider(
+                                      thickness: 1.5,
+                                    ),
+                                  ),
+                                  if (locationInfo.tripbestModule != null)
+                                    TripbestSection(
+                                        tripbests:
+                                            locationInfo.tripbestModule!),
+                                  AttractionsSection(
+                                      attractions: locationInfo.attractions,
+                                      locationName: location.name),
+                                  RestaurantSection(
+                                      restaurants: locationInfo.restaurants,
+                                      locationName: location.name),
+                                  HotelSection(
+                                      hotels: locationInfo.hotels,
+                                      locationName: location.name),
+                                  const Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 20.0,
+                                        bottom: 0,
+                                        left: 20,
+                                        right: 20),
+                                    child: Divider(
+                                      thickness: 1.5,
+                                    ),
+                                  ),
+                                  if (locationInfo.comments != null)
+                                    CommentSection(
+                                        comments: locationInfo.comments!,
+                                        locationName: location.name),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20, bottom: 80),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0),
-                                child: Text(
-                                  location.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 32),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondaryContainer,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      width: 40,
-                                      height: 40,
-                                      alignment: Alignment.center,
-                                      child: const FaIcon(
-                                          FontAwesomeIcons.locationDot,
-                                          size: 18),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Flexible(
-                                      child: Text(
-                                        location.address,
-                                        softWrap: true,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(
-                                    top: 20.0, bottom: 0, left: 20, right: 20),
-                                child: Divider(
-                                  thickness: 1.5,
-                                ),
-                              ),
-                              if (locationInfo.tripbestModule != null)
-                                TripbestSection(
-                                    tripbests: locationInfo.tripbestModule!),
-                              AttractionsSection(
-                                  attractions: locationInfo.attractions,
-                                  locationName: location.name),
-                              RestaurantSection(
-                                  restaurants: locationInfo.restaurants,
-                                  locationName: location.name),
-                              HotelSection(
-                                  hotels: locationInfo.hotels,
-                                  locationName: location.name),
-                              const Padding(
-                                padding: EdgeInsets.only(
-                                    top: 20.0, bottom: 0, left: 20, right: 20),
-                                child: Divider(
-                                  thickness: 1.5,
-                                ),
-                              ),
-                              if (locationInfo.comments != null)
-                                CommentSection(
-                                    comments: locationInfo.comments!,
-                                    locationName: location.name),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
-                },
-              );
-            }
-            return const Center(
-              child: Text('Không có dữ liệu'),
-            );
-          },
-        ),
+                }
+                return const Center(
+                  child: Text('Không có dữ liệu'),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            bottom: 70.0,
+            right: 16.0,
+            child: FloatingActionButton(
+              onPressed: () {
+                // Navigator.of(context).push(
+                //   MaterialPageRoute(
+                //     builder: (context) => const MapView(),
+                //   ),
+                // );
+              },
+              child: const Icon(Icons.map),
+            ),
+          ),
+        ],
       ),
     );
   }
