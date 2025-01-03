@@ -9,8 +9,8 @@ class Service {
   final int aggreationCommentCount;
   final List<dynamic>? tagInfoList;
   final double? avgPrice;
-  final double distance;
-  final String distanceDesc;
+  final double? distance;
+  final String? distanceDesc;
   final String? hotScore;
   final double? star;
   final String jumpUrl;
@@ -27,8 +27,8 @@ class Service {
     required this.aggreationCommentCount,
     this.tagInfoList,
     required this.avgPrice,
-    required this.distance,
-    required this.distanceDesc,
+    this.distance,
+    this.distanceDesc,
     required this.jumpUrl,
     this.star,
     this.hotScore,

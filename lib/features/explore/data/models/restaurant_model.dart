@@ -12,6 +12,7 @@ class RestaurantModel extends Restaurant {
       required super.jumpUrl,
       required super.ratingCount,
       required super.cuisineName,
+      super.distance,
       super.userNickname,
       super.userAvatar,
       super.userContent});
@@ -21,16 +22,20 @@ class RestaurantModel extends Restaurant {
       id: json['poiId'],
       name: json['poiName'],
       cover: json['coverImgaeUrl'],
-      price: json['price'],
+      // convert price from double to int
+      price: json['price'] is double ? json['price'].toInt() : 0,
       latitude: json['gglat'],
       longitude: json['gglon'],
       avgRating: json['rating'],
       ratingCount: json['reviewCount'],
-      cuisineName: json['cuisineName'],
-      userNickname: json['commentInfo']['nickname'],
-      userAvatar: json['commentInfo']['headPhoto'],
-      userContent: json['commentInfo']['content'],
-      jumpUrl: json['jumpUrl'],
+      cuisineName: json['cuisineName'] ?? 'Ẩm thực',
+      userNickname: json['commentInfo']?['nickname'],
+      userAvatar: json['commentInfo']?['headPhoto'],
+      userContent: json['commentInfo']?['content'],
+      distance: json['distancefromcenter'] != null
+          ? json['distancefromcenter'] / 1000
+          : null,
+      jumpUrl: json['jumpUrl'] ?? '',
     );
   }
 

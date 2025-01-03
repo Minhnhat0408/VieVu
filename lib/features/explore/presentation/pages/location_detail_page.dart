@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/restaurant_list_page.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/restaurant_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/sub_location_section.dart';
@@ -143,24 +145,47 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                             tag: options[index],
                             child: OutlinedButton(
                               onPressed: () {
-                                Navigator.of(context).push(
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation,
-                                            secondaryAnimation) =>
-                                        BlocProvider(
-                                      create: (context) =>
-                                          serviceLocator<AttractionBloc>(),
-                                      child: AttractionListPage(
-                                        locationId: widget.locationId,
-                                        locationName: widget.locationName,
+                                if (index == 1) {
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          BlocProvider(
+                                        create: (context) =>
+                                            serviceLocator<AttractionBloc>(),
+                                        child: AttractionListPage(
+                                          locationId: widget.locationId,
+                                          locationName: widget.locationName,
+                                        ),
                                       ),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        return child; // No transition for the rest of the page
+                                      },
                                     ),
-                                    transitionsBuilder: (context, animation,
-                                        secondaryAnimation, child) {
-                                      return child; // No transition for the rest of the page
-                                    },
-                                  ),
-                                );
+                                  );
+                                } else if (index == 2) {
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          BlocProvider(
+                                        create: (context) => serviceLocator<
+                                            NearbyServicesCubit>(),
+                                        child: RestaurantListPage(
+                                          locationId: widget.locationId,
+                                          locationName: widget.locationName,
+                                        ),
+                                      ),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        return child; // No transition for the rest of the page
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  _onItemTapped(index);
+                                }
                               },
                               style: OutlinedButton.styleFrom(
                                 backgroundColor: _selectedIndex == index

@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 
 abstract interface class AttractionRepository {
@@ -56,8 +57,24 @@ abstract interface class AttractionRepository {
     required int offset,
     int? budget,
     int? rating,
-    required int locationId,
+    double? lat,
+    double? lon,
+    int? proximity,
+    int? locationId,
     required String sortType,
     required bool topRanked,
+  });
+
+  Future<Either<Failure,List<Restaurant>>> getRestaurantsWithFilter({
+    int? categoryId1,
+    List<int> serviceIds = const [],
+    List<int> openTime = const [],
+    required int limit,
+    required int offset,
+    int? minPrice,
+    int? maxPrice,
+    double? lat,
+    double? lon,
+    int? locationId,
   });
 }

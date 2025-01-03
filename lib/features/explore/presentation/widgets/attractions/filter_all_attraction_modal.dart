@@ -130,7 +130,12 @@ class _FilterAllAtrractionModalState extends State<FilterAllAtrractionModal> {
                       return OutlinedButton(
                         onPressed: () {
                           setState(() {
-                            _parentTravelType = travelType;
+                            if (_parentTravelType?.id == travelType.id) {
+                              _parentTravelType = null;
+                              _travelTypes = [];
+                            } else {
+                              _parentTravelType = travelType;
+                            }
                           });
                           context
                               .read<TravelTypesBloc>()
@@ -326,7 +331,11 @@ class _FilterAllAtrractionModalState extends State<FilterAllAtrractionModal> {
             TextButton(
                 onPressed: () {
                   setState(() {
-                    // _travelType = null;
+                    _sortType = "hot_score";
+                    _parentTravelType = null;
+                    _travelTypes = [];
+                    _rating = null;
+                    _budget = null;
                   });
                 },
                 child: const Text("Hủy",

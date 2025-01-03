@@ -85,6 +85,9 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
       locationId: event.locationId,
       sortType: event.sortType,
       topRanked: event.topRanked,
+      lat: event.lat,
+      lon: event.lon,
+      proximity: event.proximity,
     );
     res.fold(
       (l) => emit(AttractionFailure(l.message)),

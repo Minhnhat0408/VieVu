@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
 
-class RatingModal extends StatefulWidget {
-  final int? currentRating;
-  final ValueChanged<int?> onRatingChanged;
-  const RatingModal(
-      {super.key, required this.currentRating, required this.onRatingChanged});
+class RestaurantPriceRange extends StatefulWidget {
+  final int? minPrice;
+  final int? maxPrice;
+  final ValueChanged<List<int>> onServicesChanged;
+  const RestaurantPriceRange(
+      {super.key,
+      required this.minPrice,
+      required this.maxPrice,
+      required this.onServicesChanged});
 
   @override
-  State<RatingModal> createState() => _RatingModalState();
+  State<RestaurantPriceRange> createState() => _RestaurantPriceRangeState();
 }
 
-class _RatingModalState extends State<RatingModal> {
-  late int? _currentRating;
-  
+class _RestaurantPriceRangeState extends State<RestaurantPriceRange> {
+  RangeValues _currentRangeValues = const RangeValues(0, 5000000);
+
   @override
   void initState() {
     super.initState();
-    _currentRating = widget.currentRating;
+    final double min =
+        widget.minPrice != null ? widget.minPrice!.toDouble() : 0.0;
+    final double max =
+        widget.maxPrice != null ? widget.maxPrice!.toDouble() : 5000000.0;
+    _currentRangeValues = RangeValues(min, max);
   }
 
   @override
@@ -34,7 +42,7 @@ class _RatingModalState extends State<RatingModal> {
                 width: 30,
               ),
               const Text(
-                "Chọn đánh giá",
+                "Chọn mức giá",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               IconButton(
@@ -48,31 +56,21 @@ class _RatingModalState extends State<RatingModal> {
           thickness: 1,
           color: Theme.of(context).colorScheme.primary,
         ),
-        ...[5, 4, 3, 2].map(
-          (rating) {
-            return RadioListTile(
-              value: rating,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-              groupValue: _currentRating,
-              controlAffinity: ListTileControlAffinity.trailing,
-              title: RatingBarIndicator(
-                rating: rating.toDouble(),
-                itemSize: 20,
-                direction: Axis.horizontal,
-                itemCount: 5,
-                itemBuilder: (context, _) => Icon(
-                  Icons.favorite,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _currentRating = value;
-                });
-              },
-            );
-          },
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: RangeSlider(
+            values: _currentRangeValues,
+            max: 5000000,
+            divisions: 500,
+            labels: RangeLabels(
+                '${NumberFormat('#,###').format(_currentRangeValues.start.round())} vnd',
+                '${NumberFormat('#,###').format(_currentRangeValues.end.round())} vnd'),
+            onChanged: (RangeValues values) {
+              setState(() {
+                _currentRangeValues = values;
+              });
+            },
+          ),
         ),
         Divider(
           thickness: 1,
@@ -84,14 +82,17 @@ class _RatingModalState extends State<RatingModal> {
             TextButton(
                 onPressed: () {
                   setState(() {
-                    _currentRating = null;
+                    _currentRangeValues = const RangeValues(0, 5000000);
                   });
                 },
                 child: const Text("Hủy",
                     style: TextStyle(decoration: TextDecoration.underline))),
             ElevatedButton(
               onPressed: () {
-                widget.onRatingChanged(_currentRating);
+                widget.onServicesChanged([
+                  int.parse(_currentRangeValues.start.round().toString()),
+                  int.parse(_currentRangeValues.end.round().toString())
+                ]);
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(

@@ -4,6 +4,7 @@ import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
 
@@ -154,7 +155,8 @@ class AttractionRepositoryImpl implements AttractionRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("No internet connection"));
       }
-      final attractions = await attractionRemoteDatasource.getRecommendedAttractions(
+      final attractions =
+          await attractionRemoteDatasource.getRecommendedAttractions(
         limit: limit,
         userId: userId,
       );
@@ -174,7 +176,8 @@ class AttractionRepositoryImpl implements AttractionRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("No internet connection"));
       }
-      final attractions = await attractionRemoteDatasource.getRelatedAttractions(
+      final attractions =
+          await attractionRemoteDatasource.getRelatedAttractions(
         attractionId: attractionId,
         limit: limit,
       );
@@ -186,15 +189,17 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }
 
   @override
-  Future<Either<Failure, List<Attraction>>>
-      getAttractionsWithFilter({
+  Future<Either<Failure, List<Attraction>>> getAttractionsWithFilter({
     String? categoryId1,
     List<String>? categoryId2,
     required int limit,
     required int offset,
     int? budget,
     int? rating,
-    required int locationId,
+    double? lat,
+    double? lon,
+    int? proximity,
+    int? locationId,
     required String sortType,
     required bool topRanked,
   }) async {
@@ -202,11 +207,15 @@ class AttractionRepositoryImpl implements AttractionRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("No internet connection"));
       }
-      final attractions = await attractionRemoteDatasource.getAttractionsWithFilter(
+      final attractions =
+          await attractionRemoteDatasource.getAttractionsWithFilter(
         categoryId1: categoryId1,
         categoryId2: categoryId2,
         limit: limit,
         offset: offset,
+        lat: lat,
+        lon: lon,
+        proximity: proximity,
         budget: budget,
         rating: rating,
         locationId: locationId,
@@ -215,6 +224,44 @@ class AttractionRepositoryImpl implements AttractionRepository {
       );
 
       return right(attractions);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Restaurant>>> getRestaurantsWithFilter({
+     int? categoryId1,
+    List<int> serviceIds = const [],
+    List<int> openTime = const [],
+    required int limit,
+    required int offset,
+    int? minPrice,
+    int? maxPrice,
+    double? lat,
+    double? lon,
+    int? locationId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final restaurants =
+          await attractionRemoteDatasource.getRestaurantsWithFilter(
+        categoryId1: categoryId1,
+        serviceIds: serviceIds,
+        openTime: openTime,
+        limit: limit,
+        offset: offset,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        lat: lat,
+        lon: lon,
+        locationId: locationId,
+       
+      );
+
+      return right(restaurants);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

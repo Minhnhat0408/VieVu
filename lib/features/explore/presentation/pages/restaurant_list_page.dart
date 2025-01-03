@@ -3,22 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/filter_all_attraction_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/parent_travel_type_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/rating_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/sort_type_modal.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_filter_modal.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_open_time_modal.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_price_range.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_service_modal.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_small_card.dart';
 
-class AttractionListPage extends StatefulWidget {
+class RestaurantListPage extends StatefulWidget {
   final String? locationName;
   final int? locationId;
   final double? latitude;
   final double? longitude;
-
-  const AttractionListPage({
+  const RestaurantListPage({
     super.key,
     this.locationName,
     this.locationId,
@@ -27,32 +26,33 @@ class AttractionListPage extends StatefulWidget {
   });
 
   @override
-  State<AttractionListPage> createState() => _AttractionListPageState();
+  State<RestaurantListPage> createState() => _RestaurantListPageState();
 }
 
-class _AttractionListPageState extends State<AttractionListPage> {
-  final PagingController<int, Attraction> _pagingController =
+class _RestaurantListPageState extends State<RestaurantListPage> {
+  final PagingController<int, Restaurant> _pagingController =
       PagingController(firstPageKey: 0);
-  String _sortType = "hot_score";
-  TravelType? _parentTravelType;
-  List<TravelType> _travelTypes = [];
+
+  String? _selectedFilter;
+  List<String> _selectedServices = [];
+  List<String> _selectedOpenTime = [];
+  int? _minPrice;
+  int? _maxPrice;
+
   final int pageSize = 10;
   int totalRecordCount = 0;
-  int? _currentBudget;
-  int? _currentRating;
+
   final options = [
-    "Địa điểm du lịch",
-    "Loại hình du lịch",
-    "Đánh giá",
-    "Bộ lọc",
+    "Nhà hàng",
+    "Ẩm thực",
+    "Giờ mở cửa",
+    "Giá",
+    "Dịch vụ",
   ];
   IconData _convertIcon(int index) {
     switch (index) {
       case 0:
         return Icons.close;
-
-      case 3:
-        return Icons.tune;
       default:
         return Icons.arrow_drop_down_circle_outlined;
     }
@@ -62,40 +62,24 @@ class _AttractionListPageState extends State<AttractionListPage> {
   void initState() {
     super.initState();
     _pagingController.addPageRequestListener((pageKey) {
-      if (widget.locationId != null) {
-        context.read<AttractionBloc>().add(
-              GetAttractionsWithFilter(
-                  locationId: widget.locationId,
-                  limit: pageSize - 1,
-                  offset: pageKey,
-                  categoryId1: _parentTravelType?.id,
-                  sortType: _sortType,
-                  categoryId2: _travelTypes.isNotEmpty
-                      ? _travelTypes.map((e) => e.id).toList()
-                      : null,
-                  rating: _currentRating,
-                  budget: _currentBudget,
-                  topRanked: false),
-            );
-      } else {
-        log("Latitude: ${widget.latitude}, Longitude: ${widget.longitude}");
-        context.read<AttractionBloc>().add(
-              GetAttractionsWithFilter(
-                  lat: widget.latitude,
-                  lon: widget.longitude,
-                  proximity: 30,
-                  limit: pageSize - 1,
-                  offset: pageKey,
-                  categoryId1: _parentTravelType?.id,
-                  sortType: _sortType,
-                  categoryId2: _travelTypes.isNotEmpty
-                      ? _travelTypes.map((e) => e.id).toList()
-                      : null,
-                  rating: _currentRating,
-                  budget: _currentBudget,
-                  topRanked: false),
-            );
-      }
+      context.read<NearbyServicesCubit>().getRestaurantsWithFilter(
+            categoryId1: _selectedFilter != null
+                ? restaurantFilterOptions[_selectedFilter]
+                : null,
+            serviceIds: _selectedServices
+                .map((e) => restaurantServicesMap[e]!)
+                .toList(),
+            openTime: _selectedOpenTime
+                .map((e) => restaurantTimeSlotsMap[e]!)
+                .toList(),
+            limit: pageSize,
+            offset: (pageKey ~/ pageSize) + 1,
+            minPrice: _minPrice,
+            maxPrice: _maxPrice,
+            lat: widget.latitude,
+            lon: widget.longitude,
+            locationId: widget.locationId,
+          );
     });
   }
 
@@ -109,7 +93,7 @@ class _AttractionListPageState extends State<AttractionListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.locationName ?? 'Danh sách điểm du lịch'),
+        title: Text(widget.locationName ?? "Nhà hàng"),
         centerTitle: true,
       ),
       body: Stack(children: [
@@ -170,29 +154,14 @@ class _AttractionListPageState extends State<AttractionListPage> {
                               )
                             : OutlinedButton(
                                 onPressed: () {
-                                  if (index == 1) {
+                                  if (options[index] == "Ẩm thực") {
                                     displayModal(
                                         context,
-                                        ParentTravelTypeModal(
-                                          currentTravelType: _parentTravelType,
-                                          onTravelTypeChanged: (newTravelType) {
+                                        RestaurantFilterModal(
+                                          currentFilter: _selectedFilter,
+                                          onFilterChanged: (newTravelType) {
                                             setState(() {
-                                              _parentTravelType = newTravelType;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
-                                            });
-                                          },
-                                        ),
-                                        600,
-                                        false);
-                                  } else if (index == 2) {
-                                    displayModal(
-                                        context,
-                                        RatingModal(
-                                          currentRating: _currentRating,
-                                          onRatingChanged: (newRating) {
-                                            setState(() {
-                                              _currentRating = newRating;
+                                              _selectedFilter = newTravelType;
                                               totalRecordCount = 0;
                                               _pagingController.refresh();
                                             });
@@ -200,28 +169,29 @@ class _AttractionListPageState extends State<AttractionListPage> {
                                         ),
                                         null,
                                         false);
-                                  } else {
+                                  } else if (options[index] == "Giờ mở cửa") {
                                     displayModal(
                                         context,
-                                        FilterAllAtrractionModal(
-                                          currentSortType: _sortType,
-                                          currentParentTravelType:
-                                              _parentTravelType,
-                                          currentRating: _currentRating,
-                                          currentTravelTypes: _travelTypes,
-                                          currentBudget: _currentBudget,
-                                          onFilterChanged: (newSortType,
-                                              newParentTravelType,
-                                              newTravelTypes,
-                                              newRating,
-                                              newBudget) {
+                                        RestaurantOpenTimeModal(
+                                          currentServices: _selectedOpenTime,
+                                          onServicesChanged: (newServices) {
                                             setState(() {
-                                              _sortType = newSortType;
-                                              _parentTravelType =
-                                                  newParentTravelType;
-                                              _travelTypes = newTravelTypes;
-                                              _currentRating = newRating;
-                                              _currentBudget = newBudget;
+                                              _selectedOpenTime = newServices;
+                                              totalRecordCount = 0;
+                                              _pagingController.refresh();
+                                            });
+                                          },
+                                        ),
+                                        null,
+                                        false);
+                                  } else if (options[index] == "Dịch vụ") {
+                                    displayModal(
+                                        context,
+                                        RestaurantServiceModal(
+                                          currentServices: _selectedServices,
+                                          onServicesChanged: (newServices) {
+                                            setState(() {
+                                              _selectedServices = newServices;
                                               totalRecordCount = 0;
                                               _pagingController.refresh();
                                             });
@@ -229,6 +199,25 @@ class _AttractionListPageState extends State<AttractionListPage> {
                                         ),
                                         null,
                                         true);
+                                  } else {
+                                    displayModal(
+                                        context,
+                                        RestaurantPriceRange(
+                                          maxPrice: _maxPrice,
+                                          minPrice: _minPrice,
+                                          onServicesChanged: (newServices) {
+                                            setState(() {
+                                              _maxPrice =
+                                                  newServices[1].round();
+                                              _minPrice =
+                                                  newServices[0].round();
+                                              totalRecordCount = 0;
+                                              _pagingController.refresh();
+                                            });
+                                          },
+                                        ),
+                                        null,
+                                        false);
                                   }
                                 },
                                 style: OutlinedButton.styleFrom(
@@ -239,12 +228,12 @@ class _AttractionListPageState extends State<AttractionListPage> {
                                   side: BorderSide(
                                     color:
                                         Theme.of(context).colorScheme.primary,
-                                    width: ((_parentTravelType != null &&
-                                                (index == 1 || index == 3)) ||
-                                            (_currentRating != null &&
-                                                (index == 2 || index == 3)))
-                                        ? 2.0
-                                        : 1.0, // Thicker border
+                                    // width: ((_parentTravelType != null &&
+                                    //             (index == 1 || index == 3)) ||
+                                    //         (_currentRating != null &&
+                                    //             (index == 2 || index == 3)))
+                                    //     ? 2.0
+                                    //     : 1.0, // Thicker border
                                   ),
                                 ),
                                 child: Row(
@@ -253,14 +242,14 @@ class _AttractionListPageState extends State<AttractionListPage> {
                                     Text(
                                       options[index],
                                       style: TextStyle(
-                                        fontWeight: ((_parentTravelType !=
-                                                        null &&
-                                                    (index == 1 ||
-                                                        index == 3)) ||
-                                                (_currentRating != null &&
-                                                    (index == 2 || index == 3)))
-                                            ? FontWeight.bold
-                                            : FontWeight.normal, // Bold text
+                                        // fontWeight: ((_parentTravelType !=
+                                        //                 null &&
+                                        //             (index == 1 ||
+                                        //                 index == 3)) ||
+                                        //         (_currentRating != null &&
+                                        //             (index == 2 || index == 3)))
+                                        //     ? FontWeight.bold
+                                        //     : FontWeight.normal, // Bold text
                                         color: Theme.of(context)
                                             .colorScheme
                                             .primary,
@@ -283,79 +272,30 @@ class _AttractionListPageState extends State<AttractionListPage> {
               ),
             )
           ],
-          body: BlocConsumer<AttractionBloc, AttractionState>(
+          body: BlocConsumer<NearbyServicesCubit, NearbyServicesState>(
             listener: (context, state) {
-              if (state is AttractionFailure) {
-                log(state.message.toString());
-              }
-              if (state is AttractionsLoadedSuccess) {
-                totalRecordCount += state.attractions.length;
+              if (state is RestaurantLoadedSuccess) {
+                totalRecordCount += state.restaurants.length;
                 final next = totalRecordCount;
-                final isLastPage = state.attractions.length < pageSize;
+                final isLastPage = state.restaurants.length < pageSize;
                 if (isLastPage) {
-                  _pagingController.appendLastPage(state.attractions);
+                  _pagingController.appendLastPage(state.restaurants);
                 } else {
-                  _pagingController.appendPage(state.attractions, next);
+                  _pagingController.appendPage(state.restaurants, next);
                 }
               }
             },
             builder: (context, state) {
               return CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: Row(
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                displayModal(
-                                    context,
-                                    SortModal(
-                                      currentSortType: _sortType,
-                                      onSortChanged: (newSortType) {
-                                        setState(() {
-                                          _sortType = newSortType;
-                                          _pagingController
-                                              .refresh(); // Refresh the list with the new sort type
-                                        });
-                                      },
-                                    ),
-                                    null,
-                                    false);
-                              },
-                              child: Row(
-                                children: [
-                                  Text(
-                                    _sortType == "hot_score"
-                                        ? "Phổ biến nhất"
-                                        : "Đánh giá cao nhất",
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    size: 20,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                   SliverPadding(
                     padding: const EdgeInsets.only(bottom: 70),
-                    sliver: PagedSliverList<int, Attraction>(
+                    sliver: PagedSliverList<int, Restaurant>(
                       pagingController: _pagingController,
-                      builderDelegate: PagedChildBuilderDelegate<Attraction>(
+                      builderDelegate: PagedChildBuilderDelegate<Restaurant>(
                         itemBuilder: (context, item, index) {
-                          return AttractionMedCard(
-                            attraction: item,
+                          return RestaurantSmallCard(
+                            restaurant: item,
                           );
                         },
                         firstPageProgressIndicatorBuilder: (_) =>

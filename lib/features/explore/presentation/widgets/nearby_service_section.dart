@@ -1,10 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/service_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class NearbyServiceSection extends StatefulWidget {
   final int attractionId;
@@ -69,6 +75,7 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
 
   @override
   Widget build(BuildContext context) {
+    log(services.toString());
     return BlocConsumer<NearbyServicesCubit, NearbyServicesState>(
       listener: (context, state) {
         if (state is NearbyServicesFailure) {
@@ -131,7 +138,33 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                   padding: const EdgeInsets.only(top: 20),
                   width: 300,
                   child: OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      if (_selectedFilter == 'Địa điểm du lịch') {
+                        final long = (context
+                                .read<AttractionDetailsCubit>()
+                                .state as AttractionDetailsLoadedSuccess)
+                            .attraction
+                            .longitude;
+                        final lat = (context
+                                .read<AttractionDetailsCubit>()
+                                .state as AttractionDetailsLoadedSuccess)
+                            .attraction
+                            .latitude;
+
+                        log('lat: $lat, long: $long');
+
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => BlocProvider(
+                                  create: (context) =>
+                                      serviceLocator<AttractionBloc>(),
+                                  child: AttractionListPage(
+                                    latitude: lat,
+                                    longitude: long,
+                                  ))),
+                        );
+                      }
+                    },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
                       side: BorderSide(
@@ -149,8 +182,7 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                 ),
               ),
             if (state is NearbyServicesLoadedSuccess &&
-                    services[_selectedFilter]!.isEmpty ||
-                state is NearbyServicesFailure)
+                services[_selectedFilter]!.isEmpty)
               const SizedBox(
                 height: 200,
                 width: double.infinity,

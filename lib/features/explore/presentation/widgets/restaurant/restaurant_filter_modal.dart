@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
 
-class RatingModal extends StatefulWidget {
-  final int? currentRating;
-  final ValueChanged<int?> onRatingChanged;
-  const RatingModal(
-      {super.key, required this.currentRating, required this.onRatingChanged});
+class RestaurantFilterModal extends StatefulWidget {
+  final String? currentFilter;
+  final ValueChanged<String?> onFilterChanged;
+  const RestaurantFilterModal(
+      {super.key, this.currentFilter, required this.onFilterChanged});
 
   @override
-  State<RatingModal> createState() => _RatingModalState();
+  State<RestaurantFilterModal> createState() => _RestaurantFilterModalState();
 }
 
-class _RatingModalState extends State<RatingModal> {
-  late int? _currentRating;
-  
+class _RestaurantFilterModalState extends State<RestaurantFilterModal> {
+  late String? _seletedFilter;
+
   @override
   void initState() {
     super.initState();
-    _currentRating = widget.currentRating;
+    _seletedFilter = widget.currentFilter;
   }
 
   @override
@@ -34,7 +34,7 @@ class _RatingModalState extends State<RatingModal> {
                 width: 30,
               ),
               const Text(
-                "Chọn đánh giá",
+                "Ẩm thực",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               IconButton(
@@ -48,31 +48,34 @@ class _RatingModalState extends State<RatingModal> {
           thickness: 1,
           color: Theme.of(context).colorScheme.primary,
         ),
-        ...[5, 4, 3, 2].map(
-          (rating) {
-            return RadioListTile(
-              value: rating,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-              groupValue: _currentRating,
-              controlAffinity: ListTileControlAffinity.trailing,
-              title: RatingBarIndicator(
-                rating: rating.toDouble(),
-                itemSize: 20,
-                direction: Axis.horizontal,
-                itemCount: 5,
-                itemBuilder: (context, _) => Icon(
-                  Icons.favorite,
-                  color: Theme.of(context).colorScheme.primaryContainer,
+        Flexible(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                ...restaurantFilterOptions.entries.map(
+                  (filter) {
+                    return RadioListTile(
+                      value: filter.key,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 20),
+                      groupValue: _seletedFilter,
+                      controlAffinity: ListTileControlAffinity.trailing,
+                      title: Text(
+                        filter.key,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _seletedFilter = value as String;
+                        });
+                      },
+                    );
+                  },
                 ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _currentRating = value;
-                });
-              },
-            );
-          },
+              ],
+            ),
+          ),
         ),
         Divider(
           thickness: 1,
@@ -84,14 +87,14 @@ class _RatingModalState extends State<RatingModal> {
             TextButton(
                 onPressed: () {
                   setState(() {
-                    _currentRating = null;
+                    _seletedFilter = null;
                   });
                 },
                 child: const Text("Hủy",
                     style: TextStyle(decoration: TextDecoration.underline))),
             ElevatedButton(
               onPressed: () {
-                widget.onRatingChanged(_currentRating);
+                widget.onFilterChanged(_seletedFilter);
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(

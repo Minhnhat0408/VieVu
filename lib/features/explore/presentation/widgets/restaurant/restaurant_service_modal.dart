@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
 
-class RatingModal extends StatefulWidget {
-  final int? currentRating;
-  final ValueChanged<int?> onRatingChanged;
-  const RatingModal(
-      {super.key, required this.currentRating, required this.onRatingChanged});
+class RestaurantServiceModal extends StatefulWidget {
+  final List<String> currentServices;
+  final ValueChanged<List<String>> onServicesChanged;
+  const RestaurantServiceModal(
+      {super.key,
+      required this.currentServices,
+      required this.onServicesChanged});
 
   @override
-  State<RatingModal> createState() => _RatingModalState();
+  State<RestaurantServiceModal> createState() => _RestaurantServiceModalState();
 }
 
-class _RatingModalState extends State<RatingModal> {
-  late int? _currentRating;
-  
+class _RestaurantServiceModalState extends State<RestaurantServiceModal> {
+  List<String> _seletedServices = [];
   @override
   void initState() {
     super.initState();
-    _currentRating = widget.currentRating;
+    _seletedServices = widget.currentServices;
   }
 
   @override
@@ -34,7 +35,7 @@ class _RatingModalState extends State<RatingModal> {
                 width: 30,
               ),
               const Text(
-                "Chọn đánh giá",
+                "Dịch vụ",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               IconButton(
@@ -48,31 +49,37 @@ class _RatingModalState extends State<RatingModal> {
           thickness: 1,
           color: Theme.of(context).colorScheme.primary,
         ),
-        ...[5, 4, 3, 2].map(
-          (rating) {
-            return RadioListTile(
-              value: rating,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-              groupValue: _currentRating,
-              controlAffinity: ListTileControlAffinity.trailing,
-              title: RatingBarIndicator(
-                rating: rating.toDouble(),
-                itemSize: 20,
-                direction: Axis.horizontal,
-                itemCount: 5,
-                itemBuilder: (context, _) => Icon(
-                  Icons.favorite,
-                  color: Theme.of(context).colorScheme.primaryContainer,
+        Flexible(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                ...restaurantServicesMap.entries.map(
+                  (service) {
+                    return CheckboxListTile(
+                      value: _seletedServices.contains(service.key),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 20),
+                      controlAffinity: ListTileControlAffinity.trailing,
+                      title: Text(
+                        service.key,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          if (value!) {
+                            _seletedServices.add(service.key);
+                          } else {
+                            _seletedServices.remove(service.key);
+                          }
+                        });
+                      },
+                    );
+                  },
                 ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _currentRating = value;
-                });
-              },
-            );
-          },
+              ],
+            ),
+          ),
         ),
         Divider(
           thickness: 1,
@@ -84,14 +91,14 @@ class _RatingModalState extends State<RatingModal> {
             TextButton(
                 onPressed: () {
                   setState(() {
-                    _currentRating = null;
+                    _seletedServices = [];
                   });
                 },
                 child: const Text("Hủy",
                     style: TextStyle(decoration: TextDecoration.underline))),
             ElevatedButton(
               onPressed: () {
-                widget.onRatingChanged(_currentRating);
+                widget.onServicesChanged(_seletedServices);
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(

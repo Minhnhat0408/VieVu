@@ -3,7 +3,6 @@ part of 'attraction_bloc.dart';
 @immutable
 sealed class AttractionEvent {}
 
-
 class GetHotAttractions extends AttractionEvent {
   final int limit;
   final int offset;
@@ -38,7 +37,6 @@ class GetRelatedAttractions extends AttractionEvent {
   GetRelatedAttractions({required this.attractionId, required this.limit});
 }
 
-
 class GetAttractionsWithFilter extends AttractionEvent {
   final String? categoryId1;
   final List<String>? categoryId2;
@@ -46,7 +44,10 @@ class GetAttractionsWithFilter extends AttractionEvent {
   final int offset;
   final int? budget;
   final int? rating;
-  final int locationId;
+  final double? lat;
+  final double? lon;
+  final int? proximity;
+  final int? locationId;
   final String sortType;
   final bool topRanked;
 
@@ -57,7 +58,10 @@ class GetAttractionsWithFilter extends AttractionEvent {
     required this.offset,
     this.budget,
     this.rating,
-    required this.locationId,
+    this.lat,
+    this.lon,
+    this.proximity,
+    this.locationId,
     required this.sortType,
     required this.topRanked,
   });

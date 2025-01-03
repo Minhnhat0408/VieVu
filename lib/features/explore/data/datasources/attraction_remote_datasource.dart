@@ -5,7 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
+import 'package:vn_travel_companion/features/explore/data/models/restaurant_model.dart';
 import 'package:vn_travel_companion/features/explore/data/models/service_model.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 
 abstract interface class AttractionRemoteDatasource {
   Future<AttractionModel?> getAttraction({
@@ -16,12 +18,6 @@ abstract interface class AttractionRemoteDatasource {
     required int limit,
     required int offset,
   });
-
-  // Future<List<AttractionModel>> getAttractionsByCategory({
-  //   required String category,
-  //   required int limit,
-  //   required int offset,
-  // });
 
   Future<List<AttractionModel>> getRecentViewedAttractions({
     required int limit,
@@ -67,9 +63,25 @@ abstract interface class AttractionRemoteDatasource {
     int? budget, // 1 for low, 2 for medium, 3 for high , 0 for free
     int?
         rating, // 1 for below, 2 for 2 stars, 3 for 3 stars, 4 for 4 stars, 5 for 5 stars
-    required int locationId,
+    double? lat,
+    double? lon,
+    int? proximity,
+    int? locationId,
     required String sortType,
     required bool topRanked,
+  });
+
+  Future<List<RestaurantModel>> getRestaurantsWithFilter({
+    int? categoryId1,
+    List<int> serviceIds,
+    List<int> openTime,
+    required int limit,
+    required int offset,
+    int? minPrice,
+    int? maxPrice,
+    double? lat,
+    double? lon,
+    int? locationId,
   });
 }
 
@@ -365,18 +377,24 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
     required int offset,
     int? budget,
     int? rating,
-    required int locationId,
+    double? lat,
+    double? lon,
+    int? proximity,
+    int? locationId,
     required String sortType,
     required bool topRanked,
   }) async {
     try {
-      log(categoryId1.toString());
       var query = supabaseClient.rpc('get_attractions', params: {
         'loc_id': locationId,
         'partraveltype_id': categoryId1,
         'traveltype_ids': categoryId2,
         'sorttype': sortType,
+        'lon': lon,
+        'lat': lat,
+        'proximity': proximity,
       });
+
       if (topRanked) {
         query = query.not('rank_info', 'is', null);
       }
@@ -401,13 +419,79 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
       }
 
       final response = await query.range(offset, offset + limit);
-
-      // log(response.toString());
-
+      log('attraction');
       return (response as List).map((e) {
         return AttractionModel.fromJson(e);
       }).toList();
     } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<RestaurantModel>> getRestaurantsWithFilter({
+    int? categoryId1,
+    List<int> serviceIds = const [],
+    List<int> openTime = const [],
+    required int limit,
+    required int offset,
+    int? minPrice,
+    int? maxPrice,
+    double? lat,
+    double? lon,
+    int? locationId,
+  }) async {
+    final url =
+        Uri.parse('https://vn.trip.com/restapi/soa2/18361/foodListSearch');
+
+    final body = {
+      "head": {
+        "extension": [
+          {"name": "locale", "value": "vi-VN"},
+          {"name": "platform", "value": "Online"},
+          {"name": "currency", "value": "VND"}
+        ]
+      },
+      "districtId": locationId,
+      "sortType": "score",
+      "pageIndex": offset,
+      "pageSize": limit,
+      "lat": lat,
+      "lon": lon,
+      "tag": 0,
+      "filterType": 2,
+      "serviceTypes": [],
+      "filterId": categoryId1,
+      "tagIds": null,
+      "minPrice": minPrice,
+      "maxPrice": maxPrice,
+      "opentimeType": openTime,
+      "serviceFeaturesIds": serviceIds,
+      "fromPage": null
+    };
+    try {
+      log(categoryId1.toString());
+      log(serviceIds.toString());
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(body),
+      );
+      log('${response.statusCode}res');
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+        final data = jsonResponse['results'] as List<dynamic>;
+        // log('${data.toString()}data');
+        return data.map((e) {
+          return RestaurantModel.fromJson(e);
+        }).toList();
+      } else {
+        throw ServerException("Failed to fetch data: ${response.statusCode}");
+      }
+    } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

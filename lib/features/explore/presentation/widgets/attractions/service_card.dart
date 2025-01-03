@@ -36,7 +36,7 @@ class ServiceCard extends StatelessWidget {
         }
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0),
         child: Card(
             elevation: 0,
             color: Colors.transparent,
@@ -198,21 +198,24 @@ class ServiceCard extends StatelessWidget {
                         SizedBox(
                           child: Row(
                             children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_on,
-                                    size: 16,
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
-                                  ),
-                                  Text(
-                                    service.distanceDesc,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                ],
-                              ),
+                              if (service.distanceDesc != null)
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 16,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                    Text(
+                                      service.distanceDesc!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                    ),
+                                  ],
+                                ),
                               const SizedBox(width: 20),
                               if (service.avgPrice != null)
                                 Text(

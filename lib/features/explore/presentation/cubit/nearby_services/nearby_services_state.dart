@@ -18,3 +18,10 @@ final class NearbyServicesLoadedSuccess extends NearbyServicesState {
 
   NearbyServicesLoadedSuccess(this.services);
 }
+
+
+final class RestaurantLoadedSuccess extends NearbyServicesState {
+  final List<Restaurant> restaurants;
+
+  RestaurantLoadedSuccess(this.restaurants);
+}
