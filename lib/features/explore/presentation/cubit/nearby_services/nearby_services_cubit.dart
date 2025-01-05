@@ -1,7 +1,7 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
@@ -68,6 +68,40 @@ class NearbyServicesCubit extends Cubit<NearbyServicesState> {
     servicesOrFailure.fold(
         (failure) => emit(NearbyServicesFailure(failure.message)), (services) {
       emit(RestaurantLoadedSuccess(services));
+    });
+  }
+
+  Future<void> getHotelsWithFilter({
+    required DateTime checkInDate,
+    required DateTime checkOutDate,
+    required int roomQuantity,
+    required int adultCount,
+    required int childCount,
+    int? star,
+    required int limit,
+    required int offset,
+    int? minPrice,
+    int? maxPrice,
+    required String locationName,
+  }) async {
+    emit(NearbyServicesLoading());
+    final servicesOrFailure = await _attractionRepository.getHotelsWithFilter(
+      checkInDate: checkInDate,
+      checkOutDate: checkOutDate,
+      roomQuantity: roomQuantity,
+      adultCount: adultCount,
+      childCount: childCount,
+      star: star,
+      limit: limit,
+      offset: offset,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      locationName: locationName,
+    );
+
+    servicesOrFailure.fold(
+        (failure) => emit(NearbyServicesFailure(failure.message)), (services) {
+      emit(HotelLoadedSuccess(services));
     });
   }
 }

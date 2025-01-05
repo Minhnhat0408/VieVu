@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore_main_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
 
 class ExplorePage extends StatelessWidget {
   const ExplorePage({super.key});

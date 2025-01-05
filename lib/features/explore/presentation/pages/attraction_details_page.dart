@@ -33,7 +33,6 @@ class AttractionDetailPage extends StatelessWidget {
         ),
         BlocProvider(create: (_) => serviceLocator<NearbyServicesCubit>()),
         BlocProvider(create: (_) => serviceLocator<ReviewsCubit>()),
-        
       ],
       child: Scaffold(
         body: AttractionDetailView(attractionId: attractionId),
@@ -92,7 +91,7 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
       ],
       body: BlocConsumer<AttractionDetailsCubit, AttractionDetailsState>(
         listener: (context, state) {
-          if (state is  AttractionDetailsFailure) {
+          if (state is AttractionDetailsFailure) {
             // Show error message
             showSnackbar(context, state.message, 'error');
           }
@@ -353,7 +352,10 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
                           height: 40,
                         ),
                         const SizedBox(height: 20),
-                        NearbyServiceSection(attractionId: widget.attractionId),
+                        NearbyServiceSection(
+                          attractionId: widget.attractionId,
+                          attractionName: attraction.name,
+                        ),
                         const SizedBox(height: 20),
                         const Divider(
                           thickness: 1.5,

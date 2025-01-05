@@ -5,6 +5,7 @@ import 'package:vn_travel_companion/features/explore/presentation/bloc/location/
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/hotel_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/restaurant_list_page.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/restaurant_section.dart';
@@ -183,8 +184,24 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                                       },
                                     ),
                                   );
-                                } else {
-                                  _onItemTapped(index);
+                                } else if (index == 3) {
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          BlocProvider(
+                                        create: (context) => serviceLocator<
+                                            NearbyServicesCubit>(),
+                                        child: HotelListPage(
+                                          locationName: widget.locationName,
+                                        ),
+                                      ),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        return child; // No transition for the rest of the page
+                                      },
+                                    ),
+                                  );
                                 }
                               },
                               style: OutlinedButton.styleFrom(

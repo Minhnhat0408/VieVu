@@ -24,27 +24,21 @@ class CommentCard extends StatelessWidget {
           children: [
             // Image and Icon
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 14,
-                      backgroundImage: NetworkImage(comment.avatar),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      comment.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                CircleAvatar(
+                  radius: 14,
+                  backgroundImage: NetworkImage(comment.avatar),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  comment.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
-
             const SizedBox(height: 6),
 
             AutoSizeText(

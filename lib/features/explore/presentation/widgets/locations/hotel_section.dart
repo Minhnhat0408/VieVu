@@ -24,7 +24,7 @@ class HotelSection extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Nhà hàng',
+                    'Khách sạn',
                     style: Theme.of(context)
                         .textTheme
                         .titleLarge!

@@ -1,58 +1,66 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/filter_all_attraction_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/parent_travel_type_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/rating_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/sort_type_modal.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_price_modal.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_room_info_modal.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_small_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_star_modal.dart';
 
-class AttractionListPage extends StatefulWidget {
-  final String? locationName;
-  final int? locationId;
-  final double? latitude;
-  final double? longitude;
-
-  const AttractionListPage({
+class HotelListPage extends StatefulWidget {
+  final String locationName;
+  const HotelListPage({
     super.key,
-    this.locationName,
-    this.locationId,
-    this.latitude,
-    this.longitude,
+    required this.locationName,
   });
 
   @override
-  State<AttractionListPage> createState() => _AttractionListPageState();
+  State<HotelListPage> createState() => _HotelListPageState();
 }
 
-class _AttractionListPageState extends State<AttractionListPage> {
-  final PagingController<int, Attraction> _pagingController =
+class _HotelListPageState extends State<HotelListPage> {
+  final PagingController<int, Hotel> _pagingController =
       PagingController(firstPageKey: 0);
-  String _sortType = "hot_score";
-  TravelType? _parentTravelType;
-  List<TravelType> _travelTypes = [];
+
+  int? _star;
+  int _roomQuantity = 1;
+  int _adultCount = 2;
+  int _childCount = 0;
+  int? _minPrice;
+  int? _maxPrice;
+
   final int pageSize = 10;
   int totalRecordCount = 0;
-  int? _currentBudget;
-  int? _currentRating;
-  final options = [
-    "Địa điểm du lịch",
-    "Loại hình du lịch",
-    "Đánh giá",
-    "Bộ lọc",
-  ];
+  DateTimeRange selectedDateRange = DateTimeRange(
+    start: DateTime.now(),
+    end: DateTime.now().add(const Duration(days: 1)),
+  );
+
+  Future<void> _selectDateRange(BuildContext context) async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 90)),
+      initialDateRange: selectedDateRange,
+      locale: const Locale('vi', 'VN'),
+    );
+    if (picked != null && picked != selectedDateRange) {
+      setState(() {
+        selectedDateRange = picked;
+      });
+      totalRecordCount = 0;
+      _pagingController.refresh();
+    }
+  }
+
+  final options = ["Khách sạn", "Ngày", "Khoảng giá", "Sao", "Tùy chọn phòng"];
   IconData _convertIcon(int index) {
     switch (index) {
       case 0:
         return Icons.close;
-
-      case 3:
-        return Icons.tune;
       default:
         return Icons.arrow_drop_down_circle_outlined;
     }
@@ -62,40 +70,19 @@ class _AttractionListPageState extends State<AttractionListPage> {
   void initState() {
     super.initState();
     _pagingController.addPageRequestListener((pageKey) {
-      if (widget.locationId != null) {
-        context.read<AttractionBloc>().add(
-              GetAttractionsWithFilter(
-                  locationId: widget.locationId,
-                  limit: pageSize - 1,
-                  offset: pageKey,
-                  categoryId1: _parentTravelType?.id,
-                  sortType: _sortType,
-                  categoryId2: _travelTypes.isNotEmpty
-                      ? _travelTypes.map((e) => e.id).toList()
-                      : null,
-                  rating: _currentRating,
-                  budget: _currentBudget,
-                  topRanked: false),
-            );
-      } else {
-        log("Latitude: ${widget.latitude}, Longitude: ${widget.longitude}");
-        context.read<AttractionBloc>().add(
-              GetAttractionsWithFilter(
-                  lat: widget.latitude,
-                  lon: widget.longitude,
-                  proximity: 30,
-                  limit: pageSize - 1,
-                  offset: pageKey,
-                  categoryId1: _parentTravelType?.id,
-                  sortType: _sortType,
-                  categoryId2: _travelTypes.isNotEmpty
-                      ? _travelTypes.map((e) => e.id).toList()
-                      : null,
-                  rating: _currentRating,
-                  budget: _currentBudget,
-                  topRanked: false),
-            );
-      }
+      context.read<NearbyServicesCubit>().getHotelsWithFilter(
+            checkInDate: selectedDateRange.start,
+            checkOutDate: selectedDateRange.end,
+            roomQuantity: _roomQuantity,
+            adultCount: _adultCount,
+            childCount: _childCount,
+            star: _star,
+            limit: pageSize,
+            offset: pageKey,
+            minPrice: _minPrice,
+            maxPrice: _maxPrice,
+            locationName: widget.locationName,
+          );
     });
   }
 
@@ -109,7 +96,7 @@ class _AttractionListPageState extends State<AttractionListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.locationName ?? 'Danh sách điểm du lịch'),
+        title: Text(widget.locationName),
         centerTitle: true,
       ),
       body: Stack(children: [
@@ -170,29 +157,18 @@ class _AttractionListPageState extends State<AttractionListPage> {
                               )
                             : OutlinedButton(
                                 onPressed: () {
-                                  if (index == 1) {
+                                  if (options[index] == "Khoảng giá") {
                                     displayModal(
                                         context,
-                                        ParentTravelTypeModal(
-                                          currentTravelType: _parentTravelType,
-                                          onTravelTypeChanged: (newTravelType) {
+                                        HotelPriceModal(
+                                          maxPrice: _maxPrice,
+                                          minPrice: _minPrice,
+                                          onServicesChanged: (newServices) {
                                             setState(() {
-                                              _parentTravelType = newTravelType;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
-                                            });
-                                          },
-                                        ),
-                                        600,
-                                        false);
-                                  } else if (index == 2) {
-                                    displayModal(
-                                        context,
-                                        RatingModal(
-                                          currentRating: _currentRating,
-                                          onRatingChanged: (newRating) {
-                                            setState(() {
-                                              _currentRating = newRating;
+                                              _maxPrice =
+                                                  newServices[1].round();
+                                              _minPrice =
+                                                  newServices[0].round();
                                               totalRecordCount = 0;
                                               _pagingController.refresh();
                                             });
@@ -200,35 +176,42 @@ class _AttractionListPageState extends State<AttractionListPage> {
                                         ),
                                         null,
                                         false);
+                                  } else if (options[index] == "Sao") {
+                                    displayModal(
+                                        context,
+                                        HotelStarModal(
+                                          currentRating: _star,
+                                          onRatingChanged: (newRating) {
+                                            setState(() {
+                                              _star = newRating;
+                                              totalRecordCount = 0;
+                                              _pagingController.refresh();
+                                            });
+                                          },
+                                        ),
+                                        null,
+                                        false);
+                                  } else if (options[index] == "Ngày") {
+                                    _selectDateRange(context);
                                   } else {
                                     displayModal(
                                         context,
-                                        FilterAllAtrractionModal(
-                                          currentSortType: _sortType,
-                                          currentParentTravelType:
-                                              _parentTravelType,
-                                          currentRating: _currentRating,
-                                          currentTravelTypes: _travelTypes,
-                                          currentBudget: _currentBudget,
-                                          onFilterChanged: (newSortType,
-                                              newParentTravelType,
-                                              newTravelTypes,
-                                              newRating,
-                                              newBudget) {
+                                        HotelRoomInfoModal(
+                                          roomQuantity: _roomQuantity,
+                                          adultCount: _adultCount,
+                                          childCount: _childCount,
+                                          onRoomInfoChanged: (newRoomInfo) {
                                             setState(() {
-                                              _sortType = newSortType;
-                                              _parentTravelType =
-                                                  newParentTravelType;
-                                              _travelTypes = newTravelTypes;
-                                              _currentRating = newRating;
-                                              _currentBudget = newBudget;
+                                              _roomQuantity = newRoomInfo[0];
+                                              _adultCount = newRoomInfo[1];
+                                              _childCount = newRoomInfo[2];
                                               totalRecordCount = 0;
                                               _pagingController.refresh();
                                             });
                                           },
                                         ),
                                         null,
-                                        true);
+                                        false);
                                   }
                                 },
                                 style: OutlinedButton.styleFrom(
@@ -239,10 +222,18 @@ class _AttractionListPageState extends State<AttractionListPage> {
                                   side: BorderSide(
                                     color:
                                         Theme.of(context).colorScheme.primary,
-                                    width: ((_parentTravelType != null &&
-                                                (index == 1 || index == 3)) ||
-                                            (_currentRating != null &&
-                                                (index == 2 || index == 3)))
+                                    width: (options[index] == "Khoảng giá" &&
+                                                (_minPrice != null ||
+                                                    _maxPrice != null)) ||
+                                            (options[index] == "Sao" &&
+                                                _star != null) ||
+                                            (options[index] == "Ngày" &&
+                                                index == 1) ||
+                                            (options[index] ==
+                                                    "Tùy chọn phòng" &&
+                                                (_roomQuantity != 1 ||
+                                                    _adultCount != 2 ||
+                                                    _childCount != 0))
                                         ? 2.0
                                         : 1.0, // Thicker border
                                   ),
@@ -251,14 +242,23 @@ class _AttractionListPageState extends State<AttractionListPage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      options[index],
+                                      index != 1
+                                          ? options[index]
+                                          : "${DateFormat('dd/MM/yyyy').format(selectedDateRange.start)}-${DateFormat('dd/MM/yyyy').format(selectedDateRange.end)}",
                                       style: TextStyle(
-                                        fontWeight: ((_parentTravelType !=
-                                                        null &&
-                                                    (index == 1 ||
-                                                        index == 3)) ||
-                                                (_currentRating != null &&
-                                                    (index == 2 || index == 3)))
+                                        fontWeight: (options[index] ==
+                                                        "Khoảng giá" &&
+                                                    (_minPrice != null ||
+                                                        _maxPrice != null)) ||
+                                                (options[index] == "Sao" &&
+                                                    _star != null) ||
+                                                (options[index] == "Ngày" &&
+                                                    index == 1) ||
+                                                (options[index] ==
+                                                        "Tùy chọn phòng" &&
+                                                    (_roomQuantity != 1 ||
+                                                        _adultCount != 2 ||
+                                                        _childCount != 0))
                                             ? FontWeight.bold
                                             : FontWeight.normal, // Bold text
                                         color: Theme.of(context)
@@ -283,80 +283,29 @@ class _AttractionListPageState extends State<AttractionListPage> {
               ),
             )
           ],
-          body: BlocConsumer<AttractionBloc, AttractionState>(
+          body: BlocConsumer<NearbyServicesCubit, NearbyServicesState>(
             listener: (context, state) {
-              if (state is AttractionFailure) {
-                log(state.message.toString());
-              }
-              if (state is AttractionsLoadedSuccess) {
-                totalRecordCount += state.attractions.length;
+              if (state is HotelLoadedSuccess) {
+                totalRecordCount += state.hotels.length;
                 final next = totalRecordCount;
-                final isLastPage = state.attractions.length < pageSize;
+                final isLastPage = state.hotels.length < pageSize;
                 if (isLastPage) {
-                  _pagingController.appendLastPage(state.attractions);
+                  _pagingController.appendLastPage(state.hotels);
                 } else {
-                  _pagingController.appendPage(state.attractions, next);
+                  _pagingController.appendPage(state.hotels, next);
                 }
               }
             },
             builder: (context, state) {
               return CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: Row(
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                displayModal(
-                                    context,
-                                    SortModal(
-                                      currentSortType: _sortType,
-                                      onSortChanged: (newSortType) {
-                                        setState(() {
-                                          _sortType = newSortType;
-                                          _pagingController
-                                              .refresh(); // Refresh the list with the new sort type
-                                        });
-                                      },
-                                    ),
-                                    null,
-                                    false);
-                              },
-                              child: Row(
-                                children: [
-                                  Text(
-                                    _sortType == "hot_score"
-                                        ? "Phổ biến nhất"
-                                        : "Đánh giá cao nhất",
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    size: 20,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                   SliverPadding(
                     padding: const EdgeInsets.only(bottom: 70),
-                    sliver: PagedSliverList<int, Attraction>(
+                    sliver: PagedSliverList<int, Hotel>(
                       pagingController: _pagingController,
-                      builderDelegate: PagedChildBuilderDelegate<Attraction>(
+                      builderDelegate: PagedChildBuilderDelegate<Hotel>(
                         itemBuilder: (context, item, index) {
-                          return AttractionMedCard(
-                            attraction: item,
-                          );
+                          return HotelSmallCard(hotel: item);
                         },
                         firstPageProgressIndicatorBuilder: (_) =>
                             const Center(child: CircularProgressIndicator()),

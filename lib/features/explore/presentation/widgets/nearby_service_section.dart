@@ -8,13 +8,17 @@ import 'package:vn_travel_companion/features/explore/presentation/bloc/attractio
 import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/hotel_list_page.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/restaurant_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/service_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class NearbyServiceSection extends StatefulWidget {
   final int attractionId;
-  const NearbyServiceSection({super.key, required this.attractionId});
+  final String attractionName;
+  const NearbyServiceSection(
+      {super.key, required this.attractionId, required this.attractionName});
 
   @override
   State<NearbyServiceSection> createState() => _NearbyServiceSectionState();
@@ -139,20 +143,15 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                   width: 300,
                   child: OutlinedButton(
                     onPressed: () {
+                      final long = (context.read<AttractionDetailsCubit>().state
+                              as AttractionDetailsLoadedSuccess)
+                          .attraction
+                          .longitude;
+                      final lat = (context.read<AttractionDetailsCubit>().state
+                              as AttractionDetailsLoadedSuccess)
+                          .attraction
+                          .latitude;
                       if (_selectedFilter == 'Địa điểm du lịch') {
-                        final long = (context
-                                .read<AttractionDetailsCubit>()
-                                .state as AttractionDetailsLoadedSuccess)
-                            .attraction
-                            .longitude;
-                        final lat = (context
-                                .read<AttractionDetailsCubit>()
-                                .state as AttractionDetailsLoadedSuccess)
-                            .attraction
-                            .latitude;
-
-                        log('lat: $lat, long: $long');
-
                         Navigator.of(context).push(
                           MaterialPageRoute(
                               builder: (context) => BlocProvider(
@@ -161,6 +160,27 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                                   child: AttractionListPage(
                                     latitude: lat,
                                     longitude: long,
+                                  ))),
+                        );
+                      } else if (_selectedFilter == 'Nhà hàng') {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => BlocProvider(
+                                  create: (context) =>
+                                      serviceLocator<NearbyServicesCubit>(),
+                                  child: RestaurantListPage(
+                                    latitude: lat,
+                                    longitude: long,
+                                  ))),
+                        );
+                      } else if (_selectedFilter == 'Khách sạn') {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => BlocProvider(
+                                  create: (context) =>
+                                      serviceLocator<NearbyServicesCubit>(),
+                                  child: HotelListPage(
+                                    locationName: widget.attractionName,
                                   ))),
                         );
                       }

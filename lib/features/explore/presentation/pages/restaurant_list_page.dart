@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -228,12 +227,18 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                                   side: BorderSide(
                                     color:
                                         Theme.of(context).colorScheme.primary,
-                                    // width: ((_parentTravelType != null &&
-                                    //             (index == 1 || index == 3)) ||
-                                    //         (_currentRating != null &&
-                                    //             (index == 2 || index == 3)))
-                                    //     ? 2.0
-                                    //     : 1.0, // Thicker border
+                                    width: ((_selectedFilter != null &&
+                                                options[index] == "Ẩm thực") ||
+                                            (_selectedOpenTime.isNotEmpty &&
+                                                options[index] ==
+                                                    "Giờ mở cửa") ||
+                                            ((_minPrice != null ||
+                                                    _maxPrice != null) &&
+                                                options[index] == "Giá") ||
+                                            (_selectedServices.isNotEmpty &&
+                                                options[index] == "Dịch vụ"))
+                                        ? 2.0
+                                        : 1.0, // Thicker border
                                   ),
                                 ),
                                 child: Row(
@@ -242,14 +247,19 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                                     Text(
                                       options[index],
                                       style: TextStyle(
-                                        // fontWeight: ((_parentTravelType !=
-                                        //                 null &&
-                                        //             (index == 1 ||
-                                        //                 index == 3)) ||
-                                        //         (_currentRating != null &&
-                                        //             (index == 2 || index == 3)))
-                                        //     ? FontWeight.bold
-                                        //     : FontWeight.normal, // Bold text
+                                        fontWeight: (_selectedFilter != null &&
+                                                    options[index] ==
+                                                        "Ẩm thực") ||
+                                                (_selectedOpenTime.isNotEmpty &&
+                                                    options[index] ==
+                                                        "Giờ mở cửa") ||
+                                                ((_minPrice != null ||
+                                                        _maxPrice != null) &&
+                                                    options[index] == "Giá") ||
+                                                (_selectedServices.isNotEmpty &&
+                                                    options[index] == "Dịch vụ")
+                                            ? FontWeight.bold
+                                            : FontWeight.normal, // Bold text
                                         color: Theme.of(context)
                                             .colorScheme
                                             .primary,
@@ -353,7 +363,7 @@ void displayModal(
         borderRadius: BorderRadius.circular(5),
       ),
     ),
-    expand: expand ?? false,
+    expand: expand,
     builder: (context) =>
         height != null ? SizedBox(height: height, child: child) : child,
   );

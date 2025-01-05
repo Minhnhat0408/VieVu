@@ -25,3 +25,9 @@ final class RestaurantLoadedSuccess extends NearbyServicesState {
 
   RestaurantLoadedSuccess(this.restaurants);
 }
+
+final class HotelLoadedSuccess extends NearbyServicesState {
+  final List<Hotel> hotels;
+
+  HotelLoadedSuccess(this.hotels);
+}

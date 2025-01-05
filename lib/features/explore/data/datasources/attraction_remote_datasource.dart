@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
+import 'package:vn_travel_companion/features/explore/data/models/hotel_model.dart';
 import 'package:vn_travel_companion/features/explore/data/models/restaurant_model.dart';
 import 'package:vn_travel_companion/features/explore/data/models/service_model.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 abstract interface class AttractionRemoteDatasource {
   Future<AttractionModel?> getAttraction({
@@ -82,6 +84,20 @@ abstract interface class AttractionRemoteDatasource {
     double? lat,
     double? lon,
     int? locationId,
+  });
+
+  Future<List<HotelModel>> getHotelsWithFilter({
+    required DateTime checkInDate,
+    required DateTime checkOutDate,
+    required int roomQuantity,
+    required int adultCount,
+    required int childCount,
+    int? star,
+    required int limit,
+    required int offset,
+    int? minPrice,
+    int? maxPrice,
+    required String locationName,
   });
 }
 
@@ -195,7 +211,9 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
   @override
   Future<List<ServiceModel>> getServicesNearAttraction({
-    required int attractionId,
+    int? attractionId,
+    double? latitude,
+    double? longitude,
     int limit = 20,
     int offset = 1,
     required int serviceType,
@@ -469,9 +487,8 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
       "serviceFeaturesIds": serviceIds,
       "fromPage": null
     };
+
     try {
-      log(categoryId1.toString());
-      log(serviceIds.toString());
       final response = await http.post(
         url,
         headers: {
@@ -479,19 +496,243 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         },
         body: jsonEncode(body),
       );
-      log('${response.statusCode}res');
+
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
         final data = jsonResponse['results'] as List<dynamic>;
-        // log('${data.toString()}data');
+
+        // Initialize HtmlUnescape
+        final unescape = HtmlUnescape();
+
+        // Decode HTML entities in each restaurant's data
         return data.map((e) {
-          return RestaurantModel.fromJson(e);
+          // Assuming RestaurantModel has a fromJson method
+          final restaurant = RestaurantModel.fromJson(e).copyWith(
+            // Decode HTML entities in relevant fields
+            // name: unescape.convert(e['name']),
+            userContent: unescape.convert(e?['commentInfo']?['content']),
+            // Repeat for other fields as necessary
+          );
+
+          return restaurant;
         }).toList();
       } else {
         throw ServerException("Failed to fetch data: ${response.statusCode}");
       }
     } catch (e) {
-      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<HotelModel>> getHotelsWithFilter({
+    required DateTime checkInDate,
+    required DateTime checkOutDate,
+    required int roomQuantity,
+    required int adultCount,
+    required int childCount,
+    int? star,
+    required int limit,
+    required int offset,
+    int? minPrice,
+    int? maxPrice,
+    required String locationName,
+  }) async {
+    final url = Uri.parse('https://vn.trip.com/htls/getHotelList');
+    final cityIdUrl = Uri.parse('https://vn.trip.com/htls/getKeyWordSearch');
+
+    final body = {
+      "code": 0,
+      "codeType": "",
+      "keyWord": locationName,
+      "searchType": "D",
+      "scenicCode": 0,
+      "cityCodeOfUser": 0,
+      "searchConditions": [
+        {"type": "D_PROVINCE", "value": "T"},
+        {"type": "SupportNormalSearch", "value": "T"},
+        {"type": "DisplayTagIcon", "value": "F"}
+      ],
+      "head": {
+        "platform": "PC",
+        "clientId": "1730100685388.e15dmCQTWglp",
+        "bu": "ibu",
+        "group": "TRIP",
+        "couid": "",
+        "region": "VN",
+        "locale": "vi-VN",
+        "timeZone": "7",
+        "currency": "VND"
+      }
+    };
+
+    try {
+      final response = await http.post(
+        cityIdUrl,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+        final data = jsonResponse['keyWordSearchResults'] as List<dynamic>;
+        final cityId = data[0]?['city']?['geoCode'];
+        final filterId = data[0]?['item']?['data'];
+        if (cityId == null) {
+          throw const ServerException("Failed to fetch cityId");
+        }
+        log(cityId.toString());
+        log(locationName);
+        //convert dateTime checkin to string like 20250104
+        String checkIn = DateFormat('yyyyMMdd').format(checkInDate);
+        String checkOut = DateFormat('yyyyMMdd').format(checkOutDate);
+        final hotelFilterBody = {
+          "guideLogin": "T",
+          "search": {
+            "checkIn": checkIn,
+            "checkOut": checkOut,
+
+            // "pageCode": 10320668148,
+            "location": {
+              "geo": {
+                "countryID": 111,
+                "provinceID": 0,
+                "cityID": cityId,
+                "districtID": 0,
+                "oversea": true
+              }
+              // "coordinates": [16.054899, 108.245093]
+            },
+            "pageIndex": offset,
+            "pageSize": limit,
+            "needTagMerge": "T",
+            "roomQuantity": roomQuantity,
+            "orderFieldSelectedByUser": false,
+            "hotelId": 0,
+            "hotelIds": [],
+            "tripWalkDriveSwitch": "T",
+            "resultType": "CT"
+          },
+          "queryTag": "NORMAL",
+          "mapType": "GOOGLE",
+          "extends": {
+            "crossPriceConsistencyLog": "",
+            "NewTaxDescForAmountshowtype0": "B",
+            "TaxDescForAmountshowtype2": "T",
+            "MealTagDependOnMealType": "T",
+            "MultiMainHotelPics": "T",
+            "enableDynamicRefresh": "T",
+            "isFirstDynamicRefresh": "T",
+            "ExposeBedInfos": "F",
+            "TaxDescRemoveRoomNight": "",
+            "priceMaskLoginTip": "",
+            "NeedHotelHighLight": "T"
+          },
+          "head": {
+            "platform": "Postman",
+            "clientId": "1730100685388.e15dmCQTWglp",
+            "bu": "ibu",
+            "group": "TRIP",
+            "region": "VN",
+            "locale": "vi-VN",
+            "timeZone": "7",
+            "currency": "VND",
+            "deviceConfig": "H"
+          }
+        };
+        final search = hotelFilterBody['search'] as Map<String, dynamic>;
+        search['filters'] = [];
+        if (filterId != null) {
+          log(filterId.toString() + cityId.toString());
+          search['filters'].add({
+            "filterId": filterId['filterID'] ?? filterId['filterId'],
+            "value": filterId['value'],
+            "type": filterId['type'],
+            "subType": filterId['subType'],
+          });
+        }
+        search['filters'].add({
+          "filterId": "17|1",
+          "value": "1",
+          "type": "17",
+          "subType": "2",
+          "sceneType": "17"
+        });
+        search['filters'].add({
+          "filterId": "80|0|1",
+          "value": "0",
+          "type": "80",
+          "subType": "2",
+          "sceneType": "80"
+        });
+
+        search['filters']
+            .add({"filterId": "29|1", "value": "1|$adultCount", "type": "29"});
+        for (var i = 0; i < childCount; i++) {
+          search['filters'].add({
+            "filterId": "29|${i + 2}|4",
+            "value": "${i + 2}|4",
+            "type": "29"
+          });
+        }
+        search['filters']
+            .add({"filterId": "29|2", "value": "2|$childCount", "type": "29"});
+
+        if (star != null) {
+          search['filters'].add(
+            {
+              "filterId": "16|$star", // star
+              "value": "$star",
+              "type": "16",
+              "subType": "2",
+              "sceneType": "16"
+            },
+          );
+        }
+        if (minPrice != null || maxPrice != null) {
+          final min = minPrice ?? 0;
+          final max =
+              (maxPrice == null || maxPrice == 6300000) ? 6300000 : maxPrice;
+
+          search['filters'].add({
+            "filterId": "15|Range",
+            "type": "15",
+            "subType": "2",
+            "priceBarMax": 6300000,
+            "value": "$min|$max", // Convert to a string explicitly
+          });
+        }
+        final response2 = await http.post(
+          url,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode(hotelFilterBody),
+        );
+
+        if (response2.statusCode == 200) {
+          final jsonResponse = jsonDecode(utf8.decode(response2.bodyBytes));
+          final data = jsonResponse['hotelList'] as List<dynamic>;
+          // log(data.toString());
+          // Decode HTML entities in each restaurant's data
+          return data.map((e) {
+            // Assuming RestaurantModel has a fromJson method
+            // log(e['hotelBasicInfo']['hotelName']);
+            final hotel = HotelModel.fromJson(e);
+
+            return hotel;
+          }).toList();
+        } else {
+          throw ServerException(
+              "Failed to fetch data: ${response2.statusCode}");
+        }
+      } else {
+        throw ServerException("Failed to fetch data: ${response.statusCode}");
+      }
+    } catch (e) {
+      log("${e}hotel bug");
       throw ServerException(e.toString());
     }
   }

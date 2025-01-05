@@ -47,7 +47,7 @@ dependencies:
   get_it: ^8.0.2
   flutter_dotenv: ^5.2.1
   easy_stepper: ^0.8.5+1
-  intl: ^0.20.1
+  intl: ^0.19.0
   curved_navigation_bar: ^1.0.6
   animations: ^2.0.11
   animated_text_kit: ^4.2.2
@@ -63,6 +63,8 @@ dependencies:
   timeago: ^3.2.2
   html_unescape: ^2.0.0
   modal_bottom_sheet: ^3.0.0
+  flutter_localizations:
+    sdk: flutter
 dev_dependencies:
   flutter_test:
     sdk: flutter
