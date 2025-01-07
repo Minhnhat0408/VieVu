@@ -1,7 +1,13 @@
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:latlong2/latlong.dart';
+// import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
@@ -30,7 +36,8 @@ class AttractionListPage extends StatefulWidget {
   State<AttractionListPage> createState() => _AttractionListPageState();
 }
 
-class _AttractionListPageState extends State<AttractionListPage> {
+class _AttractionListPageState extends State<AttractionListPage>
+    with SingleTickerProviderStateMixin {
   final PagingController<int, Attraction> _pagingController =
       PagingController(firstPageKey: 0);
   String _sortType = "hot_score";
@@ -38,8 +45,12 @@ class _AttractionListPageState extends State<AttractionListPage> {
   List<TravelType> _travelTypes = [];
   final int pageSize = 10;
   int totalRecordCount = 0;
+  bool mapView = false;
   int? _currentBudget;
+  final MapController _mapController = MapController();
+
   int? _currentRating;
+
   final options = [
     "Địa điểm du lịch",
     "Loại hình du lịch",
@@ -99,6 +110,11 @@ class _AttractionListPageState extends State<AttractionListPage> {
     });
   }
 
+  Future<Uint8List> _loadIcon(String path) async {
+    final ByteData bytes = await rootBundle.load(path);
+    return bytes.buffer.asUint8List();
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -107,6 +123,7 @@ class _AttractionListPageState extends State<AttractionListPage> {
 
   @override
   Widget build(BuildContext context) {
+    log('rebuild');
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.locationName ?? 'Danh sách điểm du lịch'),
@@ -117,6 +134,7 @@ class _AttractionListPageState extends State<AttractionListPage> {
           floatHeaderSlivers: true,
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverAppBar(
+              pinned: mapView,
               floating: true,
               leading: null,
               automaticallyImplyLeading: false,
@@ -290,6 +308,8 @@ class _AttractionListPageState extends State<AttractionListPage> {
               }
               if (state is AttractionsLoadedSuccess) {
                 totalRecordCount += state.attractions.length;
+                log("Total record count: $totalRecordCount");
+
                 final next = totalRecordCount;
                 final isLastPage = state.attractions.length < pageSize;
                 if (isLastPage) {
@@ -300,79 +320,181 @@ class _AttractionListPageState extends State<AttractionListPage> {
               }
             },
             builder: (context, state) {
-              return CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: Row(
+              return IndexedStack(
+                index: mapView ? 0 : 1,
+                children: [
+                  if (_pagingController.itemList != null)
+                    Stack(
+                      children: [
+                        FlutterMap(
+                          mapController: _mapController,
+                          options: MapOptions(
+                              initialCenter: LatLng(
+                                  widget.latitude!,
+                                  widget
+                                      .longitude!), // Center the map over London
+                              initialCameraFit: CameraFit.coordinates(
+                                  coordinates: _pagingController.itemList!
+                                      .map(
+                                        (attraction) => LatLng(
+                                            attraction.latitude,
+                                            attraction.longitude),
+                                      )
+                                      .toList()),
+                              minZoom: 5),
                           children: [
-                            TextButton(
-                              onPressed: () {
-                                displayModal(
-                                    context,
-                                    SortModal(
-                                      currentSortType: _sortType,
-                                      onSortChanged: (newSortType) {
-                                        setState(() {
-                                          _sortType = newSortType;
-                                          _pagingController
-                                              .refresh(); // Refresh the list with the new sort type
-                                        });
-                                      },
+                            TileLayer(
+                              // Display map tiles from any source
+                              urlTemplate:
+                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+                              userAgentPackageName:
+                                  'com.example.vn_travel_companion',
+                              // And many more recommended properties!
+                            ),
+                            MarkerClusterLayerWidget(
+                              options: MarkerClusterLayerOptions(
+                                maxClusterRadius: 55,
+                                size: const Size(60, 60),
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.all(50),
+                                maxZoom: 16,
+                                markers: _pagingController.itemList!
+                                    .map((attraction) {
+                                  return Marker(
+                                      width: 60,
+                                      height: 60,
+                                      point: LatLng(attraction.latitude,
+                                          attraction.longitude),
+                                      //circle avatar with border
+                                      child: CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        radius: 30,
+                                        child: CircleAvatar(
+                                            radius: 26,
+                                            backgroundImage:
+                                                CachedNetworkImageProvider(
+                                                    attraction.cover)),
+                                      ));
+                                }).toList(),
+                                builder: (context, markers) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                    child: Center(
+                                      child: Text(
+                                        markers.length.toString(),
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
                                     ),
-                                    null,
-                                    false);
-                              },
-                              child: Row(
-                                children: [
-                                  Text(
-                                    _sortType == "hot_score"
-                                        ? "Phổ biến nhất"
-                                        : "Đánh giá cao nhất",
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    size: 20,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
                             ),
                           ],
                         ),
-                      ),
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: FloatingActionButton(
+                            heroTag: 'rotate',
+                            onPressed: () {
+                              // Rotate the map by 45 degrees
+                              _mapController.rotate(0.0);
+                            },
+                            child: const Icon(Icons.rotate_right),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.only(bottom: 70),
-                    sliver: PagedSliverList<int, Attraction>(
-                      pagingController: _pagingController,
-                      builderDelegate: PagedChildBuilderDelegate<Attraction>(
-                        itemBuilder: (context, item, index) {
-                          return AttractionMedCard(
-                            attraction: item,
-                          );
-                        },
-                        firstPageProgressIndicatorBuilder: (_) =>
-                            const Center(child: CircularProgressIndicator()),
-                        newPageProgressIndicatorBuilder: (_) =>
-                            const Center(child: CircularProgressIndicator()),
-                        noItemsFoundIndicatorBuilder: (_) => const Center(
-                            child: Text('Không có điểm du lịch nào.')),
-                        newPageErrorIndicatorBuilder: (context) => Center(
-                          child: TextButton(
-                            onPressed: () =>
-                                _pagingController.retryLastFailedRequest(),
-                            child: const Text('Thử lại'),
+                  if (_pagingController.itemList == null)
+                    const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            child: Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    displayModal(
+                                        context,
+                                        SortModal(
+                                          currentSortType: _sortType,
+                                          onSortChanged: (newSortType) {
+                                            setState(() {
+                                              _sortType = newSortType;
+                                              _pagingController
+                                                  .refresh(); // Refresh the list with the new sort type
+                                            });
+                                          },
+                                        ),
+                                        null,
+                                        false);
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        _sortType == "hot_score"
+                                            ? "Phổ biến nhất"
+                                            : "Đánh giá cao nhất",
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Icon(
+                                        Icons.keyboard_arrow_down,
+                                        size: 20,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      SliverPadding(
+                        padding: const EdgeInsets.only(bottom: 70),
+                        sliver: PagedSliverList<int, Attraction>(
+                          pagingController: _pagingController,
+                          builderDelegate:
+                              PagedChildBuilderDelegate<Attraction>(
+                            itemBuilder: (context, item, index) {
+                              return AttractionMedCard(
+                                attraction: item,
+                              );
+                            },
+                            firstPageProgressIndicatorBuilder: (_) =>
+                                const Center(
+                                    child: CircularProgressIndicator()),
+                            newPageProgressIndicatorBuilder: (_) =>
+                                const Center(
+                                    child: CircularProgressIndicator()),
+                            noItemsFoundIndicatorBuilder: (_) => const Center(
+                                child: Text('Không có điểm du lịch nào.')),
+                            newPageErrorIndicatorBuilder: (context) => Center(
+                              child: TextButton(
+                                onPressed: () =>
+                                    _pagingController.retryLastFailedRequest(),
+                                child: const Text('Thử lại'),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );
@@ -384,11 +506,9 @@ class _AttractionListPageState extends State<AttractionListPage> {
           right: 16.0,
           child: FloatingActionButton(
             onPressed: () {
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => const MapView(),
-              //   ),
-              // );
+              setState(() {
+                mapView = !mapView;
+              });
             },
             child: const Icon(Icons.map),
           ),

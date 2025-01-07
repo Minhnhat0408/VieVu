@@ -22,7 +22,6 @@ import 'package:vn_travel_companion/features/user_preference/presentation/bloc/p
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/pages/initial_preferences.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
@@ -54,6 +53,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     context.read<AuthBloc>().add(AuthUserLoggedIn());
+    final accessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
     super.initState();
   }
 

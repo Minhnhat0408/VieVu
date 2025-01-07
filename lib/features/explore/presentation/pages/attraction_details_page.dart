@@ -62,8 +62,6 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
   @override
   void initState() {
     super.initState();
-    // Fetch attraction details
-
     context
         .read<AttractionDetailsCubit>()
         .fetchAttractionDetails(widget.attractionId);

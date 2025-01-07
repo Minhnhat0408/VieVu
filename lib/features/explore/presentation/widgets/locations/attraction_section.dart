@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
+import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class AttractionsSection extends StatelessWidget {
   final List<Attraction> attractions;
   final String locationName;
+  final int locationId;
   const AttractionsSection({
     super.key,
     required this.attractions,
     required this.locationName,
+    required this.locationId,
   });
 
   @override
@@ -33,7 +39,24 @@ class AttractionsSection extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/attractions');
+                      // Navigator.of(context).push(
+                      //   PageRouteBuilder(
+                      //     pageBuilder:
+                      //         (context, animation, secondaryAnimation) =>
+                      //             BlocProvider(
+                      //       create: (context) =>
+                      //           serviceLocator<AttractionBloc>(),
+                      //       child: AttractionListPage(
+                      //         locationId: locationId,
+                      //         locationName: locationName,
+                      //       ),
+                      //     ),
+                      //     transitionsBuilder:
+                      //         (context, animation, secondaryAnimation, child) {
+                      //       return child; // No transition for the rest of the page
+                      //     },
+                      //   ),
+                      // );
                     },
                     child: Text(
                       'Xem tất cả',

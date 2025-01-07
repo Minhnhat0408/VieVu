@@ -1,5 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info_cubit.dart';
@@ -60,6 +66,10 @@ class LocationDetailMain extends StatefulWidget {
 class LocationDetailMainState extends State<LocationDetailMain> {
   int _selectedIndex = 0;
   bool reversedTrans = false;
+  bool mapView = false;
+  double? latitude;
+  double? longitude;
+  
 
   @override
   void initState() {
@@ -124,284 +134,319 @@ class LocationDetailMainState extends State<LocationDetailMain> {
       body: Stack(
         children: [
           NestedScrollView(
-            floatHeaderSlivers: true,
-            headerSliverBuilder: (context, innerBoxIsScrolled) => [
-              SliverAppBar(
-                floating: true,
-                leading: null,
-                automaticallyImplyLeading: false,
-                snap: true,
-                scrolledUnderElevation: 0,
-                flexibleSpace: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 6),
-                    child: Row(
-                      children: List.generate(
-                        options.length, // Number of buttons
-                        (index) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Hero(
-                            tag: options[index],
-                            child: OutlinedButton(
-                              onPressed: () {
-                                if (index == 1) {
-                                  Navigator.of(context).push(
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation,
-                                              secondaryAnimation) =>
-                                          BlocProvider(
-                                        create: (context) =>
-                                            serviceLocator<AttractionBloc>(),
-                                        child: AttractionListPage(
-                                          locationId: widget.locationId,
-                                          locationName: widget.locationName,
-                                        ),
-                                      ),
-                                      transitionsBuilder: (context, animation,
-                                          secondaryAnimation, child) {
-                                        return child; // No transition for the rest of the page
-                                      },
-                                    ),
-                                  );
-                                } else if (index == 2) {
-                                  Navigator.of(context).push(
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation,
-                                              secondaryAnimation) =>
-                                          BlocProvider(
-                                        create: (context) => serviceLocator<
-                                            NearbyServicesCubit>(),
-                                        child: RestaurantListPage(
-                                          locationId: widget.locationId,
-                                          locationName: widget.locationName,
-                                        ),
-                                      ),
-                                      transitionsBuilder: (context, animation,
-                                          secondaryAnimation, child) {
-                                        return child; // No transition for the rest of the page
-                                      },
-                                    ),
-                                  );
-                                } else if (index == 3) {
-                                  Navigator.of(context).push(
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation,
-                                              secondaryAnimation) =>
-                                          BlocProvider(
-                                        create: (context) => serviceLocator<
-                                            NearbyServicesCubit>(),
-                                        child: HotelListPage(
-                                          locationName: widget.locationName,
-                                        ),
-                                      ),
-                                      transitionsBuilder: (context, animation,
-                                          secondaryAnimation, child) {
-                                        return child; // No transition for the rest of the page
-                                      },
-                                    ),
-                                  );
-                                }
-                              },
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: _selectedIndex == index
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.surface,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize
-                                    .min, // Ensures the button size matches the content
-                                children: [
-                                  Icon(
-                                    _convertIcon(
-                                        index), // Replace with the desired icon
-                                    size: 20, // Adjust size as needed
-                                    color: _selectedIndex == index
-                                        ? Theme.of(context).colorScheme.surface
-                                        : Theme.of(context).colorScheme.primary,
-                                  ),
-                                  const SizedBox(
-                                      width:
-                                          8), // Spacing between the icon and text
-                                  Text(
-                                    options[index],
-                                    style: TextStyle(
-                                      color: _selectedIndex == index
+              floatHeaderSlivers: true,
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                    SliverAppBar(
+                      // floating: true,
+                      pinned: mapView,
+                      leading: null,
+                      automaticallyImplyLeading: false,
+                      // snap: true,
+                      scrolledUnderElevation: 0,
+                      flexibleSpace: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 6),
+                          child: Row(
+                            children: List.generate(
+                              options.length, // Number of buttons
+                              (index) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Hero(
+                                  tag: options[index],
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      if (index == 1) {
+                                        if (latitude != null &&
+                                            longitude != null) {
+                                          log('latitude: $latitude, longitude: $longitude');
+                                          Navigator.of(context).push(
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                      secondaryAnimation) =>
+                                                  BlocProvider(
+                                                create: (context) =>
+                                                    serviceLocator<
+                                                        AttractionBloc>(),
+                                                child: AttractionListPage(
+                                                  locationId: widget.locationId,
+                                                  locationName:
+                                                      widget.locationName,
+                                                  latitude: latitude!,
+                                                  longitude: longitude!,
+                                                ),
+                                              ),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                return child; // No transition for the rest of the page
+                                              },
+                                            ),
+                                          );
+                                        } else {
+                                          showSnackbar(context,
+                                              'Không có dữ liệu vị trí');
+                                        }
+                                      } else if (index == 2) {
+                                        Navigator.of(context).push(
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                    secondaryAnimation) =>
+                                                BlocProvider(
+                                              create: (context) =>
+                                                  serviceLocator<
+                                                      NearbyServicesCubit>(),
+                                              child: RestaurantListPage(
+                                                locationId: widget.locationId,
+                                                locationName:
+                                                    widget.locationName,
+                                              ),
+                                            ),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              return child; // No transition for the rest of the page
+                                            },
+                                          ),
+                                        );
+                                      } else if (index == 3) {
+                                        Navigator.of(context).push(
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                    secondaryAnimation) =>
+                                                BlocProvider(
+                                              create: (context) =>
+                                                  serviceLocator<
+                                                      NearbyServicesCubit>(),
+                                              child: HotelListPage(
+                                                locationName:
+                                                    widget.locationName,
+                                              ),
+                                            ),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              return child; // No transition for the rest of the page
+                                            },
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: _selectedIndex == index
                                           ? Theme.of(context)
                                               .colorScheme
-                                              .surface
+                                              .primary
                                           : Theme.of(context)
                                               .colorScheme
-                                              .primary,
+                                              .surface,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              )
-            ],
-            body: BlocConsumer<LocationBloc, LocationState>(
-              listener: (context, state) {
-                if (state is LocationFailure) {
-                  // Show error message
-                  showSnackbar(context, state.message, 'error');
-                }
-              },
-              builder: (context, state) {
-                if (state is LocationLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                if (state is LocationDetailsLoadedSuccess) {
-                  final Location location = state.location;
-                  final imgList = [...location.images, location.cover];
-
-                  return BlocBuilder<LocationInfoCubit, LocationInfoState>(
-                    builder: (context, state2) {
-                      if (state2 is LocationInfoLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (state2 is LocationInfoFailure) {
-                        return const Center(
-                          child: Text('Không có dữ liệu'),
-                        );
-                      }
-                      final locationInfo =
-                          (state2 as LocationInfoLoaded).locationInfo;
-                      return SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(
-                              children: [
-                                SliderPagination(imgList: imgList),
-                              ],
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 20, bottom: 80),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0),
-                                    child: Text(
-                                      location.name,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 32),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0),
                                     child: Row(
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Ensures the button size matches the content
                                       children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondaryContainer,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          width: 40,
-                                          height: 40,
-                                          alignment: Alignment.center,
-                                          child: const FaIcon(
-                                              FontAwesomeIcons.locationDot,
-                                              size: 18),
+                                        Icon(
+                                          _convertIcon(
+                                              index), // Replace with the desired icon
+                                          size: 20, // Adjust size as needed
+                                          color: _selectedIndex == index
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .surface
+                                              : Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
                                         ),
-                                        const SizedBox(width: 16),
-                                        Flexible(
-                                          child: Text(
-                                            location.address,
-                                            softWrap: true,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
+                                        const SizedBox(
+                                            width:
+                                                8), // Spacing between the icon and text
+                                        Text(
+                                          options[index],
+                                          style: TextStyle(
+                                            color: _selectedIndex == index
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .surface
+                                                : Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  if (location.childLoc.isNotEmpty)
-                                    SubLocationSection(
-                                        locations: location.childLoc,
-                                        locationName: location.name),
-                                  const Padding(
-                                    padding: EdgeInsets.only(
-                                        top: 20.0,
-                                        bottom: 0,
-                                        left: 20,
-                                        right: 20),
-                                    child: Divider(
-                                      thickness: 1.5,
-                                    ),
-                                  ),
-                                  if (locationInfo.tripbestModule != null)
-                                    TripbestSection(
-                                        tripbests:
-                                            locationInfo.tripbestModule!),
-                                  AttractionsSection(
-                                      attractions: locationInfo.attractions,
-                                      locationName: location.name),
-                                  RestaurantSection(
-                                      restaurants: locationInfo.restaurants,
-                                      locationName: location.name),
-                                  HotelSection(
-                                      hotels: locationInfo.hotels,
-                                      locationName: location.name),
-                                  const Padding(
-                                    padding: EdgeInsets.only(
-                                        top: 20.0,
-                                        bottom: 0,
-                                        left: 20,
-                                        right: 20),
-                                    child: Divider(
-                                      thickness: 1.5,
-                                    ),
-                                  ),
-                                  if (locationInfo.comments != null)
-                                    CommentSection(
-                                        comments: locationInfo.comments!,
-                                        locationName: location.name),
-                                ],
+                                ),
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      );
-                    },
+                      ),
+                    )
+                  ],
+              body: BlocConsumer<LocationBloc, LocationState>(
+                listener: (context, state) {
+                  if (state is LocationFailure) {
+                    showSnackbar(context, state.message);
+                  }
+                  if (state is LocationDetailsLoadedSuccess) {
+                    setState(() {
+                      latitude = state.location.latitude;
+                      longitude = state.location.longitude;
+                    });
+                  }
+                },
+                builder: (context, state) {
+                  if (state is LocationLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (state is LocationDetailsLoadedSuccess) {
+                    final Location location = state.location;
+                    final imgList = [...location.images, location.cover];
+
+                    return BlocBuilder<LocationInfoCubit, LocationInfoState>(
+                      builder: (context, state2) {
+                        if (state2 is LocationInfoLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (state2 is LocationInfoFailure) {
+                          return const Center(
+                            child: Text('Không có dữ liệu'),
+                          );
+                        }
+                        final locationInfo =
+                            (state2 as LocationInfoLoaded).locationInfo;
+                        return SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                children: [
+                                  SliderPagination(imgList: imgList),
+                                ],
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 20, bottom: 80),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
+                                      child: Text(
+                                        location.name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 32),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondaryContainer,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            width: 40,
+                                            height: 40,
+                                            alignment: Alignment.center,
+                                            child: const FaIcon(
+                                                FontAwesomeIcons.locationDot,
+                                                size: 18),
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Flexible(
+                                            child: Text(
+                                              location.address,
+                                              softWrap: true,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (location.childLoc.isNotEmpty)
+                                      SubLocationSection(
+                                          locations: location.childLoc,
+                                          locationName: location.name),
+                                    const Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 20.0,
+                                          bottom: 0,
+                                          left: 20,
+                                          right: 20),
+                                      child: Divider(
+                                        thickness: 1.5,
+                                      ),
+                                    ),
+                                    if (locationInfo.tripbestModule != null)
+                                      TripbestSection(
+                                          tripbests:
+                                              locationInfo.tripbestModule!),
+                                    AttractionsSection(
+                                      attractions: locationInfo.attractions,
+                                      locationId: location.id,
+                                      locationName: location.name,
+                                    ),
+                                    RestaurantSection(
+                                        restaurants: locationInfo.restaurants,
+                                        locationName: location.name),
+                                    HotelSection(
+                                        hotels: locationInfo.hotels,
+                                        locationName: location.name),
+                                    const Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 20.0,
+                                          bottom: 0,
+                                          left: 20,
+                                          right: 20),
+                                      child: Divider(
+                                        thickness: 1.5,
+                                      ),
+                                    ),
+                                    if (locationInfo.comments != null)
+                                      CommentSection(
+                                          comments: locationInfo.comments!,
+                                          locationName: location.name),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  return const Center(
+                    child: Text('Không có dữ liệu'),
                   );
-                }
-                return const Center(
-                  child: Text('Không có dữ liệu'),
-                );
-              },
-            ),
-          ),
+                },
+              )),
           Positioned(
             bottom: 70.0,
             right: 16.0,
             child: FloatingActionButton(
               onPressed: () {
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (context) => const MapView(),
-                //   ),
-                // );
+                setState(() {
+                  mapView = !mapView;
+                });
               },
               child: const Icon(Icons.map),
             ),

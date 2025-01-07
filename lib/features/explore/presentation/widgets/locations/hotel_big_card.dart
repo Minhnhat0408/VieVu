@@ -78,10 +78,10 @@ class HotelBigCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: RatingBarIndicator(
-                        rating: hotel.avgRating,
+                        rating: hotel.star.toDouble(),
                         itemSize: 24,
                         direction: Axis.horizontal,
-                        itemCount: hotel.star,
+                        itemCount: 5,
                         itemBuilder: (context, _) => const Icon(Icons.star,
                             color: Color.fromARGB(255, 255, 234, 44)),
                       ),
