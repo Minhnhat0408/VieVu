@@ -69,7 +69,6 @@ class LocationDetailMainState extends State<LocationDetailMain> {
   bool mapView = false;
   double? latitude;
   double? longitude;
-  
 
   @override
   void initState() {
@@ -439,18 +438,18 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                   );
                 },
               )),
-          Positioned(
-            bottom: 70.0,
-            right: 16.0,
-            child: FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  mapView = !mapView;
-                });
-              },
-              child: const Icon(Icons.map),
-            ),
-          ),
+          // Positioned(
+          //   bottom: 70.0,
+          //   right: 16.0,
+          //   child: FloatingActionButton(
+          //     onPressed: () {
+          //       setState(() {
+          //         mapView = !mapView;
+          //       });
+          //     },
+          //     child: const Icon(Icons.map),
+          //   ),
+          // ),
         ],
       ),
     );

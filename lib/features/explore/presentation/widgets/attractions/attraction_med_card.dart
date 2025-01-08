@@ -8,9 +8,11 @@ import 'package:vn_travel_companion/features/explore/domain/entities/attraction.
 
 class AttractionMedCard extends StatelessWidget {
   final Attraction attraction;
+  final bool slider;
   const AttractionMedCard({
     super.key,
     required this.attraction,
+    this.slider = false,
   });
 
   @override
@@ -26,11 +28,14 @@ class AttractionMedCard extends StatelessWidget {
       },
       child: Card(
           elevation: 0,
-          color: Colors.transparent,
+          color: slider
+              ? Theme.of(context).colorScheme.surfaceContainerLowest
+              : Theme.of(context).colorScheme.surface,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  slider ? CrossAxisAlignment.center : CrossAxisAlignment.start,
               children: [
                 // Image and Icon
                 Stack(
@@ -75,6 +80,41 @@ class AttractionMedCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (slider)
+                      Positioned(
+                          bottom: 8,
+                          left: 8,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .secondaryContainer,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            child: Row(
+                              children: [
+                                FaIcon(
+                                  FontAwesomeIcons.fire,
+                                  size: 16,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  attraction.hotScore.toString(),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          )),
                   ],
                 ),
                 const SizedBox(width: 20),
@@ -135,38 +175,39 @@ class AttractionMedCard extends StatelessWidget {
                               style: Theme.of(context).textTheme.labelMedium,
                             ),
                             const SizedBox(width: 8),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .secondaryContainer,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              child: Row(
-                                children: [
-                                  FaIcon(
-                                    FontAwesomeIcons.fire,
-                                    size: 16,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    attraction.hotScore.toString(),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            )
+                            if (!slider)
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondaryContainer,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                child: Row(
+                                  children: [
+                                    FaIcon(
+                                      FontAwesomeIcons.fire,
+                                      size: 16,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      attraction.hotScore.toString(),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              )
                           ],
                         ),
                         const SizedBox(height: 4),

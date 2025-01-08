@@ -307,6 +307,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.2"
+  flutter_map_animations:
+    dependency: "direct main"
+    description:
+      name: flutter_map_animations
+      sha256: "08233f89919049a3601e785d32e9d1d9e1faac6578190150f1d7495fc1050d36"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.0"
   flutter_map_marker_cluster:
     dependency: "direct main"
     description:

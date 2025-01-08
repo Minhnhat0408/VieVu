@@ -1,9 +1,11 @@
 import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:latlong2/latlong.dart';
@@ -37,7 +39,7 @@ class AttractionListPage extends StatefulWidget {
 }
 
 class _AttractionListPageState extends State<AttractionListPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final PagingController<int, Attraction> _pagingController =
       PagingController(firstPageKey: 0);
   String _sortType = "hot_score";
@@ -47,10 +49,18 @@ class _AttractionListPageState extends State<AttractionListPage>
   int totalRecordCount = 0;
   bool mapView = false;
   int? _currentBudget;
-  final MapController _mapController = MapController();
-
+  // final MapController _mapController = MapController();
+  int activeIndex = 0;
+  CarouselSliderController buttonCarouselController =
+      CarouselSliderController();
   int? _currentRating;
-
+  late final AnimatedMapController _animatedMapController =
+      AnimatedMapController(
+          vsync: this,
+          // mapController: _mapController,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeInOut,
+          cancelPreviousAnimations: true); // Default to false);
   final options = [
     "Địa điểm du lịch",
     "Loại hình du lịch",
@@ -118,7 +128,16 @@ class _AttractionListPageState extends State<AttractionListPage>
   @override
   void dispose() {
     super.dispose();
+    _animatedMapController.dispose();
     _pagingController.dispose();
+  }
+
+  void _animateMapTo(LatLng destination) {
+    _animatedMapController.animateTo(
+      dest: destination,
+      zoom: 15.1,
+      rotation: 0.0,
+    );
   }
 
   @override
@@ -327,7 +346,7 @@ class _AttractionListPageState extends State<AttractionListPage>
                     Stack(
                       children: [
                         FlutterMap(
-                          mapController: _mapController,
+                          mapController: _animatedMapController.mapController,
                           options: MapOptions(
                               initialCenter: LatLng(
                                   widget.latitude!,
@@ -351,33 +370,89 @@ class _AttractionListPageState extends State<AttractionListPage>
                                   'com.example.vn_travel_companion',
                               // And many more recommended properties!
                             ),
+                            MarkerLayer(markers: [
+                              Marker(
+                                width: 70,
+                                height: 70,
+                                point:
+                                    LatLng(widget.latitude!, widget.longitude!),
+                                //circle avatar with border
+                                child: Image.asset(
+                                  'assets/icons/main2.png',
+                                  width: 70,
+                                  height: 70,
+                                ),
+                              ),
+                            ]),
                             MarkerClusterLayerWidget(
                               options: MarkerClusterLayerOptions(
-                                maxClusterRadius: 55,
+                                maxClusterRadius: 45,
                                 size: const Size(60, 60),
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.all(50),
-                                maxZoom: 16,
-                                markers: _pagingController.itemList!
-                                    .map((attraction) {
-                                  return Marker(
-                                      width: 60,
-                                      height: 60,
+                                maxZoom: 15,
+                                markers: [
+                                  ..._pagingController.itemList!
+                                      .asMap()
+                                      .entries
+                                      .map((item) {
+                                    final attraction = item.value;
+
+                                    return Marker(
+                                      width: activeIndex == attraction.id
+                                          ? 80
+                                          : 60,
+                                      height: activeIndex == attraction.id
+                                          ? 80
+                                          : 60,
                                       point: LatLng(attraction.latitude,
                                           attraction.longitude),
-                                      //circle avatar with border
-                                      child: CircleAvatar(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        radius: 30,
-                                        child: CircleAvatar(
-                                            radius: 26,
-                                            backgroundImage:
-                                                CachedNetworkImageProvider(
-                                                    attraction.cover)),
-                                      ));
-                                }).toList(),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            buttonCarouselController
+                                                .animateToPage(item.key,
+                                                    duration: const Duration(
+                                                        milliseconds: 300),
+                                                    curve: Curves.easeInOut);
+                                            activeIndex = attraction.id;
+                                          });
+                                        },
+                                        child: Container(
+                                          width: activeIndex == attraction.id
+                                              ? 80
+                                              : 60,
+                                          height: activeIndex == attraction.id
+                                              ? 80
+                                              : 60,
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                            borderRadius: BorderRadius.circular(
+                                                activeIndex == attraction.id
+                                                    ? 10
+                                                    : 30),
+                                            image: DecorationImage(
+                                              image: CachedNetworkImageProvider(
+                                                  attraction.cover),
+                                              fit: BoxFit.cover,
+                                            ),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primaryContainer,
+                                              width:
+                                                  activeIndex == attraction.id
+                                                      ? 4
+                                                      : 2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ],
                                 builder: (context, markers) {
                                   return Container(
                                     decoration: BoxDecoration(
@@ -399,15 +474,40 @@ class _AttractionListPageState extends State<AttractionListPage>
                           ],
                         ),
                         Positioned(
-                          top: 10,
-                          right: 10,
+                          bottom: 70,
+                          left: 16.0,
                           child: FloatingActionButton(
                             heroTag: 'rotate',
                             onPressed: () {
                               // Rotate the map by 45 degrees
-                              _mapController.rotate(0.0);
+                              _animatedMapController.animatedRotateTo(0);
                             },
                             child: const Icon(Icons.rotate_right),
+                          ),
+                        ),
+                        CarouselSlider.builder(
+                          itemCount: _pagingController.itemList!.length,
+                          carouselController: buttonCarouselController,
+                          itemBuilder: (context, index, realIndex) {
+                            return AttractionMedCard(
+                              attraction: _pagingController.itemList![index],
+                              slider: true,
+                            );
+                          },
+                          options: CarouselOptions(
+                            height: 130,
+                            enlargeCenterPage: true,
+                            initialPage: 0,
+                            reverse: false,
+                            enableInfiniteScroll: false,
+                            onPageChanged: (index, reason) => setState(() {
+                              activeIndex =
+                                  _pagingController.itemList![index].id;
+                              _animateMapTo(LatLng(
+                                  _pagingController.itemList![index].latitude,
+                                  _pagingController
+                                      .itemList![index].longitude));
+                            }),
                           ),
                         ),
                       ],
