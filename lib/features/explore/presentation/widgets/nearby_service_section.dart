@@ -181,6 +181,8 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                                       serviceLocator<NearbyServicesCubit>(),
                                   child: HotelListPage(
                                     locationName: widget.attractionName,
+                                    latitude: lat,
+                                    longitude: long,
                                   ))),
                         );
                       }

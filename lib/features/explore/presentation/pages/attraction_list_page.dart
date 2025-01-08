@@ -120,29 +120,24 @@ class _AttractionListPageState extends State<AttractionListPage>
     });
   }
 
-  Future<Uint8List> _loadIcon(String path) async {
-    final ByteData bytes = await rootBundle.load(path);
-    return bytes.buffer.asUint8List();
-  }
-
   @override
   void dispose() {
     super.dispose();
     _animatedMapController.dispose();
+
     _pagingController.dispose();
   }
 
   void _animateMapTo(LatLng destination) {
     _animatedMapController.animateTo(
       dest: destination,
-      zoom: 15.1,
+      zoom: 15,
       rotation: 0.0,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    log('rebuild');
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.locationName ?? 'Danh sách điểm du lịch'),
@@ -153,7 +148,6 @@ class _AttractionListPageState extends State<AttractionListPage>
           floatHeaderSlivers: true,
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverAppBar(
-              pinned: mapView,
               floating: true,
               leading: null,
               automaticallyImplyLeading: false,
@@ -503,6 +497,53 @@ class _AttractionListPageState extends State<AttractionListPage>
                             onPageChanged: (index, reason) => setState(() {
                               activeIndex =
                                   _pagingController.itemList![index].id;
+                              if (index ==
+                                  _pagingController.itemList!.length - 1) {
+                                if ((index + 1) % pageSize == 0) {
+                                  final pageKey = totalRecordCount;
+                                  if (widget.locationId != null) {
+                                    context.read<AttractionBloc>().add(
+                                          GetAttractionsWithFilter(
+                                              locationId: widget.locationId,
+                                              limit: pageSize - 1,
+                                              offset: pageKey,
+                                              categoryId1:
+                                                  _parentTravelType?.id,
+                                              sortType: _sortType,
+                                              categoryId2:
+                                                  _travelTypes.isNotEmpty
+                                                      ? _travelTypes
+                                                          .map((e) => e.id)
+                                                          .toList()
+                                                      : null,
+                                              rating: _currentRating,
+                                              budget: _currentBudget,
+                                              topRanked: false),
+                                        );
+                                  } else {
+                                    context.read<AttractionBloc>().add(
+                                          GetAttractionsWithFilter(
+                                              lat: widget.latitude,
+                                              lon: widget.longitude,
+                                              proximity: 30,
+                                              limit: pageSize - 1,
+                                              offset: pageKey,
+                                              categoryId1:
+                                                  _parentTravelType?.id,
+                                              sortType: _sortType,
+                                              categoryId2:
+                                                  _travelTypes.isNotEmpty
+                                                      ? _travelTypes
+                                                          .map((e) => e.id)
+                                                          .toList()
+                                                      : null,
+                                              rating: _currentRating,
+                                              budget: _currentBudget,
+                                              topRanked: false),
+                                        );
+                                  }
+                                }
+                              }
                               _animateMapTo(LatLng(
                                   _pagingController.itemList![index].latitude,
                                   _pagingController

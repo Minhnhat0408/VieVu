@@ -1,6 +1,14 @@
+import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
@@ -28,19 +36,28 @@ class RestaurantListPage extends StatefulWidget {
   State<RestaurantListPage> createState() => _RestaurantListPageState();
 }
 
-class _RestaurantListPageState extends State<RestaurantListPage> {
+class _RestaurantListPageState extends State<RestaurantListPage>
+    with TickerProviderStateMixin {
   final PagingController<int, Restaurant> _pagingController =
       PagingController(firstPageKey: 0);
-
+  int activeIndex = 0;
+  CarouselSliderController buttonCarouselController =
+      CarouselSliderController();
   String? _selectedFilter;
   List<String> _selectedServices = [];
   List<String> _selectedOpenTime = [];
   int? _minPrice;
   int? _maxPrice;
-
+  bool mapView = false;
   final int pageSize = 10;
   int totalRecordCount = 0;
-
+  late final AnimatedMapController _animatedMapController =
+      AnimatedMapController(
+          vsync: this,
+          // mapController: _mapController,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeInOut,
+          cancelPreviousAnimations: true);
   final options = [
     "Nhà hàng",
     "Ẩm thực",
@@ -82,10 +99,19 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     });
   }
 
+  void _animateMapTo(LatLng destination) {
+    _animatedMapController.animateTo(
+      dest: destination,
+      zoom: 15,
+      rotation: 0.0,
+    );
+  }
+
   @override
   void dispose() {
     super.dispose();
     _pagingController.dispose();
+    _animatedMapController.dispose();
   }
 
   @override
@@ -296,36 +322,241 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               }
             },
             builder: (context, state) {
-              return CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.only(bottom: 70),
-                    sliver: PagedSliverList<int, Restaurant>(
-                      pagingController: _pagingController,
-                      builderDelegate: PagedChildBuilderDelegate<Restaurant>(
-                        itemBuilder: (context, item, index) {
+              return IndexedStack(index: mapView ? 0 : 1, children: [
+                if (_pagingController.itemList != null)
+                  Stack(
+                    children: [
+                      FlutterMap(
+                        mapController: _animatedMapController.mapController,
+                        options: MapOptions(
+                            initialCenter: LatLng(
+                                widget.latitude!,
+                                widget
+                                    .longitude!), // Center the map over London
+                            initialCameraFit: CameraFit.coordinates(
+                                coordinates: _pagingController.itemList!
+                                    .map(
+                                      (attraction) => LatLng(
+                                          attraction.latitude,
+                                          attraction.longitude),
+                                    )
+                                    .toList()),
+                            minZoom: 5),
+                        children: [
+                          TileLayer(
+                            // Display map tiles from any source
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+                            userAgentPackageName:
+                                'com.example.vn_travel_companion',
+                            // And many more recommended properties!
+                          ),
+                          MarkerLayer(markers: [
+                            Marker(
+                              width: 70,
+                              height: 70,
+                              point:
+                                  LatLng(widget.latitude!, widget.longitude!),
+                              //circle avatar with border
+                              child: Image.asset(
+                                'assets/icons/main2.png',
+                                width: 70,
+                                height: 70,
+                              ),
+                            ),
+                          ]),
+                          MarkerClusterLayerWidget(
+                            options: MarkerClusterLayerOptions(
+                              maxClusterRadius: 45,
+                              size: const Size(60, 60),
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(50),
+                              maxZoom: 15,
+                              markers: [
+                                ..._pagingController.itemList!
+                                    .asMap()
+                                    .entries
+                                    .map((item) {
+                                  final attraction = item.value;
+
+                                  return Marker(
+                                    width:
+                                        activeIndex == attraction.id ? 80 : 60,
+                                    height:
+                                        activeIndex == attraction.id ? 80 : 60,
+                                    point: LatLng(attraction.latitude,
+                                        attraction.longitude),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          buttonCarouselController
+                                              .animateToPage(item.key,
+                                                  duration: const Duration(
+                                                      milliseconds: 300),
+                                                  curve: Curves.easeInOut);
+                                          activeIndex = attraction.id;
+                                        });
+                                      },
+                                      child: Container(
+                                        width: activeIndex == attraction.id
+                                            ? 80
+                                            : 60,
+                                        height: activeIndex == attraction.id
+                                            ? 80
+                                            : 60,
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          borderRadius: BorderRadius.circular(
+                                              activeIndex == attraction.id
+                                                  ? 10
+                                                  : 30),
+                                          image: DecorationImage(
+                                            image: CachedNetworkImageProvider(
+                                                attraction.cover),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primaryContainer,
+                                            width: activeIndex == attraction.id
+                                                ? 4
+                                                : 2,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                              builder: (context, markers) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  child: Center(
+                                    child: Text(
+                                      markers.length.toString(),
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 70,
+                        left: 16.0,
+                        child: FloatingActionButton(
+                          heroTag: 'rotate',
+                          onPressed: () {
+                            // Rotate the map by 45 degrees
+                            _animatedMapController.animatedRotateTo(0);
+                          },
+                          child: const Icon(Icons.rotate_right),
+                        ),
+                      ),
+                      CarouselSlider.builder(
+                        itemCount: _pagingController.itemList!.length,
+                        carouselController: buttonCarouselController,
+                        itemBuilder: (context, index, realIndex) {
                           return RestaurantSmallCard(
-                            restaurant: item,
+                            restaurant: _pagingController.itemList![index],
+                            slider: true,
                           );
                         },
-                        firstPageProgressIndicatorBuilder: (_) =>
-                            const Center(child: CircularProgressIndicator()),
-                        newPageProgressIndicatorBuilder: (_) =>
-                            const Center(child: CircularProgressIndicator()),
-                        noItemsFoundIndicatorBuilder: (_) => const Center(
-                            child: Text('Không có điểm du lịch nào.')),
-                        newPageErrorIndicatorBuilder: (context) => Center(
-                          child: TextButton(
-                            onPressed: () =>
-                                _pagingController.retryLastFailedRequest(),
-                            child: const Text('Thử lại'),
+                        options: CarouselOptions(
+                          height: 160,
+                          enlargeCenterPage: true,
+                          initialPage: 0,
+                          reverse: false,
+                          enableInfiniteScroll: false,
+                          onPageChanged: (index, reason) => setState(() {
+                            activeIndex = _pagingController.itemList![index].id;
+
+                            if (index ==
+                                _pagingController.itemList!.length - 1) {
+                              log('fatch1');
+                              if ((index + 1) % pageSize == 0) {
+                                final nextPageKey =
+                                    (_pagingController.itemList!.length ~/
+                                            pageSize) +
+                                        1;
+                                log('fatch');
+                                context
+                                    .read<NearbyServicesCubit>()
+                                    .getRestaurantsWithFilter(
+                                      categoryId1: _selectedFilter != null
+                                          ? restaurantFilterOptions[
+                                              _selectedFilter]
+                                          : null,
+                                      serviceIds: _selectedServices
+                                          .map((e) => restaurantServicesMap[e]!)
+                                          .toList(),
+                                      openTime: _selectedOpenTime
+                                          .map(
+                                              (e) => restaurantTimeSlotsMap[e]!)
+                                          .toList(),
+                                      limit: pageSize,
+                                      offset: nextPageKey,
+                                      minPrice: _minPrice,
+                                      maxPrice: _maxPrice,
+                                      lat: widget.latitude,
+                                      lon: widget.longitude,
+                                      locationId: widget.locationId,
+                                    );
+                              }
+                            }
+                            _animateMapTo(LatLng(
+                                _pagingController.itemList![index].latitude,
+                                _pagingController.itemList![index].longitude));
+                          }),
+                        ),
+                      ),
+                    ],
+                  ),
+                if (_pagingController.itemList == null)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.only(bottom: 70),
+                      sliver: PagedSliverList<int, Restaurant>(
+                        pagingController: _pagingController,
+                        builderDelegate: PagedChildBuilderDelegate<Restaurant>(
+                          itemBuilder: (context, item, index) {
+                            return RestaurantSmallCard(
+                              restaurant: item,
+                            );
+                          },
+                          firstPageProgressIndicatorBuilder: (_) =>
+                              const Center(child: CircularProgressIndicator()),
+                          newPageProgressIndicatorBuilder: (_) =>
+                              const Center(child: CircularProgressIndicator()),
+                          noItemsFoundIndicatorBuilder: (_) => const Center(
+                              child: Text('Không có điểm du lịch nào.')),
+                          newPageErrorIndicatorBuilder: (context) => Center(
+                            child: TextButton(
+                              onPressed: () =>
+                                  _pagingController.retryLastFailedRequest(),
+                              child: const Text('Thử lại'),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
+                  ],
+                ),
+              ]);
             },
           ),
         ),
@@ -334,11 +565,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           right: 16.0,
           child: FloatingActionButton(
             onPressed: () {
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => const MapView(),
-              //   ),
-              // );
+              setState(() {
+                mapView = !mapView;
+              });
             },
             child: const Icon(Icons.map),
           ),

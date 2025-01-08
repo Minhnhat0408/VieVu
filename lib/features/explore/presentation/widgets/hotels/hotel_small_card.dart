@@ -8,9 +8,11 @@ import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart'
 
 class HotelSmallCard extends StatelessWidget {
   final Hotel hotel;
+  final bool slider;
   const HotelSmallCard({
     super.key,
     required this.hotel,
+    this.slider = false,
   });
 
   @override
@@ -26,13 +28,17 @@ class HotelSmallCard extends StatelessWidget {
       },
       child: Card(
           elevation: 0,
-          color: Colors.transparent,
+          color: slider
+              ? Theme.of(context).colorScheme.surfaceContainerLowest
+              : Theme.of(context).colorScheme.surface,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
             child: Column(
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: slider
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.start,
                   children: [
                     // Image and Icon
 
@@ -173,67 +179,70 @@ class HotelSmallCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(hotel.roomName,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            )),
-                        const SizedBox(height: 4),
-                        Text(hotel.roomDesc,
-                            style: const TextStyle(
-                              fontSize: 12,
-                            )),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // display multiple icons for adult and child count
-                            Row(children: [
-                              ...List.generate(
-                                hotel.adultCount,
-                                (index) => const Icon(
-                                  FontAwesomeIcons.user,
-                                  size: 14,
+                if (!slider) const SizedBox(height: 10),
+                if (!slider)
+                  SizedBox(
+                    width: double.infinity,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(2),
+                        color:
+                            Theme.of(context).colorScheme.surfaceContainerHigh,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(hotel.roomName,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              )),
+                          const SizedBox(height: 4),
+                          Text(hotel.roomDesc,
+                              style: const TextStyle(
+                                fontSize: 12,
+                              )),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // display multiple icons for adult and child count
+                              Row(children: [
+                                ...List.generate(
+                                  hotel.adultCount,
+                                  (index) => const Icon(
+                                    FontAwesomeIcons.user,
+                                    size: 14,
+                                  ),
                                 ),
-                              ),
-                              ...List.generate(
-                                hotel.childCount,
-                                (index) => const Icon(
-                                  FontAwesomeIcons.child,
-                                  size: 14,
+                                ...List.generate(
+                                  hotel.childCount,
+                                  (index) => const Icon(
+                                    FontAwesomeIcons.child,
+                                    size: 14,
+                                  ),
                                 ),
-                              ),
-                            ]),
+                              ]),
 
-                            if (hotel.price > 0)
-                              Text(
-                                '${NumberFormat('#,###').format(hotel.price)} VND',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.primary,
+                              if (hotel.price > 0)
+                                Text(
+                                  '${NumberFormat('#,###').format(hotel.price)} VND',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
                                 ),
-                              ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                )
+                  )
                 // const SizedBox(height: 10),
               ],
             ),

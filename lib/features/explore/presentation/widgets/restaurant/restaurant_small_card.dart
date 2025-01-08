@@ -10,9 +10,11 @@ import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.
 
 class RestaurantSmallCard extends StatefulWidget {
   final Restaurant restaurant;
+  final bool slider;
   const RestaurantSmallCard({
     super.key,
     required this.restaurant,
+    this.slider = false,
   });
 
   @override
@@ -40,7 +42,9 @@ class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
           },
           child: Card(
               elevation: 0,
-              color: Colors.transparent,
+              color: widget.slider
+                  ? Theme.of(context).colorScheme.surfaceContainerLowest
+                  : Theme.of(context).colorScheme.surface,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
@@ -205,8 +209,11 @@ class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    if (widget.restaurant.userNickname != null)
+                    if (widget.restaurant.userNickname != null &&
+                        !widget.slider)
+                      const SizedBox(height: 16),
+                    if (widget.restaurant.userNickname != null &&
+                        !widget.slider)
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Column(
@@ -270,18 +277,21 @@ class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
                               ),
                             ],
                           )),
-                    const SizedBox(height: 16),
+                    if (widget.restaurant.userNickname != null &&
+                        !widget.slider)
+                      const SizedBox(height: 16),
                   ],
                 ),
               )),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: Divider(
-            thickness: 1,
-            color: Colors.grey,
+        if (widget.restaurant.userNickname != null && !widget.slider)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            child: Divider(
+              thickness: 1,
+              color: Colors.grey,
+            ),
           ),
-        ),
       ],
     );
   }

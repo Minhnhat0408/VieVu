@@ -202,6 +202,8 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                                                 locationId: widget.locationId,
                                                 locationName:
                                                     widget.locationName,
+                                                latitude: latitude!,
+                                                longitude: longitude!,
                                               ),
                                             ),
                                             transitionsBuilder: (context,
@@ -224,6 +226,8 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                                               child: HotelListPage(
                                                 locationName:
                                                     widget.locationName,
+                                                latitude: latitude!,
+                                                longitude: longitude!,
                                               ),
                                             ),
                                             transitionsBuilder: (context,
