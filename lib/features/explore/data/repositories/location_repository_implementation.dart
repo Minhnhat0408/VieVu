@@ -108,4 +108,25 @@ class LocationRepositoryImpl implements LocationRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, String>> convertGeoLocationToAddress({
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final address =
+          await locationRemoteDatasource.convertGeoLocationToAddress(
+        latitude: latitude,
+        longitude: longitude,
+      );
+
+      return right(address);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

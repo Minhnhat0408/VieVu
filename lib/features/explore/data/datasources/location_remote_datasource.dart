@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
@@ -38,6 +39,11 @@ abstract interface class LocationRemoteDatasource {
 
   Future<GenericLocationInfo> getLocationGeneralInfo({
     required int locationId,
+  });
+
+  Future<String> convertGeoLocationToAddress({
+    required double latitude,
+    required double longitude,
   });
 }
 
@@ -239,6 +245,28 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
           }
         }
         return returnData;
+      } else {
+        throw ServerException(response.body);
+      }
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<String> convertGeoLocationToAddress({
+    required double latitude,
+    required double longitude,
+  }) async {
+    final url = Uri.parse(
+        'https://api.geoapify.com/v1/geocode/reverse?lat=$latitude&lon=$longitude&format=json&apiKey=${dotenv.env['GEOCONVERT_API_KEY']!}');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+        return jsonResponse['results'][0]['address_line2'];
       } else {
         throw ServerException(response.body);
       }

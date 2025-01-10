@@ -138,6 +138,7 @@ class _AttractionListPageState extends State<AttractionListPage>
 
   @override
   Widget build(BuildContext context) {
+    log(widget.locationId.toString());
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.locationName ?? 'Danh sách điểm du lịch'),

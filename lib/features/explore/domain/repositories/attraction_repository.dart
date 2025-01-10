@@ -41,6 +41,14 @@ abstract interface class AttractionRepository {
     required String filterType, // 43;true 42;true nearbyDistance nearby10KM
   });
 
+  Future<Either<Failure, Map<String, List<Service>>>> getAllServicesNearby({
+    required double latitude,
+    required double longitude,
+    int limit = 10,
+    int offset = 1,
+    required String filterType,
+  });
+
   Future<Either<Failure, List<Attraction>>> getRecommendedAttractions({
     required int limit,
     required String userId,

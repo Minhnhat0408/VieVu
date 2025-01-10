@@ -5,6 +5,7 @@ class Service {
   final double longitude;
   final String cover;
   final double score;
+  final int typeId;
   final int commentCount;
   final int aggreationCommentCount;
   final List<dynamic>? tagInfoList;
@@ -22,6 +23,7 @@ class Service {
     required this.latitude,
     required this.longitude,
     required this.cover,
+    required this.typeId,
     required this.score,
     required this.commentCount,
     required this.aggreationCommentCount,

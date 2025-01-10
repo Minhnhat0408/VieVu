@@ -1,14 +1,24 @@
+import 'dart:developer';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/open_url.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/all_nearby_service_page.dart';
+
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class ExploreSearchItem extends StatelessWidget {
   final ExploreSearchResult? result;
@@ -56,8 +66,34 @@ class ExploreSearchItem extends StatelessWidget {
   Widget build(BuildContext context) {
     // log('result: ${result?.title}');
     return InkWell(
-      onTap: () {
+      onTap: () async {
         // Navigate to the detail page
+        if (result == null) {
+          LocationPermission permission = await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied ||
+              permission == LocationPermission.deniedForever) {
+            showSnackbar(context, 'Vui lòng bật dịch vụ định vị để sử dụng');
+            return;
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (_) => serviceLocator<NearbyServicesCubit>(),
+                    ),
+                    BlocProvider(
+                      create: (_) => serviceLocator<LocationInfoCubit>(),
+                    ),
+                  ],
+                  child: const AllNearbyServicePage(),
+                ),
+              ),
+            );
+          }
+        }
+
         final userId =
             (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
         if (result?.type == 'event') {

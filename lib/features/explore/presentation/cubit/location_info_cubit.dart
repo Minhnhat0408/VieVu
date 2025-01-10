@@ -21,4 +21,15 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
       (location) => emit(LocationInfoLoaded(locationInfo: location)),
     );
   }
+
+  Future<void> convertGeoLocationToAddress(
+      double latitude, double longitude) async {
+    emit(LocationInfoLoading());
+    final result = await _locationRepository.convertGeoLocationToAddress(
+        latitude: latitude, longitude: longitude);
+    result.fold(
+      (failure) => emit(LocationInfoFailure(message: failure.message)),
+      (address) => emit(LocationInfoAddressLoaded(address: address)),
+    );
+  }
 }

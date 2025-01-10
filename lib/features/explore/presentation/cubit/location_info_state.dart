@@ -22,3 +22,11 @@ final class LocationInfoFailure extends LocationInfoState {
     required this.message,
   });
 }
+
+final class LocationInfoAddressLoaded extends LocationInfoState {
+  final String address;
+
+  LocationInfoAddressLoaded({
+    required this.address,
+  });
+}

@@ -120,6 +120,33 @@ class AttractionRepositoryImpl implements AttractionRepository {
     }
   }
 
+ 
+  @override
+  Future<Either<Failure, Map<String, List<Service>>>> getAllServicesNearby({
+    required double latitude,
+    required double longitude,
+    int limit = 10,
+    int offset = 1,
+    required String filterType,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("No internet connection"));
+      }
+      final attractions = await attractionRemoteDatasource.getAllServicesNearby(
+        limit: limit,
+        offset: offset,
+        latitude: latitude,
+        longitude: longitude,
+        filterType: filterType,
+      );
+
+      return right(attractions);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
   @override
   Future<Either<Failure, List<Service>>> getServicesNearAttraction({
     required int attractionId,

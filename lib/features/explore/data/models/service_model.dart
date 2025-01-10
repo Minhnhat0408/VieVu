@@ -4,6 +4,7 @@ class ServiceModel extends Service {
   ServiceModel({
     required super.id,
     required super.name,
+    required super.typeId,
     required super.latitude,
     required super.longitude,
     required super.cover,
@@ -24,6 +25,7 @@ class ServiceModel extends Service {
     return ServiceModel(
       id: json['poiId'],
       name: json['name'],
+      typeId: json['typeId'],
       latitude: json['coordinate']['latitude'],
       longitude: json['coordinate']['longitude'],
       cover: json['image'],
@@ -42,6 +44,7 @@ class ServiceModel extends Service {
     return ServiceModel(
       id: json['poiId'],
       name: json['name'],
+      typeId: json['typeId'],
       latitude: json['coordinate']['latitude'],
       longitude: json['coordinate']['longitude'],
       cover: json['image'],
@@ -61,6 +64,7 @@ class ServiceModel extends Service {
     return ServiceModel(
       id: json['poiId'],
       name: json['name'],
+      typeId: json['typeId'],
       latitude: json['coordinate']['latitude'],
       longitude: json['coordinate']['longitude'],
       cover: json['image'],
@@ -79,6 +83,7 @@ class ServiceModel extends Service {
     return ServiceModel(
       id: json['poiId'],
       name: json['name'],
+      typeId: json['typeId'],
       latitude: json['coordinate']['latitude'],
       longitude: json['coordinate']['longitude'],
       cover: json['image'],

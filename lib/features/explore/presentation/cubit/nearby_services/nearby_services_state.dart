@@ -19,6 +19,11 @@ final class NearbyServicesLoadedSuccess extends NearbyServicesState {
   NearbyServicesLoadedSuccess(this.services);
 }
 
+final class AllNearbyServicesLoadedSuccess extends NearbyServicesState {
+  final Map<String, List<Service>> services;
+
+  AllNearbyServicesLoadedSuccess(this.services);
+}
 
 final class RestaurantLoadedSuccess extends NearbyServicesState {
   final List<Restaurant> restaurants;

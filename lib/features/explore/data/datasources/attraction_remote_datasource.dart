@@ -38,8 +38,18 @@ abstract interface class AttractionRemoteDatasource {
     required int radius,
   });
 
+  Future<Map<String, List<ServiceModel>>> getAllServicesNearby({
+    required double latitude,
+    required double longitude,
+    int limit = 10,
+    int offset = 1,
+    required String filterType,
+  });
+
   Future<List<ServiceModel>> getServicesNearAttraction({
-    required int attractionId,
+    int? attractionId,
+    double? latitude,
+    double? longitude,
     int limit = 20,
     int offset = 1,
     required int
@@ -232,6 +242,11 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
           "distance": 100
         }
       ],
+      "coordinate": {
+        "coordinateType": "GCJ02",
+        "latitude": latitude ?? 0,
+        "longitude": longitude ?? 0
+      },
       "poiId": attractionId,
       "head": {
         "locale": "vi-VN",
@@ -266,25 +281,33 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
             nearbyModuleList[0]['totalCount'] > 0) {
           final itemList = nearbyModuleList[0]['itemList'] as List<dynamic>;
           if (serviceType == 1) {
-            return itemList
-                .map((item) => ServiceModel.fromRestaurantJson(
-                    item as Map<String, dynamic>))
-                .toList();
+            return itemList.map((item) {
+              item['typeId'] = 1;
+              return ServiceModel.fromRestaurantJson(
+                item as Map<String, dynamic>,
+              );
+            }).toList();
           } else if (serviceType == 2) {
-            return itemList
-                .map((item) => ServiceModel.fromAttractionJson(
-                    item as Map<String, dynamic>))
-                .toList();
+            return itemList.map((item) {
+              item['typeId'] = 2;
+              return ServiceModel.fromAttractionJson(
+                item as Map<String, dynamic>,
+              );
+            }).toList();
           } else if (serviceType == 3) {
-            return itemList
-                .map((item) =>
-                    ServiceModel.fromShopJson(item as Map<String, dynamic>))
-                .toList();
+            return itemList.map((item) {
+              item['typeId'] = 3;
+              return ServiceModel.fromShopJson(
+                item as Map<String, dynamic>,
+              );
+            }).toList();
           } else {
-            return itemList
-                .map((item) =>
-                    ServiceModel.fromHotelJson(item as Map<String, dynamic>))
-                .toList();
+            return itemList.map((item) {
+              item['typeId'] = 4;
+              return ServiceModel.fromHotelJson(
+                item as Map<String, dynamic>,
+              );
+            }).toList();
           }
         } else {
           return [];
@@ -294,6 +317,105 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
       }
     } catch (e) {
       log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<Map<String, List<ServiceModel>>> getAllServicesNearby({
+    required double latitude,
+    required double longitude,
+    int limit = 10,
+    int offset = 1,
+    required String filterType,
+  }) async {
+    final url = Uri.parse(
+        'https://vn.trip.com/restapi/soa2/19913/getTripNearbyModuleList');
+    final Map<String, List<ServiceModel>> services = {
+      'restaurants': [],
+      'attractions': [],
+      'hotels': [],
+    };
+    try {
+      for (var i in [1, 2, 4]) {
+        final body = {
+          "moduleList": [
+            {
+              "count": limit,
+              "index": offset,
+              "quickFilterType": filterType,
+              "type": i,
+              "distance": 100
+            }
+          ],
+          "coordinate": {
+            "coordinateType": "GCJ02",
+            "latitude": latitude,
+            "longitude": longitude
+          },
+          "head": {
+            "locale": "vi-VN",
+            "cver": "3.0",
+            "cid": "1730100685388.e15dmCQTWglp",
+            "syscode": "999",
+            "sid": "",
+            "extension": [
+              {"name": "locale", "value": "vi-VN"},
+              {"name": "platform", "value": "Online"},
+              {"name": "currency", "value": "VND"},
+              {"name": "aid", "value": ""}
+            ]
+          }
+        };
+        final response = await http.post(
+          url,
+          headers: {
+            "Content-Type": "application/json", // Specify the content type
+          },
+          body: jsonEncode(body), // Convert the body to JSON
+        );
+        if (response.statusCode == 200) {
+          final jsonResponse = jsonDecode(response.body);
+          final nearbyModuleList =
+              jsonResponse['nearbyModuleList'] as List<dynamic>?;
+          if (nearbyModuleList != null &&
+              nearbyModuleList.isNotEmpty &&
+              nearbyModuleList[0]['totalCount'] > 0) {
+            final itemList = nearbyModuleList[0]['itemList'] as List<dynamic>;
+            if (i == 1) {
+              services['restaurants'] = itemList.map((item) {
+                item['typeId'] = 1;
+                return ServiceModel.fromRestaurantJson(
+                  item as Map<String, dynamic>,
+                );
+              }).toList();
+            } else if (i == 2) {
+              services['attractions'] = itemList.map((item) {
+                item['typeId'] = 2;
+                return ServiceModel.fromAttractionJson(
+                  item as Map<String, dynamic>,
+                );
+              }).toList();
+            } else {
+              services['hotels'] = itemList.map((item) {
+                item['typeId'] = 4;
+
+                return ServiceModel.fromHotelJson(
+                  item as Map<String, dynamic>,
+                );
+              }).toList();
+            }
+          } else {
+            return services;
+          }
+        } else {
+          throw ServerException("Failed to fetch data: ${response.statusCode}");
+        }
+      }
+
+      return services;
+    } catch (e) {
+      log('${e}service bug');
       throw ServerException(e.toString());
     }
   }
@@ -506,11 +628,14 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
         // Decode HTML entities in each restaurant's data
         return data.map((e) {
+          log(e.toString());
           // Assuming RestaurantModel has a fromJson method
           final restaurant = RestaurantModel.fromJson(e).copyWith(
             // Decode HTML entities in relevant fields
             // name: unescape.convert(e['name']),
-            userContent: unescape.convert(e?['commentInfo']?['content']),
+            userContent: e?['commentInfo'] != null
+                ? unescape.convert(e?['commentInfo']?['content'])
+                : null,
             // Repeat for other fields as necessary
           );
 
@@ -520,6 +645,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         throw ServerException("Failed to fetch data: ${response.statusCode}");
       }
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }
@@ -718,6 +844,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
           // log(data.toString());
           // Decode HTML entities in each restaurant's data
           return data.map((e) {
+            log(e.toString());
             // Assuming RestaurantModel has a fromJson method
             // log(e['hotelBasicInfo']['hotelName']);
             final hotel = HotelModel.fromJson(e);

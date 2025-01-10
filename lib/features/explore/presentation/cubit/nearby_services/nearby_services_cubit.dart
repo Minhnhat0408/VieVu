@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
@@ -35,6 +34,28 @@ class NearbyServicesCubit extends Cubit<NearbyServicesState> {
     servicesOrFailure.fold(
         (failure) => emit(NearbyServicesFailure(failure.message)), (services) {
       emit(NearbyServicesLoadedSuccess(services));
+    });
+  }
+
+  Future<void> getNearbyServices({
+    int limit = 10,
+    int offset = 1,
+    required double latitude,
+    required double longitude,
+    required String filterType,
+  }) async {
+    emit(NearbyServicesLoading());
+    final servicesOrFailure = await _attractionRepository.getAllServicesNearby(
+      limit: limit,
+      offset: offset,
+      latitude: latitude,
+      longitude: longitude,
+      filterType: filterType,
+    );
+
+    servicesOrFailure.fold(
+        (failure) => emit(NearbyServicesFailure(failure.message)), (services) {
+      emit(AllNearbyServicesLoadedSuccess(services));
     });
   }
 

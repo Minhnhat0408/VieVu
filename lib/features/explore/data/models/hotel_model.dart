@@ -22,8 +22,11 @@ class HotelModel extends Hotel {
   });
 
   factory HotelModel.fromJson(Map<String, dynamic> json) {
-    final count =
-        int.parse(json['commentInfo']['commenterNumber'].split(' ')[0]);
+    final count = json['commentInfo']['commenterNumber'] != null &&
+            json['commentInfo']['commenterNumber'].contains(' ')
+        ? int.tryParse(json['commentInfo']['commenterNumber'].split(' ')[0]) ??
+            0
+        : 0;
     return HotelModel(
       id: json['hotelBasicInfo']['hotelId'],
       name: json['hotelBasicInfo']['hotelName'] ?? '',
@@ -33,15 +36,22 @@ class HotelModel extends Hotel {
           ? json['hotelBasicInfo']['price']
           : 0,
       star: json['hotelStarInfo']['star'],
-      avgRating: double.parse(json['commentInfo']['commentScore']),
+      avgRating:
+          double.tryParse(json['commentInfo']['commentScore'] ?? '0') ?? 0.0,
       ratingCount: count,
       latitude: json['positionInfo']['coordinate']['lat'],
       longitude: json['positionInfo']['coordinate']['lng'],
       roomName:
           json['roomInfo'] != null ? json['roomInfo']['physicalRoomName'] : '',
       positionDesc: json['positionInfo']['positionInfo'],
-      adultCount: json['hotelBasicInfo']['guestInfoEntity']['adultCount'],
-      childCount: json['hotelBasicInfo']['guestInfoEntity']['childCount'],
+      adultCount:
+          json['hotelBasicInfo']?['guestInfoEntity']?['adultCount'] != null
+              ? json['hotelBasicInfo']['guestInfoEntity']['adultCount']
+              : 0,
+      childCount:
+          json['hotelBasicInfo']?['guestInfoEntity']?['childCount'] != null
+              ? json['hotelBasicInfo']['guestInfoEntity']['childCount']
+              : 0,
       roomDesc: json['roomInfo'] != null
           ? json['roomInfo']['bed']["contentList"][0]
           : '',

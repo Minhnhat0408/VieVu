@@ -20,8 +20,8 @@ class RestaurantModel extends Restaurant {
   factory RestaurantModel.fromJson(Map<String, dynamic> json) {
     return RestaurantModel(
       id: json['poiId'],
-      name: json['poiName'],
-      cover: json['coverImgaeUrl'],
+      name: json['poiName'] ?? "",
+      cover: json['coverImgaeUrl'] ?? "",
       // convert price from double to int
       price: json['price'] is double ? json['price'].toInt() : 0,
       latitude: json['gglat'],

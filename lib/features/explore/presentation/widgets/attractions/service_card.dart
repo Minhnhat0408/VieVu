@@ -10,7 +10,13 @@ import 'package:vn_travel_companion/features/explore/domain/entities/service.dar
 class ServiceCard extends StatelessWidget {
   final Service service;
   final String type;
-  const ServiceCard({super.key, required this.service, required this.type});
+  final bool slider;
+  const ServiceCard({
+    super.key,
+    required this.service,
+    required this.type,
+    this.slider = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +45,12 @@ class ServiceCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0),
         child: Card(
             elevation: 0,
-            color: Colors.transparent,
+            color: slider
+                ? Theme.of(context).colorScheme.surfaceContainerLowest
+                : Theme.of(context).colorScheme.surface,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  slider ? CrossAxisAlignment.center : CrossAxisAlignment.start,
               children: [
                 // Image and Icon
 
@@ -53,8 +62,8 @@ class ServiceCard extends StatelessWidget {
                       ),
                       child: Image.network(
                         service.cover,
-                        width: 110,
-                        height: 110,
+                        width: 108,
+                        height: 108,
                         fit: BoxFit.cover,
                       ),
                     ),

@@ -69,6 +69,7 @@ dependencies:
   flutter_map_marker_cluster: ^1.4.0
   latlong2: ^0.9.1
   flutter_map_animations: ^0.8.0
+  sliding_up_panel: ^2.0.0+1
 dev_dependencies:
   flutter_test:
     sdk: flutter
