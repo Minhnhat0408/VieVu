@@ -46,33 +46,7 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
               flexibleSpace: const ExploreAppbar(),
             ),
             SliverPadding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              sliver: SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 40, // Set the height for your horizontal scroll view
-                  child: ListView.builder(
-                    scrollDirection:
-                        Axis.horizontal, // This makes it horizontal
-                    itemCount: 1, // Number of buttons
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          left: index == 0 ? 20 : 4.0, // Padding for first item
-                          right: index == 9 ? 20 : 4.0, // Padding for last item
-                        ),
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          child: const Hero(
-                              tag: 'nope', child: Text('Xem gần đây')),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-            SliverPadding(
-                padding: const EdgeInsets.only(bottom: 40.0),
+                padding: const EdgeInsets.only(bottom: 40.0, top: 10),
                 sliver: SliverToBoxAdapter(
                     child: BlocProvider(
                   create: (context) => serviceLocator<AttractionBloc>(),

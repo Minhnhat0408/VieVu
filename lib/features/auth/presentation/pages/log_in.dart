@@ -79,13 +79,23 @@ class _LogInPageState extends State<LogInPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Hãy nhập email và mật khẩu của bạn để đăng nhập',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       AuthField(
                         hintText: 'Email',
                         controller: emailController,
                         validators: const [Validators.checkEmail],
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 24),
                       AuthField(
                         hintText: 'Mật khẩu',
                         controller: passwordController,
@@ -94,7 +104,7 @@ class _LogInPageState extends State<LogInPage> {
                           Validators.checkPassword,
                         ],
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 16),
                       GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(context, '/password-forgot');
@@ -107,7 +117,7 @@ class _LogInPageState extends State<LogInPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 24),
                       AuthSubmitBtn(
                         btnText: "Đăng Nhập",
                         onPressed: () {
@@ -121,7 +131,7 @@ class _LogInPageState extends State<LogInPage> {
                           }
                         },
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -148,7 +158,7 @@ class _LogInPageState extends State<LogInPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 36),
                       const Row(
                         children: [
                           Expanded(
@@ -172,14 +182,13 @@ class _LogInPageState extends State<LogInPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 28),
                       OutlinedButton(
                         onPressed: () {
                           context.read<AuthBloc>().add(AuthLoginWithGoogle());
                         },
                         style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.surface,
+                            backgroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 50,
                               vertical: 16,

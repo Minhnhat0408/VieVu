@@ -252,7 +252,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
       log(e.toString());
       throw ServerException(e.toString());
     }
-  }
+  } 
 
   @override
   Future<String> convertGeoLocationToAddress({

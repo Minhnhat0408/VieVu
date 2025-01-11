@@ -78,19 +78,19 @@ class _SignUpPageState extends State<SignUpPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 40),
                       AuthField(
                         hintText: 'Họ và Tên',
                         controller: nameController,
                         validators: const [Validators.checkEmpty],
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 24),
                       AuthField(
                         hintText: 'Email',
                         controller: emailController,
                         validators: const [Validators.checkEmail],
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 24),
                       AuthField(
                         hintText: 'Mật khẩu',
                         controller: passwordController,
@@ -100,7 +100,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           Validators.checkPasswordSpecialChar
                         ],
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 16),
                       Text(
                         "x Ít nhất 8 ký tự",
                         style: TextStyle(
@@ -111,7 +111,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 24),
                       AuthSubmitBtn(
                         btnText: "Đăng ký",
                         onPressed: () {
@@ -124,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           }
                         },
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -151,7 +151,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 36),
                       const Row(
                         children: [
                           Expanded(
@@ -175,8 +175,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
+                      const SizedBox(height: 28),
+                      OutlinedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
