@@ -10,7 +10,7 @@ import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_s
 import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/hotel_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/restaurant_list_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/service_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/services/service_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 

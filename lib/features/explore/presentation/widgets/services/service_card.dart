@@ -47,54 +47,54 @@ class ServiceCard extends StatelessWidget {
             elevation: 0,
             color: slider
                 ? Theme.of(context).colorScheme.surfaceContainerLowest
-                : Theme.of(context).colorScheme.surface,
-            child: Row(
-              crossAxisAlignment:
-                  slider ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-              children: [
-                // Image and Icon
+                : Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              child: Row(
+                crossAxisAlignment: slider
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
+                children: [
+                  // Image and Icon
 
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(10),
-                      ),
-                      child: Image.network(
-                        service.cover,
-                        width: 108,
-                        height: 108,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: IconButton(
-                          onPressed: () {},
-                          iconSize: 18,
-                          style: IconButton.styleFrom(
-                            padding: EdgeInsets.zero, // Remove extra padding
-                            alignment: Alignment.center,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                          ),
-                          icon: const Icon(Icons.favorite_border),
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        child: Image.network(
+                          service.cover,
+                          width: slider ? 100 : 110,
+                          height: slider ? 100 : 110,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 4,
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: IconButton(
+                            onPressed: () {},
+                            iconSize: 18,
+                            style: IconButton.styleFrom(
+                              padding: EdgeInsets.zero, // Remove extra padding
+                              alignment: Alignment.center,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                            ),
+                            icon: const Icon(Icons.favorite_border),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 190,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    // Ensure this widget allows text to take available space
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -241,8 +241,8 @@ class ServiceCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             )),
       ),
     );

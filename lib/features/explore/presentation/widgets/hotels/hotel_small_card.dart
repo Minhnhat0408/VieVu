@@ -30,7 +30,7 @@ class HotelSmallCard extends StatelessWidget {
           elevation: 0,
           color: slider
               ? Theme.of(context).colorScheme.surfaceContainerLowest
-              : Theme.of(context).colorScheme.surface,
+              : Colors.transparent,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
             child: Column(
@@ -165,14 +165,15 @@ class HotelSmallCard extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(hotel.positionDesc,
-                                      maxLines: 2,
+                                      maxLines: slider ? 1 : 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontSize: 12,
                                       )),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            if (!slider) const SizedBox(height: 4),
                           ],
                         ),
                       ),

@@ -436,11 +436,11 @@ class _AttractionListPageState extends State<AttractionListPage>
                                             border: Border.all(
                                               color: Theme.of(context)
                                                   .colorScheme
-                                                  .primaryContainer,
+                                                  .primary,
                                               width:
                                                   activeIndex == attraction.id
-                                                      ? 4
-                                                      : 2,
+                                                      ? 5
+                                                      : 3,
                                             ),
                                           ),
                                         ),
@@ -491,7 +491,6 @@ class _AttractionListPageState extends State<AttractionListPage>
                           },
                           options: CarouselOptions(
                             height: 130,
-                            enlargeCenterPage: true,
                             initialPage: 0,
                             reverse: false,
                             enableInfiniteScroll: false,

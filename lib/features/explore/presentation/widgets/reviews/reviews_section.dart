@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/review.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews/reviews_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:vn_travel_companion/features/explore/presentation/pages/reviews_page.dart';

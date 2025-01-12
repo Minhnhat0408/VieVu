@@ -30,7 +30,7 @@ class AttractionMedCard extends StatelessWidget {
           elevation: 0,
           color: slider
               ? Theme.of(context).colorScheme.surfaceContainerLowest
-              : Theme.of(context).colorScheme.surface,
+              : Colors.transparent,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
             child: Row(

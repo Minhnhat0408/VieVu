@@ -407,9 +407,7 @@ class _HotelListPageState extends State<HotelListPage>
                                             ? 80
                                             : 60,
                                         decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: Colors.blueAccent,
                                           borderRadius: BorderRadius.circular(
                                               activeIndex == attraction.id
                                                   ? 10
@@ -420,12 +418,10 @@ class _HotelListPageState extends State<HotelListPage>
                                             fit: BoxFit.cover,
                                           ),
                                           border: Border.all(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primaryContainer,
+                                            color: Colors.blueAccent,
                                             width: activeIndex == attraction.id
-                                                ? 4
-                                                : 2,
+                                                ? 5
+                                                : 3,
                                           ),
                                         ),
                                       ),
@@ -437,9 +433,7 @@ class _HotelListPageState extends State<HotelListPage>
                                 return Container(
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
+                                      color: Colors.blueAccent),
                                   child: Center(
                                     child: Text(
                                       markers.length.toString(),
@@ -475,8 +469,7 @@ class _HotelListPageState extends State<HotelListPage>
                           );
                         },
                         options: CarouselOptions(
-                          height: 150,
-                          enlargeCenterPage: true,
+                          height: 130,
                           initialPage: 0,
                           reverse: false,
                           enableInfiniteScroll: false,

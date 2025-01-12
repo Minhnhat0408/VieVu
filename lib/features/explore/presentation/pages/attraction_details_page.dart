@@ -11,7 +11,7 @@ import 'package:vn_travel_companion/features/explore/domain/entities/attraction.
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews/reviews_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/related_attraction_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_service_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/open_time_display.dart';

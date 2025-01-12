@@ -15,13 +15,13 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/service_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/services/service_card.dart';
 import 'package:font_awesome_flutter/src/fa_icon.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/attraction_section.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/service_big_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/services/service_big_card.dart';
 
 class AllNearbyServicePage extends StatefulWidget {
   const AllNearbyServicePage({super.key});
@@ -379,7 +379,7 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
                         mapController: _animatedMapController.mapController,
                         options: MapOptions(
                             initialCenter:
-                                LatLng(userPos![0] - 0.008, userPos![1]),
+                                LatLng(userPos![0] - 0.005, userPos![1]),
                             minZoom: 3),
                         children: [
                           TileLayer(
@@ -433,9 +433,13 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
                                         width: activeIndex == ser.id ? 80 : 60,
                                         height: activeIndex == ser.id ? 80 : 60,
                                         decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: ser.typeId == 1
+                                              ? Colors.orange
+                                              : ser.typeId == 2
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                  : Colors.blueAccent,
                                           borderRadius: BorderRadius.circular(
                                               activeIndex == ser.id ? 10 : 30),
                                           image: DecorationImage(
@@ -444,11 +448,15 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
                                             fit: BoxFit.cover,
                                           ),
                                           border: Border.all(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
+                                            color: ser.typeId == 1
+                                                ? Colors.orange
+                                                : ser.typeId == 2
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .primary
+                                                    : Colors.blueAccent,
                                             width:
-                                                activeIndex == ser.id ? 4 : 2,
+                                                activeIndex == ser.id ? 5 : 3,
                                           ),
                                         ),
                                       ),
@@ -503,9 +511,8 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
                       },
                       options: CarouselOptions(
                         height: 130,
-                        enlargeCenterPage: true,
                         initialPage: 0,
-                        viewportFraction: 0.9,
+                        viewportFraction: 0.8,
                         reverse: false,
                         enableInfiniteScroll: false,
                         onPageChanged: (index, reason) => setState(() {

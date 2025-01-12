@@ -44,7 +44,7 @@ class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
               elevation: 0,
               color: widget.slider
                   ? Theme.of(context).colorScheme.surfaceContainerLowest
-                  : Theme.of(context).colorScheme.surface,
+                  : Colors.transparent,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
