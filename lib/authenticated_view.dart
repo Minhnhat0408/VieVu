@@ -1,9 +1,9 @@
-import 'package:animations/animations.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
 
 class AuthenticatedView extends StatefulWidget {
   const AuthenticatedView({super.key});
@@ -28,7 +28,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
   }
 
   final screens = [
-    const SettingsPage(),
+    const TripPostsPage(),
     const SplashScreenPage(),
     const ExplorePage(),
     const SplashScreenPage(),
@@ -62,27 +62,29 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
 
     return Scaffold(
       extendBody: true,
-      body: PageTransitionSwitcher(
-        // reverse: true, // uncomment to see transition in reverse
-        transitionBuilder: (
-          Widget child,
-          Animation<double> primaryAnimation,
-          Animation<double> secondaryAnimation,
-        ) {
-          return SharedAxisTransition(
-            animation: primaryAnimation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.horizontal,
-            child: child,
-          );
-        },
-        reverse: reversedTrans,
-        duration: const Duration(milliseconds: 1000),
-        child: IndexedStack(
-          index: _selectedIndex,
-          children: screens as List<Widget>,
-        ),
+      body:
+          //  PageTransitionSwitcher(
+          //   // reverse: true, // uncomment to see transition in reverse
+          //   transitionBuilder: (
+          //     Widget child,
+          //     Animation<double> primaryAnimation,
+          //     Animation<double> secondaryAnimation,
+          //   ) {
+          //     return SharedAxisTransition(
+          //       animation: primaryAnimation,
+          //       secondaryAnimation: secondaryAnimation,
+          //       transitionType: SharedAxisTransitionType.horizontal,
+          //       child: child,
+          //     );
+          //   },
+          //   reverse: reversedTrans,
+          //   duration: const Duration(milliseconds: 1000),
+          //   child:
+          IndexedStack(
+        index: _selectedIndex,
+        children: screens as List<Widget>,
       ),
+      // ),
       bottomNavigationBar: CurvedNavigationBar(
         key: _bottomNavigationKey,
         index: _selectedIndex,

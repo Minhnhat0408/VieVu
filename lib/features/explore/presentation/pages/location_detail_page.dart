@@ -120,6 +120,7 @@ class LocationDetailMainState extends State<LocationDetailMain> {
         title: Text(widget.locationName),
         scrolledUnderElevation: 0,
         centerTitle: true,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         actions: [
           IconButton(
             icon: const Icon(Icons.share),

@@ -628,7 +628,6 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
         // Decode HTML entities in each restaurant's data
         return data.map((e) {
-          log(e.toString());
           // Assuming RestaurantModel has a fromJson method
           final restaurant = RestaurantModel.fromJson(e).copyWith(
             // Decode HTML entities in relevant fields
@@ -841,12 +840,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         if (response2.statusCode == 200) {
           final jsonResponse = jsonDecode(utf8.decode(response2.bodyBytes));
           final data = jsonResponse['hotelList'] as List<dynamic>;
-          // log(data.toString());
-          // Decode HTML entities in each restaurant's data
           return data.map((e) {
-            log(e.toString());
-            // Assuming RestaurantModel has a fromJson method
-            // log(e['hotelBasicInfo']['hotelName']);
             final hotel = HotelModel.fromJson(e);
 
             return hotel;

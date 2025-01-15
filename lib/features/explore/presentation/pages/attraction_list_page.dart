@@ -11,6 +11,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:latlong2/latlong.dart';
 // import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:vn_travel_companion/core/constants/parent_traveltypes.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
@@ -134,6 +135,20 @@ class _AttractionListPageState extends State<AttractionListPage>
       zoom: 15,
       rotation: 0.0,
     );
+  }
+
+  String _convertFilterString(int index) {
+    if (index == 1) {
+      return _parentTravelType != null
+          ? _parentTravelType!.name
+          : options[index];
+    } else if (index == 2) {
+      return _currentRating != null
+          ? "Đánh giá $_currentRating sao"
+          : options[index];
+    } else {
+      return options[index];
+    }
   }
 
   @override
@@ -283,7 +298,7 @@ class _AttractionListPageState extends State<AttractionListPage>
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      options[index],
+                                      _convertFilterString(index),
                                       style: TextStyle(
                                         fontWeight: ((_parentTravelType !=
                                                         null &&

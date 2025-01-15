@@ -8,6 +8,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
@@ -112,6 +113,18 @@ class _RestaurantListPageState extends State<RestaurantListPage>
     super.dispose();
     _pagingController.dispose();
     _animatedMapController.dispose();
+  }
+
+  String _convertFilterString(int index) {
+    if (index == 1) {
+      return _selectedFilter ?? "Ẩm thực";
+    } else if (index == 3) {
+      return (_minPrice != null || _maxPrice != null)
+          ? "${NumberFormat('#,###').format(_minPrice)} - ${NumberFormat('#,###').format(_maxPrice)} vnd"
+          : "Khoảng giá";
+    } else {
+      return options[index];
+    }
   }
 
   @override
@@ -271,7 +284,7 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      options[index],
+                                      _convertFilterString(index),
                                       style: TextStyle(
                                         fontWeight: (_selectedFilter != null &&
                                                     options[index] ==

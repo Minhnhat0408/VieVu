@@ -36,7 +36,8 @@ class SettingsPage extends StatelessWidget {
               icon: Icon(
                 Icons.computer,
                 color: notifier.isSystemOn ? Colors.green : Colors.grey,
-              ));
+              ),
+              );
         })
       ],
       body: Consumer<ThemeProvider>(

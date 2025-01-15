@@ -19,7 +19,6 @@ import 'package:vn_travel_companion/features/explore/presentation/cubit/location
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/services/service_card.dart';
-import 'package:font_awesome_flutter/src/fa_icon.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/attraction_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/services/service_big_card.dart';
 
@@ -115,6 +114,7 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
       appBar: AppBar(
         title: const Text('Gần bạn'),
         scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         centerTitle: true,
       ),
       body: BlocConsumer<NearbyServicesCubit, NearbyServicesState>(

@@ -66,6 +66,18 @@ class _HotelListPageState extends State<HotelListPage>
     );
   }
 
+  String _convertFilterString(int index) {
+    if (index == 3) {
+      return _star != null ? "Khách sạn $_star sao" : options[index];
+    } else if (index == 2) {
+      return (_minPrice != null || _maxPrice != null)
+          ? "${NumberFormat('#,###').format(_minPrice)} - ${NumberFormat('#,###').format(_maxPrice)} vnd"
+          : "Khoảng giá";
+    } else {
+      return options[index];
+    }
+  }
+
   Future<void> _selectDateRange(BuildContext context) async {
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
@@ -270,7 +282,7 @@ class _HotelListPageState extends State<HotelListPage>
                                   children: [
                                     Text(
                                       index != 1
-                                          ? options[index]
+                                          ? _convertFilterString(index)
                                           : "${DateFormat('dd/MM/yyyy').format(selectedDateRange.start)}-${DateFormat('dd/MM/yyyy').format(selectedDateRange.end)}",
                                       style: TextStyle(
                                         fontWeight: (options[index] ==

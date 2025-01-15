@@ -38,7 +38,7 @@ dependencies:
   provider: ^6.1.2
   carousel_slider: ^5.0.0
   smooth_page_indicator: ^1.2.0+3
-  flutter_bloc: ^8.1.6
+  flutter_bloc: ^9.0.0
   flutter_svg: ^2.0.16
   supabase_flutter: ^2.8.1
   google_sign_in: ^6.2.2
