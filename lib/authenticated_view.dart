@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
 
 class AuthenticatedView extends StatefulWidget {
@@ -29,7 +30,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
 
   final screens = [
     const TripPostsPage(),
-    const SplashScreenPage(),
+    const TripManagePage(),
     const ExplorePage(),
     const SplashScreenPage(),
     const SettingsPage(),
@@ -82,7 +83,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
           //   child:
           IndexedStack(
         index: _selectedIndex,
-        children: screens as List<Widget>,
+        children: screens,
       ),
       // ),
       bottomNavigationBar: CurvedNavigationBar(
