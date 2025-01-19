@@ -10,8 +10,8 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_filter_modal.dart';
@@ -580,25 +580,4 @@ class _RestaurantListPageState extends State<RestaurantListPage>
       ]),
     );
   }
-}
-
-void displayModal(
-    BuildContext context, Widget child, double? height, bool expand) {
-  showBarModalBottomSheet(
-    context: context,
-    backgroundColor: Theme.of(context).colorScheme.surface,
-    useRootNavigator: true,
-    enableDrag: true,
-    topControl: Container(
-      width: 40,
-      height: 5,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(5),
-      ),
-    ),
-    expand: expand,
-    builder: (context) =>
-        height != null ? SizedBox(height: height, child: child) : child,
-  );
 }

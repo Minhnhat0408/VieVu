@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 
 class TripManagePage extends StatefulWidget {
   const TripManagePage({super.key});
@@ -155,9 +157,103 @@ class _TripManagePageState extends State<TripManagePage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  displayModal(
+                      context,
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Padding(
+                            padding:
+                                EdgeInsets.only(left: 20.0, right: 20, top: 20),
+                            child: Text(
+                              "Tạo chuyến đi",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 20),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Tên chuyến đi',
+                                hintText: 'Ví dụ: Chuyến đi Hội An 2025',
+                              ),
+                            ),
+                          ),
+                          // Flexible(
+                          //   child: SingleChildScrollView(
+                          //     child: Column(
+                          //       children: [
+                          //         ...restaurantTimeSlotsMap.entries.map(
+                          //           (service) {
+                          //             return CheckboxListTile(
+                          //               value: _seletedServices
+                          //                   .contains(service.key),
+                          //               contentPadding:
+                          //                   const EdgeInsets.symmetric(
+                          //                       vertical: 0, horizontal: 20),
+                          //               controlAffinity:
+                          //                   ListTileControlAffinity.trailing,
+                          //               title: Text(
+                          //                 service.key,
+                          //                 style: const TextStyle(
+                          //                     fontSize: 16,
+                          //                     fontWeight: FontWeight.bold),
+                          //               ),
+                          //               onChanged: (value) {
+                          //                 setState(() {
+                          //                   if (value!) {
+                          //                     _seletedServices.add(service.key);
+                          //                   } else {
+                          //                     _seletedServices
+                          //                         .remove(service.key);
+                          //                   }
+                          //                 });
+                          //               },
+                          //             );
+                          //           },
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
+                          Divider(
+                            thickness: 1,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // widget.onServicesChanged(_seletedServices);
+                                  Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                ),
+                                child: const Text("Áp dụng"),
+                              ),
+                              const SizedBox(width: 20),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      ),
+                      null,
+                      false);
+                },
                 style: ElevatedButton.styleFrom(
-                    backgroundColor:
+                  backgroundColor:
                       Theme.of(context).colorScheme.primaryContainer,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 50, vertical: 15),

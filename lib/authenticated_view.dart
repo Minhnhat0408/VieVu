@@ -1,7 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/explore.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/explore_nested_routes.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
@@ -31,7 +31,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
   final screens = [
     const TripPostsPage(),
     const TripManagePage(),
-    const ExplorePage(),
+    const ExploreNestedRoutes(),
     const SplashScreenPage(),
     const SettingsPage(),
   ];

@@ -18,7 +18,7 @@ class ServiceModel extends Service {
     required super.jumpUrl,
     super.star,
     super.hotScore,
-    super.statusInfo,
+
   });
 
   factory ServiceModel.fromRestaurantJson(Map<String, dynamic> json) {
@@ -75,7 +75,7 @@ class ServiceModel extends Service {
       distance: json['distance'],
       distanceDesc: json['distanceDesc'],
       jumpUrl: json['jumpUrl'],
-      statusInfo: json['statusInfo'] as Map<String, dynamic>?,
+
     );
   }
 

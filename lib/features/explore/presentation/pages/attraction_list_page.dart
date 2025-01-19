@@ -2,16 +2,13 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:latlong2/latlong.dart';
-// import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:vn_travel_companion/core/constants/parent_traveltypes.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
@@ -672,25 +669,4 @@ class _AttractionListPageState extends State<AttractionListPage>
       ]),
     );
   }
-}
-
-void displayModal(
-    BuildContext context, Widget child, double? height, bool expand) {
-  showBarModalBottomSheet(
-    context: context,
-    backgroundColor: Theme.of(context).colorScheme.surface,
-    useRootNavigator: true,
-    enableDrag: true,
-    topControl: Container(
-      width: 40,
-      height: 5,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(5),
-      ),
-    ),
-    expand: expand,
-    builder: (context) =>
-        height != null ? SizedBox(height: height, child: child) : child,
-  );
 }

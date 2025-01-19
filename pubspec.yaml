@@ -70,6 +70,7 @@ dependencies:
   latlong2: ^0.9.1
   flutter_map_animations: ^0.8.0
   sliding_up_panel: ^2.0.0+1
+  go_router: ^14.6.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

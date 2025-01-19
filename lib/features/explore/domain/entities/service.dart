@@ -15,7 +15,6 @@ class Service {
   final String? hotScore;
   final double? star;
   final String jumpUrl;
-  final Map<String, dynamic>? statusInfo;
 
   const Service({
     required this.id,
@@ -34,6 +33,5 @@ class Service {
     required this.jumpUrl,
     this.star,
     this.hotScore,
-    this.statusInfo,
   });
 }

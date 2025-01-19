@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore_main_page.dart';
 
-class ExplorePage extends StatelessWidget {
-  const ExplorePage({super.key});
+class ExploreNestedRoutes extends StatelessWidget {
+  const ExploreNestedRoutes({super.key});
 
   @override
   Widget build(BuildContext context) {
