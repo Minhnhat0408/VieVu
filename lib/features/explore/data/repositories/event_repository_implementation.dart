@@ -14,7 +14,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<Either<Failure, List<Event>>> getHotEvents() async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final events = await eventRemoteDatasource.getHotEvents();
 

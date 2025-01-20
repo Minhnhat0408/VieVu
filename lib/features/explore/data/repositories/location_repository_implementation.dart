@@ -18,7 +18,7 @@ class LocationRepositoryImpl implements LocationRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final location = await locationRemoteDatasource.getLocation(
         locationId: locationId,
@@ -40,7 +40,7 @@ class LocationRepositoryImpl implements LocationRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final locations = await locationRemoteDatasource.getHotLocations(
         limit: limit,
@@ -59,7 +59,7 @@ class LocationRepositoryImpl implements LocationRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final locations = await locationRemoteDatasource.getRecentViewedLocations(
         limit: limit,
@@ -78,7 +78,7 @@ class LocationRepositoryImpl implements LocationRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       await locationRemoteDatasource.upsertRecentViewedLocations(
         locationId: locationId,
@@ -97,7 +97,7 @@ class LocationRepositoryImpl implements LocationRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final location = await locationRemoteDatasource.getLocationGeneralInfo(
         locationId: locationId,
@@ -116,7 +116,7 @@ class LocationRepositoryImpl implements LocationRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final address =
           await locationRemoteDatasource.convertGeoLocationToAddress(

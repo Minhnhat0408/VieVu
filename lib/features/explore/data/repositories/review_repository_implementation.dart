@@ -21,7 +21,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final reviews = await reviewRemoteDataSource.getAttractionReviews(
         attractionId: attractionId,

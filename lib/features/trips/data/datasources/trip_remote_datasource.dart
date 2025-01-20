@@ -1,13 +1,24 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/trips/data/models/saved_service_model.dart';
+import 'package:vn_travel_companion/features/trips/data/models/trip_model.dart';
 
 abstract interface class TripRemoteDatasource {
   Future insertTrip({
     required String name,
     required String userId,
   });
+  Future getCurrentUserTrips(
+      {required String userId, String? status, bool? isPublished});
 
+  Future getTrips({
+    required int limit,
+    required int offset,
+    String? status,
+    DateTime? startDate,
+    DateTime? endDate,
+    List<String>? transports,
+    List<String>? locationIds,
+  });
   Future updateTrip({
     required String tripId,
     String? description,
@@ -42,6 +53,71 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         'name': name,
         'owner_id': userId,
       });
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future getTrips({
+    required int limit,
+    required int offset,
+    String? status,
+    DateTime? startDate,
+    DateTime? endDate,
+    List<String>? transports,
+    List<String>? locationIds,
+  }) async {
+    try {
+      var query = supabaseClient.from('trips').select();
+
+      if (status != null) {
+        query = query.eq('status', status);
+      }
+
+      if (startDate != null) {
+        query = query.gte('start_date', startDate);
+      }
+
+      if (endDate != null) {
+        query = query.lte('end_date', endDate);
+      }
+
+      if (transports != null) {
+        query = query.contains('transports', transports);
+      }
+
+      if (locationIds != null) {
+        query = query.contains('location_ids', locationIds);
+      }
+
+      final response = await query
+          .order('created_at', ascending: false)
+          .range(offset, offset + limit);
+
+      return response.map((e) => TripModel.fromJson(e)).toList();
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future getCurrentUserTrips(
+      {required String userId, String? status, bool? isPublished}) async {
+    try {
+      var query = supabaseClient.from('trips').select().eq('owner_id', userId);
+
+      if (status != null) {
+        query = query.eq('status', status);
+      }
+
+      if (isPublished != null) {
+        query = query.eq('is_published', isPublished);
+      }
+
+      final response = await query.order('created_at', ascending: false);
+
+      return response.map((e) => TripModel.fromJson(e)).toList();
     } catch (e) {
       throw ServerException(e.toString());
     }

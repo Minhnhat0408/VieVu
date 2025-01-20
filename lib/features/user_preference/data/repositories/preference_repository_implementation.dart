@@ -17,7 +17,7 @@ class PreferenceRepositoryImpl implements PreferenceRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final preference = await remoteDataSource.getUserPreference(
         userId: userId,
@@ -39,7 +39,7 @@ class PreferenceRepositoryImpl implements PreferenceRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final res = await remoteDataSource.insertUserPreference(
         userId: userId,
@@ -65,7 +65,7 @@ class PreferenceRepositoryImpl implements PreferenceRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final preference = await remoteDataSource.updateUserPreference(
         userId: userId,

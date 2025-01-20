@@ -19,7 +19,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
       {required int attractionId}) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attraction = await attractionRemoteDatasource.getAttraction(
         attractionId: attractionId,
@@ -42,7 +42,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attractions = await attractionRemoteDatasource.getHotAttractions(
         limit: limit,
@@ -61,7 +61,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attractions =
           await attractionRemoteDatasource.getRecentViewedAttractions(
@@ -81,7 +81,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       await attractionRemoteDatasource.upsertRecentViewedAttractions(
         attractionId: attractionId,
@@ -104,7 +104,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attractions = await attractionRemoteDatasource.getNearbyAttractions(
         latitude: latitude,
@@ -120,7 +120,6 @@ class AttractionRepositoryImpl implements AttractionRepository {
     }
   }
 
- 
   @override
   Future<Either<Failure, Map<String, List<Service>>>> getAllServicesNearby({
     required double latitude,
@@ -131,7 +130,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attractions = await attractionRemoteDatasource.getAllServicesNearby(
         limit: limit,
@@ -157,7 +156,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attractions =
           await attractionRemoteDatasource.getServicesNearAttraction(
@@ -181,7 +180,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attractions =
           await attractionRemoteDatasource.getRecommendedAttractions(
@@ -202,7 +201,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attractions =
           await attractionRemoteDatasource.getRelatedAttractions(
@@ -233,7 +232,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final attractions =
           await attractionRemoteDatasource.getAttractionsWithFilter(
@@ -272,7 +271,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final restaurants =
           await attractionRemoteDatasource.getRestaurantsWithFilter(
@@ -310,7 +309,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final hotels = await attractionRemoteDatasource.getHotelsWithFilter(
         checkOutDate: checkOutDate,

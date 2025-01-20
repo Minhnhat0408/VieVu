@@ -1,4 +1,4 @@
-class SavedServices {
+class SavedService {
   final DateTime createdAt;
   final int id;
   final String tripId;
@@ -15,7 +15,7 @@ class SavedServices {
   final int ratingCount;
   final int? attractionId;
 
-  SavedServices({
+  SavedService({
     required this.id,
     required this.typeId,
     required this.createdAt,

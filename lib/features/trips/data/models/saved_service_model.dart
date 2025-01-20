@@ -1,6 +1,6 @@
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 
-class SavedServiceModel extends SavedServices {
+class SavedServiceModel extends SavedService {
   SavedServiceModel({
     required super.id,
     required super.name,

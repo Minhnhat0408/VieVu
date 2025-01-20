@@ -11,6 +11,12 @@ abstract interface class SavedServiceRemoteDatasource {
   Future deleteSavedTrips({
     required int serviceId,
   });
+
+  Future getSavedServices({
+    required String tripId,
+    int? typeId,
+
+  });
 }
 
 class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
@@ -49,6 +55,29 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
   }) async {
     try {
       await supabaseClient.from('saved_services').delete().eq('id', serviceId);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future getSavedServices({
+    required String tripId,
+    int? typeId,
+  }) async {
+    try {
+      var query =  supabaseClient
+          .from('saved_services')
+          .select('*')
+          .eq('trip_id', tripId);
+
+      if (typeId != null) {
+        query = query.eq('type_id', typeId);
+      }
+
+      final response = await query.order('created_at', ascending: false);
+
+      return response.map((e) => SavedServiceModel.fromJson(e)).toList();
     } catch (e) {
       throw ServerException(e.toString());
     }

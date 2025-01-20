@@ -22,7 +22,7 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final List<ExploreSearchResult> searchResults =
           await searchRemoteDataSource.exploreSearch(
@@ -46,7 +46,7 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final List<ExploreSearchResult> searchResults =
           await searchRemoteDataSource.searchEvents(
@@ -69,7 +69,7 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final List<ExploreSearchResult> searchResults =
           await searchRemoteDataSource.searchAll(
@@ -93,7 +93,7 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final List<ExploreSearchResult> searchResults =
           await searchRemoteDataSource.searchExternalApi(
@@ -121,7 +121,7 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       await searchRemoteDataSource.upsertSearchHistory(
         searchText: searchText,
@@ -145,7 +145,7 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final List<ExploreSearchResult> searchResults =
           await searchRemoteDataSource.getSearchHistory(

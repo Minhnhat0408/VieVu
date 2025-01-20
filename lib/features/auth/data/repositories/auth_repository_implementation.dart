@@ -21,7 +21,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final user = await remoteDataSource.signUpWithEmailAndPassword(
         email: email,
@@ -42,7 +42,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       final user = await remoteDataSource.logInWithEmailAndPassword(
         email: email,
@@ -85,7 +85,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, Unit>> logOut() async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
       await remoteDataSource.logOut();
       return right(unit);
@@ -98,7 +98,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> logInWithGoogle() async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
 
       final user = await remoteDataSource.logInWithGoogle();
@@ -119,7 +119,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
 
       await remoteDataSource.sendPasswordResetEmail(email: email);
@@ -135,7 +135,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
-        return left(Failure("No internet connection"));
+        return left(Failure("Không có kết nối mạng"));
       }
 
       await remoteDataSource.updatePassword(password: password);
