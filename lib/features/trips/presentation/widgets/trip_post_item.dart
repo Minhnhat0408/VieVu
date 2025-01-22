@@ -13,7 +13,7 @@ class _TripPostItemState extends State<TripPostItem> {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.hardEdge,
-      elevation: 4,
+      elevation: 0,
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -21,7 +21,7 @@ class _TripPostItemState extends State<TripPostItem> {
           Stack(
             children: [
               Image.asset(
-                'assets/images/intro1.jpg',
+                'assets/images/trip_placeholder.avif',
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,

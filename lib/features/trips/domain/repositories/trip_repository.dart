@@ -13,7 +13,7 @@ abstract interface class TripRepository {
     List<String>? locationIds,
   });
 
-  Future<Either<Failure, Unit>> insertTrip({
+  Future<Either<Failure, Trip>> insertTrip({
     required String name,
     required String userId,
   });
@@ -38,5 +38,7 @@ abstract interface class TripRepository {
     required String userId,
     String? status,
     bool? isPublished,
+    required int limit,
+    required int offset,
   });
 }

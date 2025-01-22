@@ -1,3 +1,6 @@
+import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_location.dart';
+
 class Trip {
   final String id;
   final String name;
@@ -10,6 +13,8 @@ class Trip {
   final String userId;
   final String status;
   final bool isPublished;
+  final List<String> locations;
+  final int serviceCount;
   final List<String>? transports;
 
   Trip({
@@ -21,6 +26,8 @@ class Trip {
     this.endDate,
     required this.createdAt,
     this.maxMember,
+    required this.locations,
+    required this.serviceCount,
     required this.userId,
     required this.status,
     required this.isPublished,

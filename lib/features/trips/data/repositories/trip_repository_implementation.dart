@@ -57,7 +57,7 @@ class TripRepositoryImpl implements TripRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> insertTrip({
+  Future<Either<Failure, Trip>> insertTrip({
     required String name,
     required String userId,
   }) async {
@@ -65,8 +65,9 @@ class TripRepositoryImpl implements TripRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      await tripRemoteDatasource.insertTrip(name: name, userId: userId);
-      return right(unit);
+      final trip =
+          await tripRemoteDatasource.insertTrip(name: name, userId: userId);
+      return right(trip);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -107,12 +108,16 @@ class TripRepositoryImpl implements TripRepository {
     required String userId,
     String? status,
     bool? isPublished,
+    required int limit,
+    required int offset,
   }) async {
     try {
       final trips = await tripRemoteDatasource.getCurrentUserTrips(
         userId: userId,
         status: status,
         isPublished: isPublished,
+        limit: limit,
+        offset: offset,
       );
       return right(trips);
     } on ServerException catch (e) {

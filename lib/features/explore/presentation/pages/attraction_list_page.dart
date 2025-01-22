@@ -618,34 +618,31 @@ class _AttractionListPageState extends State<AttractionListPage>
                           ),
                         ),
                       ),
-                      SliverPadding(
-                        padding: const EdgeInsets.only(bottom: 70),
-                        sliver: PagedSliverList<int, Attraction>(
-                          pagingController: _pagingController,
-                          builderDelegate:
-                              PagedChildBuilderDelegate<Attraction>(
-                            itemBuilder: (context, item, index) {
-                              return AttractionMedCard(
-                                attraction: item,
-                              );
-                            },
-                            firstPageProgressIndicatorBuilder: (_) =>
-                                const Center(
-                                    child: CircularProgressIndicator()),
-                            newPageProgressIndicatorBuilder: (_) =>
-                                const Center(
-                                    child: CircularProgressIndicator()),
-                            noItemsFoundIndicatorBuilder: (_) => const Center(
-                                child: Text('Không có điểm du lịch nào.')),
-                            newPageErrorIndicatorBuilder: (context) => Center(
-                              child: TextButton(
-                                onPressed: () =>
-                                    _pagingController.retryLastFailedRequest(),
-                                child: const Text('Thử lại'),
-                              ),
+                      PagedSliverList<int, Attraction>(
+                        pagingController: _pagingController,
+                        builderDelegate: PagedChildBuilderDelegate<Attraction>(
+                          itemBuilder: (context, item, index) {
+                            return AttractionMedCard(
+                              attraction: item,
+                            );
+                          },
+                          firstPageProgressIndicatorBuilder: (_) =>
+                              const Center(child: CircularProgressIndicator()),
+                          newPageProgressIndicatorBuilder: (_) =>
+                              const Center(child: CircularProgressIndicator()),
+                          noItemsFoundIndicatorBuilder: (_) => const Center(
+                              child: Text('Không có điểm du lịch nào.')),
+                          newPageErrorIndicatorBuilder: (context) => Center(
+                            child: TextButton(
+                              onPressed: () =>
+                                  _pagingController.retryLastFailedRequest(),
+                              child: const Text('Thử lại'),
                             ),
                           ),
                         ),
+                      ),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: 70), // Add vertical spacing
                       ),
                     ],
                   ),

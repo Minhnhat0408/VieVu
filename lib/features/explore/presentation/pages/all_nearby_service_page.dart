@@ -13,13 +13,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/services/service_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/attraction_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/services/service_big_card.dart';
 
 class AllNearbyServicePage extends StatefulWidget {

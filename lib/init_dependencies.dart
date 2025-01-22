@@ -40,6 +40,11 @@ import 'package:vn_travel_companion/features/search/data/repositories/explore_se
 import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
+import 'package:vn_travel_companion/features/trips/data/datasources/trip_remote_datasource.dart';
+import 'package:vn_travel_companion/features/trips/data/repositories/trip_repository_implementation.dart';
+import 'package:vn_travel_companion/features/trips/domain/repositories/trip_repository.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_manage_cubit.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/repositories/preference_repository_implementation.dart';
@@ -60,6 +65,7 @@ Future<void> initDependencies() async {
   _initEvent();
   _initSearch();
   _initReview();
+  _initTrip();
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -88,6 +94,10 @@ Future<void> initDependencies() async {
 
   serviceLocator.registerFactory(
     () => ReviewsCubit(reviewRepository: serviceLocator()),
+  );
+
+  serviceLocator.registerFactory(
+    () => TripManageCubit(tripRepository: serviceLocator()),
   );
 
   serviceLocator.registerLazySingleton(
@@ -294,6 +304,26 @@ void _initReview() {
     ..registerFactory<ReviewRemoteDataSource>(
       () => ReviewRemoteDataSourceImpl(
         serviceLocator(),
+      ),
+    );
+}
+
+void _initTrip() {
+  serviceLocator
+    ..registerFactory<TripRemoteDatasource>(
+      () => TripRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<TripRepository>(
+      () => TripRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton<TripBloc>(
+      () => TripBloc(
+        tripRepository: serviceLocator(),
       ),
     );
 }

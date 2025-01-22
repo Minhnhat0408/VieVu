@@ -1,16 +1,22 @@
+import 'dart:developer';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/trips/data/models/trip_model.dart';
 
 abstract interface class TripRemoteDatasource {
-  Future insertTrip({
+  Future<TripModel> insertTrip({
     required String name,
     required String userId,
   });
-  Future getCurrentUserTrips(
-      {required String userId, String? status, bool? isPublished});
+  Future<List<TripModel>> getCurrentUserTrips(
+      {required String userId,
+      String? status,
+      bool? isPublished,
+      required int limit,
+      required int offset});
 
-  Future getTrips({
+  Future<List<TripModel>> getTrips({
     required int limit,
     required int offset,
     String? status,
@@ -44,22 +50,30 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
   );
 
   @override
-  Future insertTrip({
+  Future<TripModel> insertTrip({
     required String name,
     required String userId,
   }) async {
     try {
-      await supabaseClient.from('trips').insert({
+      final res = await supabaseClient.from('trips').insert({
         'name': name,
         'owner_id': userId,
-      });
+        'status': 'planning',
+      }).select();
+      if (res.isEmpty) {
+        throw const ServerException('Failed to insert trip');
+      }
+      log(res.first.toString());
+
+      return TripModel.fromJson(res.first);
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }
 
   @override
-  Future getTrips({
+  Future<List<TripModel>> getTrips({
     required int limit,
     required int offset,
     String? status,
@@ -102,10 +116,19 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
   }
 
   @override
-  Future getCurrentUserTrips(
-      {required String userId, String? status, bool? isPublished}) async {
+  Future<List<TripModel>> getCurrentUserTrips(
+      {required String userId,
+      String? status,
+      bool? isPublished,
+      required int limit,
+      required int offset}) async {
     try {
-      var query = supabaseClient.from('trips').select().eq('owner_id', userId);
+      log('hellooo');
+      var query = supabaseClient
+          .from('trips')
+          .select(
+              '*, trip_locations(locations(name), is_starting_point), saved_services(count)')
+          .eq('owner_id', userId);
 
       if (status != null) {
         query = query.eq('status', status);
@@ -115,10 +138,38 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         query = query.eq('is_published', isPublished);
       }
 
-      final response = await query.order('created_at', ascending: false);
+      final response = await query
+          .order('created_at', ascending: false)
+          .range(offset, offset + limit);
 
-      return response.map((e) => TripModel.fromJson(e)).toList();
+      return response.map((e) {
+        final tripItem = e;
+        tripItem['service_count'] = e['saved_services'][0]['count'];
+        final locations = e['trip_locations'] as List;
+
+        tripItem['locations'] = <String>[];
+        if (locations.isNotEmpty) {
+          final startingPointIndex = locations.indexWhere((element) {
+            return element['is_starting_point'] == true;
+          });
+          if (startingPointIndex != -1) {
+            final startingPoint = locations[startingPointIndex];
+            locations.removeAt(startingPointIndex);
+            locations.insert(0, startingPoint);
+          }
+
+          tripItem['locations'] = locations
+              .map<String>(
+                (e) => e['locations']['name'],
+              )
+              .toList();
+        }
+
+        return TripModel.fromJson(tripItem);
+      }).toList();
     } catch (e) {
+      log(e.toString());
+
       throw ServerException(e.toString());
     }
   }

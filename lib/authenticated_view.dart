@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore_nested_routes.dart';
 import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_nested_routes.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
 
 class AuthenticatedView extends StatefulWidget {
@@ -30,7 +30,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
 
   final screens = [
     const TripPostsPage(),
-    const TripManagePage(),
+    const TripManageNestedRoutes(),
     const ExploreNestedRoutes(),
     const SplashScreenPage(),
     const SettingsPage(),

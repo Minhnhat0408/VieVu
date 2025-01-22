@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +9,6 @@ import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/all_nearby_service_page.dart';
 

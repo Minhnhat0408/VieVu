@@ -161,6 +161,7 @@ class _TripPostsPageState extends State<TripPostsPage> {
         ],
         body: ListView.builder(
           itemCount: 10,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           itemBuilder: (context, index) => const TripPostItem(),
         ),
       ),
