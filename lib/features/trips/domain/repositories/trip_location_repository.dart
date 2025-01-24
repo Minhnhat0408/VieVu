@@ -13,6 +13,7 @@ abstract interface class TripLocationRepository {
   });
 
   Future<Either<Failure, Unit>> deleteTripLocation({
-    required int id,
+    required String tripId,
+    required int locationId,
   });
 }

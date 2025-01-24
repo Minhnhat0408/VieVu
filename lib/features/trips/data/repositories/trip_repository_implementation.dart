@@ -124,4 +124,26 @@ class TripRepositoryImpl implements TripRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Trip>>> getCurrentUserTripsForSave({
+    required String userId,
+    String? status,
+    bool? isPublished,
+    required int id,
+    required String type,
+  }) async {
+    try {
+      final trips = await tripRemoteDatasource.getCurrentUserTripsForSave(
+        userId: userId,
+        status: status,
+        isPublished: isPublished,
+        id: id,
+        type: type,
+      );
+      return right(trips);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

@@ -13,7 +13,8 @@ abstract interface class TripLocationRemoteDatasource {
   });
 
   Future deleteTripLocation({
-    required int id,
+    required String tripId,
+    required int locationId,
   });
 }
 
@@ -30,10 +31,19 @@ class TripLocationRemoteDatasourceImpl implements TripLocationRemoteDatasource {
     required int locationId,
   }) async {
     try {
-      await supabaseClient.from('trip_locations').insert({
+      final res = await supabaseClient.from('trip_locations').insert({
         'trip_id': tripId,
         'location_id': locationId,
-      });
+        'is_starting_point': false,
+      }).select('locations(cover)');
+
+      await supabaseClient
+          .from('trips')
+          .update({
+            'cover': res.first['locations']['cover'],
+          })
+          .eq('id', tripId)
+          .isFilter('cover', null);
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -55,10 +65,15 @@ class TripLocationRemoteDatasourceImpl implements TripLocationRemoteDatasource {
 
   @override
   Future deleteTripLocation({
-    required int id,
+    required String tripId,
+    required int locationId,
   }) async {
     try {
-      await supabaseClient.from('trip_locations').delete().eq('id', id);
+      await supabaseClient
+          .from('trip_locations')
+          .delete()
+          .eq('trip_id', tripId)
+          .eq('location_id', locationId);
     } catch (e) {
       throw ServerException(e.toString());
     }

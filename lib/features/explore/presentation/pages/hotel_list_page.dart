@@ -208,9 +208,9 @@ class _HotelListPageState extends State<HotelListPage>
                                                   newServices[1].round();
                                               _minPrice =
                                                   newServices[0].round();
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,
@@ -223,9 +223,9 @@ class _HotelListPageState extends State<HotelListPage>
                                           onRatingChanged: (newRating) {
                                             setState(() {
                                               _star = newRating;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,
@@ -244,9 +244,9 @@ class _HotelListPageState extends State<HotelListPage>
                                               _roomQuantity = newRoomInfo[0];
                                               _adultCount = newRoomInfo[1];
                                               _childCount = newRoomInfo[2];
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,

@@ -5,11 +5,11 @@ import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_location_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_location_repository.dart';
 
-class TripLocationRepositoryImplementation implements TripLocationRepository {
+class TripLocationRepositoryImpl implements TripLocationRepository {
   final TripLocationRemoteDatasource tripLocationRemoteDatasource;
   final ConnectionChecker connectionChecker;
 
-  TripLocationRepositoryImplementation(
+  TripLocationRepositoryImpl(
       this.tripLocationRemoteDatasource, this.connectionChecker);
 
   @override
@@ -52,14 +52,16 @@ class TripLocationRepositoryImplementation implements TripLocationRepository {
 
   @override
   Future<Either<Failure, Unit>> deleteTripLocation({
-    required int id,
+    required String tripId,
+    required int locationId,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
       await tripLocationRemoteDatasource.deleteTripLocation(
-        id: id,
+        tripId: tripId,
+        locationId: locationId,
       );
       return right(unit);
     } on ServerException catch (e) {

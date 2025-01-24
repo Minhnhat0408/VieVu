@@ -3,7 +3,6 @@ part of 'trip_bloc.dart';
 @immutable
 sealed class TripEvent {}
 
-
 final class AddTrip extends TripEvent {
   final String name;
   final String userId;
@@ -36,5 +35,16 @@ final class GetCurrentUserTrips extends TripEvent {
     this.isPublished,
     required this.limit,
     required this.offset,
+  });
+}
+
+final class GetSavedToTrips extends TripEvent {
+  final String userId;
+  final int id;
+  final String type;
+  GetSavedToTrips({
+    required this.userId,
+    required this.id,
+    required this.type,
   });
 }

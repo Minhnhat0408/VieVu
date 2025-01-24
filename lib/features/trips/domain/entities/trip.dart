@@ -16,12 +16,14 @@ class Trip {
   final List<String> locations;
   final int serviceCount;
   final List<String>? transports;
+  final bool isSaved;
 
   Trip({
     required this.id,
     required this.name,
     this.description,
     this.cover,
+    required  this.isSaved,
     this.startDate,
     this.endDate,
     required this.createdAt,

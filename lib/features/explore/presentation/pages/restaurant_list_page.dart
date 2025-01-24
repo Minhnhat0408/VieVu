@@ -200,9 +200,9 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                                           onFilterChanged: (newTravelType) {
                                             setState(() {
                                               _selectedFilter = newTravelType;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,
@@ -215,9 +215,9 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                                           onServicesChanged: (newServices) {
                                             setState(() {
                                               _selectedOpenTime = newServices;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,
@@ -230,9 +230,9 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                                           onServicesChanged: (newServices) {
                                             setState(() {
                                               _selectedServices = newServices;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,
@@ -249,9 +249,9 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                                                   newServices[1].round();
                                               _minPrice =
                                                   newServices[0].round();
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,

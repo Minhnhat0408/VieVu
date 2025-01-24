@@ -16,6 +16,7 @@ class TripModel extends Trip {
     required super.isPublished,
     required super.locations,
     super.transports,
+    required super.isSaved,
     super.cover,
     required super.serviceCount,
   });
@@ -26,6 +27,7 @@ class TripModel extends Trip {
     // convert json['end_date'] from string to DateTime
     return TripModel(
       id: json['id'],
+      isSaved: json['is_saved'] ?? false,
       name: json['name'],
       cover: json['cover'],
       serviceCount: json['service_count'] ?? 0,

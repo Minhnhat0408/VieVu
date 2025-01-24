@@ -15,6 +15,7 @@ class TripBloc extends Bloc<TripEvent, TripState> {
         super(TripInitial()) {
     on<AddTrip>(_onAddTrip);
     on<GetCurrentUserTrips>(_onGetCurrentUserTrips);
+    on<GetSavedToTrips>(_onGetSavedToTrips);
   }
 
   void _onAddTrip(AddTrip event, Emitter<TripState> emit) async {
@@ -26,6 +27,21 @@ class TripBloc extends Bloc<TripEvent, TripState> {
     res.fold(
       (l) => emit(TripLoadedFailure(l.message)),
       (r) => emit(TripActionSuccess(r)),
+    );
+  }
+
+  void _onGetSavedToTrips(
+      GetSavedToTrips event, Emitter<TripState> emit) async {
+    emit(TripLoading());
+    final res = await _tripRepository.getCurrentUserTripsForSave(
+        userId: event.userId,
+        id: event.id,
+        type: event.type,
+        status: "planning");
+
+    res.fold(
+      (l) => emit(TripLoadedFailure(l.message)),
+      (r) => emit(SavedToTripLoadedSuccess(r)),
     );
   }
 

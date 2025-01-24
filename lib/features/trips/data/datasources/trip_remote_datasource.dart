@@ -16,6 +16,14 @@ abstract interface class TripRemoteDatasource {
       required int limit,
       required int offset});
 
+  Future<List<TripModel>> getCurrentUserTripsForSave({
+    required String userId,
+    String? status,
+    bool? isPublished,
+    required int id,
+    required String type,
+  });
+
   Future<List<TripModel>> getTrips({
     required int limit,
     required int offset,
@@ -110,6 +118,60 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
           .range(offset, offset + limit);
 
       return response.map((e) => TripModel.fromJson(e)).toList();
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<TripModel>> getCurrentUserTripsForSave({
+    required String userId,
+    String? status,
+    bool? isPublished,
+    required int id,
+    required String type,
+  }) async {
+    try {
+      var query = supabaseClient
+          .from('trips')
+          .select(
+              '*, trip_locations(locations(name, id), is_starting_point), saved_services(count)')
+          .eq('owner_id', userId);
+
+      if (status != null) {
+        query = query.eq('status', status);
+      }
+
+      if (isPublished != null) {
+        query = query.eq('is_published', isPublished);
+      }
+
+      final response = await query.order('created_at', ascending: false);
+
+      return response.map((e) {
+        final tripItem = e;
+        tripItem['service_count'] = e['saved_services'][0]['count'];
+        final locations = e['trip_locations'] as List;
+
+        tripItem['locations'] = <String>[];
+        if (type == "location" && locations.isNotEmpty) {
+          // check if the trip contains the location id
+          final locationIndex = locations.indexWhere((element) {
+            return element['locations']['id'] == id;
+          });
+
+          if (locationIndex != -1) {
+            tripItem['is_saved'] = true;
+          }
+          tripItem['locations'] = locations
+              .map<String>(
+                (e) => e['locations']['name'],
+              )
+              .toList();
+        }
+
+        return TripModel.fromJson(tripItem);
+      }).toList();
     } catch (e) {
       throw ServerException(e.toString());
     }

@@ -8,7 +8,7 @@ import 'package:vn_travel_companion/core/constants/trip_filters.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/add_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_small_item.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_status_modal.dart';
@@ -24,6 +24,7 @@ class TripManagePage extends StatefulWidget {
 class _TripManagePageState extends State<TripManagePage> {
   final PagingController<int, Trip> _pagingController =
       PagingController(firstPageKey: 0);
+  late ScrollController _scrollController;
   final tripName = TextEditingController();
   TripStatus? _status;
   bool? _visibility;
@@ -33,7 +34,7 @@ class _TripManagePageState extends State<TripManagePage> {
   @override
   void initState() {
     super.initState();
-
+    _scrollController = ScrollController();
     final userId =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     context
@@ -55,7 +56,7 @@ class _TripManagePageState extends State<TripManagePage> {
     // tripName.dispose();\
 
     super.dispose();
-
+    _scrollController.dispose();
     _pagingController.dispose();
   }
 
@@ -129,6 +130,7 @@ class _TripManagePageState extends State<TripManagePage> {
         builder: (context, state) {
           return _haveTrip
               ? NestedScrollView(
+                  controller: _scrollController,
                   floatHeaderSlivers: true,
                   headerSliverBuilder: (context, innerBoxIsScrolled) => [
                     SliverAppBar(
@@ -158,9 +160,9 @@ class _TripManagePageState extends State<TripManagePage> {
                                               onStatusChanged: (newStatus) {
                                                 setState(() {
                                                   _status = newStatus;
-                                                  totalRecordCount = 0;
-                                                  _pagingController.refresh();
                                                 });
+                                                totalRecordCount = 0;
+                                                _pagingController.refresh();
                                               },
                                             ),
                                             null,
@@ -175,9 +177,9 @@ class _TripManagePageState extends State<TripManagePage> {
                                           } else {
                                             _visibility = null;
                                           }
-                                          totalRecordCount = 0;
-                                          _pagingController.refresh();
                                         });
+                                        totalRecordCount = 0;
+                                        _pagingController.refresh();
                                       }
                                     },
                                     style: OutlinedButton.styleFrom(
@@ -221,27 +223,30 @@ class _TripManagePageState extends State<TripManagePage> {
                       ),
                     ),
                   ],
-                  body: PagedListView<int, Trip>(
-                    padding:
-                        const EdgeInsets.only(left: 10, right: 10, bottom: 70),
-                    pagingController: _pagingController,
-                    builderDelegate: PagedChildBuilderDelegate<Trip>(
-                      itemBuilder: (context, item, index) {
-                        return TripSmallItem(
-                          trip: item,
-                        );
-                      },
-                      firstPageProgressIndicatorBuilder: (_) =>
-                          const Center(child: CircularProgressIndicator()),
-                      newPageProgressIndicatorBuilder: (_) =>
-                          const Center(child: CircularProgressIndicator()),
-                      noItemsFoundIndicatorBuilder: (_) =>
-                          const Center(child: Text('Không có chuyến đi nào.')),
-                      newPageErrorIndicatorBuilder: (context) => Center(
-                        child: TextButton(
-                          onPressed: () =>
-                              _pagingController.retryLastFailedRequest(),
-                          child: const Text('Thử lại'),
+                  body: RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    child: PagedListView<int, Trip>(
+                      padding: const EdgeInsets.only(
+                          left: 10, right: 10, bottom: 70),
+                      pagingController: _pagingController,
+                      builderDelegate: PagedChildBuilderDelegate<Trip>(
+                        itemBuilder: (context, item, index) {
+                          return TripSmallItem(
+                            trip: item,
+                          );
+                        },
+                        firstPageProgressIndicatorBuilder: (_) =>
+                            const Center(child: CircularProgressIndicator()),
+                        newPageProgressIndicatorBuilder: (_) =>
+                            const Center(child: CircularProgressIndicator()),
+                        noItemsFoundIndicatorBuilder: (_) => const Center(
+                            child: Text('Không có chuyến đi nào.')),
+                        newPageErrorIndicatorBuilder: (context) => Center(
+                          child: TextButton(
+                            onPressed: () =>
+                                _pagingController.retryLastFailedRequest(),
+                            child: const Text('Thử lại'),
+                          ),
                         ),
                       ),
                     ),
@@ -426,5 +431,11 @@ class _TripManagePageState extends State<TripManagePage> {
         },
       ),
     );
+  }
+
+  Future<void> _onRefresh() async {
+    // Reset the PagingController and reload the trips
+    _pagingController.refresh();
+    totalRecordCount = 0;
   }
 }

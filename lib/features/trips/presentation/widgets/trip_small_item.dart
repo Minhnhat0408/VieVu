@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -19,8 +20,12 @@ class TripSmallItem extends StatelessWidget {
         children: [
           Stack(
             children: [
-              Image.asset(
-                trip.cover ?? 'assets/images/trip_placeholder.avif',
+              CachedNetworkImage(
+                imageUrl: trip.cover ?? '',
+                errorWidget: (context, url, error) => Image.asset(
+                  'assets/images/trip_placeholder.avif', // Fallback if loading fails
+                  fit: BoxFit.cover,
+                ),
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,

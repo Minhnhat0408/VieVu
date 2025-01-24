@@ -222,9 +222,9 @@ class _AttractionListPageState extends State<AttractionListPage>
                                           onTravelTypeChanged: (newTravelType) {
                                             setState(() {
                                               _parentTravelType = newTravelType;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         600,
@@ -237,9 +237,9 @@ class _AttractionListPageState extends State<AttractionListPage>
                                           onRatingChanged: (newRating) {
                                             setState(() {
                                               _currentRating = newRating;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,
@@ -266,9 +266,9 @@ class _AttractionListPageState extends State<AttractionListPage>
                                               _travelTypes = newTravelTypes;
                                               _currentRating = newRating;
                                               _currentBudget = newBudget;
-                                              totalRecordCount = 0;
-                                              _pagingController.refresh();
                                             });
+                                            totalRecordCount = 0;
+                                            _pagingController.refresh();
                                           },
                                         ),
                                         null,

@@ -41,4 +41,12 @@ abstract interface class TripRepository {
     required int limit,
     required int offset,
   });
+
+  Future<Either<Failure, List<Trip>>> getCurrentUserTripsForSave({
+    required String userId,
+    String? status,
+    bool? isPublished,
+    required int id,
+    required String type,
+  });
 }

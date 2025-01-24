@@ -13,6 +13,11 @@ final class TripActionSuccess extends TripState {
   final Trip trip;
   TripActionSuccess(this.trip);
 }
+final class SavedToTripLoadedSuccess extends TripState {
+  final List<Trip> trips;
+
+  SavedToTripLoadedSuccess(this.trips);
+}
 
 final class TripLoadedSuccess extends TripState {
   final List<Trip> trips;
