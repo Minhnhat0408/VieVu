@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
@@ -57,9 +58,12 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
     });
 
     if (services[filter] == null) {
+      final userId =
+          (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
       context.read<NearbyServicesCubit>().getServicesNearAttraction(
           attractionId: widget.attractionId,
           limit: 5,
+          userId: userId,
           offset: 1,
           serviceType: _convertFilterToServiceType(filter),
           filterType: 'nearby10KM');
@@ -69,8 +73,11 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
   @override
   void initState() {
     super.initState();
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     context.read<NearbyServicesCubit>().getServicesNearAttraction(
         attractionId: widget.attractionId,
+        userId: userId  ,
         limit: 5,
         offset: 1,
         serviceType: 2,
@@ -171,6 +178,8 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                                   child: RestaurantListPage(
                                     latitude: lat,
                                     longitude: long,
+                                    locationName: widget.attractionName,
+                                    locationId: widget.attractionId,
                                   ))),
                         );
                       } else if (_selectedFilter == 'Khách sạn') {
@@ -181,6 +190,7 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
                                       serviceLocator<NearbyServicesCubit>(),
                                   child: HotelListPage(
                                     locationName: widget.attractionName,
+                                    locationId: widget.attractionId,
                                     latitude: lat,
                                     longitude: long,
                                   ))),

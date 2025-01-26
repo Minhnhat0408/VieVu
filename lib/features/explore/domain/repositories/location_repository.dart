@@ -24,7 +24,7 @@ abstract interface class LocationRepository {
     required int locationId,
   });
 
-  Future<Either<Failure, String>> convertGeoLocationToAddress({
+  Future<Either<Failure, GeoApiLocation>> convertGeoLocationToAddress({
     required double latitude,
     required double longitude,
   });

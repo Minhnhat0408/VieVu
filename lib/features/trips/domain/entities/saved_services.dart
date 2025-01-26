@@ -13,7 +13,7 @@ class SavedService {
   final double rating;
   final int? hotelStar;
   final int ratingCount;
-  final int? attractionId;
+
 
   SavedService({
     required this.id,
@@ -30,6 +30,6 @@ class SavedService {
     required this.latitude,
     required this.longitude,
     required this.ratingCount,
-    this.attractionId,
+  
   });
 }

@@ -12,13 +12,13 @@ class ServiceModel extends Service {
     required super.commentCount,
     required super.aggreationCommentCount,
     super.tagInfoList,
+    required super.isSaved,
     super.avgPrice,
     super.distance,
     super.distanceDesc,
     required super.jumpUrl,
     super.star,
     super.hotScore,
-
   });
 
   factory ServiceModel.fromRestaurantJson(Map<String, dynamic> json) {
@@ -30,6 +30,7 @@ class ServiceModel extends Service {
       longitude: json['coordinate']['longitude'],
       cover: json['image'],
       score: json['score'],
+      isSaved:  json['isSaved'] ?? false,
       commentCount: json[' commentCount'] ?? 0,
       aggreationCommentCount: json['aggreationCommentCount'],
       tagInfoList: json['tagInfoList'],
@@ -44,6 +45,7 @@ class ServiceModel extends Service {
     return ServiceModel(
       id: json['poiId'],
       name: json['name'],
+      isSaved:  json['isSaved'] ?? false,
       typeId: json['typeId'],
       latitude: json['coordinate']['latitude'],
       longitude: json['coordinate']['longitude'],
@@ -67,6 +69,7 @@ class ServiceModel extends Service {
       typeId: json['typeId'],
       latitude: json['coordinate']['latitude'],
       longitude: json['coordinate']['longitude'],
+      isSaved:  json['isSaved'] ?? false,
       cover: json['image'],
       score: json['score'],
       commentCount: json['commentCount'],
@@ -75,7 +78,6 @@ class ServiceModel extends Service {
       distance: json['distance'],
       distanceDesc: json['distanceDesc'],
       jumpUrl: json['jumpUrl'],
-
     );
   }
 
@@ -87,6 +89,7 @@ class ServiceModel extends Service {
       latitude: json['coordinate']['latitude'],
       longitude: json['coordinate']['longitude'],
       cover: json['image'],
+      isSaved:  json['isSaved'] ?? false,
       score: json['score'],
       commentCount: json['commentCount'],
       aggreationCommentCount: json['aggreationCommentCount'],
@@ -116,5 +119,46 @@ class ServiceModel extends Service {
       'jumpUrl': jumpUrl,
       'star': star,
     };
+  }
+
+  ServiceModel copyWith({
+    int? id,
+    bool? isSaved,
+    String? name,
+    int? typeId,
+    double? latitude,
+    double? longitude,
+    String? cover,
+    double? score,
+    int? commentCount,
+    int? aggreationCommentCount,
+    List<String>? tagInfoList,
+    double? avgPrice,
+    double? distance,
+    String? distanceDesc,
+    String? jumpUrl,
+    double? star,
+    String? hotScore,
+  }) {
+    return ServiceModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      typeId: typeId ?? this.typeId,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      cover: cover ?? this.cover,
+      isSaved: isSaved ?? this.isSaved,
+      score: score ?? this.score,
+      commentCount: commentCount ?? this.commentCount,
+      aggreationCommentCount:
+          aggreationCommentCount ?? this.aggreationCommentCount,
+      tagInfoList: tagInfoList ?? this.tagInfoList,
+      avgPrice: avgPrice ?? this.avgPrice,
+      distance: distance ?? this.distance,
+      distanceDesc: distanceDesc ?? this.distanceDesc,
+      jumpUrl: jumpUrl ?? this.jumpUrl,
+      star: star ?? this.star,
+      hotScore: hotScore ?? this.hotScore,
+    );
   }
 }

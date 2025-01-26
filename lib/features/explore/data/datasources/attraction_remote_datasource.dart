@@ -19,6 +19,7 @@ abstract interface class AttractionRemoteDatasource {
   Future<List<AttractionModel>> getHotAttractions({
     required int limit,
     required int offset,
+    required String userId,
   });
 
   Future<List<AttractionModel>> getRecentViewedAttractions({
@@ -36,6 +37,7 @@ abstract interface class AttractionRemoteDatasource {
     required int limit,
     required int offset,
     required int radius,
+    required String userId,
   });
 
   Future<Map<String, List<ServiceModel>>> getAllServicesNearby({
@@ -44,6 +46,7 @@ abstract interface class AttractionRemoteDatasource {
     int limit = 10,
     int offset = 1,
     required String filterType,
+    required String userId,
   });
 
   Future<List<ServiceModel>> getServicesNearAttraction({
@@ -55,6 +58,7 @@ abstract interface class AttractionRemoteDatasource {
     required int
         serviceType, // 1 for restaurant, 2 for poi,3 for shop, 4 for hotel
     required String filterType, // 43;true 42;true nearbyDistance nearby10KM
+    required String userId,
   });
 
   Future<List<AttractionModel>> getRecommendedAttractions({
@@ -65,6 +69,7 @@ abstract interface class AttractionRemoteDatasource {
   Future<List<AttractionModel>> getRelatedAttractions({
     required int limit,
     required int attractionId,
+    required String userId,
   });
 
   Future<List<AttractionModel>> getAttractionsWithFilter({
@@ -81,6 +86,7 @@ abstract interface class AttractionRemoteDatasource {
     int? locationId,
     required String sortType,
     required bool topRanked,
+    required String userId,
   });
 
   Future<List<RestaurantModel>> getRestaurantsWithFilter({
@@ -94,6 +100,7 @@ abstract interface class AttractionRemoteDatasource {
     double? lat,
     double? lon,
     int? locationId,
+    required String userId,
   });
 
   Future<List<HotelModel>> getHotelsWithFilter({
@@ -108,6 +115,7 @@ abstract interface class AttractionRemoteDatasource {
     int? minPrice,
     int? maxPrice,
     required String locationName,
+    required String userId,
   });
 }
 
@@ -125,7 +133,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
     try {
       final response = await supabaseClient
           .from('attractions')
-          .select('*, attraction_types(id, type_name)')
+          .select('*, attraction_types(id, type_name), locations(name)')
           .eq('id', attractionId)
           .maybeSingle();
 
@@ -133,7 +141,9 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         return null;
       }
 
-      return AttractionModel.fromJson(response);
+      return AttractionModel.fromJson(response).copyWith(
+        locationName: response['locations']['name'],
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -143,16 +153,31 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
   Future<List<AttractionModel>> getHotAttractions({
     required int limit,
     required int offset,
+    required String userId,
   }) async {
     try {
       final response = await supabaseClient
           .from('attractions')
-          .select('*, attraction_types(id, type_name)')
+          .select('*, attraction_types(id, type_name), locations(name)')
           .order('hot_score', ascending: false)
           .range(offset, offset + limit);
-
+      // log(response.first.toString());
+      final res2 = await supabaseClient
+          .from('trips')
+          .select('saved_services!inner(link_id)')
+          .eq('owner_id', userId)
+          .inFilter(
+              'saved_services.link_id', response.map((e) => e['id']).toList());
+      final linkIds = res2
+          .expand(
+              (item) => item['saved_services'] ?? []) // Flatten saved_services
+          .map((service) => service['link_id']) // Extract link_id
+          .toList();
       return response.map((e) {
-        return AttractionModel.fromJson(e);
+        return AttractionModel.fromJson(e).copyWith(
+          locationName: e['locations']['name'],
+          isSaved: linkIds.contains(e['id']),
+        );
       }).toList();
     } catch (e) {
       throw ServerException(e.toString());
@@ -200,6 +225,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
     required double longitude,
     required int limit,
     required int offset,
+    required String userId,
     required int radius,
   }) async {
     try {
@@ -212,8 +238,24 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
       });
       final List<Map<String, dynamic>> data =
           List<Map<String, dynamic>>.from(response);
+      final res2 = await supabaseClient
+          .from('trips')
+          .select('saved_services!inner(link_id)')
+          .eq('owner_id', userId)
+          .inFilter(
+              'saved_services.link_id', data.map((e) => e['id']).toList());
+      final linkIds = res2
+          .expand(
+              (item) => item['saved_services'] ?? []) // Flatten saved_services
+          .map((service) => service['link_id']) // Extract link_id
+          .toList();
+      log(res2.toString());
 
-      return data.map((e) => AttractionModel.fromJson(e)).toList();
+      return data
+          .map((e) => AttractionModel.fromJson(e).copyWith(
+              locationName: e['location_name'],
+              isSaved: linkIds.contains(e['id'])))
+          .toList();
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -226,6 +268,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
     double? longitude,
     int limit = 20,
     int offset = 1,
+    required String userId,
     required int serviceType,
     required String filterType,
   }) async {
@@ -280,33 +323,44 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
             nearbyModuleList.isNotEmpty &&
             nearbyModuleList[0]['totalCount'] > 0) {
           final itemList = nearbyModuleList[0]['itemList'] as List<dynamic>;
+          final res2 = await supabaseClient
+              .from('trips')
+              .select('saved_services!inner(link_id)')
+              .eq('owner_id', userId)
+              .inFilter('saved_services.link_id',
+                  itemList.map((e) => e['poiId']).toList());
+          final linkIds = res2
+              .expand((item) =>
+                  item['saved_services'] ?? []) // Flatten saved_services
+              .map((service) => service['link_id']) // Extract link_id
+              .toList();
           if (serviceType == 1) {
             return itemList.map((item) {
               item['typeId'] = 1;
               return ServiceModel.fromRestaurantJson(
                 item as Map<String, dynamic>,
-              );
+              ).copyWith(isSaved: linkIds.contains(item['poiId']));
             }).toList();
           } else if (serviceType == 2) {
             return itemList.map((item) {
               item['typeId'] = 2;
               return ServiceModel.fromAttractionJson(
                 item as Map<String, dynamic>,
-              );
+              ).copyWith(isSaved: linkIds.contains(item['poiId']));
             }).toList();
           } else if (serviceType == 3) {
             return itemList.map((item) {
               item['typeId'] = 3;
               return ServiceModel.fromShopJson(
                 item as Map<String, dynamic>,
-              );
+              ).copyWith(isSaved: linkIds.contains(item['poiId']));
             }).toList();
           } else {
             return itemList.map((item) {
               item['typeId'] = 4;
               return ServiceModel.fromHotelJson(
                 item as Map<String, dynamic>,
-              );
+              ).copyWith(isSaved: linkIds.contains(item['poiId']));
             }).toList();
           }
         } else {
@@ -325,6 +379,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
   Future<Map<String, List<ServiceModel>>> getAllServicesNearby({
     required double latitude,
     required double longitude,
+    required String userId,
     int limit = 10,
     int offset = 1,
     required String filterType,
@@ -382,19 +437,30 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
               nearbyModuleList.isNotEmpty &&
               nearbyModuleList[0]['totalCount'] > 0) {
             final itemList = nearbyModuleList[0]['itemList'] as List<dynamic>;
+            final res2 = await supabaseClient
+                .from('trips')
+                .select('saved_services!inner(link_id)')
+                .eq('owner_id', userId)
+                .inFilter('saved_services.link_id',
+                    itemList.map((e) => e['poiId']).toList());
+            final linkIds = res2
+                .expand((item) =>
+                    item['saved_services'] ?? []) // Flatten saved_services
+                .map((service) => service['link_id']) // Extract link_id
+                .toList();
             if (i == 1) {
               services['restaurants'] = itemList.map((item) {
                 item['typeId'] = 1;
                 return ServiceModel.fromRestaurantJson(
                   item as Map<String, dynamic>,
-                );
+                ).copyWith(isSaved: linkIds.contains(item['poiId']));
               }).toList();
             } else if (i == 2) {
               services['attractions'] = itemList.map((item) {
                 item['typeId'] = 2;
                 return ServiceModel.fromAttractionJson(
                   item as Map<String, dynamic>,
-                );
+                ).copyWith(isSaved: linkIds.contains(item['poiId']));
               }).toList();
             } else {
               services['hotels'] = itemList.map((item) {
@@ -402,7 +468,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
                 return ServiceModel.fromHotelJson(
                   item as Map<String, dynamic>,
-                );
+                ).copyWith(isSaved: linkIds.contains(item['poiId']));
               }).toList();
             }
           } else {
@@ -458,9 +524,21 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         final jsonResponse =
             jsonDecode(utf8.decode(responseRecommendation.bodyBytes));
         final data = jsonResponse['recommendations'] as List<dynamic>;
-
+        final res2 = await supabaseClient
+            .from('trips')
+            .select('saved_services!inner(link_id)')
+            .eq('owner_id', userId)
+            .inFilter(
+                'saved_services.link_id', data.map((e) => e['id']).toList());
+        final linkIds = res2
+            .expand((item) =>
+                item['saved_services'] ?? []) // Flatten saved_services
+            .map((service) => service['link_id']) // Extract link_id
+            .toList();
         return data.map((e) {
-          return AttractionModel.fromJson(e);
+          return AttractionModel.fromJson(e).copyWith(
+            isSaved: linkIds.contains(e['id']),
+          );
         }).toList();
       } else {
         throw ServerException(
@@ -473,6 +551,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
   @override
   Future<List<AttractionModel>> getRelatedAttractions({
+    required String userId,
     required int limit,
     required int attractionId,
   }) async {
@@ -496,9 +575,21 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         final jsonResponse =
             jsonDecode(utf8.decode(responseRecommendation.bodyBytes));
         final data = jsonResponse['related_attractions'] as List<dynamic>;
-
+        final res2 = await supabaseClient
+            .from('trips')
+            .select('saved_services!inner(link_id)')
+            .eq('owner_id', userId)
+            .inFilter(
+                'saved_services.link_id', data.map((e) => e['id']).toList());
+        final linkIds = res2
+            .expand((item) =>
+                item['saved_services'] ?? []) // Flatten saved_services
+            .map((service) => service['link_id']) // Extract link_id
+            .toList();
         return data.map((e) {
-          return AttractionModel.fromJson(e);
+          return AttractionModel.fromJson(e).copyWith(
+            isSaved: linkIds.contains(e['id']),
+          );
         }).toList();
       } else {
         throw ServerException(
@@ -511,6 +602,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
   @override
   Future<List<AttractionModel>> getAttractionsWithFilter({
+    required String userId,
     String? categoryId1,
     List<String>? categoryId2,
     required int limit,
@@ -560,8 +652,21 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
       final response = await query.range(offset, offset + limit);
       log('attraction');
+      final res2 = await supabaseClient
+          .from('trips')
+          .select('saved_services!inner(link_id)')
+          .eq('owner_id', userId)
+          .inFilter(
+              'saved_services.link_id', response.map((e) => e['id']).toList());
+      final linkIds = res2
+          .expand(
+              (item) => item['saved_services'] ?? []) // Flatten saved_services
+          .map((service) => service['link_id']) // Extract link_id
+          .toList();
       return (response as List).map((e) {
-        return AttractionModel.fromJson(e);
+        return AttractionModel.fromJson(e).copyWith(
+          isSaved: linkIds.contains(e['id']),
+        );
       }).toList();
     } catch (e) {
       throw ServerException(e.toString());
@@ -570,6 +675,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
   @override
   Future<List<RestaurantModel>> getRestaurantsWithFilter({
+    required String userId,
     int? categoryId1,
     List<int> serviceIds = const [],
     List<int> openTime = const [],
@@ -625,13 +731,24 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
         // Initialize HtmlUnescape
         final unescape = HtmlUnescape();
-
+        final res2 = await supabaseClient
+            .from('trips')
+            .select('saved_services!inner(link_id)')
+            .eq('owner_id', userId)
+            .inFilter(
+                'saved_services.link_id', data.map((e) => e['poiId']).toList());
+        final linkIds = res2
+            .expand((item) =>
+                item['saved_services'] ?? []) // Flatten saved_services
+            .map((service) => service['link_id']) // Extract link_id
+            .toList();
         // Decode HTML entities in each restaurant's data
         return data.map((e) {
           // Assuming RestaurantModel has a fromJson method
           final restaurant = RestaurantModel.fromJson(e).copyWith(
             // Decode HTML entities in relevant fields
             // name: unescape.convert(e['name']),
+            isSaved: linkIds.contains(e['poiId']),
             userContent: e?['commentInfo'] != null
                 ? unescape.convert(e?['commentInfo']?['content'])
                 : null,
@@ -651,6 +768,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
   @override
   Future<List<HotelModel>> getHotelsWithFilter({
+    required String userId,
     required DateTime checkInDate,
     required DateTime checkOutDate,
     required int roomQuantity,
@@ -708,9 +826,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         if (cityId == null) {
           throw const ServerException("Failed to fetch cityId");
         }
-        log(cityId.toString());
-        log(locationName);
-        //convert dateTime checkin to string like 20250104
+
         String checkIn = DateFormat('yyyyMMdd').format(checkInDate);
         String checkOut = DateFormat('yyyyMMdd').format(checkOutDate);
         final hotelFilterBody = {
@@ -840,8 +956,23 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         if (response2.statusCode == 200) {
           final jsonResponse = jsonDecode(utf8.decode(response2.bodyBytes));
           final data = jsonResponse['hotelList'] as List<dynamic>;
+
+          log(data[0].toString());
+          final res2 = await supabaseClient
+              .from('trips')
+              .select('saved_services!inner(link_id)')
+              .eq('owner_id', userId)
+              .inFilter('saved_services.link_id',
+                  data.map((e) => e['hotelBasicInfo']['hotelId']).toList());
+          final linkIds = res2
+              .expand((item) =>
+                  item['saved_services'] ?? []) // Flatten saved_services
+              .map((service) => service['link_id']) // Extract link_id
+              .toList();
           return data.map((e) {
-            final hotel = HotelModel.fromJson(e);
+            final hotel = HotelModel.fromJson(e).copyWith(
+              isSaved: linkIds.contains(e['hotelBasicInfo']['hotelId']),
+            );
 
             return hotel;
           }).toList();
@@ -851,7 +982,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         }
       } else {
         throw ServerException("Failed to fetch data: ${response.statusCode}");
-      }
+    }
     } catch (e) {
       log("${e}hotel bug");
       throw ServerException(e.toString());

@@ -12,7 +12,6 @@ class SavedServiceModel extends SavedService {
     required super.longitude,
     required super.rating,
     required super.ratingCount,
-    super.attractionId,
     super.externalLink,
     super.hotelStar,
     required super.typeId,
@@ -33,7 +32,6 @@ class SavedServiceModel extends SavedService {
       rating: json['rating'],
       hotelStar: json['hotelStar'],
       ratingCount: json['ratingCount'],
-      attractionId: json['attractionId'],
       externalLink: json['externalLink'],
       tagInforList: json['tagInforList'] != null
           ? (json['tagInforList'] as List<dynamic>)

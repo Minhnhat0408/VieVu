@@ -10,6 +10,7 @@ class AttractionModel extends Attraction {
       required super.longitude,
       required super.locationId,
       required super.description,
+      required super.isSaved,
       super.travelTypes,
       super.ename,
       super.images,
@@ -17,6 +18,7 @@ class AttractionModel extends Attraction {
       super.rankInfo,
       super.address,
       super.openTimeRule,
+      required super.locationName,
       super.phone,
       super.avgRating,
       super.ratingCount,
@@ -27,10 +29,12 @@ class AttractionModel extends Attraction {
       id: jsonn['id'],
       name: jsonn['name'],
       ename: jsonn['ename'] ?? '',
+      locationName: jsonn['location_name'] ?? '',
       cover: jsonn['cover'],
       images: jsonn['images'] != null
           ? (jsonn['images'] as List<dynamic>).map((v) => v.toString()).toList()
           : <String>[],
+      isSaved: jsonn['is_saved'] ?? false,
       hotScore:
           jsonn['hot_score'] != null ? jsonn['hot_score'].toDouble() : 0.0,
       price: _parseInt(jsonn['price']),
@@ -58,7 +62,9 @@ class AttractionModel extends Attraction {
       id: json['id'] ?? 0,
       name: json['name'],
       ename: json['ename'] ?? '',
+      locationName: json['location_name'] ?? '',
       cover: json['imageUrl'],
+      isSaved: false,
       images: json['images'] != null
           ? (json['images'] as List<dynamic>).map((v) => v.toString()).toList()
           : null,
@@ -125,13 +131,17 @@ class AttractionModel extends Attraction {
     double? avgRating,
     int? ratingCount,
     String? phone,
+    bool? isSaved,
     List<Map<String, String>>? travelTypes,
     double? distance,
+    String? locationName,
   }) {
     return AttractionModel(
       id: id ?? this.id,
       name: name ?? this.name,
       ename: ename ?? this.ename,
+      isSaved: isSaved ?? this.isSaved,
+      locationName: locationName ?? this.locationName,
       cover: cover ?? this.cover,
       images: images ?? this.images,
       hotScore: hotScore ?? this.hotScore,

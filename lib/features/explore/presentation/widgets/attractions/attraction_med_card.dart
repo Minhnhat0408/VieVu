@@ -4,9 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
-class AttractionMedCard extends StatelessWidget {
+class AttractionMedCard extends StatefulWidget {
   final Attraction attraction;
   final bool slider;
   const AttractionMedCard({
@@ -16,6 +24,13 @@ class AttractionMedCard extends StatelessWidget {
   });
 
   @override
+  State<AttractionMedCard> createState() => _AttractionMedCardState();
+}
+
+class _AttractionMedCardState extends State<AttractionMedCard> {
+  int changeSavedItemCount = 0;
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
@@ -23,19 +38,20 @@ class AttractionMedCard extends StatelessWidget {
         Navigator.pushNamed(
           context,
           '/attraction',
-          arguments: attraction.id,
+          arguments: widget.attraction.id,
         );
       },
       child: Card(
           elevation: 0,
-          color: slider
+          color: widget.slider
               ? Theme.of(context).colorScheme.surfaceContainerLowest
               : Colors.transparent,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
             child: Row(
-              crossAxisAlignment:
-                  slider ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+              crossAxisAlignment: widget.slider
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.start,
               children: [
                 // Image and Icon
                 Stack(
@@ -45,7 +61,7 @@ class AttractionMedCard extends StatelessWidget {
                         Radius.circular(10),
                       ),
                       child: CachedNetworkImage(
-                        imageUrl: attraction.cover, // Use optimized size
+                        imageUrl: widget.attraction.cover, // Use optimized size
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(),
                         ),
@@ -68,7 +84,70 @@ class AttractionMedCard extends StatelessWidget {
                         width: 28,
                         height: 28,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            final userId = (context.read<AppUserCubit>().state
+                                    as AppUserLoggedIn)
+                                .user
+                                .id;
+                            context.read<TripBloc>().add(GetSavedToTrips(
+                                userId: userId,
+                                id: widget.attraction.id,
+                                type: 'service'));
+                            displayModal(
+                                context,
+                                SavedToTripModal(
+                                  type: "service",
+                                  onTripsChanged: (List<Trip> selectedTrips,
+                                      List<Trip> unselectedTrips) {
+                                    setState(() {
+                                      changeSavedItemCount =
+                                          selectedTrips.length +
+                                              unselectedTrips.length;
+                                    });
+
+                                    for (var item in selectedTrips) {
+                                      context
+                                          .read<SavedServiceBloc>()
+                                          .add(InsertSavedService(
+                                            tripId: item.id,
+                                            linkId: widget.attraction.id,
+                                            cover: widget.attraction.cover,
+                                            name: widget.attraction.name,
+                                            locationName:
+                                                widget.attraction.locationName,
+                                            rating:
+                                                widget.attraction.avgRating ??
+                                                    0,
+                                            ratingCount:
+                                                widget.attraction.ratingCount ??
+                                                    0,
+                                            typeId: 2,
+                                            latitude:
+                                                widget.attraction.latitude,
+                                            longitude:
+                                                widget.attraction.longitude,
+                                          ));
+
+                                      context
+                                          .read<TripLocationBloc>()
+                                          .add(InsertTripLocation(
+                                            locationId:
+                                                widget.attraction.locationId,
+                                            tripId: item.id,
+                                          ));
+                                    }
+
+                                    for (var item in unselectedTrips) {
+                                      context.read<SavedServiceBloc>().add(
+                                          DeleteSavedService(
+                                              linkId: widget.attraction.id,
+                                              tripId: item.id));
+                                    }
+                                  },
+                                ),
+                                null,
+                                false);
+                          },
                           iconSize: 18,
                           style: IconButton.styleFrom(
                             padding: EdgeInsets.zero, // Remove extra padding
@@ -80,7 +159,7 @@ class AttractionMedCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (slider)
+                    if (widget.slider)
                       Positioned(
                           bottom: 8,
                           left: 8,
@@ -102,7 +181,7 @@ class AttractionMedCard extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  attraction.hotScore.toString(),
+                                  widget.attraction.hotScore.toString(),
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelMedium!
@@ -126,7 +205,7 @@ class AttractionMedCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AutoSizeText(
-                          attraction.name,
+                          widget.attraction.name,
                           minFontSize: 14, // Minimum font size to shrink to
                           maxLines: 1, // Allow up to 2 lines for wrapping
                           overflow: TextOverflow
@@ -137,7 +216,7 @@ class AttractionMedCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        if (attraction.travelTypes != null)
+                        if (widget.attraction.travelTypes != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 2),
@@ -148,7 +227,8 @@ class AttractionMedCard extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              attraction.travelTypes![0]['type_name'] ?? '',
+                              widget.attraction.travelTypes![0]['type_name'] ??
+                                  '',
                               maxLines: 1,
                               style: TextStyle(
                                   fontSize: 12,
@@ -159,7 +239,7 @@ class AttractionMedCard extends StatelessWidget {
                         Row(
                           children: [
                             RatingBarIndicator(
-                              rating: attraction.avgRating ?? 0,
+                              rating: widget.attraction.avgRating ?? 0,
                               itemSize: 20,
                               direction: Axis.horizontal,
                               itemCount: 5,
@@ -171,11 +251,11 @@ class AttractionMedCard extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '(${attraction.ratingCount})',
+                              '(${widget.attraction.ratingCount})',
                               style: Theme.of(context).textTheme.labelMedium,
                             ),
                             const SizedBox(width: 8),
-                            if (!slider)
+                            if (!widget.slider)
                               Container(
                                 decoration: BoxDecoration(
                                   color: Theme.of(context)
@@ -195,7 +275,7 @@ class AttractionMedCard extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      attraction.hotScore.toString(),
+                                      widget.attraction.hotScore.toString(),
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelMedium!
@@ -211,9 +291,9 @@ class AttractionMedCard extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        if (attraction.price != null)
+                        if (widget.attraction.price != null)
                           Text(
-                            '${NumberFormat('#,###').format(attraction.price)} VND',
+                            '${NumberFormat('#,###').format(widget.attraction.price)} VND',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.primary,

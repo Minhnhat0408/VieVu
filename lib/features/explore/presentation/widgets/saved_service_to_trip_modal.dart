@@ -6,20 +6,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 
-class SavedToTripModal extends StatefulWidget {
+class SavedServiceToTripModal extends StatefulWidget {
   final Function(List<Trip> trips, List<Trip> trips2) onTripsChanged;
-  final String type;
-  const SavedToTripModal({
+  const SavedServiceToTripModal({
     super.key,
     required this.onTripsChanged,
-    required this.type,
   });
 
   @override
-  State<SavedToTripModal> createState() => _SavedToTripModalState();
+  State<SavedServiceToTripModal> createState() => _SavedServiceToTripModalState();
 }
 
-class _SavedToTripModalState extends State<SavedToTripModal> {
+class _SavedServiceToTripModalState extends State<SavedServiceToTripModal> {
   final List<Trip> _selectedTrips = [];
   final List<Trip> _unselectedTrips = [];
   List<Trip> _currentSelectedTrips = [];
@@ -121,9 +119,7 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
-                                        widget.type == "location"
-                                            ? "${trip.locations.length} điểm đến"
-                                            : "${trip.serviceCount} dịch vụ",
+                                        "${trip.locations.length} điểm đến",
                                         style: const TextStyle(fontSize: 14),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
@@ -141,16 +137,20 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                                   if (!_initialSelectedTrips.contains(trip)) {
                                     log('hello');
                                     _selectedTrips.add(trip);
+                                    _unselectedTrips.remove(trip);
                                   }
-                                  _unselectedTrips.remove(trip);
                                 } else {
                                   _currentSelectedTrips.remove(trip);
                                   if (_initialSelectedTrips.contains(trip)) {
                                     log("hi");
                                     _unselectedTrips.add(trip);
+                                    _selectedTrips.remove(trip);
                                   }
-                                  _selectedTrips.remove(trip);
                                 }
+
+                                log(_selectedTrips.toString());
+
+                                log(_unselectedTrips.toString());
                               });
                             },
                           );

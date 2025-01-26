@@ -12,6 +12,7 @@ class Restaurant {
   final String? userAvatar;
   final String? userContent;
   final double? distance;
+  final bool isSaved;
   final String jumpUrl;
 
   const Restaurant({
@@ -21,6 +22,7 @@ class Restaurant {
     required this.price,
     required this.latitude,
     required this.longitude,
+    required this.isSaved,
     required this.avgRating,
     required this.ratingCount,
     required this.cuisineName,

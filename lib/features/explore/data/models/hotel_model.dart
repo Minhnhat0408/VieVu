@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
 
 class HotelModel extends Hotel {
   HotelModel({
     required super.id,
+    required super.isSaved,
     required super.name,
     required super.cover,
     required super.address,
@@ -27,6 +30,12 @@ class HotelModel extends Hotel {
         ? int.tryParse(json['commentInfo']['commenterNumber'].split(' ')[0]) ??
             0
         : 0;
+
+    final cityNameEn = json['positionInfo']['cityNameEn'] as String;
+
+    final normalizedCityNameEn = cityNameEn.replaceAll(' ', '-').toLowerCase();
+    final link =
+        'https://vn.trip.com/hotels/$normalizedCityNameEn-hotel-detail-${json['hotelBasicInfo']['hotelId']}';
     return HotelModel(
       id: json['hotelBasicInfo']['hotelId'],
       name: json['hotelBasicInfo']['hotelName'] ?? '',
@@ -36,6 +45,7 @@ class HotelModel extends Hotel {
           ? json['hotelBasicInfo']['price']
           : 0,
       star: json['hotelStarInfo']['star'],
+      isSaved: json['isSaved'] ?? false,
       avgRating:
           double.tryParse(json['commentInfo']['commentScore'] ?? '0') ?? 0.0,
       ratingCount: count,
@@ -58,7 +68,7 @@ class HotelModel extends Hotel {
       additionalDesc: json['additionalDesc'] != null
           ? List<String>.from(json['additionalDesc'])
           : null,
-      jumpUrl: json['jumpUrl'] ?? '',
+      jumpUrl: link,
     );
   }
 
@@ -66,6 +76,7 @@ class HotelModel extends Hotel {
     return HotelModel(
       id: json['hotelId'],
       name: json['hotelName'],
+      isSaved: json['isSaved'] ?? false,
       cover: json['imageUrl'],
       address: json['hotelAddress'] ?? '',
       price: json['price'] ?? 0,
@@ -115,6 +126,7 @@ class HotelModel extends Hotel {
     String? address,
     int? star,
     int? price,
+    bool? isSaved,
     double? avgRating,
     int? ratingCount,
     double? latitude,
@@ -132,6 +144,7 @@ class HotelModel extends Hotel {
       name: name ?? this.name,
       cover: cover ?? this.cover,
       address: address ?? this.address,
+      isSaved: isSaved ?? this.isSaved,
       star: star ?? this.star,
       price: price ?? this.price,
       avgRating: avgRating ?? this.avgRating,

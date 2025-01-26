@@ -26,7 +26,7 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
   void _onGetHotAttractions(
       GetHotAttractions event, Emitter<AttractionState> emit) async {
     final res = await _attractionRepository.getHotAttractions(
-        limit: event.limit, offset: event.offset);
+        limit: event.limit, offset: event.offset, userId: event.userId);
     res.fold(
       (l) => emit(AttractionFailure(l.message)),
       (r) => emit(AttractionsLoadedSuccess(r)),
@@ -66,7 +66,7 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
   void _onGetRelatedAttractions(
       GetRelatedAttractions event, Emitter<AttractionState> emit) async {
     final res = await _attractionRepository.getRelatedAttractions(
-        attractionId: event.attractionId, limit: event.limit);
+        attractionId: event.attractionId, limit: event.limit , userId: event.userId);
     res.fold(
       (l) => emit(AttractionFailure(l.message)),
       (r) => emit(AttractionsLoadedSuccess(r)),
@@ -81,6 +81,7 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
       limit: event.limit,
       offset: event.offset,
       budget: event.budget,
+      userId: event.userId,
       rating: event.rating,
       locationId: event.locationId,
       sortType: event.sortType,

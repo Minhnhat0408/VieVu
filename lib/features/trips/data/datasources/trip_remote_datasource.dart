@@ -135,7 +135,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       var query = supabaseClient
           .from('trips')
           .select(
-              '*, trip_locations(locations(name, id), is_starting_point), saved_services(count)')
+              '*, trip_locations(locations(name, id), is_starting_point), service_count:saved_services(count), saved_services(name,external_link, link_id)')
           .eq('owner_id', userId);
 
       if (status != null) {
@@ -147,13 +147,13 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       }
 
       final response = await query.order('created_at', ascending: false);
-
       return response.map((e) {
         final tripItem = e;
-        tripItem['service_count'] = e['saved_services'][0]['count'];
+        tripItem['service_count'] = e['service_count'][0]['count'];
         final locations = e['trip_locations'] as List;
-
+        final services = e['saved_services'] as List;
         tripItem['locations'] = <String>[];
+        log(services.toString());
         if (type == "location" && locations.isNotEmpty) {
           // check if the trip contains the location id
           final locationIndex = locations.indexWhere((element) {
@@ -168,11 +168,20 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
                 (e) => e['locations']['name'],
               )
               .toList();
+        } else if (type == "service" && services.isNotEmpty) {
+          final serviceIndex = services.indexWhere((element) {
+            return element['link_id'] == id;
+          });
+
+          if (serviceIndex != -1) {
+            tripItem['is_saved'] = true;
+          }
         }
 
         return TripModel.fromJson(tripItem);
       }).toList();
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

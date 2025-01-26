@@ -40,12 +40,16 @@ import 'package:vn_travel_companion/features/search/data/repositories/explore_se
 import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
+import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_location_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_remote_datasource.dart';
+import 'package:vn_travel_companion/features/trips/data/repositories/saved_service_repository_implementation.dart';
 import 'package:vn_travel_companion/features/trips/data/repositories/trip_location_repository_implementation.dart';
 import 'package:vn_travel_companion/features/trips/data/repositories/trip_repository_implementation.dart';
+import 'package:vn_travel_companion/features/trips/domain/repositories/saved_service_repository.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_location_repository.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_repository.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_manage_cubit.dart';
@@ -71,6 +75,7 @@ Future<void> initDependencies() async {
   _initReview();
   _initTrip();
   _initTripLocation();
+  _initSavedService();
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
@@ -349,6 +354,26 @@ void _initTripLocation() {
     ..registerLazySingleton(
       () => TripLocationBloc(
         tripLocationRepository: serviceLocator(),
+      ),
+    );
+}
+
+void _initSavedService() {
+  serviceLocator
+    ..registerFactory<SavedServiceRemoteDatasource>(
+      () => SavedServiceRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<SavedServiceRepository>(
+      () => SavedServiceRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => SavedServiceBloc(
+        savedServiceRepository: serviceLocator(),
       ),
     );
 }

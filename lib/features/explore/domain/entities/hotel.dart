@@ -7,6 +7,7 @@ class Hotel {
   final int price;
   final double avgRating;
   final int ratingCount;
+  final bool isSaved;
   final double latitude;
   final double longitude;
   final String roomName;
@@ -33,6 +34,7 @@ class Hotel {
     required this.adultCount,
     required this.childCount,
     required this.roomDesc,
+    required this.isSaved,
     this.additionalDesc,
     required this.jumpUrl,
   });

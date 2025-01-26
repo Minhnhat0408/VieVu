@@ -10,6 +10,7 @@ class RestaurantModel extends Restaurant {
       required super.longitude,
       required super.avgRating,
       required super.jumpUrl,
+      required super.isSaved,
       required super.ratingCount,
       required super.cuisineName,
       super.distance,
@@ -21,6 +22,7 @@ class RestaurantModel extends Restaurant {
     return RestaurantModel(
       id: json['poiId'],
       name: json['poiName'] ?? "",
+      isSaved: json['isSaved'] ?? false,
       cover: json['coverImgaeUrl'] ?? "",
       // convert price from double to int
       price: json['price'] is double ? json['price'].toInt() : 0,
@@ -43,6 +45,7 @@ class RestaurantModel extends Restaurant {
     return RestaurantModel(
       id: json['poiId'],
       name: json['name'],
+      isSaved: json['isSaved'] ?? false,
       cover: json['imageUrl'],
       price: json['price'] is int
           ? json['price']
@@ -73,6 +76,7 @@ class RestaurantModel extends Restaurant {
     String? cover,
     int? price,
     double? latitude,
+    bool? isSaved,
     double? longitude,
     double? avgRating,
     int? ratingCount,
@@ -86,6 +90,7 @@ class RestaurantModel extends Restaurant {
       id: id ?? this.id,
       name: name ?? this.name,
       cover: cover ?? this.cover,
+      isSaved: isSaved ?? this.isSaved,
       price: price ?? this.price,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,

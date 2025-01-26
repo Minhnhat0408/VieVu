@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_small_card.dart';
@@ -114,8 +115,11 @@ class _NearbyAttractionSectionState extends State<NearbyAttractionSection> {
 
   void _fetchNearbyAttractions() {
     if (userPos != null) {
+      final userId =
+          (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
       nearbyAttractionsCubit.fetchNearbyAttractions(
         latitude: userPos![0],
+        userId: userId,
         longitude: userPos![1],
         limit: 5,
         offset: 0,

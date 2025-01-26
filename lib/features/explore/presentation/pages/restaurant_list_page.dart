@@ -10,6 +10,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
@@ -21,14 +22,14 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/restau
 import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_small_card.dart';
 
 class RestaurantListPage extends StatefulWidget {
-  final String? locationName;
-  final int? locationId;
+  final String locationName;
+  final int locationId;
   final double? latitude;
   final double? longitude;
   const RestaurantListPage({
     super.key,
-    this.locationName,
-    this.locationId,
+    required this.locationName,
+    required this.locationId,
     this.latitude,
     this.longitude,
   });
@@ -78,11 +79,14 @@ class _RestaurantListPageState extends State<RestaurantListPage>
   @override
   void initState() {
     super.initState();
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     _pagingController.addPageRequestListener((pageKey) {
       context.read<NearbyServicesCubit>().getRestaurantsWithFilter(
             categoryId1: _selectedFilter != null
                 ? restaurantFilterOptions[_selectedFilter]
                 : null,
+            userId: userId,
             serviceIds: _selectedServices
                 .map((e) => restaurantServicesMap[e]!)
                 .toList(),
@@ -354,6 +358,7 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                                           attraction.longitude),
                                     )
                                     .toList()),
+                            initialZoom: 13,
                             minZoom: 5),
                         children: [
                           TileLayer(
@@ -477,6 +482,8 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                           return RestaurantSmallCard(
                             restaurant: _pagingController.itemList![index],
                             slider: true,
+                            locationName: widget.locationName,
+                            locationId: widget.locationId,
                           );
                         },
                         options: CarouselOptions(
@@ -494,10 +501,15 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                                     (_pagingController.itemList!.length ~/
                                             pageSize) +
                                         1;
-                                log('fatch');
+                                final userId = (context
+                                        .read<AppUserCubit>()
+                                        .state as AppUserLoggedIn)
+                                    .user
+                                    .id;
                                 context
                                     .read<NearbyServicesCubit>()
                                     .getRestaurantsWithFilter(
+                                      userId: userId,
                                       categoryId1: _selectedFilter != null
                                           ? restaurantFilterOptions[
                                               _selectedFilter]
@@ -541,6 +553,8 @@ class _RestaurantListPageState extends State<RestaurantListPage>
                           itemBuilder: (context, item, index) {
                             return RestaurantSmallCard(
                               restaurant: item,
+                              locationName: widget.locationName,
+                              locationId: widget.locationId,
                             );
                           },
                           firstPageProgressIndicatorBuilder: (_) =>

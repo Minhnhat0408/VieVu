@@ -29,7 +29,8 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
         latitude: latitude, longitude: longitude);
     result.fold(
       (failure) => emit(LocationInfoFailure(message: failure.message)),
-      (address) => emit(LocationInfoAddressLoaded(address: address)),
+      (geo) => emit(LocationInfoAddressLoaded(
+          address: geo.address, cityName: geo.cityName, locationId: geo.id)),
     );
   }
 }

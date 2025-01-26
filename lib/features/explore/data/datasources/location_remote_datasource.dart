@@ -41,7 +41,7 @@ abstract interface class LocationRemoteDatasource {
     required int locationId,
   });
 
-  Future<String> convertGeoLocationToAddress({
+  Future<GeoApiLocationModel> convertGeoLocationToAddress({
     required double latitude,
     required double longitude,
   });
@@ -252,10 +252,10 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
       log(e.toString());
       throw ServerException(e.toString());
     }
-  } 
+  }
 
   @override
-  Future<String> convertGeoLocationToAddress({
+  Future<GeoApiLocationModel> convertGeoLocationToAddress({
     required double latitude,
     required double longitude,
   }) async {
@@ -266,7 +266,25 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
-        return jsonResponse['results'][0]['address_line2'];
+        // return jsonResponse['results'][0]['address_line2'];
+
+        final res = await supabaseClient
+            .from('locations')
+            .select('id')
+            .eq('name', jsonResponse['results'][0]['city'])
+            .limit(1)
+            .maybeSingle();
+
+        if (res != null) {
+          return GeoApiLocationModel(
+              address: jsonResponse['results'][0]['address_line2'],
+              cityName: jsonResponse['results'][0]['city'],
+              latitude: latitude,
+              id: res['id'],
+              longitude: longitude);
+        }
+
+        throw const ServerException('Location not found');
       } else {
         throw ServerException(response.body);
       }

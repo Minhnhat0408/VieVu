@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
@@ -16,7 +20,12 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/attrac
 import 'package:vn_travel_companion/features/explore/presentation/widgets/nearby_service_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/open_time_display.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews/reviews_section.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/slider_pagination.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class AttractionDetailPage extends StatelessWidget {
@@ -57,11 +66,16 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
   int activeIndex = 0;
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _reviewsSectionKey = GlobalKey();
-
+  int changeSavedItemCount = 0;
   bool _showFullDescription = false;
+  int currentSavedTripCount = 0;
   @override
   void initState() {
     super.initState();
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
+    context.read<TripBloc>().add(GetSavedToTrips(
+        userId: userId, id: widget.attractionId, type: 'service'));
     context
         .read<AttractionDetailsCubit>()
         .fetchAttractionDetails(widget.attractionId);
@@ -85,7 +99,90 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
             // Share the attraction
           },
         ),
-        IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border))
+        BlocListener<TripBloc, TripState>(
+          listener: (context, state) {
+            // TODO: implement listener
+            if (state is SavedToTripLoadedSuccess) {
+              log('SavedToTripLoadedSuccess');
+              currentSavedTripCount =
+                  state.trips.where((trip) => trip.isSaved).length;
+            }
+          },
+          child: BlocBuilder<AttractionDetailsCubit, AttractionDetailsState>(
+            builder: (context, state) {
+              return IconButton(
+                  onPressed: () {
+                    if (state is AttractionDetailsLoadedSuccess) {
+                      final userId = (context.read<AppUserCubit>().state
+                              as AppUserLoggedIn)
+                          .user
+                          .id;
+                      context.read<TripBloc>().add(GetSavedToTrips(
+                          userId: userId,
+                          id: state.attraction.id,
+                          type: 'service'));
+                      displayModal(
+                          context,
+                          SavedToTripModal(
+                            type: "service",
+                            onTripsChanged: (List<Trip> selectedTrips,
+                                List<Trip> unselectedTrips) {
+                              setState(() {
+                                changeSavedItemCount = selectedTrips.length +
+                                    unselectedTrips.length;
+
+                                currentSavedTripCount = currentSavedTripCount +
+                                    selectedTrips.length -
+                                    unselectedTrips.length;
+                              });
+
+                              for (var item in selectedTrips) {
+                                context
+                                    .read<SavedServiceBloc>()
+                                    .add(InsertSavedService(
+                                      tripId: item.id,
+                                      linkId: state.attraction.id,
+                                      cover: state.attraction.cover,
+                                      name: state.attraction.name,
+                                      locationName:
+                                          state.attraction.locationName,
+                                      rating: state.attraction.avgRating ?? 0,
+                                      ratingCount:
+                                          state.attraction.ratingCount ?? 0,
+                                      typeId: 2,
+                                      latitude: state.attraction.latitude,
+                                      longitude: state.attraction.longitude,
+                                    ));
+
+                                context
+                                    .read<TripLocationBloc>()
+                                    .add(InsertTripLocation(
+                                      locationId: state.attraction.locationId,
+                                      tripId: item.id,
+                                    ));
+                              }
+
+                              for (var item in unselectedTrips) {
+                                context.read<SavedServiceBloc>().add(
+                                    DeleteSavedService(
+                                        linkId: state.attraction.id,
+                                        tripId: item.id));
+                              }
+                            },
+                          ),
+                          null,
+                          false);
+                    }
+                  },
+                  icon: Icon(
+                    currentSavedTripCount > 0
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: currentSavedTripCount > 0 ? Colors.redAccent : null,
+                  ));
+            },
+          ),
+        ),
       ],
       body: BlocConsumer<AttractionDetailsCubit, AttractionDetailsState>(
         listener: (context, state) {

@@ -18,6 +18,7 @@ import 'package:vn_travel_companion/features/explore/presentation/bloc/event/eve
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
@@ -42,6 +43,7 @@ void main() async {
       BlocProvider(create: (_) => serviceLocator<SearchHistoryCubit>()),
       BlocProvider(create: (_) => serviceLocator<TripBloc>()),
       BlocProvider(create: (_) => serviceLocator<TripLocationBloc>()),
+      BlocProvider(create: (_) => serviceLocator<SavedServiceBloc>()),
     ],
     child: const MyApp(),
   ));

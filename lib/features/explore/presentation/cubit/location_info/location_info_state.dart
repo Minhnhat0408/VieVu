@@ -25,8 +25,12 @@ final class LocationInfoFailure extends LocationInfoState {
 
 final class LocationInfoAddressLoaded extends LocationInfoState {
   final String address;
+  final int locationId;
+  final String cityName;
 
   LocationInfoAddressLoaded({
     required this.address,
+    required this.locationId,
+    required this.cityName,
   });
 }

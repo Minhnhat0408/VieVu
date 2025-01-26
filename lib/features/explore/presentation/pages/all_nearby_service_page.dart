@@ -12,6 +12,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
@@ -53,9 +54,12 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
   void _fetchNearbyAttractions() {
     if (userPos != null) {
       log('runnn');
+      final userId =
+          (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
       context.read<NearbyServicesCubit>().getNearbyServices(
           limit: 10,
           offset: 1,
+          userId: userId,
           filterType: 'nearby10KM',
           latitude: userPos![0],
           longitude: userPos![1]);

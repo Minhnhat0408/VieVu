@@ -15,6 +15,7 @@ class NearbyAttractionsCubit extends Cubit<NearbyAttractionsState> {
   Future<void> fetchNearbyAttractions({
     required double latitude,
     required double longitude,
+    required String userId,
     int limit = 10,
     int offset = 0,
     int radius = 10,
@@ -24,6 +25,7 @@ class NearbyAttractionsCubit extends Cubit<NearbyAttractionsState> {
     final result = await _attractionRepository.getNearbyAttractions(
       latitude: latitude,
       longitude: longitude,
+      userId: userId,
       limit: limit,
       offset: offset,
       radius: radius,

@@ -4,17 +4,29 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/format_distance.dart';
 import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class RestaurantSmallCard extends StatefulWidget {
   final Restaurant restaurant;
   final bool slider;
+  final int locationId;
+  final String locationName;
   const RestaurantSmallCard({
     super.key,
     required this.restaurant,
     this.slider = false,
+    required this.locationId,
+    required this.locationName,
   });
 
   @override
@@ -23,6 +35,7 @@ class RestaurantSmallCard extends StatefulWidget {
 
 class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
   bool _showFull = false;
+  int changeSavedItemCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +98,78 @@ class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
                                 width: 28,
                                 height: 28,
                                 child: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    final userId = (context
+                                            .read<AppUserCubit>()
+                                            .state as AppUserLoggedIn)
+                                        .user
+                                        .id;
+                                    context.read<TripBloc>().add(
+                                        GetSavedToTrips(
+                                            userId: userId,
+                                            id: widget.restaurant.id,
+                                            type: 'service'));
+                                    displayModal(
+                                        context,
+                                        SavedToTripModal(
+                                          type: "service",
+                                          onTripsChanged:
+                                              (List<Trip> selectedTrips,
+                                                  List<Trip> unselectedTrips) {
+                                            setState(() {
+                                              changeSavedItemCount =
+                                                  selectedTrips.length +
+                                                      unselectedTrips.length;
+                                            });
+
+                                            for (var item in selectedTrips) {
+                                              context
+                                                  .read<SavedServiceBloc>()
+                                                  .add(InsertSavedService(
+                                                    tripId: item.id,
+                                                    linkId:
+                                                        widget.restaurant.id,
+                                                    cover:
+                                                        widget.restaurant.cover,
+                                                    name:
+                                                        widget.restaurant.name,
+                                                    locationName:
+                                                        widget.locationName,
+                                                    rating: widget
+                                                        .restaurant.avgRating,
+                                                    ratingCount: widget
+                                                        .restaurant.ratingCount,
+                                                    typeId: 1,
+                                                    externalLink: widget
+                                                        .restaurant.jumpUrl,
+                                                    latitude: widget
+                                                        .restaurant.latitude,
+                                                    longitude: widget
+                                                        .restaurant.longitude,
+                                                  ));
+
+                                              context
+                                                  .read<TripLocationBloc>()
+                                                  .add(InsertTripLocation(
+                                                    locationId:
+                                                        widget.locationId,
+                                                    tripId: item.id,
+                                                  ));
+                                            }
+
+                                            for (var item in unselectedTrips) {
+                                              context
+                                                  .read<SavedServiceBloc>()
+                                                  .add(DeleteSavedService(
+                                                      linkId:
+                                                          widget.restaurant.id,
+                                                      tripId: item.id));
+                                            }
+                                          },
+                                        ),
+                                        null,
+                                        false);
+                                  },
                                   iconSize: 18,
                                   style: IconButton.styleFrom(
                                     padding:

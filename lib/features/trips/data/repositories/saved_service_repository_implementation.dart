@@ -17,7 +17,18 @@ class SavedServiceRepositoryImpl implements SavedServiceRepository {
   @override
   Future<Either<Failure, Unit>> insertSavedService({
     required String tripId,
-    required SavedService service,
+    String? externalLink,
+    required int linkId,
+    required String cover,
+    required String name,
+    required String locationName,
+    List<String>? tagInfoList,
+    required double rating,
+    required int ratingCount,
+    int? hotelStar,
+    required int typeId,
+    required double latitude,
+    required double longitude,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -25,7 +36,18 @@ class SavedServiceRepositoryImpl implements SavedServiceRepository {
       }
       await savedServiceRemoteDatasource.insertSavedService(
         tripId: tripId,
-        service: service as SavedServiceModel,
+        externalLink: externalLink,
+        linkId: linkId,
+        cover: cover,
+        name: name,
+        locationName: locationName,
+        tagInfoList: tagInfoList,
+        rating: rating,
+        ratingCount: ratingCount,
+        hotelStar: hotelStar,
+        typeId: typeId,
+        latitude: latitude,
+        longitude: longitude,
       );
       return right(unit);
     } on ServerException catch (e) {
@@ -35,14 +57,16 @@ class SavedServiceRepositoryImpl implements SavedServiceRepository {
 
   @override
   Future<Either<Failure, Unit>> deleteSavedService({
-    required int serviceId,
+    required int linkId,
+    required String tripId,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
       await savedServiceRemoteDatasource.deleteSavedTrips(
-        serviceId: serviceId,
+        linkId: linkId,
+        tripId: tripId,
       );
       return right(unit);
     } on ServerException catch (e) {

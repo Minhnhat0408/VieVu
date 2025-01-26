@@ -13,6 +13,7 @@ class Service {
   final double? distance;
   final String? distanceDesc;
   final String? hotScore;
+  final bool isSaved;
   final double? star;
   final String jumpUrl;
 
@@ -22,6 +23,7 @@ class Service {
     required this.latitude,
     required this.longitude,
     required this.cover,
+    required this.isSaved,
     required this.typeId,
     required this.score,
     required this.commentCount,

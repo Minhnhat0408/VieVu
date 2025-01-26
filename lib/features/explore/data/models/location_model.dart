@@ -71,3 +71,24 @@ class LocationModel extends Location {
     );
   }
 }
+
+class GeoApiLocationModel extends GeoApiLocation {
+  GeoApiLocationModel(
+      {required super.address,
+      required super.id,
+      required super.latitude,
+      required super.longitude,
+      required super.cityName});
+
+  factory GeoApiLocationModel.fromJson(Map<String, dynamic> json) {
+    return GeoApiLocationModel(
+      address: json['address'],
+      id: json['id'],
+      latitude: json['latitude'].toDouble(),
+      longitude: json['longitude'].toDouble(),
+      cityName: json['cityName'],
+    );
+  }
+
+  
+}

@@ -37,6 +37,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
 
   @override
   Future<Either<Failure, List<Attraction>>> getHotAttractions({
+    required String userId,
     required int limit,
     required int offset,
   }) async {
@@ -47,6 +48,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
       final attractions = await attractionRemoteDatasource.getHotAttractions(
         limit: limit,
         offset: offset,
+        userId: userId,
       );
 
       return right(attractions);
@@ -97,6 +99,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   @override
   Future<Either<Failure, List<Attraction>>> getNearbyAttractions({
     required double latitude,
+    required String userId,
     required double longitude,
     required int limit,
     required int offset,
@@ -110,6 +113,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
         latitude: latitude,
         longitude: longitude,
         limit: limit,
+        userId: userId,
         offset: offset,
         radius: radius,
       );
@@ -124,6 +128,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   Future<Either<Failure, Map<String, List<Service>>>> getAllServicesNearby({
     required double latitude,
     required double longitude,
+    required String userId,
     int limit = 10,
     int offset = 1,
     required String filterType,
@@ -135,6 +140,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
       final attractions = await attractionRemoteDatasource.getAllServicesNearby(
         limit: limit,
         offset: offset,
+        userId: userId,
         latitude: latitude,
         longitude: longitude,
         filterType: filterType,
@@ -149,6 +155,8 @@ class AttractionRepositoryImpl implements AttractionRepository {
   @override
   Future<Either<Failure, List<Service>>> getServicesNearAttraction({
     required int attractionId,
+    required String userId,
+
     int limit = 20,
     int offset = 1,
     required int serviceType,
@@ -163,6 +171,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
         attractionId: attractionId,
         limit: limit,
         offset: offset,
+        userId: userId,
         serviceType: serviceType,
         filterType: filterType,
       );
@@ -177,6 +186,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   Future<Either<Failure, List<Attraction>>> getRecommendedAttractions({
     required int limit,
     required String userId,
+
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -198,6 +208,8 @@ class AttractionRepositoryImpl implements AttractionRepository {
   Future<Either<Failure, List<Attraction>>> getRelatedAttractions({
     required int attractionId,
     required int limit,
+    required String userId,
+
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -207,6 +219,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
           await attractionRemoteDatasource.getRelatedAttractions(
         attractionId: attractionId,
         limit: limit,
+        userId: userId,
       );
 
       return right(attractions);
@@ -221,6 +234,8 @@ class AttractionRepositoryImpl implements AttractionRepository {
     List<String>? categoryId2,
     required int limit,
     required int offset,
+    required String userId,
+
     int? budget,
     int? rating,
     double? lat,
@@ -239,6 +254,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
         categoryId1: categoryId1,
         categoryId2: categoryId2,
         limit: limit,
+        userId: userId,
         offset: offset,
         lat: lat,
         lon: lon,
@@ -262,6 +278,8 @@ class AttractionRepositoryImpl implements AttractionRepository {
     List<int> serviceIds = const [],
     List<int> openTime = const [],
     required int limit,
+    required String userId,
+
     required int offset,
     int? minPrice,
     int? maxPrice,
@@ -282,6 +300,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
         offset: offset,
         minPrice: minPrice,
         maxPrice: maxPrice,
+        userId: userId,
         lat: lat,
         lon: lon,
         locationId: locationId,
@@ -299,6 +318,8 @@ class AttractionRepositoryImpl implements AttractionRepository {
     required DateTime checkOutDate,
     required int roomQuantity,
     required int adultCount,
+    required String userId,
+
     required int childCount,
     int? star,
     required int limit,
@@ -320,6 +341,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
         star: star,
         limit: limit,
         offset: offset,
+        userId: userId,
         minPrice: minPrice,
         maxPrice: maxPrice,
         locationName: locationName,

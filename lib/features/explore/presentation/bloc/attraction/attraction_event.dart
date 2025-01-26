@@ -6,8 +6,9 @@ sealed class AttractionEvent {}
 class GetHotAttractions extends AttractionEvent {
   final int limit;
   final int offset;
+  final String userId;
 
-  GetHotAttractions({required this.limit, required this.offset});
+  GetHotAttractions({required this.limit, required this.offset, required this.userId});
 }
 
 class GetRecentViewedAttractions extends AttractionEvent {
@@ -33,12 +34,16 @@ class GetRecommendedAttraction extends AttractionEvent {
 class GetRelatedAttractions extends AttractionEvent {
   final int attractionId;
   final int limit;
+  final String userId;
 
-  GetRelatedAttractions({required this.attractionId, required this.limit});
+
+  GetRelatedAttractions({required this.attractionId, required this.limit, required this.userId});
 }
 
 class GetAttractionsWithFilter extends AttractionEvent {
   final String? categoryId1;
+  final String userId;
+
   final List<String>? categoryId2;
   final int limit;
   final int offset;
@@ -57,6 +62,7 @@ class GetAttractionsWithFilter extends AttractionEvent {
     required this.limit,
     required this.offset,
     this.budget,
+    required this.userId,
     this.rating,
     this.lat,
     this.lon,

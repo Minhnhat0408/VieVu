@@ -4,31 +4,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
-class HotelSmallCard extends StatelessWidget {
+class HotelSmallCard extends StatefulWidget {
   final Hotel hotel;
   final bool slider;
+  final int locationId;
+  final String locationName;
   const HotelSmallCard({
     super.key,
     required this.hotel,
     this.slider = false,
+    required this.locationId,
+    required this.locationName,
   });
+
+  @override
+  State<HotelSmallCard> createState() => _HotelSmallCardState();
+}
+
+class _HotelSmallCardState extends State<HotelSmallCard> {
+  int changeSavedItemCount = 0;
+  int? currentSavedTripCount;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Navigate to the detail page
-        Navigator.pushNamed(
-          context,
-          '/hotel',
-          arguments: hotel.id,
-        );
+        if (widget.hotel.jumpUrl.contains('http') ||
+            widget.hotel.jumpUrl.contains('https')) {
+          openDeepLink(widget.hotel.jumpUrl);
+        } else {
+          final String url = 'https://vn.trip.com${widget.hotel.jumpUrl}';
+          openDeepLink(url);
+        }
       },
       child: Card(
           elevation: 0,
-          color: slider
+          color: widget.slider
               ? Theme.of(context).colorScheme.surfaceContainerLowest
               : Colors.transparent,
           child: Padding(
@@ -36,7 +58,7 @@ class HotelSmallCard extends StatelessWidget {
             child: Column(
               children: [
                 Row(
-                  crossAxisAlignment: slider
+                  crossAxisAlignment: widget.slider
                       ? CrossAxisAlignment.center
                       : CrossAxisAlignment.start,
                   children: [
@@ -49,7 +71,7 @@ class HotelSmallCard extends StatelessWidget {
                             Radius.circular(10),
                           ),
                           child: CachedNetworkImage(
-                            imageUrl: hotel.cover, // Use optimized size
+                            imageUrl: widget.hotel.cover, // Use optimized size
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -72,7 +94,73 @@ class HotelSmallCard extends StatelessWidget {
                             width: 28,
                             height: 28,
                             child: IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                final userId = (context
+                                        .read<AppUserCubit>()
+                                        .state as AppUserLoggedIn)
+                                    .user
+                                    .id;
+                                context.read<TripBloc>().add(GetSavedToTrips(
+                                    userId: userId,
+                                    id: widget.hotel.id,
+                                    type: 'service'));
+                                displayModal(
+                                    context,
+                                    SavedToTripModal(
+                                      type: "service",
+                                      onTripsChanged: (List<Trip> selectedTrips,
+                                          List<Trip> unselectedTrips) {
+                                        setState(() {
+                                          changeSavedItemCount =
+                                              selectedTrips.length +
+                                                  unselectedTrips.length;
+                                          currentSavedTripCount ??= 0;
+                                          currentSavedTripCount =
+                                              currentSavedTripCount! +
+                                                  selectedTrips.length -
+                                                  unselectedTrips.length;
+                                        });
+
+                                        for (var item in selectedTrips) {
+                                          context
+                                              .read<SavedServiceBloc>()
+                                              .add(InsertSavedService(
+                                                tripId: item.id,
+                                                linkId: widget.hotel.id,
+                                                cover: widget.hotel.cover,
+                                                name: widget.hotel.name,
+                                                locationName:
+                                                    widget.locationName,
+                                                rating: widget.hotel.avgRating,
+                                                ratingCount:
+                                                    widget.hotel.ratingCount,
+                                                typeId: 4,
+                                                externalLink:
+                                                    widget.hotel.jumpUrl,
+                                                latitude: widget.hotel.latitude,
+                                                longitude:
+                                                    widget.hotel.longitude,
+                                              ));
+
+                                          context
+                                              .read<TripLocationBloc>()
+                                              .add(InsertTripLocation(
+                                                locationId: widget.locationId,
+                                                tripId: item.id,
+                                              ));
+                                        }
+
+                                        for (var item in unselectedTrips) {
+                                          context.read<SavedServiceBloc>().add(
+                                              DeleteSavedService(
+                                                  linkId: widget.hotel.id,
+                                                  tripId: item.id));
+                                        }
+                                      },
+                                    ),
+                                    null,
+                                    false);
+                              },
                               iconSize: 18,
                               style: IconButton.styleFrom(
                                 padding:
@@ -82,7 +170,22 @@ class HotelSmallCard extends StatelessWidget {
                                     .colorScheme
                                     .primaryContainer,
                               ),
-                              icon: const Icon(Icons.favorite_border),
+                              icon: Icon(
+                                currentSavedTripCount != null
+                                    ? currentSavedTripCount! > 0
+                                        ? Icons.favorite
+                                        : Icons.favorite_border
+                                    : widget.hotel.isSaved
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                color: currentSavedTripCount != null
+                                    ? currentSavedTripCount! > 0
+                                        ? Colors.redAccent
+                                        : null
+                                    : widget.hotel.isSaved
+                                        ? Colors.redAccent
+                                        : null,
+                              ),
                             ),
                           ),
                         ),
@@ -97,7 +200,7 @@ class HotelSmallCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             AutoSizeText(
-                              hotel.name,
+                              widget.hotel.name,
                               minFontSize: 14, // Minimum font size to shrink to
                               maxLines: 1, // Allow up to 2 lines for wrapping
                               overflow: TextOverflow
@@ -111,7 +214,7 @@ class HotelSmallCard extends StatelessWidget {
                             Row(
                               children: [
                                 RatingBarIndicator(
-                                  rating: hotel.avgRating,
+                                  rating: widget.hotel.avgRating,
                                   itemSize: 20,
                                   direction: Axis.horizontal,
                                   itemCount: 5,
@@ -123,7 +226,7 @@ class HotelSmallCard extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  '(${hotel.ratingCount})',
+                                  '(${widget.hotel.ratingCount})',
                                   style:
                                       Theme.of(context).textTheme.labelMedium,
                                 ),
@@ -141,7 +244,7 @@ class HotelSmallCard extends StatelessWidget {
                                           Theme.of(context).colorScheme.primary,
                                       borderRadius: BorderRadius.circular(20)),
                                   child: RatingBarIndicator(
-                                    rating: hotel.star.toDouble(),
+                                    rating: widget.hotel.star.toDouble(),
                                     itemSize: 16,
                                     direction: Axis.horizontal,
                                     itemCount: 5,
@@ -164,8 +267,8 @@ class HotelSmallCard extends StatelessWidget {
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                                 Expanded(
-                                  child: Text(hotel.positionDesc,
-                                      maxLines: slider ? 1 : 2,
+                                  child: Text(widget.hotel.positionDesc,
+                                      maxLines: widget.slider ? 1 : 2,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontSize: 12,
@@ -173,15 +276,15 @@ class HotelSmallCard extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            if (!slider) const SizedBox(height: 4),
+                            if (!widget.slider) const SizedBox(height: 4),
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-                if (!slider) const SizedBox(height: 10),
-                if (!slider)
+                if (!widget.slider) const SizedBox(height: 10),
+                if (!widget.slider)
                   SizedBox(
                     width: double.infinity,
                     child: Container(
@@ -197,13 +300,13 @@ class HotelSmallCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(hotel.roomName,
+                          Text(widget.hotel.roomName,
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               )),
                           const SizedBox(height: 4),
-                          Text(hotel.roomDesc,
+                          Text(widget.hotel.roomDesc,
                               style: const TextStyle(
                                 fontSize: 12,
                               )),
@@ -214,14 +317,14 @@ class HotelSmallCard extends StatelessWidget {
                               // display multiple icons for adult and child count
                               Row(children: [
                                 ...List.generate(
-                                  hotel.adultCount,
+                                  widget.hotel.adultCount,
                                   (index) => const Icon(
                                     FontAwesomeIcons.user,
                                     size: 14,
                                   ),
                                 ),
                                 ...List.generate(
-                                  hotel.childCount,
+                                  widget.hotel.childCount,
                                   (index) => const Icon(
                                     FontAwesomeIcons.child,
                                     size: 14,
@@ -229,9 +332,9 @@ class HotelSmallCard extends StatelessWidget {
                                 ),
                               ]),
 
-                              if (hotel.price > 0)
+                              if (widget.hotel.price > 0)
                                 Text(
-                                  '${NumberFormat('#,###').format(hotel.price)} VND',
+                                  '${NumberFormat('#,###').format(widget.hotel.price)} VND',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color:

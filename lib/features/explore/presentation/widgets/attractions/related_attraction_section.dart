@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
@@ -21,9 +22,10 @@ class _RelatedAttractionSectionState extends State<RelatedAttractionSection> {
   @override
   void initState() {
     super.initState();
-
-    context.read<AttractionBloc>().add(
-        GetRelatedAttractions(limit: 10, attractionId: widget.attractionId));
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
+    context.read<AttractionBloc>().add(GetRelatedAttractions(
+        limit: 10, attractionId: widget.attractionId, userId: userId));
   }
 
   @override

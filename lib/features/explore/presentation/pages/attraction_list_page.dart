@@ -8,6 +8,7 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
@@ -80,6 +81,8 @@ class _AttractionListPageState extends State<AttractionListPage>
   @override
   void initState() {
     super.initState();
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     _pagingController.addPageRequestListener((pageKey) {
       if (widget.locationId != null) {
         context.read<AttractionBloc>().add(
@@ -87,6 +90,7 @@ class _AttractionListPageState extends State<AttractionListPage>
                   locationId: widget.locationId,
                   limit: pageSize - 1,
                   offset: pageKey,
+                  userId: userId,
                   categoryId1: _parentTravelType?.id,
                   sortType: _sortType,
                   categoryId2: _travelTypes.isNotEmpty
@@ -102,6 +106,7 @@ class _AttractionListPageState extends State<AttractionListPage>
               GetAttractionsWithFilter(
                   lat: widget.latitude,
                   lon: widget.longitude,
+                  userId: userId,
                   proximity: 30,
                   limit: pageSize - 1,
                   offset: pageKey,
@@ -359,14 +364,8 @@ class _AttractionListPageState extends State<AttractionListPage>
                                   widget.latitude!,
                                   widget
                                       .longitude!), // Center the map over London
-                              initialCameraFit: CameraFit.coordinates(
-                                  coordinates: _pagingController.itemList!
-                                      .map(
-                                        (attraction) => LatLng(
-                                            attraction.latitude,
-                                            attraction.longitude),
-                                      )
-                                      .toList()),
+
+                              initialZoom: 11,
                               minZoom: 5),
                           children: [
                             TileLayer(
@@ -513,12 +512,18 @@ class _AttractionListPageState extends State<AttractionListPage>
                                   _pagingController.itemList!.length - 1) {
                                 if ((index + 1) % pageSize == 0) {
                                   final pageKey = totalRecordCount;
+                                  final userId = (context
+                                          .read<AppUserCubit>()
+                                          .state as AppUserLoggedIn)
+                                      .user
+                                      .id;
                                   if (widget.locationId != null) {
                                     context.read<AttractionBloc>().add(
                                           GetAttractionsWithFilter(
                                               locationId: widget.locationId,
                                               limit: pageSize - 1,
                                               offset: pageKey,
+                                              userId: userId,
                                               categoryId1:
                                                   _parentTravelType?.id,
                                               sortType: _sortType,
@@ -537,6 +542,7 @@ class _AttractionListPageState extends State<AttractionListPage>
                                           GetAttractionsWithFilter(
                                               lat: widget.latitude,
                                               lon: widget.longitude,
+                                              userId: userId,
                                               proximity: 30,
                                               limit: pageSize - 1,
                                               offset: pageKey,

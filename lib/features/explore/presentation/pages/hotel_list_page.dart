@@ -8,6 +8,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
@@ -18,6 +19,7 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels
 
 class HotelListPage extends StatefulWidget {
   final String locationName;
+  final int locationId;
   final double? latitude;
   final double? longitude;
   const HotelListPage({
@@ -25,6 +27,7 @@ class HotelListPage extends StatefulWidget {
     required this.locationName,
     required this.latitude,
     required this.longitude,
+    required this.locationId,
   });
 
   @override
@@ -108,10 +111,13 @@ class _HotelListPageState extends State<HotelListPage>
   @override
   void initState() {
     super.initState();
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     _pagingController.addPageRequestListener((pageKey) {
       context.read<NearbyServicesCubit>().getHotelsWithFilter(
             checkInDate: selectedDateRange.start,
             checkOutDate: selectedDateRange.end,
+            userId: userId,
             roomQuantity: _roomQuantity,
             adultCount: _adultCount,
             childCount: _childCount,
@@ -355,6 +361,7 @@ class _HotelListPageState extends State<HotelListPage>
                                           attraction.longitude),
                                     )
                                     .toList()),
+                            initialZoom: 13,
                             minZoom: 5),
                         children: [
                           TileLayer(
@@ -478,6 +485,8 @@ class _HotelListPageState extends State<HotelListPage>
                           return HotelSmallCard(
                             hotel: _pagingController.itemList![index],
                             slider: true,
+                            locationName: widget.locationName,
+                            locationId: widget.locationId,
                           );
                         },
                         options: CarouselOptions(
@@ -490,6 +499,10 @@ class _HotelListPageState extends State<HotelListPage>
 
                             if (index ==
                                 _pagingController.itemList!.length - 1) {
+                              final userId = (context.read<AppUserCubit>().state
+                                      as AppUserLoggedIn)
+                                  .user
+                                  .id;
                               if ((index + 1) % pageSize == 0) {
                                 final nextPageKey =
                                     (totalRecordCount ~/ pageSize) + 1;
@@ -500,6 +513,7 @@ class _HotelListPageState extends State<HotelListPage>
                                       checkOutDate: selectedDateRange.end,
                                       roomQuantity: _roomQuantity,
                                       adultCount: _adultCount,
+                                      userId: userId,
                                       childCount: _childCount,
                                       star: _star,
                                       limit: pageSize,
@@ -530,7 +544,11 @@ class _HotelListPageState extends State<HotelListPage>
                         pagingController: _pagingController,
                         builderDelegate: PagedChildBuilderDelegate<Hotel>(
                           itemBuilder: (context, item, index) {
-                            return HotelSmallCard(hotel: item);
+                            return HotelSmallCard(
+                              hotel: item,
+                              locationName: widget.locationName,
+                              locationId: widget.locationId,
+                            );
                           },
                           firstPageProgressIndicatorBuilder: (_) =>
                               const Center(child: CircularProgressIndicator()),

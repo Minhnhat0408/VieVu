@@ -12,6 +12,7 @@ abstract interface class AttractionRepository {
 
   Future<Either<Failure, List<Attraction>>> getHotAttractions({
     required int limit,
+    required String userId,
     required int offset,
   });
 
@@ -26,6 +27,7 @@ abstract interface class AttractionRepository {
 
   Future<Either<Failure, List<Attraction>>> getNearbyAttractions({
     required double latitude,
+    required String userId,
     required double longitude,
     required int limit,
     required int offset,
@@ -33,6 +35,7 @@ abstract interface class AttractionRepository {
   });
 
   Future<Either<Failure, List<Service>>> getServicesNearAttraction({
+    required String userId,
     required int attractionId,
     int limit = 20,
     int offset = 1,
@@ -42,6 +45,7 @@ abstract interface class AttractionRepository {
   });
 
   Future<Either<Failure, Map<String, List<Service>>>> getAllServicesNearby({
+    required String userId,
     required double latitude,
     required double longitude,
     int limit = 10,
@@ -55,11 +59,13 @@ abstract interface class AttractionRepository {
   });
 
   Future<Either<Failure, List<Attraction>>> getRelatedAttractions({
+    required String userId,
     required int attractionId,
     required int limit,
   });
 
   Future<Either<Failure, List<Attraction>>> getAttractionsWithFilter({
+    required String userId,
     String? categoryId1,
     List<String>? categoryId2,
     required int limit,
@@ -75,6 +81,7 @@ abstract interface class AttractionRepository {
   });
 
   Future<Either<Failure, List<Restaurant>>> getRestaurantsWithFilter({
+    required String userId,
     int? categoryId1,
     List<int> serviceIds = const [],
     List<int> openTime = const [],
@@ -88,6 +95,7 @@ abstract interface class AttractionRepository {
   });
 
   Future<Either<Failure, List<Hotel>>> getHotelsWithFilter({
+    required String userId,
     required DateTime checkInDate,
     required DateTime checkOutDate,
     required int roomQuantity,

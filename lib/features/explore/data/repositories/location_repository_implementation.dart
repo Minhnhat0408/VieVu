@@ -110,7 +110,7 @@ class LocationRepositoryImpl implements LocationRepository {
   }
 
   @override
-  Future<Either<Failure, String>> convertGeoLocationToAddress({
+  Future<Either<Failure, GeoApiLocation>> convertGeoLocationToAddress({
     required double latitude,
     required double longitude,
   }) async {
