@@ -53,7 +53,6 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
 
   void _fetchNearbyAttractions() {
     if (userPos != null) {
-      log('runnn');
       final userId =
           (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
       context.read<NearbyServicesCubit>().getNearbyServices(

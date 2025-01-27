@@ -22,6 +22,8 @@ abstract interface class LocationRepository {
 
   Future<Either<Failure, GenericLocationInfo>> getLocationGeneralInfo({
     required int locationId,
+    required String userId,
+    required String locationName,
   });
 
   Future<Either<Failure, GeoApiLocation>> convertGeoLocationToAddress({

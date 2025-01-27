@@ -12,10 +12,14 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
   })  : _locationRepository = locationRepository,
         super(LocationInfoInitial());
 
-  Future<void> fetchLocationInfo(int locationId) async {
+  Future<void> fetchLocationInfo({
+    required int locationId,
+    required String userId,
+    required String locationName,
+  }) async {
     emit(LocationInfoLoading());
     final result = await _locationRepository.getLocationGeneralInfo(
-        locationId: locationId);
+        locationId: locationId, userId: userId, locationName: locationName);
     result.fold(
       (failure) => emit(LocationInfoFailure(message: failure.message)),
       (location) => emit(LocationInfoLoaded(locationInfo: location)),

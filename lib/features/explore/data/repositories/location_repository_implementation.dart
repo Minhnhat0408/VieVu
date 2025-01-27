@@ -94,6 +94,8 @@ class LocationRepositoryImpl implements LocationRepository {
   @override
   Future<Either<Failure, GenericLocationInfo>> getLocationGeneralInfo({
     required int locationId,
+    required String userId,
+    required String locationName,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -101,6 +103,8 @@ class LocationRepositoryImpl implements LocationRepository {
       }
       final location = await locationRemoteDatasource.getLocationGeneralInfo(
         locationId: locationId,
+        userId: userId,
+        locationName: locationName,
       );
 
       return right(location);

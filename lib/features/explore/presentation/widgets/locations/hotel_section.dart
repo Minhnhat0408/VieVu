@@ -79,7 +79,7 @@ class HotelSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Sự giao hòa giữa nét quyến rũ, tính biểu tượng và vẻ đẹp hiện đại ở ${state is LocationDetailsLoadedSuccess ? state.location.name : ''}',
+                      'Sự giao hòa giữa nét quyến rũ, tính biểu tượng và vẻ đẹp hiện đại ở ${state.location.name}',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.outline,
                         fontSize: 14,

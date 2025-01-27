@@ -1,9 +1,20 @@
 import 'dart:developer';
+import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/core/utils/calculate_distance.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
@@ -11,6 +22,9 @@ import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_s
 import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/hotel_list_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/restaurant_list_page.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_small_card.dart';
+import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_small_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
@@ -65,8 +79,10 @@ class LocationDetailMain extends StatefulWidget {
   State<LocationDetailMain> createState() => LocationDetailMainState();
 }
 
-class LocationDetailMainState extends State<LocationDetailMain> {
+class LocationDetailMainState extends State<LocationDetailMain>
+    with TickerProviderStateMixin {
   int _selectedIndex = 0;
+  int activeIndex = 0;
   bool reversedTrans = false;
   bool _dialogShown = false; // Track if the dialog is already shown
   bool mapView = false;
@@ -74,6 +90,23 @@ class LocationDetailMainState extends State<LocationDetailMain> {
   double? longitude;
   int changeSavedItemCount = 0;
   int currentSavedTripCount = 0;
+  List<dynamic> allServices = [];
+  late final AnimatedMapController _animatedMapController =
+      AnimatedMapController(
+          vsync: this,
+          // mapController: _mapController,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeInOut,
+          cancelPreviousAnimations: true);
+  CarouselSliderController buttonCarouselController =
+      CarouselSliderController();
+  void _animateMapTo(LatLng destination) {
+    _animatedMapController.animateTo(
+      dest: destination,
+      zoom: 15,
+      rotation: 0.0,
+    );
+  }
 
   @override
   void initState() {
@@ -85,7 +118,16 @@ class LocationDetailMainState extends State<LocationDetailMain> {
     context
         .read<LocationBloc>()
         .add(GetLocation(locationId: widget.locationId));
-    context.read<LocationInfoCubit>().fetchLocationInfo(widget.locationId);
+    context.read<LocationInfoCubit>().fetchLocationInfo(
+        locationId: widget.locationId,
+        userId: userId,
+        locationName: widget.locationName);
+  }
+
+  @override
+  void dispose() {
+    _animatedMapController.dispose();
+    super.dispose();
   }
 
   void _onItemTapped(int index) {
@@ -146,49 +188,7 @@ class LocationDetailMainState extends State<LocationDetailMain> {
               }
             },
             child: IconButton(
-                onPressed: () {
-                  final userId =
-                      (context.read<AppUserCubit>().state as AppUserLoggedIn)
-                          .user
-                          .id;
-                  context.read<TripBloc>().add(GetSavedToTrips(
-                      userId: userId, id: widget.locationId, type: 'location'));
-                  displayModal(
-                      context,
-                      SavedToTripModal(
-                        type: "location",
-                        onTripsChanged: (List<Trip> selectedTrips,
-                            List<Trip> unselectedTrips) {
-                          setState(() {
-                            changeSavedItemCount =
-                                selectedTrips.length + unselectedTrips.length;
-
-                            currentSavedTripCount = currentSavedTripCount +
-                                selectedTrips.length -
-                                unselectedTrips.length;
-                          });
-                          for (var item in selectedTrips) {
-                            context
-                                .read<TripLocationBloc>()
-                                .add(InsertTripLocation(
-                                  locationId: widget.locationId,
-                                  tripId: item.id,
-                                ));
-                          }
-
-                          for (var item in unselectedTrips) {
-                            context
-                                .read<TripLocationBloc>()
-                                .add(DeleteTripLocation(
-                                  locationId: widget.locationId,
-                                  tripId: item.id,
-                                ));
-                          }
-                        },
-                      ),
-                      null,
-                      false);
-                },
+                onPressed: () => _showSaveModal(context),
                 icon: Icon(
                   currentSavedTripCount > 0
                       ? Icons.favorite
@@ -300,11 +300,8 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                 floatHeaderSlivers: true,
                 headerSliverBuilder: (context, innerBoxIsScrolled) => [
                       SliverAppBar(
-                        // floating: true,
-                        pinned: mapView,
                         leading: null,
                         automaticallyImplyLeading: false,
-                        // snap: true,
                         scrolledUnderElevation: 0,
                         flexibleSpace: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -324,7 +321,6 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                                         if (index == 1) {
                                           if (latitude != null &&
                                               longitude != null) {
-                                            log('latitude: $latitude, longitude: $longitude');
                                             Navigator.of(context).push(
                                               PageRouteBuilder(
                                                 pageBuilder: (context,
@@ -492,114 +488,37 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                               child: Text('Không có dữ liệu'),
                             );
                           }
+
                           final locationInfo =
                               (state2 as LocationInfoLoaded).locationInfo;
-                          return SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          allServices = [
+                            ...locationInfo.attractions,
+                            ...locationInfo.restaurants,
+                            ...locationInfo.hotels,
+                          ];
+                          allServices.sort((a, b) {
+                            double distanceA = calculateDistance(
+                              a.latitude,
+                              a.longitude,
+                              state.location.latitude,
+                              state.location.longitude,
+                            );
+                            double distanceB = calculateDistance(
+                              b.latitude,
+                              b.longitude,
+                              state.location.latitude,
+                              state.location.longitude,
+                            );
+                            return distanceA.compareTo(
+                                distanceB); // Sort by ascending distance
+                          });
+                          return IndexedStack(
+                              index: mapView ? 0 : 1,
                               children: [
-                                Stack(
-                                  children: [
-                                    SliderPagination(imgList: imgList),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 20, bottom: 80),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20.0),
-                                        child: Text(
-                                          location.name,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 32),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20.0),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondaryContainer,
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              width: 40,
-                                              height: 40,
-                                              alignment: Alignment.center,
-                                              child: const FaIcon(
-                                                  FontAwesomeIcons.locationDot,
-                                                  size: 18),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Flexible(
-                                              child: Text(
-                                                location.address,
-                                                softWrap: true,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      if (location.childLoc.isNotEmpty)
-                                        SubLocationSection(
-                                            locations: location.childLoc,
-                                            locationName: location.name),
-                                      const Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 20.0,
-                                            bottom: 0,
-                                            left: 20,
-                                            right: 20),
-                                        child: Divider(
-                                          thickness: 1.5,
-                                        ),
-                                      ),
-                                      if (locationInfo.tripbestModule != null)
-                                        TripbestSection(
-                                            tripbests:
-                                                locationInfo.tripbestModule!),
-                                      AttractionsSection(
-                                        attractions: locationInfo.attractions,
-                                      ),
-                                      RestaurantSection(
-                                        restaurants: locationInfo.restaurants,
-                                      ),
-                                      HotelSection(
-                                        hotels: locationInfo.hotels,
-                                      ),
-                                      const Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 20.0,
-                                            bottom: 0,
-                                            left: 20,
-                                            right: 20),
-                                        child: Divider(
-                                          thickness: 1.5,
-                                        ),
-                                      ),
-                                      if (locationInfo.comments != null)
-                                        CommentSection(
-                                            comments: locationInfo.comments!,
-                                            locationName: location.name),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                                _buildMapView(location, state),
+                                _buildDetailsView(
+                                    location, locationInfo, imgList),
+                              ]);
                         },
                       );
                     }
@@ -608,9 +527,328 @@ class LocationDetailMainState extends State<LocationDetailMain> {
                     );
                   },
                 )),
+            Positioned(
+              bottom: 70.0,
+              right: 16.0,
+              child: FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    mapView = !mapView;
+                  });
+                },
+                child: const Icon(Icons.map),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  // Widget _buildContent(BuildContext context, Location location) {
+  //   return Stack(
+  //     children: [
+  //       if (_isMapView) _buildMapView(location) else _buildDetailsView(location),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildMapView(Location location, LocationDetailsLoadedSuccess state) {
+    return Stack(
+      children: [
+        FlutterMap(
+          mapController: _animatedMapController.mapController,
+          options: MapOptions(
+              initialCenter: LatLng(state.location.latitude,
+                  state.location.longitude), // Center the map over London
+              initialCameraFit: CameraFit.coordinates(
+                  coordinates: allServices
+                      .map(
+                        (e) => LatLng(e.latitude, e.longitude),
+                      )
+                      .toList()),
+              initialZoom: 11,
+              minZoom: 5),
+          children: [
+            TileLayer(
+              // Display map tiles from any source
+              urlTemplate:
+                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+              userAgentPackageName: 'com.example.vn_travel_companion',
+              // And many more recommended properties!
+            ),
+            MarkerLayer(markers: [
+              Marker(
+                width: 70,
+                height: 70,
+                point:
+                    LatLng(state.location.latitude, state.location.longitude),
+                //circle avatar with border
+                child: Image.asset(
+                  'assets/icons/main2.png',
+                  width: 70,
+                  height: 70,
+                ),
+              ),
+            ]),
+            MarkerClusterLayerWidget(
+              options: MarkerClusterLayerOptions(
+                maxClusterRadius: 45,
+                size: const Size(60, 60),
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(50),
+                maxZoom: 15,
+                markers: [
+                  ...allServices.asMap().entries.map((item) {
+                    final attraction = item.value;
+
+                    return Marker(
+                      width: activeIndex == attraction.id ? 80 : 60,
+                      height: activeIndex == attraction.id ? 80 : 60,
+                      point: LatLng(attraction.latitude, attraction.longitude),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            buttonCarouselController.animateToPage(item.key,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut);
+                            activeIndex = attraction.id;
+                          });
+                        },
+                        child: Container(
+                          width: activeIndex == attraction.id ? 80 : 60,
+                          height: activeIndex == attraction.id ? 80 : 60,
+                          decoration: BoxDecoration(
+                            color: attraction is Attraction
+                                ? Theme.of(context).colorScheme.primary
+                                : attraction is Restaurant
+                                    ? Colors.orangeAccent
+                                    : Colors.blueAccent,
+                            borderRadius: BorderRadius.circular(
+                                activeIndex == attraction.id ? 10 : 30),
+                            image: DecorationImage(
+                              image:
+                                  CachedNetworkImageProvider(attraction.cover),
+                              fit: BoxFit.cover,
+                            ),
+                            border: Border.all(
+                              color: attraction is Attraction
+                                  ? Theme.of(context).colorScheme.primary
+                                  : attraction is Restaurant
+                                      ? Colors.orangeAccent
+                                      : Colors.blueAccent,
+                              width: activeIndex == attraction.id ? 5 : 3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+                builder: (context, markers) {
+                  return Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Theme.of(context).colorScheme.primary),
+                    child: Center(
+                      child: Text(
+                        markers.length.toString(),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        Positioned(
+          bottom: 70,
+          left: 16.0,
+          child: FloatingActionButton(
+            heroTag: 'rotate',
+            onPressed: () {
+              // Rotate the map by 45 degrees
+              _animatedMapController.animatedRotateTo(0);
+            },
+            child: const Icon(Icons.rotate_right),
+          ),
+        ),
+        CarouselSlider.builder(
+          itemCount: allServices.length,
+          carouselController: buttonCarouselController,
+          itemBuilder: (context, index, realIndex) {
+            if (allServices[index] is Attraction) {
+              final attraction = allServices[index] as Attraction;
+              return AttractionMedCard(
+                attraction: attraction,
+                slider: true,
+              );
+            } else if (allServices[index] is Restaurant) {
+              final restaurant = allServices[index] as Restaurant;
+              return RestaurantSmallCard(
+                restaurant: restaurant,
+                locationId: widget.locationId,
+                locationName: widget.locationName,
+                slider: true,
+              );
+            } else {
+              final hotel = allServices[index] as Hotel;
+              return HotelSmallCard(
+                hotel: hotel,
+                locationId: widget.locationId,
+                locationName: widget.locationName,
+                slider: true,
+              );
+            }
+          },
+          options: CarouselOptions(
+            height: 130,
+            initialPage: 0,
+            reverse: false,
+            enableInfiniteScroll: false,
+            onPageChanged: (index, reason) => setState(() {
+              activeIndex = allServices[index].id;
+
+              _animateMapTo(LatLng(
+                  allServices[index].latitude, allServices[index].longitude));
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsView(Location location, GenericLocationInfo locationInfo,
+      List<String> imgList) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              SliderPagination(imgList: imgList),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20, bottom: 80),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Text(
+                    location.name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 32),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color:
+                              Theme.of(context).colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        width: 40,
+                        height: 40,
+                        alignment: Alignment.center,
+                        child: const FaIcon(FontAwesomeIcons.locationDot,
+                            size: 18),
+                      ),
+                      const SizedBox(width: 16),
+                      Flexible(
+                        child: Text(
+                          location.address,
+                          softWrap: true,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (location.childLoc.isNotEmpty)
+                  SubLocationSection(
+                      locations: location.childLoc,
+                      locationName: location.name),
+                const Padding(
+                  padding: EdgeInsets.only(
+                      top: 20.0, bottom: 0, left: 20, right: 20),
+                  child: Divider(
+                    thickness: 1.5,
+                  ),
+                ),
+                if (locationInfo.tripbestModule != null)
+                  TripbestSection(tripbests: locationInfo.tripbestModule!),
+                AttractionsSection(
+                  attractions: locationInfo.attractions,
+                ),
+                RestaurantSection(
+                  restaurants: locationInfo.restaurants,
+                ),
+                HotelSection(
+                  hotels: locationInfo.hotels,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(
+                      top: 20.0, bottom: 0, left: 20, right: 20),
+                  child: Divider(
+                    thickness: 1.5,
+                  ),
+                ),
+                if (locationInfo.comments != null)
+                  CommentSection(
+                      comments: locationInfo.comments!,
+                      locationName: location.name),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSaveModal(BuildContext context) {
+    // Add modal logic
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
+    context.read<TripBloc>().add(GetSavedToTrips(
+        userId: userId, id: widget.locationId, type: 'location'));
+    displayModal(
+        context,
+        SavedToTripModal(
+          type: "location",
+          onTripsChanged:
+              (List<Trip> selectedTrips, List<Trip> unselectedTrips) {
+            setState(() {
+              changeSavedItemCount =
+                  selectedTrips.length + unselectedTrips.length;
+
+              currentSavedTripCount = currentSavedTripCount +
+                  selectedTrips.length -
+                  unselectedTrips.length;
+            });
+            for (var item in selectedTrips) {
+              context.read<TripLocationBloc>().add(InsertTripLocation(
+                    locationId: widget.locationId,
+                    tripId: item.id,
+                  ));
+            }
+
+            for (var item in unselectedTrips) {
+              context.read<TripLocationBloc>().add(DeleteTripLocation(
+                    locationId: widget.locationId,
+                    tripId: item.id,
+                  ));
+            }
+          },
+        ),
+        null,
+        false);
   }
 }

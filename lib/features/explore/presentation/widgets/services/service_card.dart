@@ -6,9 +6,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/open_url.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
@@ -108,11 +110,32 @@ class _ServiceCardState extends State<ServiceCard> {
                                         .state as AppUserLoggedIn)
                                     .user
                                     .id;
-                                final location = (context
-                                            .read<AttractionDetailsCubit>()
-                                            .state
-                                        as AttractionDetailsLoadedSuccess)
-                                    .attraction;
+
+                                int locationId;
+                                String locationName;
+                                if (!widget.slider) {
+                                  locationId = (context
+                                              .read<AttractionDetailsCubit>()
+                                              .state
+                                          as AttractionDetailsLoadedSuccess)
+                                      .attraction
+                                      .locationId;
+                                  locationName = (context
+                                              .read<AttractionDetailsCubit>()
+                                              .state
+                                          as AttractionDetailsLoadedSuccess)
+                                      .attraction
+                                      .locationName;
+                                } else {
+                                  locationId = (context
+                                          .read<LocationInfoCubit>()
+                                          .state as LocationInfoAddressLoaded)
+                                      .locationId;
+                                  locationName = (context
+                                          .read<LocationInfoCubit>()
+                                          .state as LocationInfoAddressLoaded)
+                                      .cityName;
+                                }
 
                                 context.read<TripBloc>().add(GetSavedToTrips(
                                     userId: userId,
@@ -145,8 +168,7 @@ class _ServiceCardState extends State<ServiceCard> {
                                                 linkId: widget.service.id,
                                                 cover: widget.service.cover,
                                                 name: widget.service.name,
-                                                locationName:
-                                                    location.locationName,
+                                                locationName: locationName,
                                                 externalLink:
                                                     widget.service.jumpUrl,
                                                 rating: widget.service.score,
@@ -162,7 +184,7 @@ class _ServiceCardState extends State<ServiceCard> {
                                           context
                                               .read<TripLocationBloc>()
                                               .add(InsertTripLocation(
-                                                locationId: location.locationId,
+                                                locationId: locationId,
                                                 tripId: item.id,
                                               ));
                                         }
