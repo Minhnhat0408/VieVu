@@ -1,20 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/events/event_big_card.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
-class HotEventsSection extends StatefulWidget {
+class HotEventsSection extends StatelessWidget {
   const HotEventsSection({super.key});
 
   @override
-  State<HotEventsSection> createState() => _HotEventsSectionState();
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => serviceLocator<LocationInfoCubit>(),
+        ),
+      ],
+      child: const HotEventsSectionContent(),
+    );
+  }
 }
 
-class _HotEventsSectionState extends State<HotEventsSection> {
+class HotEventsSectionContent extends StatefulWidget {
+  const HotEventsSectionContent({super.key});
+
+  @override
+  State<HotEventsSectionContent> createState() =>
+      _HotEventsSectionContentState();
+}
+
+class _HotEventsSectionContentState extends State<HotEventsSectionContent> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<EventBloc>(context).add(GetHotEvents());
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
+    BlocProvider.of<EventBloc>(context).add(GetHotEvents(userId: userId));
   }
 
   @override

@@ -133,4 +133,22 @@ class LocationRepositoryImpl implements LocationRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, GeoApiLocation>> convertAddressToGeoLocation({
+    required String address,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final geo = await locationRemoteDatasource.convertAddressToGeoLocation(
+        address: address,
+      );
+
+      return right(geo);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

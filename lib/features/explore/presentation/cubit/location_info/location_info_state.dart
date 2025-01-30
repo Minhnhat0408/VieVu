@@ -23,6 +23,16 @@ final class LocationInfoFailure extends LocationInfoState {
   });
 }
 
+final class LocationInfoGeoLoaded extends LocationInfoState {
+  final double latitude;
+  final double longitude;
+
+  LocationInfoGeoLoaded({
+    required this.latitude,
+    required this.longitude,
+  });
+}
+
 final class LocationInfoAddressLoaded extends LocationInfoState {
   final String address;
   final int locationId;

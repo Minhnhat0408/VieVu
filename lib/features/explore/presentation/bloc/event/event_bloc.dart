@@ -17,7 +17,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
   }
 
   void _onGetHotEvents(GetHotEvents event, Emitter<EventState> emit) async {
-    final res = await _eventRepository.getHotEvents();
+    final res = await _eventRepository.getHotEvents(userId: event.userId);
     res.fold(
       (l) => emit(EventFailure(message: l.message)),
       (r) => emit(EventLoadedSuccess(events: r)),

@@ -31,7 +31,7 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
   Widget build(BuildContext context) {
     return BlocListener<TripBloc, TripState>(
       listener: (context, state) {
-        // TODO: implement listener
+        // TODO: implemenpt listener
         if (state is SavedToTripLoadedSuccess) {
           currentSavedTripCount =
               state.trips.where((trip) => trip.isSaved).length;

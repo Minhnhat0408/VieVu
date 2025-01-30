@@ -11,12 +11,16 @@ class EventRepositoryImpl implements EventRepository {
   final ConnectionChecker connectionChecker;
   const EventRepositoryImpl(this.eventRemoteDatasource, this.connectionChecker);
   @override
-  Future<Either<Failure, List<Event>>> getHotEvents() async {
+  Future<Either<Failure, List<Event>>> getHotEvents({
+    required String userId,
+  }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      final events = await eventRemoteDatasource.getHotEvents();
+      final events = await eventRemoteDatasource.getHotEvents(
+        userId: userId,
+      );
 
       return right(events);
     } on ServerException catch (e) {

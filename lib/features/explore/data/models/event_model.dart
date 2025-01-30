@@ -10,23 +10,43 @@ class EventModel extends Event {
       required super.orgLogo,
       required super.day,
       required super.deepLink,
-       super.latitude,
-       super.longitude,
+      required super.isSaved,
+      super.latitude,
+      super.longitude,
       required super.venue,
       required super.address});
 
-  factory EventModel.fromJson(Map<String, dynamic> jsonn) {
+  factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
-      id: jsonn['id'],
-      name: jsonn['name'],
-      image: jsonn['imageUrl'],
-      price: jsonn['price'],
-      isFree: jsonn['is_free'],
-      orgLogo: jsonn['orgLogoUrl'],
-      deepLink: jsonn['deepLink'],
-      day: jsonn['day'],
-      venue: jsonn['venue'],
-      address: jsonn['address'],
+      id: json['id'] ?? '',
+      day: json['day'] ?? '',
+      price: json['price'] ?? 0,
+      isFree: json['isFree'] ?? false,
+      orgLogo: json['orgLogoUrl'] ?? '',
+      deepLink: json['deeplink'] ?? '',
+      image: json['imageUrl'] ?? '',
+      name: json['name'] ?? '',
+      isSaved: json['isSaved'] ?? false,
+      venue: json['venue'] ?? '',
+      address: json['address'] ?? '',
+    );
+  }
+
+  factory EventModel.fromEventDetails(Map<String, dynamic> json) {
+    return EventModel(
+      id: json['id'],
+      day: json['startTime'] ?? '',
+      price: json['minTicketPrice'] ?? 0,
+      isFree: json['isFree'] ?? false,
+      orgLogo: json['orgLogoURL'] ?? '',
+      deepLink: json['deeplink'] ?? '',
+      isSaved: json['isSaved'] ?? false,
+      image: json['bannerURL'] ?? '',
+      name: json['title'] ?? '',
+      venue: json['venue'] ?? '',
+      address: json['address'] ?? '',
+      latitude: json['latitude'] ?? 0.0,
+      longitude: json['longitude'] ?? 0.0,
     );
   }
 
@@ -41,6 +61,7 @@ class EventModel extends Event {
     double? latitude,
     String? day,
     double? longitude,
+    bool? isSaved,
     String? venue,
     String? address,
   }) {
@@ -50,6 +71,7 @@ class EventModel extends Event {
       image: image ?? this.image,
       price: price ?? this.price,
       day: day ?? this.day,
+      isSaved: isSaved ?? this.isSaved,
       isFree: isFree ?? this.isFree,
       orgLogo: orgLogo ?? this.orgLogo,
       deepLink: deepLink ?? this.deepLink,

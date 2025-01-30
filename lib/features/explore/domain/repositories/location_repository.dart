@@ -30,4 +30,8 @@ abstract interface class LocationRepository {
     required double latitude,
     required double longitude,
   });
+
+  Future<Either<Failure, GeoApiLocation>> convertAddressToGeoLocation({
+    required String address,
+  });
 }

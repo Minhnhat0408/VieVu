@@ -1,25 +1,35 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/explore/data/models/event_model.dart';
 
 abstract class EventRemoteDatasource {
-  Future<List<EventModel>> getHotEvents();
+  Future<List<EventModel>> getHotEvents({
+    required String userId,
+  });
 }
 
 class EventRemoteDatasourceImpl implements EventRemoteDatasource {
   final http.Client client;
+  final SupabaseClient supabaseClient;
 
-  EventRemoteDatasourceImpl(this.client);
+  EventRemoteDatasourceImpl({
+    required this.client,
+    required this.supabaseClient,
+  });
 
   @override
-  Future<List<EventModel>> getHotEvents() async {
-   
- final url = Uri.parse(
-        'https://api-v2.ticketbox.vn/gin/api/v2/discovery/categories');    try {
+  Future<List<EventModel>> getHotEvents({
+    required String userId,
+  }) async {
+    final url = Uri.parse(
+        'https://api-v2.ticketbox.vn/gin/api/v2/discovery/categories');
+    try {
       // Fetch trending events
       final response = await client.get(url);
- 
+
       // log(response.body.toString());
       if (response.statusCode == 200) {
         final decodedBody = utf8.decode(response.bodyBytes);
@@ -27,10 +37,11 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
           decodedBody,
         );
 
-        if (data['data']['result']['trendingEvents']['events'] != null) {
+        if (data['data']['result']['specialEvents']['events'] != null) {
           final events =
-              data['data']['result']['trendingEvents']['events'] as List;
+              data['data']['result']['specialEvents']['events'] as List;
 
+          log(events[0].toString());
           // Fetch and enrich event details
           List<EventModel> enrichedEvents = [];
           for (var event in events) {
@@ -38,10 +49,26 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
             if (enrichedEvent != null) {
               enrichedEvents.add(enrichedEvent);
             }
-     
           }
-        
-          return enrichedEvents;
+
+          final res2 = await supabaseClient
+              .from('trips')
+              .select('saved_services!inner(link_id)')
+              .eq('owner_id', userId)
+              .inFilter('saved_services.link_id',
+                  enrichedEvents.map((e) => e.id).toList());
+          final linkIds = res2
+              .expand((item) =>
+                  item['saved_services'] ?? []) // Flatten saved_services
+              .map((service) => service['link_id']) // Extract link_id
+              .toList();
+
+          // Mark saved events
+          final markedEvents = enrichedEvents.map((event) {
+            return event.copyWith(isSaved: linkIds.contains(event.id));
+          }).toList();
+
+          return markedEvents;
         } else {
           throw Exception('Trending events not found');
         }
@@ -50,6 +77,7 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
             'Failed to load events: ${response.statusCode} ${response.reasonPhrase}');
       }
     } catch (e) {
+      log('Error fetching events: $e');
       throw Exception('Error fetching events: $e');
     }
   }
@@ -58,6 +86,7 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
   Future<EventModel?> _enrichEventWithDetails(
       Map<String, dynamic> event) async {
     final eventId = event['id'];
+
     final detailsUrl =
         Uri.parse('https://api-v2.ticketbox.vn/gin/api/v1/events/$eventId');
     try {
@@ -72,21 +101,10 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
           decodedBody,
         );
 
-        // Extract the desired fields
-        final venue = details['data']['result']['venue'] ?? '';
-        final address = details['data']['result']['address'] ?? '';
-
-        return EventModel(
-          id: event['id'] ?? '',
-          day: event['day'] ?? '',
-          price: event['price'] ?? 0,
-          isFree: event['isFree'] ?? false,
-          orgLogo: event['orgLogoUrl'] ?? '',
-          deepLink: event['deeplink'] ?? '',
-          image: event['imageUrl'] ?? '',
-          name: event['name'] ?? '',
-          venue: venue,
-          address: address,
+        return EventModel.fromEventDetails(details['data']['result']).copyWith(
+          deepLink: event['deeplink'],
+          // latitude: jsonResponse['results'][0]['lat'],
+          // longitude: jsonResponse['results'][0]['lon'],
         );
       } else {
         return null;

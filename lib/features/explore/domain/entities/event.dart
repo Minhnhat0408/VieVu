@@ -9,9 +9,9 @@ class Event {
   final String day;
   final double? latitude;
   final double? longitude;
+  final bool isSaved;
   final String venue;
   final String address;
-
 
   const Event({
     required this.id,
@@ -20,10 +20,11 @@ class Event {
     required this.day,
     required this.price,
     required this.isFree,
+    required this.isSaved,
     required this.orgLogo,
     required this.deepLink,
-     this.latitude,
-     this.longitude,
+    this.latitude,
+    this.longitude,
     required this.venue,
     required this.address,
   });

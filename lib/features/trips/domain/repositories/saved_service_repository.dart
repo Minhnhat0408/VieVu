@@ -11,6 +11,7 @@ abstract interface class SavedServiceRepository {
     required String name,
     required String locationName,
     List<String>? tagInfoList,
+    DateTime? eventDate,
     required double rating,
     required int ratingCount,
     int? hotelStar,

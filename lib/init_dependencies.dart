@@ -266,7 +266,8 @@ void _initEvent() {
   serviceLocator
     ..registerFactory<EventRemoteDatasource>(
       () => EventRemoteDatasourceImpl(
-        serviceLocator(),
+        client: serviceLocator(),
+        supabaseClient: serviceLocator(),
       ),
     )
     ..registerFactory<EventRepository>(

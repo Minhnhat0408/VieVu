@@ -36,6 +36,7 @@ class SavedServiceBloc extends Bloc<SavedServiceEvent, SavedServiceState> {
       hotelStar: event.hotelStar,
       typeId: event.typeId,
       latitude: event.latitude,
+      eventDate: event.eventDate,
       longitude: event.longitude,
     );
     res.fold(

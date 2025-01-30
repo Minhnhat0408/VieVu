@@ -124,7 +124,9 @@ class TripSmallItem extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        trip.locations.join(' - '),
+                        trip.locations.length > 3
+                            ? "${trip.locations.take(2).join(' - ')} và ${trip.locations.length - 2} nơi khác"
+                            : trip.locations.join(' - '),
                       ),
                     ],
                   ),

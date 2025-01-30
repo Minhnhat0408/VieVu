@@ -11,6 +11,7 @@ class Service {
   final List<dynamic>? tagInfoList;
   final double? avgPrice;
   final double? distance;
+  final DateTime? eventDate;
   final String? distanceDesc;
   final String? hotScore;
   final bool isSaved;
@@ -23,6 +24,7 @@ class Service {
     required this.latitude,
     required this.longitude,
     required this.cover,
+    this.eventDate,
     required this.isSaved,
     required this.typeId,
     required this.score,

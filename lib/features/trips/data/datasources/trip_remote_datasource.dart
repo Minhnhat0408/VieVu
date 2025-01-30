@@ -153,7 +153,6 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         final locations = e['trip_locations'] as List;
         final services = e['saved_services'] as List;
         tripItem['locations'] = <String>[];
-        log(services.toString());
         if (type == "location" && locations.isNotEmpty) {
           // check if the trip contains the location id
           final locationIndex = locations.indexWhere((element) {

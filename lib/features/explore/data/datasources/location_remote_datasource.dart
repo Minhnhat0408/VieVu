@@ -43,6 +43,10 @@ abstract interface class LocationRemoteDatasource {
     required double latitude,
     required double longitude,
   });
+
+  Future<GeoApiLocationModel> convertAddressToGeoLocation({
+    required String address,
+  });
 }
 
 class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
@@ -686,6 +690,40 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
       }
     } catch (e) {
       log("${e}hotel bug");
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<GeoApiLocationModel> convertAddressToGeoLocation({
+    required String address,
+  }) async {
+    String baseUrl = "https://api.geoapify.com/v1/geocode/search";
+    String text = address;
+    String encodedText = Uri.encodeComponent(text);
+
+    String url =
+        "$baseUrl?text=$encodedText&limit=1&filter=countrycode:vn&format=json&apiKey=${dotenv.env['GEOCONVERT_API_KEY']}";
+    final convertAddressLongLat = Uri.parse(url);
+
+    try {
+      final response = await http.get(convertAddressLongLat);
+    
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+        log(jsonResponse.toString());
+        return GeoApiLocationModel(
+            address: jsonResponse['results'][0]['formatted'],
+            cityName: jsonResponse['results'][0]['city'],
+            latitude: jsonResponse['results'][0]['lat'],
+            id: 0,
+            longitude: jsonResponse['results'][0]['lon']);
+      } else {
+        throw ServerException(response.body);
+      }
+    } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }
