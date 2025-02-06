@@ -21,3 +21,11 @@ void displayModal(
         height != null ? SizedBox(height: height, child: child) : child,
   );
 }
+
+void displayFullScreenModal(BuildContext context, Widget child) {
+  showDialog(
+    context: context,
+    useRootNavigator: true,
+    builder: (context) => Dialog.fullscreen(child: child),
+  );
+}

@@ -36,7 +36,7 @@ class _ImageCarouselPageState extends State<ImageCarouselPage> {
                   color: Colors.white,
                 ),
                 iconSize: 36,
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(0),
                 onPressed: () {
                   Navigator.of(context).pop(); // Navigate back
                 },

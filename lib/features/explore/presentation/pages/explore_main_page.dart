@@ -40,7 +40,7 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
               leading: null,
               automaticallyImplyLeading: false,
               scrolledUnderElevation: 0,
-              collapsedHeight: 70,
+              // collapsedHeight: 70,
               foregroundColor: Theme.of(context).colorScheme.surface,
               backgroundColor: Theme.of(context).colorScheme.surface,
               flexibleSpace: const ExploreAppbar(),

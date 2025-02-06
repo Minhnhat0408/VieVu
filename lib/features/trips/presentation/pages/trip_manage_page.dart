@@ -121,6 +121,12 @@ class _TripManagePageState extends State<TripManagePage> {
             final currentList = _pagingController.itemList ?? [];
 
             // Create a new list with the new item at the first position
+            //check if the trip is already in the list
+            if (currentList
+                    .indexWhere((element) => element.id == state.trip.id) !=
+                -1) {
+              currentList.removeWhere((element) => element.id == state.trip.id);
+            }
             final updatedList = [state.trip, ...currentList];
 
             // Update the PagingController's itemList

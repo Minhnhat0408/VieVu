@@ -21,12 +21,13 @@ class CustomAppbar extends StatelessWidget {
       extendBodyBehindAppBar: extendBodyBehindAppBar,
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
+
         backgroundColor: Colors.transparent,
         leading: Navigator.canPop(context)
             ? IconButton(
                 icon: const Icon(Icons.chevron_left),
-                iconSize: 36,
-                padding: const EdgeInsets.all(4),
+                iconSize: 32,
+                padding: const EdgeInsets.all(0),
                 onPressed: () {
                   Navigator.of(context).pop(); // Navigate back
                 },
@@ -37,6 +38,7 @@ class CustomAppbar extends StatelessWidget {
         centerTitle: centerTitle,
       ),
       body: body,
+      
     );
   }
 }

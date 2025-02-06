@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
@@ -22,6 +24,21 @@ class TripRepositoryImpl implements TripRepository {
       }
       await tripRemoteDatasource.deleteTrip(tripId: tripId);
       return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Trip>> getTripDetails({
+    required String tripId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final trip = await tripRemoteDatasource.getTripDetails(tripId: tripId);
+      return right(trip);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -74,30 +91,44 @@ class TripRepositoryImpl implements TripRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> updateTrip({
+  Future<Either<Failure, Trip>> updateTrip({
     required String tripId,
     String? description,
-    String? cover,
+    File? cover,
     DateTime? startDate,
     DateTime? endDate,
     int? maxMember,
     String? status,
     bool? isPublished,
+    String? name,
     List<String>? transports,
   }) async {
     try {
-      await tripRemoteDatasource.updateTrip(
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      String? imageUrl;
+      if (cover != null) {
+        imageUrl = await tripRemoteDatasource.uploadTripCover(
+          file: cover,
+          tripId: tripId,
+        );
+      }
+
+      final res = await tripRemoteDatasource.updateTrip(
         tripId: tripId,
         description: description,
-        cover: cover,
         startDate: startDate,
+        name: name,
         endDate: endDate,
+        cover: imageUrl,
+        updatedAt: DateTime.now().toIso8601String(),
         maxMember: maxMember,
         status: status,
         isPublished: isPublished,
         transports: transports,
       );
-      return right(unit);
+      return right(res);
     } on ServerException catch (e) {
       return Left(Failure(e.message));
     }

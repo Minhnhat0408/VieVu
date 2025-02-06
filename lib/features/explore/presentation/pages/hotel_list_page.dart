@@ -88,6 +88,7 @@ class _HotelListPageState extends State<HotelListPage>
       lastDate: DateTime.now().add(const Duration(days: 90)),
       initialDateRange: selectedDateRange,
       locale: const Locale('vi', 'VN'),
+      
     );
     if (picked != null && picked != selectedDateRange) {
       setState(() {

@@ -170,19 +170,13 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
             ? IconButton(
                 icon: const Icon(Icons.chevron_left),
                 iconSize: 36,
+                padding: const EdgeInsets.all(0),
                 highlightColor: Colors.transparent,
                 onPressed: () => Navigator.of(context).pop(),
               )
             : null,
         centerTitle: true,
         toolbarHeight: 90,
-        // bottom: PreferredSize(
-        //   preferredSize: const Size.fromHeight(1.0), // Thickness of the line
-        //   child: Container(
-        //     color: Theme.of(context).colorScheme.primaryContainer, // Line color
-        //     height: 1.0, // Line thickness
-        //   ),
-        // ),
         title: Hero(
           tag: 'exploreSearch',
           child: SearchBar(

@@ -52,7 +52,7 @@ import 'package:vn_travel_companion/features/trips/domain/repositories/trip_repo
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_manage_cubit.dart';
+import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
 import 'package:vn_travel_companion/features/user_preference/data/repositories/preference_repository_implementation.dart';
@@ -106,8 +106,8 @@ Future<void> initDependencies() async {
     () => ReviewsCubit(reviewRepository: serviceLocator()),
   );
 
-  serviceLocator.registerFactory(
-    () => TripManageCubit(tripRepository: serviceLocator()),
+  serviceLocator.registerLazySingleton(
+    () => TripDetailsCubit(tripRepository: serviceLocator()),
   );
 
   serviceLocator.registerLazySingleton(

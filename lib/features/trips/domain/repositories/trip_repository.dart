@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
@@ -18,10 +20,15 @@ abstract interface class TripRepository {
     required String userId,
   });
 
-  Future<Either<Failure, Unit>> updateTrip({
+  Future<Either<Failure, Trip>> getTripDetails({
+    required String tripId,
+  });
+
+  Future<Either<Failure, Trip>> updateTrip({
     required String tripId,
     String? description,
-    String? cover,
+    File? cover,
+    String? name,
     DateTime? startDate,
     DateTime? endDate,
     int? maxMember,

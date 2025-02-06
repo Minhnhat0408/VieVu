@@ -11,9 +11,29 @@ final class AddTrip extends TripEvent {
 }
 
 final class UpdateTrip extends TripEvent {
-  final Trip trip;
+  final String tripId;
+  final File? cover;
+  final String? name;
+  final String? description;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final int? maxMember;
+  final String? status;
+  final bool? isPublished;
+  final List<String>? transports;
 
-  UpdateTrip(this.trip);
+  UpdateTrip({
+    required this.tripId,
+    this.name,
+    this.description,
+    this.cover,
+    this.startDate,
+    this.endDate,
+    this.maxMember,
+    this.status,
+    this.isPublished,
+    this.transports,
+  });
 }
 
 final class DeleteTrip extends TripEvent {
