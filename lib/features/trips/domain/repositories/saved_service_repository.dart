@@ -27,4 +27,7 @@ abstract interface class SavedServiceRepository {
     required String tripId,
     int? typeId,
   });
+
+  Future<Either<Failure, List<int>>> getListSavedServiceIds(
+      {required String userId, required List<int> serviceIds});
 }

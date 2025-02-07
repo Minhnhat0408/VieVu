@@ -231,8 +231,9 @@ void _initExplore() {
     )
     ..registerFactory<AttractionRepository>(
       () => AttractionRepositoryImpl(
-        serviceLocator(),
-        serviceLocator(),
+        attractionRemoteDatasource: serviceLocator(),
+        connectionChecker: serviceLocator(),
+        savedServiceRemoteDatasource: serviceLocator(),
       ),
     )
     ..registerFactory(
@@ -251,8 +252,10 @@ void _initLocation() {
     )
     ..registerFactory<LocationRepository>(
       () => LocationRepositoryImpl(
-        serviceLocator(),
-        serviceLocator(),
+        attractionRemoteDatasource: serviceLocator(),
+        locationRemoteDatasource: serviceLocator(),
+        connectionChecker: serviceLocator(),
+        savedServiceRemoteDatasource: serviceLocator(),
       ),
     )
     ..registerFactory(

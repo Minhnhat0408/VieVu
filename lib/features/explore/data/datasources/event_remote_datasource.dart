@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/explore/data/models/event_model.dart';
@@ -41,7 +40,6 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
           final events =
               data['data']['result']['specialEvents']['events'] as List;
 
-          log(events[0].toString());
           // Fetch and enrich event details
           List<EventModel> enrichedEvents = [];
           for (var event in events) {

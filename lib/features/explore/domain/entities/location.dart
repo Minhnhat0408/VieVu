@@ -30,6 +30,8 @@ class Location {
   });
 }
 
+
+
 class GenericLocationInfo {
    List<Attraction> attractions;
    List<Hotel> hotels;

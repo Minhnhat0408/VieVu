@@ -2,15 +2,23 @@ import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
+import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/location_repository.dart';
+import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
 
 class LocationRepositoryImpl implements LocationRepository {
   final LocationRemoteDatasource locationRemoteDatasource;
+  final AttractionRemoteDatasource attractionRemoteDatasource;
+  final SavedServiceRemoteDatasource savedServiceRemoteDatasource;
   final ConnectionChecker connectionChecker;
-  const LocationRepositoryImpl(
-      this.locationRemoteDatasource, this.connectionChecker);
+  const LocationRepositoryImpl({
+    required this.locationRemoteDatasource,
+    required this.attractionRemoteDatasource,
+    required this.connectionChecker,
+    required this.savedServiceRemoteDatasource,
+  });
 
   @override
   Future<Either<Failure, Location>> getLocation({
@@ -101,13 +109,75 @@ class LocationRepositoryImpl implements LocationRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      final location = await locationRemoteDatasource.getLocationGeneralInfo(
+      final locationInfo =
+          await locationRemoteDatasource.getLocationGeneralInfo(
         locationId: locationId,
-        userId: userId,
+      );
+      final returnData = GenericLocationInfo(
+        attractions: [],
+        hotels: [],
+        restaurants: [],
+        tripbestModule: locationInfo['tripbestModule'],
+        comments: locationInfo['comments'],
+        locations: locationInfo['locations'],
+      );
+
+      final att = await attractionRemoteDatasource.getAttractionsWithFilter(
+          locationId: locationId,
+          limit: 8,
+          offset: 0,
+          sortType: "hot_score",
+          topRanked: false);
+
+      final ress = await attractionRemoteDatasource.getRestaurantsWithFilter(
+        limit: 8,
+        offset: 1,
+        locationId: locationId,
+      );
+
+      final hotel = await attractionRemoteDatasource.getHotelsWithFilter(
+        checkInDate: DateTime.now(),
+        checkOutDate: DateTime.now().add(const Duration(days: 1)),
+        roomQuantity: 1,
+        adultCount: 2,
+        childCount: 0,
+        limit: 8,
+        offset: 1,
         locationName: locationName,
       );
 
-      return right(location);
+      final listIds = [
+        ...att.map((e) => e.id),
+        ...ress.map((e) => e.id),
+        ...hotel.map((e) => e.id),
+      ];
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: listIds,
+      );
+
+      returnData.attractions = att.map((e) {
+        if (linkIds.contains(e.id)) {
+          return e.copyWith(isSaved: true);
+        }
+        return e;
+      }).toList();
+
+      returnData.restaurants = ress.map((e) {
+        if (linkIds.contains(e.id)) {
+          return e.copyWith(isSaved: true);
+        }
+        return e;
+      }).toList();
+
+      returnData.hotels = hotel.map((e) {
+        if (linkIds.contains(e.id)) {
+          return e.copyWith(isSaved: true);
+        }
+        return e;
+      }).toList();
+
+      return right(returnData);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

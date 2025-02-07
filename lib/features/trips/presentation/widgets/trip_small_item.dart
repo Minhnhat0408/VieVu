@@ -2,7 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:vn_travel_companion/core/utils/calculate_distance.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
@@ -131,9 +133,9 @@ class TripSmallItem extends StatelessWidget {
                       ],
                     ),
                   if (trip.startDate != null && trip.endDate != null)
-                    const Row(
+                    Row(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                           width: 20,
                           child: Icon(
@@ -141,9 +143,9 @@ class TripSmallItem extends StatelessWidget {
                             size: 18,
                           ),
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
-                          '10/10/2021 - 20/10/2021',
+                          '${DateFormat('dd/MM/yyyy').format(trip.startDate!)} - ${DateFormat('dd/MM/yyyy').format(trip.endDate!)}',
                         ),
                       ],
                     ),

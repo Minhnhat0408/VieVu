@@ -79,19 +79,20 @@ class _TripDetailPageState extends State<TripDetailPage> {
                               : null,
                           actions: [
                             IconButton(
-                              icon: const Icon(Icons.message),
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(
-                                    Theme.of(context).colorScheme.surface),
+                              icon: Icon(
+                                trip != null && trip!.isPublished
+                                    ? Icons.public
+                                    : Icons.lock,
+                                color: Colors.black,
                               ),
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const TripSettingsPage(),
-                                  ),
-                                );
-                              },
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(trip !=
+                                            null &&
+                                        trip!.isPublished
+                                    ? const Color.fromARGB(255, 91, 218, 95)
+                                    : const Color.fromARGB(255, 255, 138, 130)),
+                              ),
+                              onPressed: () {},
                             ),
                             IconButton(
                               icon: const Icon(Icons.settings),

@@ -98,4 +98,22 @@ class SavedServiceRepositoryImpl implements SavedServiceRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, List<int>>> getListSavedServiceIds(
+      {required String userId, required List<int> serviceIds}) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final savedServiceIds =
+          await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: serviceIds,
+      );
+      return right(savedServiceIds);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

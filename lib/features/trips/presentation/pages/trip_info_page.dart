@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:vn_travel_companion/core/constants/transport_options.dart';
+import 'package:vn_travel_companion/core/utils/calculate_distance.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 
 class TripInfoPage extends StatelessWidget {
@@ -18,11 +21,22 @@ class TripInfoPage extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold),
             ),
-            subtitle: const Padding(
-              padding: EdgeInsets.only(top: 2.0),
-              child: Text(
-                '10/10/2021 - 20/10/2021 (10 ngày)',
-              ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: trip.startDate != null
+                  ? Row(
+                      children: [
+                        Icon(
+                          Icons.date_range,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          "${DateFormat('dd/MM/yyyy').format(trip.startDate!)} - ${DateFormat('dd/MM/yyyy').format(trip.endDate!)} (${calculateDaysBetween(trip.startDate!, trip.endDate!)} ngày)",
+                        ),
+                      ],
+                    )
+                  : const Text('Chưa có thời gian'),
             ),
           ),
           ListTile(
@@ -33,8 +47,28 @@ class TripInfoPage extends StatelessWidget {
                   fontWeight: FontWeight.bold),
             ),
             subtitle: Padding(
-              padding: const EdgeInsets.only(top: 2.0),
-              child: Text(trip.description ?? 'Chưa có mô'),
+              padding: const EdgeInsets.only(top: 4.0),
+              child: trip.description != null
+                  ? RichText(
+                      textAlign: TextAlign.justify,
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        children: [
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: Icon(
+                              Icons.format_quote_outlined,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          const WidgetSpan(child: SizedBox(width: 6)),
+                          TextSpan(
+                            text: trip.description!,
+                          ),
+                        ],
+                      ),
+                    )
+                  : const Text('Chưa có mô tả'),
             ),
           ),
           ListTile(
@@ -45,33 +79,22 @@ class TripInfoPage extends StatelessWidget {
                   fontWeight: FontWeight.bold),
             ),
             subtitle: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                children: [
-                  Badge(
-                    label: const Icon(
-                      Icons.flight,
-                      size: 20,
-                    ),
-                    alignment: Alignment.center,
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                    padding: const EdgeInsets.all(5),
-                  ),
-                  const SizedBox(width: 4),
-                  Badge(
-                    label: const Icon(
-                      Icons.train,
-                      size: 20,
-                    ),
-                    alignment: Alignment.center,
-                    backgroundColor:
-                        Theme.of(context).colorScheme.tertiaryContainer,
-                    padding: const EdgeInsets.all(5),
-                  ),
-                ],
-              ),
-            ),
+                padding: const EdgeInsets.only(top: 4.0),
+                child: trip.transports != null
+                    ? Wrap(
+                        spacing: 8.0, // Space between badges
+                        children: trip.transports!.map((transport) {
+                          final option = transportOptions.firstWhere(
+                            (element) => element.value == transport,
+                          );
+
+                          return Tooltip(
+                            message: option.label, // Show label in tooltip
+                            child: option.badge,
+                          );
+                        }).toList(),
+                      )
+                    : const Text('Chưa có phương tiện')),
           ),
           ListTile(
             title: Text(
@@ -81,7 +104,7 @@ class TripInfoPage extends StatelessWidget {
                   fontWeight: FontWeight.bold),
             ),
             subtitle: Padding(
-              padding: const EdgeInsets.only(top: 2.0),
+              padding: const EdgeInsets.only(top: 4.0),
               child: Text(trip.maxMember != null
                   ? '0/${trip.maxMember} thành viên'
                   : 'Chưa có thành viên'),
@@ -118,6 +141,29 @@ class TripInfoPage extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
+              ),
+            ),
+          ),
+          ListTile(
+            title: Text(
+              'Ngày tạo',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.av_timer_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    DateFormat('dd/MM/yyyy').format(trip.createdAt),
+                  ),
+                ],
               ),
             ),
           ),

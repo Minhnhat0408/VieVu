@@ -18,11 +18,12 @@ final transportOptions = [
     value: 'plane',
     badge: const Badge(
       label: Icon(
+        color: Colors.black,
         Icons.flight,
         size: 20,
       ),
       alignment: Alignment.center,
-      backgroundColor: Colors.blueAccent,
+      backgroundColor: Color.fromARGB(255, 112, 165, 255),
       padding: EdgeInsets.all(5),
     ),
   ),
@@ -31,11 +32,12 @@ final transportOptions = [
     value: 'train',
     badge: const Badge(
       label: Icon(
+        color: Colors.black,
         Icons.train,
         size: 20,
       ),
       alignment: Alignment.center,
-      backgroundColor: Colors.amberAccent,
+      backgroundColor: Color.fromARGB(255, 255, 229, 133),
       padding: EdgeInsets.all(5),
     ),
   ),
@@ -44,11 +46,12 @@ final transportOptions = [
     value: 'boat',
     badge: const Badge(
       label: Icon(
+        color: Colors.black,
         Icons.sailing,
         size: 20,
       ),
       alignment: Alignment.center,
-      backgroundColor: Colors.amberAccent,
+      backgroundColor: Color.fromARGB(255, 120, 255, 210),
       padding: EdgeInsets.all(5),
     ),
   ),
@@ -57,11 +60,12 @@ final transportOptions = [
     value: 'car',
     badge: const Badge(
       label: Icon(
+        color: Colors.black,
         Icons.directions_car,
         size: 20,
       ),
       alignment: Alignment.center,
-      backgroundColor: Colors.redAccent,
+      backgroundColor: Color.fromARGB(255, 255, 138, 138),
       padding: EdgeInsets.all(5),
     ),
   ),
@@ -70,11 +74,12 @@ final transportOptions = [
     value: 'motorbike',
     badge: const Badge(
       label: Icon(
+        color: Colors.black,
         Icons.motorcycle,
         size: 20,
       ),
       alignment: Alignment.center,
-      backgroundColor: Colors.limeAccent,
+      backgroundColor: Color.fromARGB(255, 216, 255, 133),
       padding: EdgeInsets.all(5),
     ),
   ),
@@ -83,11 +88,12 @@ final transportOptions = [
     value: 'walk',
     badge: const Badge(
       label: Icon(
+        color: Colors.black,
         Icons.directions_walk,
         size: 20,
       ),
       alignment: Alignment.center,
-      backgroundColor: Colors.tealAccent,
+      backgroundColor: Color.fromARGB(255, 255, 167, 221),
       padding: EdgeInsets.all(5),
     ),
   ),

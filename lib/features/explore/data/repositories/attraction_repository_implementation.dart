@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
@@ -8,12 +10,16 @@ import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart'
 import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
+import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
 
 class AttractionRepositoryImpl implements AttractionRepository {
   final AttractionRemoteDatasource attractionRemoteDatasource;
+  final SavedServiceRemoteDatasource savedServiceRemoteDatasource;
   final ConnectionChecker connectionChecker;
   const AttractionRepositoryImpl(
-      this.attractionRemoteDatasource, this.connectionChecker);
+      {required this.attractionRemoteDatasource,
+      required this.savedServiceRemoteDatasource,
+      required this.connectionChecker});
   @override
   Future<Either<Failure, Attraction>> getAttraction(
       {required int attractionId}) async {
@@ -48,10 +54,18 @@ class AttractionRepositoryImpl implements AttractionRepository {
       final attractions = await attractionRemoteDatasource.getHotAttractions(
         limit: limit,
         offset: offset,
+      );
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
         userId: userId,
+        serviceIds: attractions.map((e) => e.id).toList(),
       );
 
-      return right(attractions);
+      final updatedAttractions = attractions
+          .map((element) =>
+              element.copyWith(isSaved: linkIds.contains(element.id)))
+          .toList();
+
+      return right(updatedAttractions);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -113,12 +127,21 @@ class AttractionRepositoryImpl implements AttractionRepository {
         latitude: latitude,
         longitude: longitude,
         limit: limit,
-        userId: userId,
         offset: offset,
         radius: radius,
       );
 
-      return right(attractions);
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: attractions.map((e) => e.id).toList(),
+      );
+
+      final updatedAttractions = attractions
+          .map((element) =>
+              element.copyWith(isSaved: linkIds.contains(element.id)))
+          .toList();
+
+      return right(updatedAttractions);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -140,13 +163,34 @@ class AttractionRepositoryImpl implements AttractionRepository {
       final attractions = await attractionRemoteDatasource.getAllServicesNearby(
         limit: limit,
         offset: offset,
-        userId: userId,
         latitude: latitude,
         longitude: longitude,
         filterType: filterType,
       );
+      final listIds = attractions.values
+          .expand((element) => element.map((e) => e.id))
+          .toList();
 
-      return right(attractions);
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: listIds,
+      );
+      final updatedAttractions = {
+        "restaurants": attractions["restaurants"]!
+            .map((element) =>
+                element.copyWith(isSaved: linkIds.contains(element.id)))
+            .toList(),
+        "attractions": attractions["attractions"]!
+            .map((element) =>
+                element.copyWith(isSaved: linkIds.contains(element.id)))
+            .toList(),
+        "hotels": attractions["hotels"]!
+            .map((element) =>
+                element.copyWith(isSaved: linkIds.contains(element.id)))
+            .toList(),
+      };
+
+      return right(updatedAttractions);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -156,7 +200,6 @@ class AttractionRepositoryImpl implements AttractionRepository {
   Future<Either<Failure, List<Service>>> getServicesNearAttraction({
     required int attractionId,
     required String userId,
-
     int limit = 20,
     int offset = 1,
     required int serviceType,
@@ -171,12 +214,21 @@ class AttractionRepositoryImpl implements AttractionRepository {
         attractionId: attractionId,
         limit: limit,
         offset: offset,
-        userId: userId,
         serviceType: serviceType,
         filterType: filterType,
       );
 
-      return right(attractions);
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: attractions.map((e) => e.id).toList(),
+      );
+
+      final updatedAttractions = attractions
+          .map((element) =>
+              element.copyWith(isSaved: linkIds.contains(element.id)))
+          .toList();
+
+      return right(updatedAttractions);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -186,7 +238,6 @@ class AttractionRepositoryImpl implements AttractionRepository {
   Future<Either<Failure, List<Attraction>>> getRecommendedAttractions({
     required int limit,
     required String userId,
-
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -209,7 +260,6 @@ class AttractionRepositoryImpl implements AttractionRepository {
     required int attractionId,
     required int limit,
     required String userId,
-
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -219,10 +269,19 @@ class AttractionRepositoryImpl implements AttractionRepository {
           await attractionRemoteDatasource.getRelatedAttractions(
         attractionId: attractionId,
         limit: limit,
-        userId: userId,
       );
 
-      return right(attractions);
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: attractions.map((e) => e.id).toList(),
+      );
+
+      final updatedAttractions = attractions
+          .map((element) =>
+              element.copyWith(isSaved: linkIds.contains(element.id)))
+          .toList();
+
+      return right(updatedAttractions);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -235,7 +294,6 @@ class AttractionRepositoryImpl implements AttractionRepository {
     required int limit,
     required int offset,
     required String userId,
-
     int? budget,
     int? rating,
     double? lat,
@@ -254,7 +312,6 @@ class AttractionRepositoryImpl implements AttractionRepository {
         categoryId1: categoryId1,
         categoryId2: categoryId2,
         limit: limit,
-        userId: userId,
         offset: offset,
         lat: lat,
         lon: lon,
@@ -265,8 +322,17 @@ class AttractionRepositoryImpl implements AttractionRepository {
         sortType: sortType,
         topRanked: topRanked,
       );
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: attractions.map((e) => e.id).toList(),
+      );
 
-      return right(attractions);
+      final updatedAttractions = attractions
+          .map((element) =>
+              element.copyWith(isSaved: linkIds.contains(element.id)))
+          .toList();
+
+      return right(updatedAttractions);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -279,7 +345,6 @@ class AttractionRepositoryImpl implements AttractionRepository {
     List<int> openTime = const [],
     required int limit,
     required String userId,
-
     required int offset,
     int? minPrice,
     int? maxPrice,
@@ -300,13 +365,21 @@ class AttractionRepositoryImpl implements AttractionRepository {
         offset: offset,
         minPrice: minPrice,
         maxPrice: maxPrice,
-        userId: userId,
         lat: lat,
         lon: lon,
         locationId: locationId,
       );
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: restaurants.map((e) => e.id).toList(),
+      );
 
-      return right(restaurants);
+      final updatedRestaurants = restaurants
+          .map((element) =>
+              element.copyWith(isSaved: linkIds.contains(element.id)))
+          .toList();
+
+      return right(updatedRestaurants);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -319,7 +392,6 @@ class AttractionRepositoryImpl implements AttractionRepository {
     required int roomQuantity,
     required int adultCount,
     required String userId,
-
     required int childCount,
     int? star,
     required int limit,
@@ -341,13 +413,21 @@ class AttractionRepositoryImpl implements AttractionRepository {
         star: star,
         limit: limit,
         offset: offset,
-        userId: userId,
         minPrice: minPrice,
         maxPrice: maxPrice,
         locationName: locationName,
       );
+      final linkIds = await savedServiceRemoteDatasource.getListSavedServiceIds(
+        userId: userId,
+        serviceIds: hotels.map((e) => e.id).toList(),
+      );
 
-      return right(hotels);
+      final updatedHotels = hotels
+          .map((element) =>
+              element.copyWith(isSaved: linkIds.contains(element.id)))
+          .toList();
+
+      return right(updatedHotels);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

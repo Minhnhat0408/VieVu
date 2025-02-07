@@ -32,7 +32,11 @@ class TripModel extends Trip {
       cover: json['cover'],
       serviceCount: json['service_count'] ?? 0,
       description: json['description'],
-      transports: json['transports'],
+      transports: json['transports'] != null
+          ? (json['transports'] as List<dynamic>)
+              .map((v) => v.toString())
+              .toList()
+          : null,
       startDate: json['start_date'] == null
           ? null
           : DateTime.parse(json['start_date']),
