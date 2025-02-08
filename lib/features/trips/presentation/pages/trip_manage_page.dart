@@ -132,6 +132,11 @@ class _TripManagePageState extends State<TripManagePage> {
             // Update the PagingController's itemList
             _pagingController.itemList = updatedList;
           }
+
+          if (state is TripDeletedSuccess) {
+            totalRecordCount = 0;
+            _pagingController.refresh();
+          }
         },
         builder: (context, state) {
           return _haveTrip

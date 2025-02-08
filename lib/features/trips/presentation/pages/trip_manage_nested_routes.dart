@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_settings_page.dart';
 
 class TripManageNestedRoutes extends StatelessWidget {
   const TripManageNestedRoutes({super.key});
@@ -13,6 +16,15 @@ class TripManageNestedRoutes extends StatelessWidget {
         onGenerateRoute: (RouteSettings settings) {
           Widget page;
           switch (settings.name) {
+            case '/trip-detail':
+              final trip = settings.arguments;
+              page = TripDetailPage(trip: trip as Trip);
+              break;
+
+            case '/trip-settings':
+              page = const TripSettingsPage();
+              break;
+
             default:
               page = const TripManagePage();
           }

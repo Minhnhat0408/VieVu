@@ -6,6 +6,37 @@ class Validators {
     return null;
   }
 
+  static String? checkZero(String? value) {
+    if (value == '0') {
+      return '0 không hợp lệ';
+    }
+    //check if value is a number
+    if (value != null && value.isNotEmpty) {
+      if (double.tryParse(value) == null) {
+        return 'Vui lòng nhập số';
+      }
+      if (value.length > 4) {
+        return 'Vui lòng nhập số có tối đa 4 chữ số';
+      }
+    }
+
+    return null;
+  }
+
+  static String? check80Characters(String? value) {
+    if (value != null && value.length > 80) {
+      return 'Vui lòng nhập tối đa 80 ký tự';
+    }
+    return null;
+  }
+
+  static String? check1000Characters(String? value) {
+    if (value != null && value.length > 1000) {
+      return 'Vui lòng nhập tối đa 1000 ký tự';
+    }
+    return null;
+  }
+
   static String? checkEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập email';

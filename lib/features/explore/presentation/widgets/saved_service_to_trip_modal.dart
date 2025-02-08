@@ -14,7 +14,8 @@ class SavedServiceToTripModal extends StatefulWidget {
   });
 
   @override
-  State<SavedServiceToTripModal> createState() => _SavedServiceToTripModalState();
+  State<SavedServiceToTripModal> createState() =>
+      _SavedServiceToTripModalState();
 }
 
 class _SavedServiceToTripModalState extends State<SavedServiceToTripModal> {
@@ -92,10 +93,13 @@ class _SavedServiceToTripModalState extends State<SavedServiceToTripModal> {
                                   borderRadius: BorderRadius.circular(
                                       8), // Set the border radius
                                   child: CachedNetworkImage(
-                                    imageUrl: trip.cover ?? '',
+                                    imageUrl: trip.cover ??
+                                        'assets/images/trip_placeholder.avif',
                                     errorWidget: (context, url, error) =>
                                         Image.asset(
-                                            'assets/images/trip_placeholder.png'),
+                                      'assets/images/trip_placeholder.avif', // Fallback if loading fails
+                                      fit: BoxFit.cover,
+                                    ),
                                     width: 60,
                                     height: 60,
                                     fit: BoxFit.cover,

@@ -19,6 +19,7 @@ class TripBloc extends Bloc<TripEvent, TripState> {
     on<GetCurrentUserTrips>(_onGetCurrentUserTrips);
     on<GetSavedToTrips>(_onGetSavedToTrips);
     on<UpdateTrip>(_onUpdateTrip);
+    on<DeleteTrip>(_onDeleteTrip);
   }
   void _onUpdateTrip(UpdateTrip event, Emitter<TripState> emit) async {
     emit(TripActionLoading());
@@ -38,6 +39,15 @@ class TripBloc extends Bloc<TripEvent, TripState> {
     res.fold(
       (l) => emit(TripLoadedFailure(l.message)),
       (r) => emit(TripActionSuccess(r)),
+    );
+  }
+
+  void _onDeleteTrip(DeleteTrip event, Emitter<TripState> emit) async {
+    emit(TripActionLoading());
+    final res = await _tripRepository.deleteTrip(tripId: event.id);
+    res.fold(
+      (l) => emit(TripLoadedFailure(l.message)),
+      (r) => emit(TripDeletedSuccess()),
     );
   }
 

@@ -1,15 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:timeago/timeago.dart' as timeago;
-import 'package:vn_travel_companion/core/utils/calculate_distance.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
 
 class TripSmallItem extends StatelessWidget {
   final Trip trip;
@@ -19,9 +12,10 @@ class TripSmallItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return TripDetailPage(trip: trip);
-        }));
+        Navigator.of(context).pushNamed(
+          '/trip-detail',
+          arguments: trip,
+        );
       },
       child: Card(
         clipBehavior: Clip.hardEdge,

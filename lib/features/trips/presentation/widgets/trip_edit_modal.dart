@@ -1,19 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/constants/transport_options.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/utils/image_picker.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/validators.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 
 class TripEditModal extends StatefulWidget {
   const TripEditModal({super.key});
@@ -25,6 +30,7 @@ class TripEditModal extends StatefulWidget {
 class _TripEditModalState extends State<TripEditModal> {
   final emailController = TextEditingController();
   final descriptionController = TextEditingController();
+  final maxMemberController = TextEditingController();
   final passwordController = TextEditingController();
   final nameController = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -55,9 +61,16 @@ class _TripEditModalState extends State<TripEditModal> {
   @override
   void initState() {
     super.initState();
-    final tripTmp =
+    var tripTmp =
         (context.read<TripDetailsCubit>().state as TripDetailsLoadedSuccess)
             .trip;
+    if (context.read<TripBloc>().state is TripActionSuccess) {
+      if ((context.read<TripBloc>().state as TripActionSuccess).trip.id ==
+          tripTmp.id) {
+        tripTmp = (context.read<TripBloc>().state as TripActionSuccess).trip;
+      }
+    }
+
     nameController.text = tripTmp.name;
     descriptionController.text = tripTmp.description ?? "";
     selectedDateRange = tripTmp.startDate != null
@@ -67,12 +80,14 @@ class _TripEditModalState extends State<TripEditModal> {
           )
         : null;
     if (tripTmp.transports != null) {
-      controller.setItems(items
-          .where(
-            (element) => tripTmp.transports!.contains(element.value.value),
-          )
-          .toList());
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.selectWhere(
+          (option) => tripTmp.transports!.contains(option.value.value),
+        );
+      });
     }
+    log(tripTmp.maxMember.toString());
+    maxMemberController.text = tripTmp.maxMember?.toString() ?? "";
     coverImage = tripTmp.cover ?? "";
   }
 
@@ -92,7 +107,11 @@ class _TripEditModalState extends State<TripEditModal> {
       body: BlocConsumer<TripBloc, TripState>(
         listener: (context, state) {
           if (state is TripActionSuccess) {
-            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.of(context).pop();
+          }
+
+          if (state is TripLoadedFailure) {
+            showSnackbar(context, state.message, SnackBarState.error);
           }
         },
         builder: (context, state) => Stack(children: [
@@ -105,6 +124,13 @@ class _TripEditModalState extends State<TripEditModal> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Lưu ý: Cập nhật tất cả thông tin không bắt buộc để công khai chuyến đi của bạn',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontStyle: FontStyle.italic),
+                    ),
+                    const SizedBox(height: 20),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -166,16 +192,28 @@ class _TripEditModalState extends State<TripEditModal> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Tên chuyến đi', // Label always on top
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.primary),
+                        Row(
+                          children: [
+                            Text(
+                              'Tên chuyến đi', // Label always on top
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '(*)',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.error),
+                            ),
+                          ],
                         ),
                         const SizedBox(
                             height: 8), // Space between label and input box
                         TextFormField(
                           controller: nameController,
+                          onChanged: (value) => setState(() {}),
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
@@ -183,7 +221,12 @@ class _TripEditModalState extends State<TripEditModal> {
                             ),
                             hintText: 'Hãy đặt tên cho chuyến đi của bạn',
                           ),
-                          validator: (value) => Validators.checkEmpty(value),
+                          validator: Validators.combineValidators(
+                            [
+                              Validators.checkEmpty,
+                              Validators.check80Characters,
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Align(
@@ -266,6 +309,7 @@ class _TripEditModalState extends State<TripEditModal> {
                         const SizedBox(
                             height: 8), // Space between label and input box
                         TextFormField(
+                          onChanged: (value) => setState(() {}),
                           maxLines: 5,
                           controller: descriptionController,
                           decoration: const InputDecoration(
@@ -275,6 +319,7 @@ class _TripEditModalState extends State<TripEditModal> {
                             ),
                             hintText: 'Hãy viết mô tả chuyến đi của bạn',
                           ),
+                          validator: Validators.check1000Characters,
                         ),
                         const SizedBox(height: 8),
                         Align(
@@ -289,6 +334,35 @@ class _TripEditModalState extends State<TripEditModal> {
                       ],
                     ),
                     const SizedBox(height: 4),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Số lượng thành viên', // Label always on top
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary),
+                        ),
+                        const SizedBox(
+                            height: 8), // Space between label and input box
+                        TextFormField(
+                          controller: maxMemberController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                            ),
+                            hintText: 'Nhập số lượng thành viên tối đa',
+                          ),
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: Validators.checkZero,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -385,25 +459,61 @@ class _TripEditModalState extends State<TripEditModal> {
               onPressed: () {
                 if (formKey.currentState!.validate() &&
                     state is! TripActionLoading) {
+                  // check if anything changed
+                  final tripTmp = (context.read<TripDetailsCubit>().state
+                          as TripDetailsLoadedSuccess)
+                      .trip;
+
+                  if (nameController.text == tripTmp.name &&
+                      descriptionController.text ==
+                          (tripTmp.description ?? "") &&
+                      selectedDateRange ==
+                          (tripTmp.startDate != null
+                              ? DateTimeRange(
+                                  start: tripTmp.startDate!,
+                                  end: tripTmp.endDate!,
+                                )
+                              : null) &&
+                      listEquals(
+                          controller.selectedItems
+                              .map((e) => e.value.value)
+                              .toList(),
+                          tripTmp.transports) &&
+                      image == null &&
+                      maxMemberController.text ==
+                          (tripTmp.maxMember?.toString() ?? "")) {
+                    showSnackbar(
+                        context,
+                        'Không có thay đổi nào được thực hiện',
+                        SnackBarState.warning);
+                    return;
+                  }
+                  final userId =
+                      (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                          .user
+                          .id;
                   context.read<TripBloc>().add(
                         UpdateTrip(
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text,
-                          startDate: selectedDateRange?.start,
-                          endDate: selectedDateRange?.end,
-                          transports: controller.selectedItems.isEmpty
-                              ? null
-                              : controller.selectedItems
-                                  .map((e) => e.value.value)
-                                  .toList(),
-                          cover: image,
-                          name: nameController.text,
-                          tripId: (context.read<TripDetailsCubit>().state
-                                  as TripDetailsLoadedSuccess)
-                              .trip
-                              .id,
-                        ),
+                            description:
+                                descriptionController.text.trim().isEmpty
+                                    ? null
+                                    : descriptionController.text,
+                            startDate: selectedDateRange?.start,
+                            endDate: selectedDateRange?.end,
+                            transports: controller.selectedItems.isEmpty
+                                ? null
+                                : controller.selectedItems
+                                    .map((e) => e.value.value)
+                                    .toList(),
+                            cover: image,
+                            name: nameController.text,
+                            tripId: (context.read<TripDetailsCubit>().state
+                                    as TripDetailsLoadedSuccess)
+                                .trip
+                                .id,
+                            maxMember: maxMemberController.text.isNotEmpty
+                                ? int.parse(maxMemberController.text)
+                                : null),
                       );
                 }
               },

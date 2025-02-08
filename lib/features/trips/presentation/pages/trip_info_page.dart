@@ -105,9 +105,18 @@ class TripInfoPage extends StatelessWidget {
             ),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4.0),
-              child: Text(trip.maxMember != null
-                  ? '0/${trip.maxMember} thành viên'
-                  : 'Chưa có thành viên'),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.people,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(trip.maxMember != null
+                      ? '0/${trip.maxMember} thành viên'
+                      : 'Chưa có thành viên'),
+                ],
+              ),
             ),
           ),
           ListTile(

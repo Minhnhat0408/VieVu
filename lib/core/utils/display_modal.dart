@@ -25,7 +25,6 @@ void displayModal(
 void displayFullScreenModal(BuildContext context, Widget child) {
   showDialog(
     context: context,
-    useRootNavigator: true,
     builder: (context) => Dialog.fullscreen(child: child),
   );
 }

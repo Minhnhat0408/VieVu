@@ -39,7 +39,9 @@ final class UpdateTrip extends TripEvent {
 final class DeleteTrip extends TripEvent {
   final String id;
 
-  DeleteTrip(this.id);
+  DeleteTrip({
+    required this.id,
+  });
 }
 
 final class GetCurrentUserTrips extends TripEvent {

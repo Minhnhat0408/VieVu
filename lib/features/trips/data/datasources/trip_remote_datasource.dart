@@ -335,6 +335,8 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     List<String>? transports,
   }) async {
     try {
+      // check if the user is the owner of the trip
+
       final updateData = _buildUpdateObject(
         description: description,
         cover: cover,
@@ -355,7 +357,11 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
             .update(updateData)
             .eq('id', tripId)
             .select('*, trip_locations(locations(name), is_starting_point)')
-            .single();
+            .maybeSingle(); // Prevents crash if no row is found
+
+        if (res == null) {
+          throw const ServerException('Không có quyền cập nhật chuyến đi');
+        }
 
         final tripItem = res;
         final locations = res['trip_locations'] as List;
