@@ -91,7 +91,7 @@ class TripSmallItem extends StatelessWidget {
                 children: [
                   RichText(
                     text: TextSpan(
-                      text: trip.name,
+                      text: "${trip.name} " ,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

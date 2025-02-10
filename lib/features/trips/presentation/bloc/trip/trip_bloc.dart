@@ -37,7 +37,7 @@ class TripBloc extends Bloc<TripEvent, TripState> {
     );
 
     res.fold(
-      (l) => emit(TripLoadedFailure(l.message)),
+      (l) => emit(TripActionFailure(l.message)),
       (r) => emit(TripActionSuccess(r)),
     );
   }
@@ -46,7 +46,7 @@ class TripBloc extends Bloc<TripEvent, TripState> {
     emit(TripActionLoading());
     final res = await _tripRepository.deleteTrip(tripId: event.id);
     res.fold(
-      (l) => emit(TripLoadedFailure(l.message)),
+      (l) => emit(TripActionFailure(l.message)),
       (r) => emit(TripDeletedSuccess()),
     );
   }

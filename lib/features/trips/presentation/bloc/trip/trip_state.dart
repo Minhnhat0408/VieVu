@@ -16,6 +16,12 @@ final class TripActionSuccess extends TripState {
   TripActionSuccess(this.trip);
 }
 
+final class TripActionFailure extends TripState {
+  final String message;
+
+  TripActionFailure(this.message);
+}
+
 final class SavedToTripLoadedSuccess extends TripState {
   final List<Trip> trips;
 

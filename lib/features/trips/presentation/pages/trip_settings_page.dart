@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_edit_modal.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_privacy_modal.dart';
 
 final Map<String, String> optionLists = {
   'Chỉnh sửa': 'Thay đổi các thông tin hiển thị của chuyến đi',
@@ -32,8 +34,9 @@ class TripSettingOptions {
 
 class TripSettingsPage extends StatefulWidget {
   static const String routeName = '/trip-settings';
+  final Trip? trip;
 
-  const TripSettingsPage({super.key});
+  const TripSettingsPage({super.key, required this.trip});
 
   @override
   State<TripSettingsPage> createState() => _TripSettingsPageState();
@@ -80,6 +83,12 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                           context,
                           const TripEditModal(),
                         );
+                      } else if (entry.key == 'Quyền riêng tư') {
+                        // Change privacy
+
+                        displayModal(context,
+                            TripPrivacyModal(trip: widget.trip!), null, false);
+                        // Share trip
                       }
                     },
                   ),
@@ -102,48 +111,48 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
               return Column(
                 children: [
                   ListTile(
-                    title: Text(option.title,
-                        style: TextStyle(
-                            color: option.title == 'Xóa chuyến đi'
-                                ? Colors.red
-                                : null)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                    leading: option.icon,
-                    onTap: () {
-                      // Handle each option's action
-                      if (option.title == 'Xóa chuyến đi') {
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text('Bạn có muốn xóa?'),
-                            content:
-                                const Text('Chuyến đi sẽ bị xóa vĩnh viễn'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, 'Hủy bỏ'),
-                                child: const Text('Hủy bỏ'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context, 'Xóa');
-                                  final tripId = (context
-                                          .read<TripDetailsCubit>()
-                                          .state as TripDetailsLoadedSuccess)
-                                      .trip
-                                      .id;
-                                  context
-                                      .read<TripBloc>()
-                                      .add(DeleteTrip(id: tripId));
-                                },
-                                child: const Text('Xóa'),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                      title: Text(option.title,
+                          style: TextStyle(
+                              color: option.title == 'Xóa chuyến đi'
+                                  ? Colors.red
+                                  : null)),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 20),
+                      leading: option.icon,
+                      onTap: () {
+                        // Handle each option's action
+                        if (option.title == 'Xóa chuyến đi') {
+                          showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Bạn có muốn xóa?'),
+                              content:
+                                  const Text('Chuyến đi sẽ bị xóa vĩnh viễn'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Hủy bỏ'),
+                                  child: const Text('Hủy bỏ'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, 'Xóa');
+                                    final tripId = (context
+                                            .read<TripDetailsCubit>()
+                                            .state as TripDetailsLoadedSuccess)
+                                        .trip
+                                        .id;
+                                    context
+                                        .read<TripBloc>()
+                                        .add(DeleteTrip(id: tripId));
+                                  },
+                                  child: const Text('Xóa'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      }),
                 ],
               );
             }),

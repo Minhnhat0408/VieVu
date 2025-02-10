@@ -98,8 +98,8 @@ class _MyAppState extends State<MyApp> {
                     ? ThemeMode.dark
                     : ThemeMode.light
                 : notifier.isDarkMode
-                    ? ThemeMode.dark
-                    : ThemeMode.light,
+                    ? ThemeMode.light
+                    : ThemeMode.dark,
             theme: theme.light(),
             darkTheme: theme.dark(),
             routes: routes,

@@ -349,6 +349,47 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         transports: transports,
       );
 
+      if (isPublished != null) {
+        //check if trip have all the required fields
+        final res = await supabaseClient
+            .from('trips')
+            .select('*, trip_locations(count)')
+            .eq('id', tripId)
+            .maybeSingle(); // Prevents crash if no row is found
+
+        if (res == null) {
+          throw const ServerException('Không có quyền cập nhật chuyến đi');
+        }
+        if (res['trip_locations'][0]['count'] == 0) {
+          throw const ServerException(
+              'Vui lòng thêm địa điểm cho chuyến đi trước khi công khai');
+        }
+        if (res['cover'] == null) {
+          throw const ServerException(
+              'Vui lòng thêm ảnh bìa cho chuyến đi trước  khi công khai');
+        }
+
+        if (res['description'] == null) {
+          throw const ServerException(
+              'Vui lòng thêm mô tả cho chuyến đi trước  khi công khai');
+        }
+
+        if (res['start_date'] == null || res['end_date'] == null) {
+          throw const ServerException(
+              'Vui lòng thêm thời gian cho chuyến đi trước  khi công khai');
+        }
+
+        if (res['max_member'] == null) {
+          throw const ServerException(
+              'Vui lòng thêm số lượng thành viên tối đa cho chuyến đi trước khi công khai');
+        }
+
+        if (res['transports'] == null) {
+          throw const ServerException(
+              'Vui lòng thêm phương tiện di chuyển cho chuyến đi trước  khi công khai');
+        }
+      }
+
       if (updateData.isNotEmpty) {
         // Check if there's anything to update
         updateData['updated_at'] = updatedAt;

@@ -22,7 +22,9 @@ class TripManageNestedRoutes extends StatelessWidget {
               break;
 
             case '/trip-settings':
-              page = const TripSettingsPage();
+              final trip = settings.arguments;
+
+              page = TripSettingsPage(trip: trip as Trip);
               break;
 
             default:
