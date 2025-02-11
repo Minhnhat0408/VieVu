@@ -17,3 +17,11 @@ final class SavedServiceFailure extends SavedServiceState {
     required this.message,
   });
 }
+
+final class SavedServicesLoadedSuccess extends SavedServiceState {
+  final List<SavedService> savedServices;
+
+  SavedServicesLoadedSuccess({
+    required this.savedServices,
+  });
+}

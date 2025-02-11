@@ -21,7 +21,6 @@ class CustomAppbar extends StatelessWidget {
       extendBodyBehindAppBar: extendBodyBehindAppBar,
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
-
         backgroundColor: Colors.transparent,
         leading: Navigator.canPop(context)
             ? IconButton(
@@ -38,7 +37,6 @@ class CustomAppbar extends StatelessWidget {
         centerTitle: centerTitle,
       ),
       body: body,
-      
     );
   }
 }

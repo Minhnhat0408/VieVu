@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
@@ -114,6 +115,7 @@ class TripRepositoryImpl implements TripRepository {
           tripId: tripId,
         );
       }
+      log('imageUrl: $imageUrl');
 
       final res = await tripRemoteDatasource.updateTrip(
         tripId: tripId,

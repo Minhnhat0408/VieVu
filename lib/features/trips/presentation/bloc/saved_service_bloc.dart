@@ -18,6 +18,7 @@ class SavedServiceBloc extends Bloc<SavedServiceEvent, SavedServiceState> {
 
     on<InsertSavedService>(_onInsertSavedService);
     on<DeleteSavedService>(_onDeleteSavedService);
+    on<GetSavedServices>(_onGetSavedServices);
   }
 
   void _onInsertSavedService(
@@ -42,6 +43,19 @@ class SavedServiceBloc extends Bloc<SavedServiceEvent, SavedServiceState> {
     res.fold(
       (l) => emit(SavedServiceFailure(message: l.message)),
       (r) => emit(SavedServiceActionSucess()),
+    );
+  }
+
+  void _onGetSavedServices(
+      GetSavedServices event, Emitter<SavedServiceState> emit) async {
+    emit(SavedServiceLoading());
+    final res = await _savedServiceRepository.getSavedServices(
+      tripId: event.tripId,
+      typeId: event.typeId,
+    );
+    res.fold(
+      (l) => emit(SavedServiceFailure(message: l.message)),
+      (r) => emit(SavedServicesLoadedSuccess(savedServices: r)),
     );
   }
 

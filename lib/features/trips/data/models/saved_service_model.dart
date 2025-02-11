@@ -22,22 +22,22 @@ class SavedServiceModel extends SavedService {
     return SavedServiceModel(
       id: json['id'],
       name: json['name'],
-      tripId: json['tripId'],
-      typeId: json['typeId'],
+      tripId: json['trip_id'],
+      typeId: json['type_id'],
       cover: json['cover'],
-      createdAt: json['createdAt'],
-      locationName: json['locationName'],
+      createdAt: DateTime.parse(json['created_at']),
+      locationName: json['location_name'],
       latitude: json['latitude'],
       longitude: json['longitude'],
-      rating: json['rating'],
-      hotelStar: json['hotelStar'],
-      ratingCount: json['ratingCount'],
-      externalLink: json['externalLink'],
-      tagInforList: json['tagInforList'] != null
-          ? (json['tagInforList'] as List<dynamic>)
+      rating: json['avg_rating']?.toDouble() ?? 0,
+      hotelStar: json['hotel_star'] ?? 0,
+      ratingCount: json['rating_count'] ?? 0,
+      externalLink: json['external_link'],
+      tagInforList: json['tag_info_list'] != null
+          ? (json['tag_info_list'] as List<dynamic>)
               .map((v) => v.toString())
               .toList()
-          : <String>[],
+          : null,
     );
   }
 }

@@ -150,6 +150,10 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
                                       ratingCount:
                                           state.attraction.ratingCount ?? 0,
                                       typeId: 2,
+                                      tagInfoList: state.attraction.travelTypes!
+                                          .map((e) => e['type_name'].toString())
+                                          .toList(),
+                                      
                                       latitude: state.attraction.latitude,
                                       longitude: state.attraction.longitude,
                                     ));

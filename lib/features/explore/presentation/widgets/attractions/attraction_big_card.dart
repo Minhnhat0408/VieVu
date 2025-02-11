@@ -122,8 +122,14 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
                                                     0,
                                             ratingCount:
                                                 widget.attraction.ratingCount ??
-                                                    0,
+                                                    0,  
                                             typeId: 2,
+                                            tagInfoList: widget
+                                                .attraction.travelTypes!
+                                                .map((e) => e is String
+                                                    ? e
+                                                    : e['type_name'] as String)
+                                                .toList(),
                                             latitude:
                                                 widget.attraction.latitude,
                                             longitude:

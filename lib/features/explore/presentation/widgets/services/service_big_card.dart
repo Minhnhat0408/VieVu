@@ -18,6 +18,7 @@ import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_locati
 
 class ServiceBigCard extends StatefulWidget {
   final Service service;
+
   final String type;
 
   const ServiceBigCard({required this.service, super.key, required this.type});
@@ -35,8 +36,8 @@ class _ServiceBigCardState extends State<ServiceBigCard> {
     return BlocListener<TripBloc, TripState>(
       listener: (context, state) {
         if (state is SavedToTripLoadedSuccess) {
-          currentSavedTripCount =
-              state.trips.where((trip) => trip.isSaved).length;
+          // currentSavedTripCount =
+          //     state.trips.where((trip) => trip.isSaved).length;
         }
       },
       child: InkWell(

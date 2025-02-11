@@ -64,23 +64,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
     return Scaffold(
       extendBody: true,
       body:
-          //  PageTransitionSwitcher(
-          //   // reverse: true, // uncomment to see transition in reverse
-          //   transitionBuilder: (
-          //     Widget child,
-          //     Animation<double> primaryAnimation,
-          //     Animation<double> secondaryAnimation,
-          //   ) {
-          //     return SharedAxisTransition(
-          //       animation: primaryAnimation,
-          //       secondaryAnimation: secondaryAnimation,
-          //       transitionType: SharedAxisTransitionType.horizontal,
-          //       child: child,
-          //     );
-          //   },
-          //   reverse: reversedTrans,
-          //   duration: const Duration(milliseconds: 1000),
-          //   child:
+
           IndexedStack(
         index: _selectedIndex,
         children: screens,

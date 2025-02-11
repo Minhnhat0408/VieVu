@@ -114,6 +114,7 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
 
       return response.map((e) => SavedServiceModel.fromJson(e)).toList();
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

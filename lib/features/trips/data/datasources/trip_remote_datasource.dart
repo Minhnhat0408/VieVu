@@ -145,16 +145,27 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
   }) async {
     try {
       await supabaseClient.storage.from('trip_cover_images').upload(
-            tripId,
+            "$tripId.jpg",
             file,
           );
 
       return supabaseClient.storage.from('trip_cover_images').getPublicUrl(
-            tripId,
+            "$tripId.jpg",
           );
     } on StorageException catch (e) {
       log(e.toString());
-      throw ServerException(e.message);
+      if (e.message == "The resource already exists") {
+        await supabaseClient.storage.from('trip_cover_images').update(
+              "$tripId.jpg",
+              file,
+            );
+
+        return supabaseClient.storage.from('trip_cover_images').getPublicUrl(
+              "$tripId.jpg",
+            );
+      } else {
+        throw ServerException(e.toString());
+      }
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());
@@ -184,7 +195,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         query = query.eq('is_published', isPublished);
       }
 
-      final response = await query.order('created_at', ascending: false);
+      final response = await query.order('updated_at', ascending: false);
       return response.map((e) {
         final tripItem = e;
         tripItem['service_count'] = e['service_count'][0]['count'];
@@ -289,13 +300,14 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     try {
       final res = await supabaseClient
           .from('trips')
-          .select('*, trip_locations(locations(name), is_starting_point)')
+          .select(
+              '*, trip_locations(locations(name), is_starting_point),  saved_services(count)')
           .eq('id', tripId)
           .single();
 
       final tripItem = res;
       final locations = res['trip_locations'] as List;
-
+      tripItem['service_count'] = res['saved_services'][0]['count'];
       tripItem['locations'] = <String>[];
       if (locations.isNotEmpty) {
         final startingPointIndex = locations.indexWhere((element) {

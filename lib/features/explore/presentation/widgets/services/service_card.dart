@@ -175,6 +175,16 @@ class _ServiceCardState extends State<ServiceCard> {
                                                 ratingCount:
                                                     widget.service.commentCount,
                                                 typeId: widget.service.typeId,
+                                                hotelStar: widget.service.star
+                                                    ?.toInt(),
+                                                tagInfoList: widget
+                                                    .service.tagInfoList
+                                                    ?.map((item) =>
+                                                        item is String
+                                                            ? item
+                                                            : item['tagName']
+                                                                .toString())
+                                                    .toList(),
                                                 latitude:
                                                     widget.service.latitude,
                                                 longitude:
