@@ -13,6 +13,8 @@ class SavedServiceModel extends SavedService {
     required super.rating,
     required super.ratingCount,
     super.externalLink,
+    super.price,
+    super.eventDate,
     super.hotelStar,
     required super.typeId,
     super.tagInforList,
@@ -20,7 +22,7 @@ class SavedServiceModel extends SavedService {
 
   factory SavedServiceModel.fromJson(Map<String, dynamic> json) {
     return SavedServiceModel(
-      id: json['id'],
+      id: json['link_id'],
       name: json['name'],
       tripId: json['trip_id'],
       typeId: json['type_id'],
@@ -32,6 +34,10 @@ class SavedServiceModel extends SavedService {
       rating: json['avg_rating']?.toDouble() ?? 0,
       hotelStar: json['hotel_star'] ?? 0,
       ratingCount: json['rating_count'] ?? 0,
+      eventDate: json['event_date'] != null
+          ? DateTime.parse(json['event_date'])
+          : null,
+      price: json['price'],
       externalLink: json['external_link'],
       tagInforList: json['tag_info_list'] != null
           ? (json['tag_info_list'] as List<dynamic>)

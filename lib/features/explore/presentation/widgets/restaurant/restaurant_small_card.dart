@@ -154,6 +154,12 @@ class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
                                                           .restaurant
                                                           .ratingCount,
                                                       typeId: 1,
+                                                      price: widget
+                                                          .restaurant.price,
+                                                      tagInfoList: [
+                                                        widget.restaurant
+                                                            .cuisineName
+                                                      ],
                                                       externalLink: widget
                                                           .restaurant.jumpUrl,
                                                       latitude: widget

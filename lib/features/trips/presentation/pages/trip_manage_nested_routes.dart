@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 
@@ -25,6 +26,10 @@ class TripManageNestedRoutes extends StatelessWidget {
               final trip = settings.arguments;
 
               page = TripSettingsPage(trip: trip as Trip);
+              break;
+            case '/attraction':
+              final attractionId = settings.arguments as int;
+              page = AttractionDetailPage(attractionId: attractionId);
               break;
 
             default:

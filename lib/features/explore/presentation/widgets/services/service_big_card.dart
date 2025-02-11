@@ -137,8 +137,16 @@ class _ServiceBigCardState extends State<ServiceBigCard> {
                                                   ? state.cityName
                                                   : '',
                                               rating: widget.service.score,
+                                              price: widget.service.avgPrice
+                                                  ?.toInt(),
                                               ratingCount:
                                                   widget.service.commentCount,
+                                              tagInfoList: widget
+                                                  .service.tagInfoList
+                                                  ?.map((e) => e is String
+                                                      ? e
+                                                      : e['tagName'] as String)
+                                                  .toList(),
                                               typeId: widget.service.typeId,
                                               latitude: widget.service.latitude,
                                               longitude:

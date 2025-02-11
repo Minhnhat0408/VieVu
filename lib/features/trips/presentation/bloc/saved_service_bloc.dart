@@ -36,13 +36,15 @@ class SavedServiceBloc extends Bloc<SavedServiceEvent, SavedServiceState> {
       ratingCount: event.ratingCount,
       hotelStar: event.hotelStar,
       typeId: event.typeId,
+      price: event.price,
       latitude: event.latitude,
       eventDate: event.eventDate,
       longitude: event.longitude,
     );
     res.fold(
       (l) => emit(SavedServiceFailure(message: l.message)),
-      (r) => emit(SavedServiceActionSucess()),
+      (r) =>
+          emit(SavedServiceActionSucess(tripId: event.tripId, savedService: r)),
     );
   }
 
@@ -68,7 +70,8 @@ class SavedServiceBloc extends Bloc<SavedServiceEvent, SavedServiceState> {
     );
     res.fold(
       (l) => emit(SavedServiceFailure(message: l.message)),
-      (r) => emit(SavedServiceActionSucess()),
+      (r) => emit(SavedServiceDeleteSuccess(
+          tripId: event.tripId, linkId: event.linkId)),
     );
   }
 }

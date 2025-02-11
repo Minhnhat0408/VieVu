@@ -15,7 +15,7 @@ class SavedServiceRepositoryImpl implements SavedServiceRepository {
       this.savedServiceRemoteDatasource, this.connectionChecker);
 
   @override
-  Future<Either<Failure, Unit>> insertSavedService({
+  Future<Either<Failure, SavedService>> insertSavedService({
     required String tripId,
     String? externalLink,
     required int linkId,
@@ -27,6 +27,7 @@ class SavedServiceRepositoryImpl implements SavedServiceRepository {
     required double rating,
     required int ratingCount,
     int? hotelStar,
+    int? price,
     required int typeId,
     required double latitude,
     required double longitude,
@@ -35,11 +36,12 @@ class SavedServiceRepositoryImpl implements SavedServiceRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      await savedServiceRemoteDatasource.insertSavedService(
+      final res = await savedServiceRemoteDatasource.insertSavedService(
         tripId: tripId,
         externalLink: externalLink,
         linkId: linkId,
         cover: cover,
+        price: price,
         name: name,
         locationName: locationName,
         tagInfoList: tagInfoList,
@@ -51,7 +53,7 @@ class SavedServiceRepositoryImpl implements SavedServiceRepository {
         latitude: latitude,
         longitude: longitude,
       );
-      return right(unit);
+      return right(res);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

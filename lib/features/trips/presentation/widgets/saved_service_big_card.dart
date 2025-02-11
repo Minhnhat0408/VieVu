@@ -3,8 +3,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
@@ -36,13 +38,15 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
             arguments: widget.service.id,
           );
         } else {
-          // if (widget.service.externalLink.contains('http') ||
-          //     widget.service.externalLink.contains('https')) {
-          //   openDeepLink(widget.service.externalLink);
-          // } else {
-          //   final String url = 'https://vn.trip.com${widget.service.jumpUrl}';
-          //   openDeepLink(url);
-          // }
+          if (widget.service.externalLink != null &&
+              (widget.service.externalLink!.contains('http') ||
+                  widget.service.externalLink!.contains('https'))) {
+            openDeepLink(widget.service.externalLink!);
+          } else {
+            final String url =
+                'https://vn.trip.com${widget.service.externalLink}';
+            openDeepLink(url);
+          }
         }
       },
       child: Card(
@@ -79,92 +83,92 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
                           const Icon(Icons.error),
                     ),
                   ),
-                  // BlocBuilder<LocationInfoCubit, LocationInfoState>(
-                  //   builder: (context, state) {
-                  //     return Positioned(
-                  //       top: 8,
-                  //       right: 8,
-                  //       child: IconButton(
-                  //         onPressed: () {
-                  //           final userId = (context.read<AppUserCubit>().state
-                  //                   as AppUserLoggedIn)
-                  //               .user
-                  //               .id;
-                  //           context.read<TripBloc>().add(GetSavedToTrips(
-                  //               userId: userId,
-                  //               id: widget.service.id,
-                  //               type: 'service'));
-                  //           displayModal(
-                  //               context,
-                  //               SavedToTripModal(
-                  //                 type: "service",
-                  //                 onTripsChanged: (List<Trip> selectedTrips,
-                  //                     List<Trip> unselectedTrips) {
-                  //                   setState(() {
-                  //                     changeSavedItemCount =
-                  //                         selectedTrips.length +
-                  //                             unselectedTrips.length;
-                  //                     currentSavedTripCount ??= 0;
-                  //                     currentSavedTripCount =
-                  //                         currentSavedTripCount! +
-                  //                             selectedTrips.length -
-                  //                             unselectedTrips.length;
-                  //                   });
+                  BlocBuilder<LocationInfoCubit, LocationInfoState>(
+                    builder: (context, state) {
+                      return Positioned(
+                        top: 8,
+                        right: 8,
+                        child: IconButton(
+                          onPressed: () {
+                            final userId = (context.read<AppUserCubit>().state
+                                    as AppUserLoggedIn)
+                                .user
+                                .id;
+                            context.read<TripBloc>().add(GetSavedToTrips(
+                                userId: userId,
+                                id: widget.service.id,
+                                type: 'service'));
+                            displayModal(
+                                context,
+                                SavedToTripModal(
+                                  type: "service",
+                                  onTripsChanged: (List<Trip> selectedTrips,
+                                      List<Trip> unselectedTrips) {
+                                    setState(() {
+                                      changeSavedItemCount =
+                                          selectedTrips.length +
+                                              unselectedTrips.length;
+                                      currentSavedTripCount ??= 0;
+                                      currentSavedTripCount =
+                                          currentSavedTripCount! +
+                                              selectedTrips.length -
+                                              unselectedTrips.length;
+                                    });
 
-                  //                   for (var item in selectedTrips) {
-                  //                     context
-                  //                         .read<SavedServiceBloc>()
-                  //                         .add(InsertSavedService(
-                  //                           tripId: item.id,
-                  //                           linkId: widget.service.id,
-                  //                           cover: widget.service.cover,
-                  //                           name: widget.service.name,
-                  //                           locationName: state
-                  //                                   is LocationInfoAddressLoaded
-                  //                               ? state.cityName
-                  //                               : '',
-                  //                           rating: widget.service.rating,
-                  //                           ratingCount:
-                  //                               widget.service.ratingCount,
-                  //                           typeId: widget.service.typeId,
-                  //                           latitude: widget.service.latitude,
-                  //                           longitude: widget.service.longitude,
-                  //                         ));
+                                    for (var item in selectedTrips) {
+                                      context
+                                          .read<SavedServiceBloc>()
+                                          .add(InsertSavedService(
+                                            tripId: item.id,
+                                            linkId: widget.service.id,
+                                            cover: widget.service.cover,
+                                            name: widget.service.name,
+                                            locationName: state
+                                                    is LocationInfoAddressLoaded
+                                                ? state.cityName
+                                                : '',
+                                            rating: widget.service.rating,
+                                            ratingCount:
+                                                widget.service.ratingCount,
+                                            typeId: widget.service.typeId,
+                                            latitude: widget.service.latitude,
+                                            longitude: widget.service.longitude,
+                                          ));
 
-                  //                     context
-                  //                         .read<TripLocationBloc>()
-                  //                         .add(InsertTripLocation(
-                  //                           locationId: state
-                  //                                   is LocationInfoAddressLoaded
-                  //                               ? state.locationId
-                  //                               : 0,
-                  //                           tripId: item.id,
-                  //                         ));
-                  //                   }
+                                      context
+                                          .read<TripLocationBloc>()
+                                          .add(InsertTripLocation(
+                                            locationId: state
+                                                    is LocationInfoAddressLoaded
+                                                ? state.locationId
+                                                : 0,
+                                            tripId: item.id,
+                                          ));
+                                    }
 
-                  //                   for (var item in unselectedTrips) {
-                  //                     context.read<SavedServiceBloc>().add(
-                  //                         DeleteSavedService(
-                  //                             linkId: widget.service.id,
-                  //                             tripId: item.id));
-                  //                   }
-                  //                 },
-                  //               ),
-                  //               null,
-                  //               false);
-                  //         },
-                  //         style: IconButton.styleFrom(
-                  //           backgroundColor:
-                  //               Theme.of(context).colorScheme.primaryContainer,
-                  //         ),
-                  //         icon: const Icon(
-                  //           Icons.favorite,
-                  //           color: Colors.redAccent,
-                  //         ),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
+                                    for (var item in unselectedTrips) {
+                                      context.read<SavedServiceBloc>().add(
+                                          DeleteSavedService(
+                                              linkId: widget.service.id,
+                                              tripId: item.id));
+                                    }
+                                  },
+                                ),
+                                null,
+                                false);
+                          },
+                          style: IconButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
+                          ),
+                          icon: const Icon(
+                            Icons.favorite,
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   // if (widget.service.hotScore != null)
                   //   Positioned(
                   //     bottom: 8,
@@ -276,57 +280,85 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
                     const SizedBox(height: 6),
                     // Rating
                     if (widget.service.typeId != 5)
-                      Row(
+                      Column(
                         children: [
-                          RatingBarIndicator(
-                            rating: widget.service.rating,
-                            itemSize: 20,
-                            direction: Axis.horizontal,
-                            itemCount: 5,
-                            itemBuilder: (context, _) => Icon(
-                              Icons.favorite,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                            ),
+                          Row(
+                            children: [
+                              RatingBarIndicator(
+                                rating: widget.service.rating,
+                                itemSize: 20,
+                                direction: Axis.horizontal,
+                                itemCount: 5,
+                                itemBuilder: (context, _) => Icon(
+                                  Icons.favorite,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer,
+                                ),
+                              ),
+                              Text(
+                                '(${widget.service.ratingCount})',
+                                style: Theme.of(context).textTheme.labelMedium,
+                              ),
+                            ],
                           ),
-                          Text(
-                            '(${widget.service.ratingCount})',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
+                          const SizedBox(height: 6),
                         ],
                       ),
-                    const SizedBox(height: 6),
                     // Travel Types
                     if (widget.service.tagInforList != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 2),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.primary,
+                      Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            child: Text(
+                              widget.service.tagInforList![0],
+                              maxLines: 1,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          widget.service.tagInforList![0],
-                          maxLines: 1,
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context).colorScheme.primary),
+                          const SizedBox(height: 6),
+                        ],
+                      ),
+                    // Price
+                    if (widget.service.eventDate != null)
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.calendar_today, size: 16),
+                              const SizedBox(width: 4),
+                              Text(
+                                DateFormat('dd/MM/yyyy')
+                                    .format(widget.service.eventDate!),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                        ],
+                      ),
+
+                    if (widget.service.price != null)
+                      Text(
+                        'Từ: ${NumberFormat('#,###').format(widget.service.price)} VND',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
-                    const SizedBox(height: 6),
-                    // Price
-                    // if (widget.service.avgPrice != null)
-                    //   Text(
-                    //     'Từ: ${NumberFormat('#,###').format(widget.service.avgPrice)} VND',
-                    //     style: TextStyle(
-                    //       fontSize: 16,
-                    //       fontWeight: FontWeight.bold,
-                    //       color: Theme.of(context).colorScheme.primary,
-                    //     ),
-                    //   ),
                   ],
                 ),
               ),

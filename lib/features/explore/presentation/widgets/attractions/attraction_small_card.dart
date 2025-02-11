@@ -129,6 +129,7 @@ class _AttractionSmallCardState extends State<AttractionSmallCard> {
                                                 widget.attraction.ratingCount ??
                                                     0,
                                             typeId: 2,
+                                            price: widget.attraction.price,
                                             tagInfoList: widget
                                                 .attraction.travelTypes
                                                 ?.map((e) => e is String

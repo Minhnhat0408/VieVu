@@ -36,6 +36,7 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
           currentSavedTripCount =
               state.trips.where((trip) => trip.isSaved).length;
         }
+      
       },
       child: InkWell(
         onTap: () {
@@ -122,8 +123,9 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
                                                     0,
                                             ratingCount:
                                                 widget.attraction.ratingCount ??
-                                                    0,  
+                                                    0,
                                             typeId: 2,
+                                            price: widget.attraction.price,
                                             tagInfoList: widget
                                                 .attraction.travelTypes!
                                                 .map((e) => e is String

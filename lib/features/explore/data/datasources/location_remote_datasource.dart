@@ -217,7 +217,6 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
           }
         }
 
-
         return returnData;
       } else {
         throw ServerException(response.body);
@@ -285,7 +284,6 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
-        log(jsonResponse.toString());
         return GeoApiLocationModel(
             address: jsonResponse['results'][0]['formatted'],
             cityName: jsonResponse['results'][0]['city'],

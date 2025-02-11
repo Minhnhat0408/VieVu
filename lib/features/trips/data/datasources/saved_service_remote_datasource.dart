@@ -5,12 +5,13 @@ import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/trips/data/models/saved_service_model.dart';
 
 abstract interface class SavedServiceRemoteDatasource {
-  Future insertSavedService({
+  Future<SavedServiceModel> insertSavedService({
     required String tripId,
     String? externalLink,
     required int linkId,
     required String cover,
     required String name,
+    int? price,
     required String locationName,
     DateTime? eventDate,
     List<String>? tagInfoList,
@@ -40,7 +41,7 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
   );
 
   @override
-  Future insertSavedService({
+  Future<SavedServiceModel> insertSavedService({
     required String tripId,
     String? externalLink,
     required int linkId,
@@ -50,6 +51,7 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
     List<String>? tagInfoList,
     required double rating,
     DateTime? eventDate,
+    int? price,
     required int ratingCount,
     int? hotelStar,
     required int typeId,
@@ -57,22 +59,33 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
     required double longitude,
   }) async {
     try {
-      await supabaseClient.from('saved_services').insert({
-        'trip_id': tripId,
-        'external_link': externalLink,
-        'cover': cover,
-        'name': name,
-        'location_name': locationName,
-        'tag_info_list': tagInfoList,
-        'avg_rating': rating,
-        'link_id': linkId,
-        'event_date': eventDate?.toUtc().toIso8601String(),
-        'rating_count': ratingCount,
-        'hotel_star': hotelStar,
-        'type_id': typeId,
-        'latitude': latitude,
-        'longitude': longitude,
-      });
+      final res = await supabaseClient
+          .from('saved_services')
+          .insert({
+            'trip_id': tripId,
+            'external_link': externalLink,
+            'cover': cover,
+            'name': name,
+            'location_name': locationName,
+            'tag_info_list': tagInfoList,
+            'avg_rating': rating,
+            'link_id': linkId,
+            'price': price,
+            'event_date': eventDate?.toUtc().toIso8601String(),
+            'rating_count': ratingCount,
+            'hotel_star': hotelStar,
+            'type_id': typeId,
+            'latitude': latitude,
+            'longitude': longitude,
+          })
+          .select("*")
+          .maybeSingle();
+
+      if (res == null) {
+        throw const ServerException('Failed to insert saved service');
+      }
+
+      return SavedServiceModel.fromJson(res);
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());

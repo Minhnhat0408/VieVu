@@ -177,6 +177,8 @@ class _ServiceCardState extends State<ServiceCard> {
                                                 typeId: widget.service.typeId,
                                                 hotelStar: widget.service.star
                                                     ?.toInt(),
+                                                price: widget.service.avgPrice
+                                                    ?.toInt(),
                                                 tagInfoList: widget
                                                     .service.tagInfoList
                                                     ?.map((item) =>

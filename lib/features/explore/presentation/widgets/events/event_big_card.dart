@@ -151,6 +151,9 @@ class _EventBigCardState extends State<EventBigCard> {
                                             rating: 0,
                                             ratingCount: 0,
                                             typeId: 5,
+                                            price: widget.event.price == 0
+                                                ? null
+                                                : widget.event.price,
                                             latitude: latitude ??
                                                 0, // Use fetched latitude
                                             longitude: longitude ??

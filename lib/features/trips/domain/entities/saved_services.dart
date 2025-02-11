@@ -8,9 +8,11 @@ class SavedService {
   final String cover;
   final String name;
   final int typeId;
+  final DateTime? eventDate;
   final String locationName;
   final List<String>? tagInforList;
   final double rating;
+  final int? price;
   final int? hotelStar;
   final int ratingCount;
 
@@ -22,6 +24,8 @@ class SavedService {
     required this.tripId,
     this.hotelStar,
     this.externalLink,
+    this.eventDate,
+    this.price,
     required this.cover,
     required this.name,
     required this.locationName,
@@ -30,6 +34,6 @@ class SavedService {
     required this.latitude,
     required this.longitude,
     required this.ratingCount,
-  
+
   });
 }

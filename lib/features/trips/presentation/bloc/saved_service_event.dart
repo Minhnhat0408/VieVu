@@ -16,6 +16,7 @@ class InsertSavedService extends SavedServiceEvent {
   final int? hotelStar;
   final DateTime? eventDate;
   final int typeId;
+  final int? price;
   final double latitude;
   final double longitude;
 
@@ -23,6 +24,7 @@ class InsertSavedService extends SavedServiceEvent {
     required this.tripId,
     this.externalLink,
     this.eventDate,
+    this.price,
     required this.linkId,
     required this.cover,
     required this.name,

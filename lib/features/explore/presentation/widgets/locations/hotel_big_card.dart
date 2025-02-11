@@ -126,6 +126,8 @@ class _HotelBigCardState extends State<HotelBigCard> {
                                               .name,
                                           rating: widget.hotel.avgRating,
                                           ratingCount: widget.hotel.ratingCount,
+                                          hotelStar: widget.hotel.star,
+                                          price: widget.hotel.price,
                                           typeId: 3,
                                           latitude: widget.hotel.latitude,
                                           longitude: widget.hotel.longitude,

@@ -137,6 +137,14 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                                                       .attraction.ratingCount ??
                                                   0,
                                               typeId: 2,
+                                              price: widget.attraction.price,
+                                              tagInfoList: widget
+                                                  .attraction.travelTypes
+                                                  ?.map((e) => e is String
+                                                      ? e
+                                                      : e['type_name']
+                                                          .toString())
+                                                  .toList(),
                                               latitude:
                                                   widget.attraction.latitude,
                                               longitude:

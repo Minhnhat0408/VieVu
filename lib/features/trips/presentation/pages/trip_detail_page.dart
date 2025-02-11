@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:circular_menu/circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
@@ -14,6 +15,7 @@ import 'package:vn_travel_companion/features/trips/presentation/pages/trip_setti
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_todo_list_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_detail_appbar.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class TripDetailPage extends StatefulWidget {
   static const String routeName = '/trip-detail';
@@ -75,7 +77,10 @@ class _TripDetailPageState extends State<TripDetailPage> {
                         ],
                     body: TabBarView(children: [
                       TripInfoPage(trip: trip!),
-                      TripSavedServicesPage(trip: trip!),
+                      BlocProvider(
+                        create: (context) => serviceLocator<LocationInfoCubit>(),
+                        child: TripSavedServicesPage(trip: trip!),
+                      ),
                       const TripItineraryPage(),
                       const TripTodoListPage(),
                     ])),

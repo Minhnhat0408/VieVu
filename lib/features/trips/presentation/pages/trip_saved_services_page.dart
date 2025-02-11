@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service_big_card.dart';
@@ -25,24 +26,7 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
   ];
 
   final List<bool> _expanded = List.generate(6, (index) => false);
-
-  @override
-  void initState() {
-    super.initState();
-
-    final services =
-        (context.read<SavedServiceBloc>().state as SavedServicesLoadedSuccess)
-            .savedServices;
-    // expand the panel if there is any service in that panel
-    for (int i = 0; i < 6; i++) {
-      if (services.any((item) => item.typeId == i)) {
-        setState(() {
-          _expanded[i] = true;
-        });
-      }
-    }
-  }
-
+  List<SavedService>? _savedServices;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,13 +65,44 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
           BlocConsumer<SavedServiceBloc, SavedServiceState>(
             listener: (context, state) {
               // TODO: implement listener
+              if (state is SavedServicesLoadedSuccess) {
+                for (int i = 0; i < 6; i++) {
+                  if (state.savedServices.any((item) => item.typeId == i)) {
+                    setState(() {
+                      _expanded[i] = true;
+                    });
+                  }
+                }
+
+                setState(() {
+                  _savedServices = state.savedServices;
+                });
+              }
+
+              if (state is SavedServiceActionSucess) {
+                if (state.tripId == widget.trip.id) {
+                  setState(() {
+                    _savedServices!.add(state.savedService);
+                  });
+                }
+              }
+
+              if (state is SavedServiceDeleteSuccess) {
+                if (state.tripId == widget.trip.id) {
+                  setState(() {
+                    // Remove the deleted service from the list
+                    _savedServices!
+                        .removeWhere((item) => item.id == state.linkId);
+                  });
+                }
+              }
             },
             builder: (context, state) {
               return SliverPadding(
                 padding: const EdgeInsets.only(bottom: 70.0),
                 sliver: SliverToBoxAdapter(
                   child: widget.trip.serviceCount > 0
-                      ? state is SavedServicesLoadedSuccess
+                      ? _savedServices != null
                           ? Column(
                               children: [
                                 ExpansionPanelList(
@@ -116,7 +131,7 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                                       horizontal: 20,
                                                       vertical: 10),
                                               title: Text(
-                                                  "$panel (${state.savedServices.where((item) => item.typeId == index).length})",
+                                                  "$panel (${_savedServices!.where((item) => item.typeId == index).length})",
                                                   style: const TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
@@ -129,7 +144,7 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                           body: Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 20),
-                                            child: state.savedServices
+                                            child: _savedServices!
                                                     .where((item) =>
                                                         item.typeId == index)
                                                     .isEmpty
@@ -144,10 +159,12 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                                   )
                                                 : ListView.separated(
                                                     shrinkWrap: true,
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10),
                                                     physics:
                                                         const NeverScrollableScrollPhysics(),
-                                                    itemCount: state
-                                                        .savedServices
+                                                    itemCount: _savedServices!
                                                         .where((item) =>
                                                             item.typeId ==
                                                             index)
@@ -155,10 +172,9 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                                     separatorBuilder:
                                                         (context, _) =>
                                                             const SizedBox(
-                                                                height: 12),
+                                                                height: 20),
                                                     itemBuilder: (context, i) {
-                                                      final service = state
-                                                              .savedServices
+                                                      final service = _savedServices!
                                                               .where((item) =>
                                                                   item.typeId ==
                                                                   index)

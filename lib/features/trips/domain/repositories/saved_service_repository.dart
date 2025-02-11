@@ -3,7 +3,7 @@ import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 
 abstract interface class SavedServiceRepository {
-  Future<Either<Failure, Unit>> insertSavedService({
+  Future<Either<Failure, SavedService>> insertSavedService({
     required String tripId,
     String? externalLink,
     required int linkId,
@@ -15,6 +15,7 @@ abstract interface class SavedServiceRepository {
     required double rating,
     required int ratingCount,
     int? hotelStar,
+    int? price,
     required int typeId,
     required double latitude,
     required double longitude,

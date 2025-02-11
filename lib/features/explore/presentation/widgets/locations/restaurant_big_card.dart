@@ -126,11 +126,13 @@ class _RestaurantBigCardState extends State<RestaurantBigCard> {
                                                   as LocationDetailsLoadedSuccess)
                                               .location
                                               .name,
-                                          rating:
-                                              widget.restaurant.avgRating ?? 0,
+                                          rating: widget.restaurant.avgRating,
                                           ratingCount:
-                                              widget.restaurant.ratingCount ??
-                                                  0,
+                                              widget.restaurant.ratingCount,
+                                          price: widget.restaurant.price,
+                                          tagInfoList: [
+                                            widget.restaurant.cuisineName
+                                          ],
                                           typeId: 1,
                                           latitude: widget.restaurant.latitude,
                                           longitude:

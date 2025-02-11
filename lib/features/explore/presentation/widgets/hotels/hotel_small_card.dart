@@ -138,6 +138,8 @@ class _HotelSmallCardState extends State<HotelSmallCard> {
                                                 externalLink:
                                                     widget.hotel.jumpUrl,
                                                 latitude: widget.hotel.latitude,
+                                                hotelStar: widget.hotel.star,
+                                                price: widget.hotel.price,
                                                 longitude:
                                                     widget.hotel.longitude,
                                               ));
