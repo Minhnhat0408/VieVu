@@ -62,7 +62,7 @@ class ExploreSearchResultModel extends ExploreSearchResult {
     return ExploreSearchResultModel(
       title: json['title'] ?? json['keyword'],
       address: json['address'],
-      id: json['link_id'],
+      id: json['link_id'] ?? 0,
       externalLink: json['external_link'],
       type: json['has_detail']
           ? json['link_id'] != null

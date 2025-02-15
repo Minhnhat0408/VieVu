@@ -238,6 +238,9 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
                 child: Padding(
                     padding: const EdgeInsets.only(bottom: 4.0),
                     child: FilterOptionsBig(
+                        key: _keyword.isEmpty
+                            ? const Key('searchHistory')
+                            : const Key('searchResults'),
                         options: _keyword.isEmpty
                             ? ["Tìm kiếm gần đây"]
                             : _filterOptions,

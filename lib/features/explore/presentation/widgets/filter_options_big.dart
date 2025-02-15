@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class FilterOptionsBig extends StatefulWidget {
@@ -17,19 +19,20 @@ class FilterOptionsBig extends StatefulWidget {
   });
 
   @override
-  _FilterOptionsBigState createState() => _FilterOptionsBigState();
+  State<FilterOptionsBig> createState() => _FilterOptionsBigState();
 }
 
 class _FilterOptionsBigState extends State<FilterOptionsBig> {
-  late List<String> options;
+  List<String> options = [];
   String? topItem;
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    options = List.from(widget.options); // Keep a mutable copy
-    topItem = widget.selectedOption;
+    log('FilterOptionsBig init');
+    options = List.from(widget.options);
+    topItem = widget.selectedOption.isNotEmpty ? widget.selectedOption : null;
   }
 
   void toggleSelection(String item) {
@@ -54,6 +57,13 @@ class _FilterOptionsBigState extends State<FilterOptionsBig> {
         curve: Curves.easeOut,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    options.clear();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -110,11 +120,5 @@ class _FilterOptionsBigState extends State<FilterOptionsBig> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }
