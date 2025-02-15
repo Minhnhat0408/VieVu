@@ -173,7 +173,7 @@ class MaterialTheme {
   static ColorScheme darkScheme() {
     return const ColorScheme(
       brightness: Brightness.dark,
-      primary: Color.fromARGB(255, 139, 209, 171),
+      primary: Color.fromARGB(255, 125, 187, 153),
       surfaceTint: Color.fromARGB(255, 139, 209, 162),
       onPrimary: Color.fromARGB(255, 2, 55, 33),
       primaryContainer: Color.fromARGB(255, 23, 78, 52),

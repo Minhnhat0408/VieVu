@@ -15,17 +15,19 @@ class Attraction {
   final List<dynamic>? openTimeRule;
   final String description;
   final String? phone;
-  final bool isSaved;
+  bool isSaved;
   final double? avgRating;
   final int? ratingCount;
   final List<dynamic>? travelTypes;
   final double? distance;
+  final String? externalLink;
 
-  const Attraction({
+  Attraction({
     required this.id,
     required this.name,
     this.ename,
     required this.isSaved,
+    this.externalLink,
     required this.cover,
     this.images,
     required this.hotScore,

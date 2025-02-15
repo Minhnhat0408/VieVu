@@ -99,9 +99,10 @@ class ExploreSearchItem extends StatelessWidget {
                 userId: userId,
                 title: result!.title,
                 address: result!.address,
-                externalLink: result!.id,
+                externalLink: result!.externalLink,
+                linkId: result!.id,
               ));
-          openDeepLink(result!.id);
+          openDeepLink(result!.externalLink!);
         } else if (result?.type == 'attractions') {
           context.read<SearchBloc>().add(SearchHistory(
                 cover: result!.cover,
@@ -110,21 +111,22 @@ class ExploreSearchItem extends StatelessWidget {
                 address: result!.address,
                 linkId: result!.id,
               ));
-          Navigator.pushNamed(context, '/attraction',
-              arguments: int.parse(result!.id));
+          Navigator.pushNamed(context, '/attraction', arguments: result!.id);
         } else if (result?.type == 'hotel' ||
             result?.type == 'restaurant' ||
             result?.type == 'shop') {
           // check if result.id contains http or https if not add https://vn.trip.com
-          if (result!.id.contains('http') || result!.id.contains('https')) {
-            openDeepLink(result!.id);
+          if (result!.externalLink!.contains('http') ||
+              result!.externalLink!.contains('https')) {
+            openDeepLink(result!.externalLink!);
 
             context.read<SearchBloc>().add(SearchHistory(
                   cover: result!.cover,
                   userId: userId,
                   title: result!.title,
                   address: result!.address,
-                  externalLink: result!.id,
+                  externalLink: result!.externalLink,
+                  linkId: result!.id,
                 ));
           } else {
             openDeepLink('https://vn.trip.com${result!.id}');
@@ -133,7 +135,8 @@ class ExploreSearchItem extends StatelessWidget {
                   userId: userId,
                   title: result!.title,
                   address: result!.address,
-                  externalLink: 'https://vn.trip.com${result!.id}',
+                  externalLink: 'https://vn.trip.com${result!.externalLink}',
+                  linkId: result!.id,
                 ));
           }
         } else if (result?.type == 'locations') {
@@ -142,10 +145,11 @@ class ExploreSearchItem extends StatelessWidget {
                 title: result!.title,
                 address: result!.address,
                 linkId: result!.id,
+
               ));
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => LocationDetailPage(
-              locationId: int.parse(result!.id),
+              locationId: result!.id,
               locationName: result!.title,
             ),
           ));

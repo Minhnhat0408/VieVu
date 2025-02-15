@@ -90,7 +90,7 @@ class AttractionsSection extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 390, // Height for the horizontal list
+                height: 410, // Height for the horizontal list
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: attractions.length, // Number of items

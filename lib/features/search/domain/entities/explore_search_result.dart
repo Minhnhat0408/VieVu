@@ -1,15 +1,24 @@
 class ExploreSearchResult {
   final String title;
   final String? address;
-  final String id;
+  final int id;
+  final String? externalLink;
   final String type;
+  final String? locationName;
+  final int? price;
   final String? cover;
   final int? ratingCount;
   final double? avgRating;
+
   final double? hotScore;
+  bool isSaved;
 
   ExploreSearchResult({
     required this.title,
+    this.locationName,
+    this.price,
+    this.externalLink,
+    required this.isSaved,
     this.address,
     required this.id,
     required this.type,

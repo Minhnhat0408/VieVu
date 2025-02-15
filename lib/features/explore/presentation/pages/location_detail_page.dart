@@ -209,7 +209,8 @@ class LocationDetailMainState extends State<LocationDetailMain>
               context: context,
               builder: (context) => Dialog(
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  width: 200,
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -220,9 +221,9 @@ class LocationDetailMainState extends State<LocationDetailMain>
                       ),
                       const SizedBox(height: 16),
                       RichText(
+                        textAlign: TextAlign.center,
                         text: TextSpan(
-                          text: 'Đã thay đổi',
-                          style: const TextStyle(color: Colors.black),
+                          text: 'Đã thay đổi lưu ',
                           children: [
                             TextSpan(
                               text: widget.locationName,
@@ -230,68 +231,29 @@ class LocationDetailMainState extends State<LocationDetailMain>
                                   color: Colors.green,
                                   fontWeight: FontWeight.bold),
                             ),
+                            const TextSpan(
+                              text: ' tại ',
+                            ),
                             TextSpan(
-                              text: ' tại $changeSavedItemCount chuyến đi',
-                              style: const TextStyle(color: Colors.black),
+                              text: '$changeSavedItemCount chuyến đi',
+                              style: const TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          final userId = (context.read<AppUserCubit>().state
-                                  as AppUserLoggedIn)
-                              .user
-                              .id;
-                          context.read<TripBloc>().add(GetSavedToTrips(
-                              userId: userId,
-                              id: widget.locationId,
-                              type: 'location'));
-                          displayModal(
-                              context,
-                              SavedToTripModal(
-                                type: "location",
-                                onTripsChanged: (List<Trip> selectedTrips,
-                                    List<Trip> unselectedTrips) {
-                                  setState(() {
-                                    changeSavedItemCount =
-                                        selectedTrips.length +
-                                            unselectedTrips.length;
-                                  });
-                                  for (var item in selectedTrips) {
-                                    context
-                                        .read<TripLocationBloc>()
-                                        .add(InsertTripLocation(
-                                          locationId: widget.locationId,
-                                          tripId: item.id,
-                                        ));
-                                  }
-
-                                  for (var item in unselectedTrips) {
-                                    context
-                                        .read<TripLocationBloc>()
-                                        .add(DeleteTripLocation(
-                                          locationId: widget.locationId,
-                                          tripId: item.id,
-                                        ));
-                                  }
-                                },
-                              ),
-                              null,
-                              false);
-                        },
-                        child: const Text('Thay đổi',
-                            style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                fontWeight: FontWeight.bold)),
-                      ),
                     ],
                   ),
                 ),
               ),
-            );
+            ).then((_) {
+              // Reset _dialogShown to false when dialog is dismissed
+              setState(() {
+                _dialogShown = false;
+              });
+            });
           }
         },
         child: Stack(

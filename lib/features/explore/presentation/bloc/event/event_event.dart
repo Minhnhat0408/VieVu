@@ -8,3 +8,9 @@ class GetHotEvents extends EventEvent {
 
   GetHotEvents({required this.userId});
 }
+
+class GetEventDetails extends EventEvent {
+  final int eventId;
+
+  GetEventDetails({required this.eventId});
+}

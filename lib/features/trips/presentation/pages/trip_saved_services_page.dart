@@ -2,9 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/add_saved_services_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service_big_card.dart';
 
 class TripSavedServicesPage extends StatefulWidget {
@@ -16,17 +18,39 @@ class TripSavedServicesPage extends StatefulWidget {
 }
 
 class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
-  final List<String> _panels = [
-    "Điểm đến du lịch",
-    "Đồ ăn & đồ uống",
-    "Địa điểm tham quan",
-    "Cửa hàng lưu niệm",
-    "Địa điểm lưu trú",
-    "Sự kiện & giải trí",
-  ];
+  final Map<String, int> _panels = {
+    "Địa điểm tham quan": 2,
+    "Đồ ăn & đồ uống": 1,
+    "Địa điểm lưu trú": 4,
+    "Sự kiện & giải trí": 5,
+    "Điểm đến du lịch": 0,
+  };
 
   final List<bool> _expanded = List.generate(6, (index) => false);
   List<SavedService>? _savedServices;
+  @override
+  void initState() {
+    super.initState();
+    if (context.read<SavedServiceBloc>().state is SavedServicesLoadedSuccess) {
+      loadSavedServices(context.read<SavedServiceBloc>().state);
+    }
+  }
+
+  void loadSavedServices(state) {
+    for (int i in [0, 1, 2, 4, 5]) {
+      if (state.savedServices.any((item) => item.typeId == i)) {
+        setState(() {
+          // Get the actual index
+          _expanded[i] = true;
+        });
+      }
+    }
+
+    setState(() {
+      _savedServices = state.savedServices;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,24 +63,17 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
             leading: null,
             primary: false,
             floating: true,
-            title: Text("${widget.trip.serviceCount} mục đã lưu",
+            title: Text(
+                "${_savedServices != null ? _savedServices!.length : widget.trip.serviceCount} mục đã lưu",
                 style: const TextStyle(fontSize: 16)),
             actions: [
-              ElevatedButton(onPressed: () {}, child: const Text('Thêm')),
-              const SizedBox(width: 10),
-              OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.filter_alt, size: 16),
-                      SizedBox(width: 5),
-                      Text('Lọc'),
-                    ],
-                  )),
+              ElevatedButton(
+                  onPressed: () {
+                    // showDialog
+                    displayFullScreenModal(
+                        context, AddSavedServicesPage(trip: widget.trip));
+                  },
+                  child: const Text('Thêm')),
               const SizedBox(width: 20),
             ],
             pinned: true,
@@ -65,18 +82,9 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
           BlocConsumer<SavedServiceBloc, SavedServiceState>(
             listener: (context, state) {
               // TODO: implement listener
-              if (state is SavedServicesLoadedSuccess) {
-                for (int i = 0; i < 6; i++) {
-                  if (state.savedServices.any((item) => item.typeId == i)) {
-                    setState(() {
-                      _expanded[i] = true;
-                    });
-                  }
-                }
 
-                setState(() {
-                  _savedServices = state.savedServices;
-                });
+              if (state is SavedServicesLoadedSuccess) {
+                loadSavedServices(state);
               }
 
               if (state is SavedServiceActionSucess) {
@@ -84,6 +92,13 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                   setState(() {
                     _savedServices!.add(state.savedService);
                   });
+
+                  // check if the panel is expanded
+                  if (!_expanded[state.savedService.typeId]) {
+                    setState(() {
+                      _expanded[state.savedService.typeId] = true;
+                    });
+                  }
                 }
               }
 
@@ -108,8 +123,12 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                 ExpansionPanelList(
                                     expansionCallback:
                                         (int index, bool isExpanded) {
+                                      log(index.toString());
                                       setState(() {
-                                        _expanded[index] = isExpanded;
+                                        final actualIndex =
+                                            _panels.values.toList()[
+                                                index]; // Get the actual index
+                                        _expanded[actualIndex] = isExpanded;
                                       });
                                     },
                                     expandedHeaderPadding:
@@ -117,9 +136,9 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                     animationDuration:
                                         const Duration(milliseconds: 1000),
                                     children: [
-                                      ..._panels.asMap().entries.map((entry) {
-                                        int index = entry.key;
-                                        String panel = entry
+                                      ..._panels.entries.map((entry) {
+                                        String panel = entry.key;
+                                        int index = entry
                                             .value; // Assuming _panels is a List<String>
 
                                         return ExpansionPanel(
@@ -148,13 +167,43 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                                     .where((item) =>
                                                         item.typeId == index)
                                                     .isEmpty
-                                                ? const Center(
-                                                    child: Text(
-                                                      "Không có dịch vụ nào",
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontStyle:
-                                                              FontStyle.italic),
+                                                ? Center(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 50.0,
+                                                          vertical: 28),
+                                                      child: Column(
+                                                        children: [
+                                                          Text(
+                                                            "Không có mục $panel nào được lưu",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: const TextStyle(
+                                                                fontSize: 16,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              displayFullScreenModal(
+                                                                  context,
+                                                                  AddSavedServicesPage(
+                                                                    trip: widget
+                                                                        .trip,
+                                                                    searchType:
+                                                                        index,
+                                                                  ));
+                                                            },
+                                                            child: const Text(
+                                                                'Thêm dịch vụ đầu tiên'),
+                                                          )
+                                                        ],
+                                                      ),
                                                     ),
                                                   )
                                                 : ListView.separated(
@@ -194,7 +243,10 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                               ],
                             )
                           : const Center(
-                              child: CircularProgressIndicator(),
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 80.0),
+                                child: CircularProgressIndicator(),
+                              ),
                             )
                       : Center(
                           child: Padding(

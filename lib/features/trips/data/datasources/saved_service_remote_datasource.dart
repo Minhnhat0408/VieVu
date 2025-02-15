@@ -29,6 +29,8 @@ abstract interface class SavedServiceRemoteDatasource {
     required String tripId,
     int? typeId,
   });
+    Future<List<int>> getListSavedServiceIdsForTrip(
+      {required String tripId, required List<int> serviceIds});
   Future<List<int>> getListSavedServiceIds(
       {required String userId, required List<int> serviceIds});
 }
@@ -124,10 +126,26 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
       }
 
       final response = await query.order('created_at', ascending: false);
-
       return response.map((e) => SavedServiceModel.fromJson(e)).toList();
     } catch (e) {
       log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<int>> getListSavedServiceIdsForTrip(
+      {required String tripId, required List<int> serviceIds}) async {
+    try {
+      final res2 = await supabaseClient
+          .from('saved_services')
+          .select('link_id')
+          .eq('trip_id', tripId)
+          .inFilter('link_id', serviceIds);
+      final linkIds = res2.map((service) => service['link_id']).toList();
+
+      return linkIds.cast<int>();
+    } catch (e) {
       throw ServerException(e.toString());
     }
   }

@@ -8,6 +8,10 @@ abstract class EventRemoteDatasource {
   Future<List<EventModel>> getHotEvents({
     required String userId,
   });
+
+  Future<EventModel> getEventDetails({
+    required int eventId,
+  });
 }
 
 class EventRemoteDatasourceImpl implements EventRemoteDatasource {
@@ -77,6 +81,35 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
     } catch (e) {
       log('Error fetching events: $e');
       throw Exception('Error fetching events: $e');
+    }
+  }
+
+  @override
+  Future<EventModel> getEventDetails({
+    required int eventId,
+  }) async {
+    final url =
+        Uri.parse('https://api-v2.ticketbox.vn/gin/api/v1/events/$eventId');
+    try {
+      final response = await client.get(
+          url,
+        headers: {'x-accept-language': 'vi'},
+      );
+
+      if (response.statusCode == 200) {
+        final decodedBody = utf8.decode(response.bodyBytes);
+        final data = json.decode(
+          decodedBody,
+        );
+
+        return EventModel.fromEventDetails(data['data']['result']);
+      } else {
+          throw Exception(
+              'Failed to load event details: ${response.statusCode} ${response.reasonPhrase}');
+        }
+      } catch (e) {
+        log('Error fetching event details: $e');
+      throw Exception('Error fetching event details: $e');
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/theme/theme_provider.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class SettingsPage extends StatelessWidget {
   static route() {
@@ -30,14 +31,14 @@ class SettingsPage extends StatelessWidget {
         }),
         Consumer<ThemeProvider>(builder: (context, notifier, child) {
           return IconButton(
-              onPressed: () {
-                context.read<ThemeProvider>().themeSystemOnChanged();
-              },
-              icon: Icon(
-                Icons.computer,
-                color: notifier.isSystemOn ? Colors.green : Colors.grey,
-              ),
-              );
+            onPressed: () {
+              context.read<ThemeProvider>().themeSystemOnChanged();
+            },
+            icon: Icon(
+              Icons.computer,
+              color: notifier.isSystemOn ? Colors.green : Colors.grey,
+            ),
+          );
         })
       ],
       body: Consumer<ThemeProvider>(
@@ -94,6 +95,9 @@ class SettingsPage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8)))),
                         onPressed: () {
                           context.read<AuthBloc>().add(AuthLogout());
+                          context
+                              .read<PreferencesBloc>()
+                              .add(UserPreferenceSignOut());
                         },
                         child: Text(
                           "Đăng xuất",

@@ -23,8 +23,38 @@ void displayModal(
 }
 
 void displayFullScreenModal(BuildContext context, Widget child) {
-  showDialog(
+  showGeneralDialog(
     context: context,
-    builder: (context) => Dialog.fullscreen(child: child),
+    pageBuilder: (context, animation1, animation2) {
+      return child;
+    },
+    transitionBuilder: (context, animation1, animation2, child) {
+      return ScaleTransition(
+        scale: Tween<double>(begin: 0.2, end: 1.0).animate(CurvedAnimation(
+          parent: animation1,
+          curve: const Interval(
+            0.2,
+            1.0,
+            curve: Curves.easeInOut,
+          ),
+        )),
+        child: FadeTransition(
+          opacity: Tween<double>(begin: 0.2, end: 1.0).animate(CurvedAnimation(
+            parent: animation1,
+            curve: const Interval(
+              0.2,
+              1.0,
+              curve: Curves.easeInOut,
+            ),
+          )),
+          child: Dialog.fullscreen(
+            child: child,
+          ),
+        ),
+      );
+    },
+    barrierDismissible: true,
+    barrierLabel: '',
+    transitionDuration: const Duration(milliseconds: 400),
   );
 }

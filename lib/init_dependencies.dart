@@ -275,8 +275,9 @@ void _initEvent() {
     )
     ..registerFactory<EventRepository>(
       () => EventRepositoryImpl(
-        serviceLocator(),
-        serviceLocator(),
+        eventRemoteDatasource: serviceLocator(),
+        locationRemoteDatasource: serviceLocator(),
+        connectionChecker: serviceLocator(),
       ),
     )
     ..registerLazySingleton(
@@ -296,8 +297,9 @@ void _initSearch() {
     )
     ..registerFactory<ExploreSearchRepository>(
       () => ExploreSearchRepositoryImpl(
-        serviceLocator(),
-        serviceLocator(),
+        searchRemoteDataSource: serviceLocator(),
+        savedServiceRemoteDatasource: serviceLocator(),
+        connectionChecker: serviceLocator(),
       ),
     )
     ..registerLazySingleton(

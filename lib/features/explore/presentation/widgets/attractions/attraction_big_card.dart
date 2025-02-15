@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
@@ -16,8 +19,10 @@ import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_locati
 
 class AttractionBigCard extends StatefulWidget {
   final Attraction attraction;
+  final Function? onSavedChanged;
 
-  const AttractionBigCard({required this.attraction, super.key});
+  const AttractionBigCard(
+      {required this.attraction, super.key, this.onSavedChanged});
 
   @override
   State<AttractionBigCard> createState() => _AttractionBigCardState();
@@ -26,6 +31,13 @@ class AttractionBigCard extends StatefulWidget {
 class _AttractionBigCardState extends State<AttractionBigCard> {
   int changeSavedItemCount = 0;
   int? currentSavedTripCount;
+  bool isSaved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isSaved = widget.attraction.isSaved;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +48,16 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
           currentSavedTripCount =
               state.trips.where((trip) => trip.isSaved).length;
         }
-      
       },
       child: InkWell(
         onTap: () {
           // Navigate to Attraction Details Page
-          Navigator.pushNamed(context, '/attraction',
-              arguments: widget.attraction.id);
+          if (widget.attraction.latitude != 0) {
+            Navigator.pushNamed(context, '/attraction',
+                arguments: widget.attraction.id);
+          } else if (widget.attraction.externalLink != null) {
+            openDeepLink(widget.attraction.externalLink!);
+          }
         },
         child: Card(
           elevation: 0,
@@ -106,7 +121,16 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
                                           currentSavedTripCount! +
                                               selectedTrips.length -
                                               unselectedTrips.length;
+                                      if (currentSavedTripCount! > 0) {
+                                        isSaved = true;
+                                      } else {
+                                        isSaved = false;
+                                      }
                                     });
+                                    if (widget.onSavedChanged != null) {
+                                      widget.onSavedChanged!(
+                                          currentSavedTripCount! > 0);
+                                    }
 
                                     for (var item in selectedTrips) {
                                       context
@@ -163,20 +187,8 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
                                 Theme.of(context).colorScheme.primaryContainer,
                           ),
                           icon: Icon(
-                            currentSavedTripCount != null
-                                ? currentSavedTripCount! > 0
-                                    ? Icons.favorite
-                                    : Icons.favorite_border
-                                : widget.attraction.isSaved
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                            color: currentSavedTripCount != null
-                                ? currentSavedTripCount! > 0
-                                    ? Colors.redAccent
-                                    : null
-                                : widget.attraction.isSaved
-                                    ? Colors.redAccent
-                                    : null,
+                            isSaved ? Icons.favorite : Icons.favorite_border,
+                            color: isSaved ? Colors.redAccent : null,
                           )),
                     ),
                     if (widget.attraction.rankInfo != null)

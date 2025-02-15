@@ -13,10 +13,12 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class EventBigCard extends StatefulWidget {
   final Event event;
-  const EventBigCard({super.key, required this.event});
+  final Function? onSavedChanged;
+  const EventBigCard({super.key, required this.event, this.onSavedChanged});
 
   @override
   State<EventBigCard> createState() => _EventBigCardState();
@@ -27,10 +29,13 @@ class _EventBigCardState extends State<EventBigCard> {
   int? currentSavedTripCount;
   double? latitude;
   double? longitude;
+  int? locationId;
+  bool isSaved = false;
 
   @override
   void initState() {
     super.initState();
+    isSaved = widget.event.isSaved;
   }
 
   @override
@@ -42,6 +47,7 @@ class _EventBigCardState extends State<EventBigCard> {
             log('Latitude and longitude are fetched');
             latitude = state.latitude;
             longitude = state.longitude;
+            locationId = state.locationId;
           });
         }
       },
@@ -113,7 +119,9 @@ class _EventBigCardState extends State<EventBigCard> {
                               context
                                   .read<LocationInfoCubit>()
                                   .convertAddressToGeoLocation(
-                                      widget.event.venue);
+                                    widget.event.venue,
+                                    widget.event.id,
+                                  );
                             }
 
                             displayModal(
@@ -131,10 +139,20 @@ class _EventBigCardState extends State<EventBigCard> {
                                         currentSavedTripCount! +
                                             selectedTrips.length -
                                             unselectedTrips.length;
+                                    if (currentSavedTripCount! > 0) {
+                                      isSaved = true;
+                                    } else {
+                                      isSaved = false;
+                                    }
                                   });
-
+                                  if (widget.onSavedChanged != null) {
+                                    widget.onSavedChanged!(widget.event.id,
+                                        currentSavedTripCount! > 0);
+                                  }
                                   for (var item in selectedTrips) {
-                                    if (latitude == null || longitude == null) {
+                                    if (latitude == null ||
+                                        longitude == null ||
+                                        locationId == null) {
                                       log('Latitude and longitude are null');
                                     } else {
                                       context
@@ -159,6 +177,12 @@ class _EventBigCardState extends State<EventBigCard> {
                                             longitude: longitude ??
                                                 0, // Use fetched longitude
                                           ));
+                                      context
+                                          .read<TripLocationBloc>()
+                                          .add(InsertTripLocation(
+                                            locationId: locationId!,
+                                            tripId: item.id,
+                                          ));
                                     }
                                   }
 
@@ -179,20 +203,8 @@ class _EventBigCardState extends State<EventBigCard> {
                                 Theme.of(context).colorScheme.primaryContainer,
                           ),
                           icon: Icon(
-                            currentSavedTripCount != null
-                                ? currentSavedTripCount! > 0
-                                    ? Icons.favorite
-                                    : Icons.favorite_border
-                                : widget.event.isSaved
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                            color: currentSavedTripCount != null
-                                ? currentSavedTripCount! > 0
-                                    ? Colors.redAccent
-                                    : null
-                                : widget.event.isSaved
-                                    ? Colors.redAccent
-                                    : null,
+                            isSaved ? Icons.favorite : Icons.favorite_border,
+                            color: isSaved ? Colors.redAccent : null,
                           ),
                         ),
                       ),

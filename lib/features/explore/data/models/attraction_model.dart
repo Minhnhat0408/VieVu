@@ -18,6 +18,7 @@ class AttractionModel extends Attraction {
       super.rankInfo,
       super.address,
       super.openTimeRule,
+      super.externalLink,
       required super.locationName,
       super.phone,
       super.avgRating,
@@ -68,7 +69,9 @@ class AttractionModel extends Attraction {
       images: json['images'] != null
           ? (json['images'] as List<dynamic>).map((v) => v.toString()).toList()
           : null,
-      hotScore: json['hot_score'] != null ? json['hot_score'].toDouble() : 0.0,
+      hotScore: json['hotScore'] != null
+          ? double.parse((json['hotScore'] as String).replaceAll(',', '.'))
+          : 0.0,
       price: _parseInt(json['price']),
       rankInfo: null,
       latitude: json['latitude'] != null ? json['latitude'].toDouble() : 0.0,
@@ -80,6 +83,7 @@ class AttractionModel extends Attraction {
       description: json['description']?.toString() ?? '',
       phone: json['phone'],
       avgRating: json['score'] ?? 0.0,
+      externalLink: json['jumpUrl'],
       ratingCount: _parseInt(json['commentNum']) ?? 0,
       travelTypes: json['tags'] is List
           ? json['tags']

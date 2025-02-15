@@ -4,7 +4,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
+import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
+import 'package:vn_travel_companion/features/explore/data/models/hotel_model.dart';
 import 'package:vn_travel_companion/features/explore/data/models/location_model.dart';
+import 'package:vn_travel_companion/features/explore/data/models/restaurant_model.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/comment.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/tripbest.dart';
 
@@ -170,9 +173,9 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
         "hotComment",
         "hotDistrict",
         "tripBestRank",
-        // "classicRecommendSight",
-        // "classicRecommendHotel",
-        // "classicRecommendRestaurant"
+        "classicRecommendSight",
+        "classicRecommendHotel",
+        "classicRecommendRestaurant"
       ],
       "head": {
         "syscode": "10000",
@@ -197,10 +200,16 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
           'Content-Type': 'application/json',
         },
       );
+      log(locationId.toString());
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
-        final data = jsonResponse['moduleList'] as List<dynamic>;
+        final data = jsonResponse['moduleList'] != null
+            ? jsonResponse['moduleList'] as List<dynamic>
+            : null;
         final returnData = {};
+        if (data == null) {
+          return returnData;
+        }
         for (final item in data) {
           if (item['typeName'] == 'hotComment') {
             log('hotComment');
@@ -214,6 +223,27 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
                     ['rankgingInfoTabList'] as List)
                 .map((e) => TripBest.fromJson(e))
                 .toList();
+          } else if (item['typeName'] == 'classicRecommendSight') {
+            log('classicRecommendSight');
+            returnData['attractions'] = (item['classicRecommendSightModule']
+                    ['sightList'][0]['sightList'] as List)
+                .map((e) {
+              return AttractionModel.fromGeneralLocationInfo(e);
+            }).toList();
+          } else if (item['typeName'] == 'classicRecommendHotel') {
+            log('classicRecommendHotel');
+            returnData['hotels'] = (item['classicRecommendHotelModule']
+                    ['hotelList'][0]['hotelList'] as List)
+                .map((e) => HotelModel.fromGeneralLocationInfo(e))
+                .toList();
+          } else if (item['typeName'] == 'classicRecommendRestaurant') {
+            log('classicRecommendRestaurant');
+
+            returnData['restaurants'] =
+                (item['classicRecommendRestaurantModule']['restaurantList'][0]
+                        ['restaurantList'] as List)
+                    .map((e) => RestaurantModel.fromGeneralLocationInfo(e))
+                    .toList();
           }
         }
 
@@ -243,15 +273,18 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
 
         final res = await supabaseClient
             .from('locations')
-            .select('id')
-            .eq('name', jsonResponse['results'][0]['city'])
+            .select('id, name')
+            .or(
+              'name.eq.${jsonResponse['results'][0]['city']}, ename.eq.${jsonResponse['results'][0]['city']}',
+            )
             .limit(1)
             .maybeSingle();
+        log(res.toString());
 
         if (res != null) {
           return GeoApiLocationModel(
               address: jsonResponse['results'][0]['address_line2'],
-              cityName: jsonResponse['results'][0]['city'],
+              cityName: res['name'],
               latitude: latitude,
               id: res['id'],
               longitude: longitude);
@@ -284,11 +317,22 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+        final res = await supabaseClient
+            .from('locations')
+            .select('id, name')
+            .or(
+              'name.eq.${jsonResponse['results'][0]['city']}, ename.eq.${jsonResponse['results'][0]['city']}',
+            )
+            .limit(1)
+            .maybeSingle();
+        log(res.toString());
+
         return GeoApiLocationModel(
             address: jsonResponse['results'][0]['formatted'],
-            cityName: jsonResponse['results'][0]['city'],
+            cityName:
+                res != null ? res['name'] : jsonResponse['results'][0]['city'],
             latitude: jsonResponse['results'][0]['lat'],
-            id: 0,
+            id: res != null ? res['id'] : 0,
             longitude: jsonResponse['results'][0]['lon']);
       } else {
         throw ServerException(response.body);

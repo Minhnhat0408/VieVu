@@ -38,7 +38,7 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
     );
   }
 
-  Future<void> convertAddressToGeoLocation(String address) async {
+  Future<void> convertAddressToGeoLocation(String address, int id) async {
     emit(LocationInfoLoading());
     final result = await _locationRepository.convertAddressToGeoLocation(
       address: address,
@@ -46,7 +46,10 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
     result.fold(
       (failure) => emit(LocationInfoFailure(message: failure.message)),
       (geo) => emit(LocationInfoGeoLoaded(
-          latitude: geo.latitude, longitude: geo.longitude)),
+          latitude: geo.latitude,
+          longitude: geo.longitude,
+          linkId: id,
+          locationId: geo.id)),
     );
   }
 }

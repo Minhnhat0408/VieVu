@@ -4,6 +4,7 @@ import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
+import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/location_repository.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
@@ -124,13 +125,13 @@ class LocationRepositoryImpl implements LocationRepository {
 
       final att = await attractionRemoteDatasource.getAttractionsWithFilter(
           locationId: locationId,
-          limit: 8,
+          limit: 9,
           offset: 0,
           sortType: "hot_score",
           topRanked: false);
 
       final ress = await attractionRemoteDatasource.getRestaurantsWithFilter(
-        limit: 8,
+        limit: 10,
         offset: 1,
         locationId: locationId,
       );
@@ -141,10 +142,22 @@ class LocationRepositoryImpl implements LocationRepository {
         roomQuantity: 1,
         adultCount: 2,
         childCount: 0,
-        limit: 8,
+        limit: 10,
         offset: 1,
         locationName: locationName,
       );
+      final additionalAtt =
+          locationInfo['attractions'] as List<AttractionModel>;
+      // add those additional attractions to the list  att if they are not already in the list
+      if (att.length < 8) {
+        for (var element in additionalAtt) {
+          //check by id
+          if (att.length >= 8) break;
+          if (!att.any((e) => e.id == element.id)) {
+            att.add(element);
+          }
+        }
+      }
 
       final listIds = [
         ...att.map((e) => e.id),

@@ -7,24 +7,23 @@ abstract interface class ExploreSearchRepository {
     required String searchText,
     required int limit,
     required int offset,
+    String? tripId,
     String searchType = 'all',
   });
 
   Future<Either<Failure,List<ExploreSearchResult>>> searchEvents({
     required String searchText,
     required int limit,
+    String? tripId,
     required int page,
   });
 
-  Future<Either<Failure,List<ExploreSearchResult>>> searchAll({
-    required String searchText,
-    required int limit,
-    required int offset,
-  });
+
 
   Future<Either<Failure,List<ExploreSearchResult>>> searchExternalApi({
     required String searchText,
     required int limit,
+    String? tripId,
     required int page,
     required String searchType,
   });
@@ -35,12 +34,12 @@ abstract interface class ExploreSearchRepository {
     required String userId,
     String? title,
     String? address,
-    String? linkId,
+    int? linkId,
     String? externalLink,
   });
 
   Future<Either<Failure,List<ExploreSearchResult>>> getSearchHistory({
     required String userId,
   });
-  
+
 }

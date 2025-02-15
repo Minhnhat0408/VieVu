@@ -16,30 +16,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       return emit(SearchLoading());
     });
 
-    on<SearchAll>(_onSearchAll);
     on<ExploreSearch>(_onExploreSearch);
     on<SearchHistory>(_onSearchHistory);
     on<EventsSearch>(_onEventsSearch);
     on<SearchExternalApi>(_onSearchExternalApi);
-
-  }
-
-  void _onSearchAll(SearchAll event, Emitter<SearchState> emit) async {
-    final res = await _exploreSearchRepository.searchAll(
-      searchText: event.searchText,
-      limit: event.limit,
-      offset: event.offset,
-    );
-    res.fold(
-      (l) => emit(SearchError(message: l.message)),
-      (r) => emit(SearchOverAllSuccess(results: r)),
-    );
   }
 
   void _onExploreSearch(ExploreSearch event, Emitter<SearchState> emit) async {
     final res = await _exploreSearchRepository.exploreSearch(
       searchText: event.searchText,
       limit: event.limit,
+      tripId: event.tripId,
       offset: event.offset,
       searchType: event.searchType,
     );
@@ -53,6 +40,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final res = await _exploreSearchRepository.searchEvents(
       searchText: event.searchText,
       limit: event.limit,
+      tripId: event.tripId,
       page: event.page,
     );
     res.fold(
@@ -61,10 +49,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     );
   }
 
-  void _onSearchExternalApi(SearchExternalApi event, Emitter<SearchState> emit) async {
+  void _onSearchExternalApi(
+      SearchExternalApi event, Emitter<SearchState> emit) async {
     final res = await _exploreSearchRepository.searchExternalApi(
       searchText: event.searchText,
       limit: event.limit,
+      tripId: event.tripId,
       page: event.page,
       searchType: event.searchType,
     );

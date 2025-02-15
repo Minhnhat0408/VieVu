@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
 
@@ -13,6 +14,7 @@ class HotAttractionsSection extends StatefulWidget {
 }
 
 class _HotAttractionsSectionState extends State<HotAttractionsSection> {
+  List<Attraction>? attractions;
   @override
   void initState() {
     super.initState();
@@ -43,18 +45,23 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
             if (state is AttractionFailure) {
               showSnackbar(context, state.message, 'error');
             }
+            if (state is AttractionsLoadedSuccess) {
+              setState(() {
+                attractions = state.attractions;
+              });
+            }
           },
           builder: (context, state) {
             if (state is AttractionLoading) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (state is AttractionsLoadedSuccess) {
+            if (state is AttractionsLoadedSuccess && attractions != null) {
               return SizedBox(
                 height: 400, // Height for the horizontal list
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: state.attractions.length, // Number of items
+                  itemCount: attractions!.length, // Number of items
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: EdgeInsets.only(
@@ -66,7 +73,13 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
                             : 4.0, // Extra padding for the last item
                       ),
                       child: AttractionBigCard(
-                        attraction: state.attractions[index],
+                        attraction: attractions![index],
+                        onSavedChanged: (bool saveState) {
+                          setState(() {
+                            // replace the saved status of the attraction by attraction 's id
+                            attractions![index].isSaved = saveState;
+                          });
+                        },
                       ),
                     );
                   },

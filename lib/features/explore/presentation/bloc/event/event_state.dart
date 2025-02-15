@@ -17,3 +17,9 @@ final class EventLoadedSuccess extends EventState {
 
   EventLoadedSuccess({required this.events});
 }
+
+final class EventDetailsLoadedSuccess extends EventState {
+  final Event event;
+
+  EventDetailsLoadedSuccess({required this.event});
+}

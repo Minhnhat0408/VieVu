@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/event.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/events/event_big_card.dart';
@@ -31,6 +32,7 @@ class HotEventsSectionContent extends StatefulWidget {
 }
 
 class _HotEventsSectionContentState extends State<HotEventsSectionContent> {
+  List<Event>? events;
   @override
   void initState() {
     super.initState();
@@ -63,20 +65,26 @@ class _HotEventsSectionContentState extends State<HotEventsSectionContent> {
                 ),
               );
             }
+
+            if (state is EventLoadedSuccess) {
+              setState(() {
+                events = state.events;
+              });
+            }
           },
           builder: (context, state) {
             if (state is EventLoading) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
-            } else if (state is EventLoadedSuccess) {
+            } else if (events != null) {
               return SizedBox(
                 height: 300,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: state.events.length,
+                  itemCount: events!.length,
                   itemBuilder: (context, index) {
-                    final event = state.events[index];
+                    final event = events![index];
                     return Padding(
                         padding: EdgeInsets.only(
                           left: index == 0
@@ -86,7 +94,18 @@ class _HotEventsSectionContentState extends State<HotEventsSectionContent> {
                               ? 20.0
                               : 4.0, // Extra padding for the last item
                         ),
-                        child: EventBigCard(event: event));
+                        child: EventBigCard(
+                          event: event,
+                          onSavedChanged: (int id, bool saveState) {
+                            setState(() {
+                              // replace the saved status of the attraction by attraction 's id
+                              events!
+                                  .where((element) => element.id == id)
+                                  .first
+                                  .isSaved = saveState;
+                            });
+                          },
+                        ));
                   },
                 ),
               );

@@ -18,12 +18,6 @@ abstract interface class SearchRemoteDataSource {
     required int page,
   });
 
-  Future<List<ExploreSearchResultModel>> searchAll({
-    required String searchText,
-    required int limit,
-    required int offset,
-  });
-
   Future<List<ExploreSearchResultModel>> searchExternalApi({
     required String searchText,
     required int limit,
@@ -37,7 +31,7 @@ abstract interface class SearchRemoteDataSource {
     required String userId,
     String? title,
     String? address,
-    String? linkId,
+    int? linkId,
     String? externalLink,
   });
 
@@ -55,25 +49,6 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
   );
 
   @override
-  Future<List<ExploreSearchResultModel>> searchAll({
-    required String searchText,
-    required int limit,
-    required int offset,
-  }) async {
-    try {
-      final response = await exploreSearch(
-          searchText: searchText, limit: limit, offset: offset);
-
-      final events =
-          await searchEvents(searchText: searchText, limit: limit, page: 1);
-
-      return [...response, ...events];
-    } catch (e) {
-      throw Exception(e.toString());
-    }
-  }
-
-  @override
   Future<List<ExploreSearchResultModel>> exploreSearch({
     required String searchText,
     required int limit,
@@ -89,6 +64,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
       });
       final List<Map<String, dynamic>> data =
           List<Map<String, dynamic>>.from(response);
+
       return data.map((e) => ExploreSearchResultModel.fromJson(e)).toList();
     } catch (e) {
       throw Exception(e.toString());
@@ -129,7 +105,8 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
             data.add({
               'title': event['name'],
               'address': details['data']['result']['address'],
-              'id': event['deeplink'],
+              'id': event['originalId'],
+              'external_link': event['deeplink'],
               'table_name': 'event',
               'cover': event['imageUrl'],
             });
@@ -208,13 +185,12 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
     required String userId,
     String? title,
     String? address,
-    String? linkId,
+    int? linkId,
     String? externalLink,
   }) async {
     try {
-      final compareLinkId = linkId != null
-          ? "link_id.eq.${int.parse(linkId)}"
-          : "link_id.is.null";
+      final compareLinkId =
+          linkId != null ? "link_id.eq.$linkId" : "link_id.is.null";
       final response = await supabaseClient
           .from('search_history')
           .select('id')
@@ -231,7 +207,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
           'created_at': DateTime.now().toIso8601String(),
           'address': address,
           'has_detail': cover != null,
-          'link_id': linkId != null ? int.parse(linkId) : null,
+          'link_id': linkId,
           'external_link': externalLink,
         });
       } else {
