@@ -11,8 +11,7 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/add_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_small_item.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_status_modal.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/settings/trip_status_modal.dart';
 
 class TripManagePage extends StatefulWidget {
   const TripManagePage({super.key});

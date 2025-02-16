@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +11,7 @@ import 'package:vn_travel_companion/features/explore/domain/entities/attraction.
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
@@ -43,7 +41,6 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
   Widget build(BuildContext context) {
     return BlocListener<TripBloc, TripState>(
       listener: (context, state) {
-        // TODO: implemenpt listener
         if (state is SavedToTripLoadedSuccess) {
           currentSavedTripCount =
               state.trips.where((trip) => trip.isSaved).length;

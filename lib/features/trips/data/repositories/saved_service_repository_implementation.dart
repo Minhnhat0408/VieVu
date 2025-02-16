@@ -3,7 +3,6 @@ import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/data/models/saved_service_model.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/saved_service_repository.dart';
 

@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 

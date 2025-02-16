@@ -26,9 +26,19 @@ class UpdateTripLocation extends TripLocationEvent {
 class DeleteTripLocation extends TripLocationEvent {
   final String tripId;
   final int locationId;
+  final String locationName;
 
   DeleteTripLocation({
     required this.tripId,
+    required this.locationName,
     required this.locationId,
+  });
+}
+
+class GetTripLocations extends TripLocationEvent {
+  final String tripId;
+
+  GetTripLocations({
+    required this.tripId,
   });
 }

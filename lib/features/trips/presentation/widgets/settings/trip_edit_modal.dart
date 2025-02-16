@@ -2,23 +2,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/constants/transport_options.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/utils/image_picker.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/validators.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 
 class TripEditModal extends StatefulWidget {
   const TripEditModal({super.key});
@@ -488,10 +484,7 @@ class _TripEditModalState extends State<TripEditModal> {
                         SnackBarState.warning);
                     return;
                   }
-                  final userId =
-                      (context.read<AppUserCubit>().state as AppUserLoggedIn)
-                          .user
-                          .id;
+
                   context.read<TripBloc>().add(
                         UpdateTrip(
                             description:

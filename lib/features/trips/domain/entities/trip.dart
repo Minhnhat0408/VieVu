@@ -1,5 +1,3 @@
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_location.dart';
 
 class Trip {
   final String id;

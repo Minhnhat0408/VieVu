@@ -1,6 +1,3 @@
-import 'dart:developer';
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +78,7 @@ class LocationDetailMain extends StatefulWidget {
 
 class LocationDetailMainState extends State<LocationDetailMain>
     with TickerProviderStateMixin {
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
   int activeIndex = 0;
   bool reversedTrans = false;
   bool _dialogShown = false; // Track if the dialog is already shown
@@ -130,17 +127,6 @@ class LocationDetailMainState extends State<LocationDetailMain>
     super.dispose();
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      if (_selectedIndex > index) {
-        reversedTrans = true;
-      } else {
-        reversedTrans = false;
-      }
-      _selectedIndex = index;
-    });
-  }
-
   final options = [
     "Tổng quan",
     "Địa điểm du lịch",
@@ -181,7 +167,6 @@ class LocationDetailMainState extends State<LocationDetailMain>
           ),
           BlocListener<TripBloc, TripState>(
             listener: (context, state) {
-              // TODO: implement listener
               if (state is SavedToTripLoadedSuccess) {
                 currentSavedTripCount =
                     state.trips.where((trip) => trip.isSaved).length;
@@ -200,8 +185,9 @@ class LocationDetailMainState extends State<LocationDetailMain>
       ),
       body: BlocListener<TripLocationBloc, TripLocationState>(
         listener: (context, state) {
-          // TODO: implement listener
-          if (state is TripLocationActionSucess && !_dialogShown) {
+          if ((state is TripLocationAddedSuccess ||
+                  state is TripLocationDeletedSuccess) &&
+              !_dialogShown) {
             setState(() {
               _dialogShown = true; // Mark dialog as shown
             });
@@ -507,14 +493,6 @@ class LocationDetailMainState extends State<LocationDetailMain>
     );
   }
 
-  // Widget _buildContent(BuildContext context, Location location) {
-  //   return Stack(
-  //     children: [
-  //       if (_isMapView) _buildMapView(location) else _buildDetailsView(location),
-  //     ],
-  //   );
-  // }
-
   Widget _buildMapView(Location location, LocationDetailsLoadedSuccess state) {
     return Stack(
       children: [
@@ -806,6 +784,7 @@ class LocationDetailMainState extends State<LocationDetailMain>
               context.read<TripLocationBloc>().add(DeleteTripLocation(
                     locationId: widget.locationId,
                     tripId: item.id,
+                    locationName: widget.locationName,
                   ));
             }
           },

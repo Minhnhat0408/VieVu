@@ -12,7 +12,6 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/filter
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
-import 'package:vn_travel_companion/features/search/presentation/widgets/explore_search_item.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service_small_card.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
@@ -266,7 +265,7 @@ class _AddSavedServicesPageViewState extends State<AddSavedServicesPageView> {
                       padding: const EdgeInsets.only(bottom: 4.0),
                       child: FilterOptionsBig(
                           options: _filterOptions,
-                          
+
                           selectedOption: _selectedFilter,
                           onOptionSelected: _onFilterChanged,
                           isFiltering: state is SearchLoading)),

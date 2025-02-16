@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class _TripCoverPickerState extends State<TripCoverPicker> {
         _avatarImage = File(pickedFile.path);
         widget.onAvatarSelected(_avatarImage); // Notify parent widget
       } else {
-        print('No image selected.');
+        log('No image selected.');
       }
     });
   }

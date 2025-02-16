@@ -3,6 +3,7 @@ import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_location_remote_datasource.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_location.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_location_repository.dart';
 
 class TripLocationRepositoryImpl implements TripLocationRepository {
@@ -13,7 +14,7 @@ class TripLocationRepositoryImpl implements TripLocationRepository {
       this.tripLocationRemoteDatasource, this.connectionChecker);
 
   @override
-  Future<Either<Failure, Unit>> insertTripLocation({
+  Future<Either<Failure, TripLocation>> insertTripLocation({
     required String tripId,
     required int locationId,
   }) async {
@@ -21,11 +22,11 @@ class TripLocationRepositoryImpl implements TripLocationRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      await tripLocationRemoteDatasource.insertTripLocation(
+      final res = await tripLocationRemoteDatasource.insertTripLocation(
         tripId: tripId,
         locationId: locationId,
       );
-      return right(unit);
+      return right(res);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -64,6 +65,22 @@ class TripLocationRepositoryImpl implements TripLocationRepository {
         locationId: locationId,
       );
       return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<TripLocation>>> getTripLocations({
+    required String tripId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final tripLocations =
+          await tripLocationRemoteDatasource.getTripLocations(tripId: tripId);
+      return right(tripLocations);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

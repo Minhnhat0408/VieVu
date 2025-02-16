@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_location.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_location_repository.dart';
 
 part 'trip_location_event.dart';
@@ -13,6 +14,7 @@ class TripLocationBloc extends Bloc<TripLocationEvent, TripLocationState> {
         super(TripLocationInitial()) {
     on<InsertTripLocation>(_onInsertTripLocation);
     on<DeleteTripLocation>(_onDeleteTripLocation);
+    on<GetTripLocations>(_onGetTripLocations);
   }
 
   void _onInsertTripLocation(
@@ -24,7 +26,8 @@ class TripLocationBloc extends Bloc<TripLocationEvent, TripLocationState> {
     );
     res.fold(
       (l) => emit(TripLocationFailure(message: l.message)),
-      (r) => emit(TripLocationActionSucess()),
+      (r) =>
+          emit(TripLocationAddedSuccess(tripId: event.tripId, tripLocation: r)),
     );
   }
 
@@ -37,7 +40,22 @@ class TripLocationBloc extends Bloc<TripLocationEvent, TripLocationState> {
     );
     res.fold(
       (l) => emit(TripLocationFailure(message: l.message)),
-      (r) => emit(TripLocationActionSucess()),
+      (r) => emit(TripLocationDeletedSuccess(
+          tripId: event.tripId,
+          locationId: event.locationId,
+          locationName: event.locationName)),
+    );
+  }
+
+  void _onGetTripLocations(
+      GetTripLocations event, Emitter<TripLocationState> emit) async {
+    emit(TripLocationLoading());
+    final res = await _tripLocationRepository.getTripLocations(
+      tripId: event.tripId,
+    );
+    res.fold(
+      (l) => emit(TripLocationFailure(message: l.message)),
+      (r) => emit(TripLocationsLoaded(tripLocations: r)),
     );
   }
 }

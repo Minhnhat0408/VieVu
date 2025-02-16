@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -135,7 +133,7 @@ class _RestaurantListPageState extends State<RestaurantListPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.locationName ?? "Nhà hàng"),
+        title: Text(widget.locationName),
         centerTitle: true,
       ),
       body: Stack(children: [

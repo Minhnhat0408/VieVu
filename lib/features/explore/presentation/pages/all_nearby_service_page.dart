@@ -70,10 +70,10 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
     }
   }
 
-  bool _hasLocationPermission() {
-    return locationPermission == LocationPermission.whileInUse ||
-        locationPermission == LocationPermission.always;
-  }
+  // bool _hasLocationPermission() {
+  //   return locationPermission == LocationPermission.whileInUse ||
+  //       locationPermission == LocationPermission.always;
+  // }
 
   void _animateMapTo(LatLng destination) {
     _animatedMapController.animateTo(

@@ -11,7 +11,7 @@ import 'package:vn_travel_companion/features/explore/presentation/cubit/location
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
@@ -25,8 +25,6 @@ class SavedServiceBigCard extends StatefulWidget {
 }
 
 class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
-  int? currentSavedTripCount;
-  int changeSavedItemCount = 0;
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -104,17 +102,6 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
                                   type: "service",
                                   onTripsChanged: (List<Trip> selectedTrips,
                                       List<Trip> unselectedTrips) {
-                                    setState(() {
-                                      changeSavedItemCount =
-                                          selectedTrips.length +
-                                              unselectedTrips.length;
-                                      currentSavedTripCount ??= 0;
-                                      currentSavedTripCount =
-                                          currentSavedTripCount! +
-                                              selectedTrips.length -
-                                              unselectedTrips.length;
-                                    });
-
                                     for (var item in selectedTrips) {
                                       context
                                           .read<SavedServiceBloc>()
@@ -169,49 +156,6 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
                       );
                     },
                   ),
-                  // if (widget.service.hotScore != null)
-                  //   Positioned(
-                  //     bottom: 8,
-                  //     right: 8,
-                  //     child: Container(
-                  //         padding: EdgeInsets.zero,
-                  //         decoration: BoxDecoration(
-                  //             borderRadius: BorderRadius.circular(20),
-                  //             color: Colors.white),
-                  //         clipBehavior: Clip.hardEdge,
-                  //         child: Container(
-                  //           decoration: BoxDecoration(
-                  //             color: Theme.of(context)
-                  //                 .colorScheme
-                  //                 .secondaryContainer,
-                  //             borderRadius: BorderRadius.circular(16),
-                  //           ),
-                  //           padding: const EdgeInsets.symmetric(
-                  //               horizontal: 8, vertical: 4),
-                  //           child: Row(
-                  //             crossAxisAlignment: CrossAxisAlignment.center,
-                  //             children: [
-                  //               FaIcon(
-                  //                 FontAwesomeIcons.fire,
-                  //                 size: 16,
-                  //                 color: Theme.of(context).colorScheme.primary,
-                  //               ),
-                  //               const SizedBox(width: 4),
-                  //               Text(
-                  //                 widget.service.hotScore.toString(),
-                  //                 style: Theme.of(context)
-                  //                     .textTheme
-                  //                     .labelMedium!
-                  //                     .copyWith(
-                  //                         color: Theme.of(context)
-                  //                             .colorScheme
-                  //                             .primary,
-                  //                         fontWeight: FontWeight.bold),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         )),
-                  //   ),
                   if (widget.service.typeId == 4 &&
                       widget.service.hotelStar != null)
                     Positioned(

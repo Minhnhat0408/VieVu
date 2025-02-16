@@ -3,15 +3,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
-
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 
@@ -38,32 +36,6 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
   void initState() {
     super.initState();
     isSaved = widget.result.isSaved;
-  }
-
-  Widget _getIconForType(String type) {
-    switch (type) {
-      case 'attractions':
-        return const Icon(
-          Icons.attractions,
-          size: 40,
-        );
-      case 'locations':
-        return const Icon(
-          Icons.place,
-          size: 40,
-        );
-      case 'keyword':
-        return const Icon(
-          Icons.search,
-          size: 40,
-        );
-
-      default:
-        return const FaIcon(
-          FontAwesomeIcons.locationArrow,
-          size: 40,
-        );
-    }
   }
 
   @override
@@ -194,8 +166,6 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
               .trip
               .id;
 
-          final userId =
-              (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
           if (widget.result.type == 'event') {
             // openDeepLink(widget.result.id);
             if (isSaved) {
@@ -329,11 +299,9 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AutoSizeText(
-                        widget.result == null
-                            ? 'Lân cận'
-                            : widget.result.type == 'keyword'
-                                ? '"${widget.result.title}"'
-                                : widget.result.title,
+                        widget.result.type == 'keyword'
+                            ? '"${widget.result.title}"'
+                            : widget.result.title,
                         minFontSize: 14, // Minimum font size to shrink to
                         maxLines: 2, // Allow up to 2 lines for wrapping
                         overflow: TextOverflow
@@ -388,7 +356,7 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      widget.result.hotScore.toString() ?? '0',
+                                      widget.result.hotScore.toString(),
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelMedium!

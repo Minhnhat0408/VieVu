@@ -88,7 +88,6 @@ class _ReviewsPageState extends State<ReviewsPage> {
         centerTitle: true,
         body: BlocConsumer<ReviewsCubit, ReviewsState>(
           listener: (context, state) {
-            // TODO: implement listener
             if (state is ReviewsFailure) {
               log(state.message.toString());
             }

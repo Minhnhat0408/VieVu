@@ -1,17 +1,15 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:circular_menu/circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_info_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_saved_services_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_settings_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_todo_list_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_detail_appbar.dart';
@@ -38,6 +36,9 @@ class _TripDetailPageState extends State<TripDetailPage> {
     context
         .read<SavedServiceBloc>()
         .add(GetSavedServices(tripId: widget.trip.id));
+    context
+        .read<TripLocationBloc>()
+        .add(GetTripLocations(tripId: widget.trip.id));
   }
 
   @override
@@ -58,14 +59,29 @@ class _TripDetailPageState extends State<TripDetailPage> {
             }
           },
           builder: (context, state) {
-            return BlocListener<TripBloc, TripState>(
-              listener: (context, state) {
-                if (state is TripActionSuccess) {
-                  setState(() {
-                    trip = state.trip;
-                  });
-                }
-              },
+            return MultiBlocListener(
+              listeners: [
+                BlocListener<TripBloc, TripState>(
+                  listener: (context, state) {
+                    if (state is TripActionSuccess) {
+                      setState(() {
+                        trip = state.trip;
+                      });
+                    }
+                  },
+                ),
+                BlocListener<TripLocationBloc, TripLocationState>(
+                  listener: (context, state) {
+                    // TODO: implement listener
+                    if (state is TripLocationAddedSuccess) {
+                      trip!.locations.add(state.tripLocation.location.name);
+                    }
+                    if (state is TripLocationDeletedSuccess) {
+                      trip!.locations.remove(state.locationName);
+                    }
+                  },
+                ),
+              ],
               child: Stack(children: [
                 NestedScrollView(
                     floatHeaderSlivers: false,
@@ -78,7 +94,8 @@ class _TripDetailPageState extends State<TripDetailPage> {
                     body: TabBarView(children: [
                       TripInfoPage(trip: trip!),
                       BlocProvider(
-                        create: (context) => serviceLocator<LocationInfoCubit>(),
+                        create: (context) =>
+                            serviceLocator<LocationInfoCubit>(),
                         child: TripSavedServicesPage(trip: trip!),
                       ),
                       const TripItineraryPage(),

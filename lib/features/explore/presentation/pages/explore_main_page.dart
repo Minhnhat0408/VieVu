@@ -10,7 +10,6 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/attrac
 import 'package:vn_travel_companion/features/explore/presentation/widgets/events/hot_events.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/hot_locations.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/nearby_attraction.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class ExploreMainPage extends StatefulWidget {

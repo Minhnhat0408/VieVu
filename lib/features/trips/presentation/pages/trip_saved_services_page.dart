@@ -5,9 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_location.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/add_saved_services_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service_big_card.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_location_big_card.dart';
 
 class TripSavedServicesPage extends StatefulWidget {
   final Trip trip;
@@ -23,16 +26,28 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
     "Đồ ăn & đồ uống": 1,
     "Địa điểm lưu trú": 4,
     "Sự kiện & giải trí": 5,
-    "Điểm đến du lịch": 0,
   };
 
   final List<bool> _expanded = List.generate(6, (index) => false);
   List<SavedService>? _savedServices;
+  List<TripLocation>? _tripLocations;
+  bool _isExpanded = false;
   @override
   void initState() {
     super.initState();
     if (context.read<SavedServiceBloc>().state is SavedServicesLoadedSuccess) {
       loadSavedServices(context.read<SavedServiceBloc>().state);
+    }
+
+    if (context.read<TripLocationBloc>().state is TripLocationsLoaded) {
+      final state =
+          context.read<TripLocationBloc>().state as TripLocationsLoaded;
+      setState(() {
+        _tripLocations = state.tripLocations;
+        if (_tripLocations!.isNotEmpty) {
+          _isExpanded = true;
+        }
+      });
     }
   }
 
@@ -83,10 +98,6 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
             listener: (context, state) {
               // TODO: implement listener
 
-              if (state is SavedServicesLoadedSuccess) {
-                loadSavedServices(state);
-              }
-
               if (state is SavedServiceActionSucess) {
                 if (state.tripId == widget.trip.id) {
                   setState(() {
@@ -113,60 +124,188 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
               }
             },
             builder: (context, state) {
-              return SliverPadding(
-                padding: const EdgeInsets.only(bottom: 70.0),
-                sliver: SliverToBoxAdapter(
-                  child: widget.trip.serviceCount > 0
-                      ? _savedServices != null
-                          ? Column(
-                              children: [
-                                ExpansionPanelList(
-                                    expansionCallback:
-                                        (int index, bool isExpanded) {
-                                      log(index.toString());
-                                      setState(() {
-                                        final actualIndex =
-                                            _panels.values.toList()[
-                                                index]; // Get the actual index
-                                        _expanded[actualIndex] = isExpanded;
-                                      });
-                                    },
-                                    expandedHeaderPadding:
-                                        const EdgeInsets.all(0),
-                                    animationDuration:
-                                        const Duration(milliseconds: 1000),
-                                    children: [
-                                      ..._panels.entries.map((entry) {
-                                        String panel = entry.key;
-                                        int index = entry
-                                            .value; // Assuming _panels is a List<String>
+              return BlocListener<TripLocationBloc, TripLocationState>(
+                listener: (context, state) {
+                  // TODO: implement listener
 
-                                        return ExpansionPanel(
+                  if (state is TripLocationAddedSuccess) {
+                    if (state.tripId == widget.trip.id) {
+                      setState(() {
+                        _tripLocations!.add(state.tripLocation);
+                        _isExpanded = true;
+                      });
+                    }
+                  }
+
+                  if (state is TripLocationDeletedSuccess) {
+                    if (state.tripId == widget.trip.id) {
+                      setState(() {
+                        _tripLocations!.removeWhere(
+                            (item) => item.location.id == state.locationId);
+                        if (_tripLocations!.isEmpty) {
+                          _isExpanded = false;
+                        }
+                      });
+                    }
+                  }
+                },
+                child: SliverPadding(
+                  padding: const EdgeInsets.only(bottom: 70.0),
+                  sliver: SliverToBoxAdapter(
+                    child: widget.trip.serviceCount > 0
+                        ? _savedServices != null
+                            ? Column(
+                                children: [
+                                  ExpansionPanelList(
+                                      expansionCallback:
+                                          (int index, bool isExpanded) {
+                                        log(index.toString());
+                                        setState(() {
+                                          if (index == 4) {
+                                            _isExpanded = !_isExpanded;
+                                            return;
+                                          }
+                                          final actualIndex = _panels.values
+                                                  .toList()[
+                                              index]; // Get the actual index
+                                          _expanded[actualIndex] = isExpanded;
+                                        });
+                                      },
+                                      expandedHeaderPadding:
+                                          const EdgeInsets.all(0),
+                                      animationDuration:
+                                          const Duration(milliseconds: 1000),
+                                      children: [
+                                        ..._panels.entries.map((entry) {
+                                          String panel = entry.key;
+                                          int index = entry
+                                              .value; // Assuming _panels is a List<String>
+
+                                          return ExpansionPanel(
+                                            headerBuilder:
+                                                (BuildContext context,
+                                                    bool isExpanded) {
+                                              return ListTile(
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 10),
+                                                title: Text(
+                                                    "$panel (${_savedServices!.where((item) => item.typeId == index).length})",
+                                                    style: const TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              );
+                                            },
+
+                                            canTapOnHeader: true,
+
+                                            body: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20),
+                                              child: _savedServices!
+                                                      .where((item) =>
+                                                          item.typeId == index)
+                                                      .isEmpty
+                                                  ? Center(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal:
+                                                                    50.0,
+                                                                vertical: 28),
+                                                        child: Column(
+                                                          children: [
+                                                            Text(
+                                                              "Không có mục $panel nào được lưu",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: const TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                            ElevatedButton(
+                                                              onPressed: () {
+                                                                displayFullScreenModal(
+                                                                    context,
+                                                                    AddSavedServicesPage(
+                                                                      trip: widget
+                                                                          .trip,
+                                                                      searchType:
+                                                                          index,
+                                                                    ));
+                                                              },
+                                                              child: const Text(
+                                                                  'Thêm dịch vụ đầu tiên'),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : ListView.separated(
+                                                      shrinkWrap: true,
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 10),
+                                                      physics:
+                                                          const NeverScrollableScrollPhysics(),
+                                                      itemCount: _savedServices!
+                                                          .where((item) =>
+                                                              item.typeId ==
+                                                              index)
+                                                          .length,
+                                                      separatorBuilder:
+                                                          (context, _) =>
+                                                              const SizedBox(
+                                                                  height: 20),
+                                                      itemBuilder:
+                                                          (context, i) {
+                                                        final service = _savedServices!
+                                                                .where((item) =>
+                                                                    item.typeId ==
+                                                                    index)
+                                                                .toList()[
+                                                            i]; // Convert iterable to list once
+                                                        return SavedServiceBigCard(
+                                                            service: service);
+                                                      },
+                                                    ),
+                                            ),
+
+                                            isExpanded: _expanded[
+                                                index], // Use the correct index
+                                          );
+                                        }),
+                                        ExpansionPanel(
                                           headerBuilder: (BuildContext context,
                                               bool isExpanded) {
-                                            return ListTile(
+                                            return const ListTile(
                                               contentPadding:
-                                                  const EdgeInsets.symmetric(
+                                                  EdgeInsets.symmetric(
                                                       horizontal: 20,
                                                       vertical: 10),
-                                              title: Text(
-                                                  "$panel (${_savedServices!.where((item) => item.typeId == index).length})",
-                                                  style: const TextStyle(
+                                              title: Text("Điểm đến du lịch",
+                                                  style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.bold)),
                                             );
                                           },
-
                                           canTapOnHeader: true,
-
                                           body: Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 20),
-                                            child: _savedServices!
-                                                    .where((item) =>
-                                                        item.typeId == index)
-                                                    .isEmpty
+                                            child: _tripLocations == null ||
+                                                    _tripLocations!.isEmpty
                                                 ? Center(
                                                     child: Padding(
                                                       padding: const EdgeInsets
@@ -175,11 +314,11 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                                           vertical: 28),
                                                       child: Column(
                                                         children: [
-                                                          Text(
-                                                            "Không có mục $panel nào được lưu",
+                                                          const Text(
+                                                            "Không có mục nào được lưu",
                                                             textAlign: TextAlign
                                                                 .center,
-                                                            style: const TextStyle(
+                                                            style: TextStyle(
                                                                 fontSize: 16,
                                                                 fontStyle:
                                                                     FontStyle
@@ -196,7 +335,7 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                                                     trip: widget
                                                                         .trip,
                                                                     searchType:
-                                                                        index,
+                                                                        0,
                                                                   ));
                                                             },
                                                             child: const Text(
@@ -213,82 +352,79 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
                                                             top: 10),
                                                     physics:
                                                         const NeverScrollableScrollPhysics(),
-                                                    itemCount: _savedServices!
-                                                        .where((item) =>
-                                                            item.typeId ==
-                                                            index)
-                                                        .length,
+                                                    itemCount:
+                                                        _tripLocations!.length,
                                                     separatorBuilder:
                                                         (context, _) =>
                                                             const SizedBox(
                                                                 height: 20),
                                                     itemBuilder: (context, i) {
-                                                      final service = _savedServices!
-                                                              .where((item) =>
-                                                                  item.typeId ==
-                                                                  index)
-                                                              .toList()[
-                                                          i]; // Convert iterable to list once
-                                                      return SavedServiceBigCard(
-                                                          service: service);
+                                                      final tripLocation =
+                                                          _tripLocations!
+                                                                  .toList()[
+                                                              i]; // Convert iterable to list once
+                                                      return TripLocationBigCard(
+                                                          tripLocation:
+                                                              tripLocation);
                                                     },
                                                   ),
                                           ),
 
-                                          isExpanded: _expanded[
-                                              index], // Use the correct index
-                                        );
-                                      }),
-                                    ])
-                              ],
-                            )
-                          : const Center(
-                              child: Padding(
-                                padding: EdgeInsets.only(top: 80.0),
-                                child: CircularProgressIndicator(),
-                              ),
-                            )
-                      : Center(
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 60.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const SizedBox(
-                                  height: 80,
+                                          isExpanded:
+                                              _isExpanded, // Use the correct index
+                                        ),
+                                      ])
+                                ],
+                              )
+                            : const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: 80.0),
+                                  child: CircularProgressIndicator(),
                                 ),
-                                Icon(
-                                  Icons.favorite_border,
-                                  size: 100,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                const SizedBox(
-                                  height: 30,
-                                ),
-                                const Text(
-                                  'Bắt đầu lưu địa điểm tham quan, lưu trú và ăn uống trong chuyến đi tiếp theo',
-                                  style: TextStyle(
-                                    fontSize: 16,
+                              )
+                        : Center(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 60.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    height: 80,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 30),
-                                ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 30, vertical: 20)),
-                                    child: const Text(
-                                      'Thêm dịch vụ đầu tiên',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ))
-                              ],
+                                  Icon(
+                                    Icons.favorite_border,
+                                    size: 100,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  const Text(
+                                    'Bắt đầu lưu địa điểm tham quan, lưu trú và ăn uống trong chuyến đi tiếp theo',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 30),
+                                  ElevatedButton(
+                                      onPressed: () {},
+                                      style: ElevatedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 30, vertical: 20)),
+                                      child: const Text(
+                                        'Thêm dịch vụ đầu tiên',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ))
+                                ],
+                              ),
                             ),
                           ),
-                        ),
+                  ),
                 ),
               );
             },

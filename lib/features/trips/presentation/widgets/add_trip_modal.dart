@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
@@ -25,7 +24,6 @@ class _AddTripModalState extends State<AddTripModal> {
   Widget build(BuildContext context) {
     return BlocConsumer<TripBloc, TripState>(
       listener: (context, state) {
-        // TODO: implement listener
         if (state is TripActionSuccess) {
           Navigator.of(context).pop();
         }

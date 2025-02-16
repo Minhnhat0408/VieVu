@@ -23,7 +23,7 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/review
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/slider_pagination.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
@@ -101,7 +101,6 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
         ),
         BlocListener<TripBloc, TripState>(
           listener: (context, state) {
-            // TODO: implement listener
             if (state is SavedToTripLoadedSuccess) {
               log('SavedToTripLoadedSuccess');
               currentSavedTripCount =
@@ -153,7 +152,7 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
                                       tagInfoList: state.attraction.travelTypes!
                                           .map((e) => e['type_name'].toString())
                                           .toList(),
-                                      
+
                                       latitude: state.attraction.latitude,
                                       longitude: state.attraction.longitude,
                                     ));

@@ -6,8 +6,8 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 
-import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_edit_modal.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_privacy_modal.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/settings/trip_edit_modal.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/settings/trip_privacy_modal.dart';
 
 final Map<String, String> optionLists = {
   'Chỉnh sửa': 'Thay đổi các thông tin hiển thị của chuyến đi',

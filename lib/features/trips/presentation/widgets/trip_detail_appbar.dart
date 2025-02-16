@@ -4,7 +4,7 @@ import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_settings_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_privacy_modal.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/settings/trip_privacy_modal.dart';
 
 class TripDetailAppbar extends StatelessWidget {
   final Trip? trip;

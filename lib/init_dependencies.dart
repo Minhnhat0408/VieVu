@@ -49,7 +49,7 @@ import 'package:vn_travel_companion/features/trips/data/repositories/trip_reposi
 import 'package:vn_travel_companion/features/trips/domain/repositories/saved_service_repository.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_location_repository.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_repository.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';

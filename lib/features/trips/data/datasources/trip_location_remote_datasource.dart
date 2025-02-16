@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
+import 'package:vn_travel_companion/features/trips/data/models/trip_location_model.dart';
 
 abstract interface class TripLocationRemoteDatasource {
-  Future insertTripLocation({
+  Future<TripLocationModel> insertTripLocation({
     required String tripId,
     required int locationId,
   });
@@ -16,6 +19,10 @@ abstract interface class TripLocationRemoteDatasource {
     required String tripId,
     required int locationId,
   });
+
+  Future<List<TripLocationModel>> getTripLocations({
+    required String tripId,
+  });
 }
 
 class TripLocationRemoteDatasourceImpl implements TripLocationRemoteDatasource {
@@ -26,24 +33,30 @@ class TripLocationRemoteDatasourceImpl implements TripLocationRemoteDatasource {
   );
 
   @override
-  Future insertTripLocation({
+  Future<TripLocationModel> insertTripLocation({
     required String tripId,
     required int locationId,
   }) async {
     try {
-      final res = await supabaseClient.from('trip_locations').insert({
-        'trip_id': tripId,
-        'location_id': locationId,
-        'is_starting_point': false,
-      }).select('locations(cover)');
+      final res = await supabaseClient
+          .from('trip_locations')
+          .insert({
+            'trip_id': tripId,
+            'location_id': locationId,
+            'is_starting_point': false,
+          })
+          .select('*,locations(*)')
+          .single();
 
       await supabaseClient
           .from('trips')
           .update({
-            'cover': res.first['locations']['cover'],
+            'cover': res['locations']['cover'],
           })
           .eq('id', tripId)
           .isFilter('cover', null);
+
+      return TripLocationModel.fromJson(res);
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -75,6 +88,23 @@ class TripLocationRemoteDatasourceImpl implements TripLocationRemoteDatasource {
           .eq('trip_id', tripId)
           .eq('location_id', locationId);
     } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<TripLocationModel>> getTripLocations({
+    required String tripId,
+  }) async {
+    try {
+      final res = await supabaseClient
+          .from('trip_locations')
+          .select('*, locations(*)')
+          .eq('trip_id', tripId);
+
+      return res.map((e) => TripLocationModel.fromJson(e)).toList();
+    } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }
