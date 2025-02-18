@@ -20,7 +20,7 @@ import 'package:vn_travel_companion/features/search/presentation/bloc/search_blo
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
@@ -43,9 +43,9 @@ void main() async {
       BlocProvider(create: (_) => serviceLocator<SearchBloc>()),
       BlocProvider(create: (_) => serviceLocator<SearchHistoryCubit>()),
       BlocProvider(create: (_) => serviceLocator<TripBloc>()),
-      BlocProvider(create: (_) => serviceLocator<TripLocationBloc>()),
       BlocProvider(create: (_) => serviceLocator<SavedServiceBloc>()),
       BlocProvider(create: (_) => serviceLocator<TripDetailsCubit>()),
+      BlocProvider(create: (_) => serviceLocator<TripItineraryBloc>()),
     ],
     child: const MyApp(),
   ));

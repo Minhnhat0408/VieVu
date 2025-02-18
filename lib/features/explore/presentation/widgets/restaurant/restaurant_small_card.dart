@@ -14,7 +14,6 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class RestaurantSmallCard extends StatefulWidget {
   final Restaurant restaurant;
@@ -116,11 +115,11 @@ class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
                                           GetSavedToTrips(
                                               userId: userId,
                                               id: widget.restaurant.id,
-                                              type: 'service'));
+                                              ));
                                       displayModal(
                                           context,
                                           SavedToTripModal(
-                                            type: "service",
+
                                             onTripsChanged: (List<Trip>
                                                     selectedTrips,
                                                 List<Trip> unselectedTrips) {
@@ -168,13 +167,7 @@ class _RestaurantSmallCardState extends State<RestaurantSmallCard> {
                                                           .restaurant.longitude,
                                                     ));
 
-                                                context
-                                                    .read<TripLocationBloc>()
-                                                    .add(InsertTripLocation(
-                                                      locationId:
-                                                          widget.locationId,
-                                                      tripId: item.id,
-                                                    ));
+
                                               }
 
                                               for (var item

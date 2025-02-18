@@ -54,6 +54,6 @@ abstract interface class TripRepository {
     String? status,
     bool? isPublished,
     required int id,
-    required String type,
+
   });
 }

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-void displayModal(
+Future<dynamic> displayModal(
     BuildContext context, Widget child, double? height, bool expand) {
-  showBarModalBottomSheet(
+  return showBarModalBottomSheet(
     context: context,
     backgroundColor: Theme.of(context).colorScheme.surface,
     useRootNavigator: true,
     enableDrag: true,
     topControl: Container(
-      width: 40,
+      width: 80,
       height: 5,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(5),
       ),
     ),

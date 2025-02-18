@@ -24,8 +24,8 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels
 import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_small_card.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/restaurant_section.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/sub_location_section.dart';
@@ -81,7 +81,6 @@ class LocationDetailMainState extends State<LocationDetailMain>
   final int _selectedIndex = 0;
   int activeIndex = 0;
   bool reversedTrans = false;
-  bool _dialogShown = false; // Track if the dialog is already shown
   bool mapView = false;
   double? latitude;
   double? longitude;
@@ -111,7 +110,9 @@ class LocationDetailMainState extends State<LocationDetailMain>
     final userId =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     context.read<TripBloc>().add(GetSavedToTrips(
-        userId: userId, id: widget.locationId, type: 'location'));
+          userId: userId,
+          id: widget.locationId,
+        ));
     context
         .read<LocationBloc>()
         .add(GetLocation(locationId: widget.locationId));
@@ -183,123 +184,33 @@ class LocationDetailMainState extends State<LocationDetailMain>
           ),
         ],
       ),
-      body: BlocListener<TripLocationBloc, TripLocationState>(
-        listener: (context, state) {
-          if ((state is TripLocationAddedSuccess ||
-                  state is TripLocationDeletedSuccess) &&
-              !_dialogShown) {
-            setState(() {
-              _dialogShown = true; // Mark dialog as shown
-            });
-            showDialog(
-              context: context,
-              builder: (context) => Dialog(
-                child: Container(
-                  width: 200,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                        size: 50,
-                      ),
-                      const SizedBox(height: 16),
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          text: 'Đã thay đổi lưu ',
-                          children: [
-                            TextSpan(
-                              text: widget.locationName,
-                              style: const TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const TextSpan(
-                              text: ' tại ',
-                            ),
-                            TextSpan(
-                              text: '$changeSavedItemCount chuyến đi',
-                              style: const TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-              ),
-            ).then((_) {
-              // Reset _dialogShown to false when dialog is dismissed
-              setState(() {
-                _dialogShown = false;
-              });
-            });
-          }
-        },
-        child: Stack(
-          children: [
-            NestedScrollView(
-                floatHeaderSlivers: true,
-                headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                      SliverAppBar(
-                        leading: null,
-                        automaticallyImplyLeading: false,
-                        scrolledUnderElevation: 0,
-                        flexibleSpace: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 6),
-                            child: Row(
-                              children: List.generate(
-                                options.length, // Number of buttons
-                                (index) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 4.0),
-                                  child: Hero(
-                                    tag: options[index],
-                                    child: OutlinedButton(
-                                      onPressed: () {
-                                        if (index == 1) {
-                                          if (latitude != null &&
-                                              longitude != null) {
-                                            Navigator.of(context).push(
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                        animation,
-                                                        secondaryAnimation) =>
-                                                    BlocProvider(
-                                                  create: (context) =>
-                                                      serviceLocator<
-                                                          AttractionBloc>(),
-                                                  child: AttractionListPage(
-                                                    locationId:
-                                                        widget.locationId,
-                                                    locationName:
-                                                        widget.locationName,
-                                                    latitude: latitude!,
-                                                    longitude: longitude!,
-                                                  ),
-                                                ),
-                                                transitionsBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child) {
-                                                  return child; // No transition for the rest of the page
-                                                },
-                                              ),
-                                            );
-                                          } else {
-                                            showSnackbar(context,
-                                                'Không có dữ liệu vị trí');
-                                          }
-                                        } else if (index == 2) {
+      body: Stack(
+        children: [
+          NestedScrollView(
+              floatHeaderSlivers: true,
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                    SliverAppBar(
+                      leading: null,
+                      automaticallyImplyLeading: false,
+                      scrolledUnderElevation: 0,
+                      flexibleSpace: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 6),
+                          child: Row(
+                            children: List.generate(
+                              options.length, // Number of buttons
+                              (index) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Hero(
+                                  tag: options[index],
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      if (index == 1) {
+                                        if (latitude != null &&
+                                            longitude != null) {
                                           Navigator.of(context).push(
                                             PageRouteBuilder(
                                               pageBuilder: (context, animation,
@@ -307,8 +218,8 @@ class LocationDetailMainState extends State<LocationDetailMain>
                                                   BlocProvider(
                                                 create: (context) =>
                                                     serviceLocator<
-                                                        NearbyServicesCubit>(),
-                                                child: RestaurantListPage(
+                                                        AttractionBloc>(),
+                                                child: AttractionListPage(
                                                   locationId: widget.locationId,
                                                   locationName:
                                                       widget.locationName,
@@ -324,50 +235,93 @@ class LocationDetailMainState extends State<LocationDetailMain>
                                               },
                                             ),
                                           );
-                                        } else if (index == 3) {
-                                          Navigator.of(context).push(
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation,
-                                                      secondaryAnimation) =>
-                                                  BlocProvider(
-                                                create: (context) =>
-                                                    serviceLocator<
-                                                        NearbyServicesCubit>(),
-                                                child: HotelListPage(
-                                                  locationName:
-                                                      widget.locationName,
-                                                  locationId: widget.locationId,
-                                                  latitude: latitude!,
-                                                  longitude: longitude!,
-                                                ),
-                                              ),
-                                              transitionsBuilder: (context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                  child) {
-                                                return child; // No transition for the rest of the page
-                                              },
-                                            ),
-                                          );
+                                        } else {
+                                          showSnackbar(context,
+                                              'Không có dữ liệu vị trí');
                                         }
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        backgroundColor: _selectedIndex == index
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .surface,
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize
-                                            .min, // Ensures the button size matches the content
-                                        children: [
-                                          Icon(
-                                            _convertIcon(
-                                                index), // Replace with the desired icon
-                                            size: 20, // Adjust size as needed
+                                      } else if (index == 2) {
+                                        Navigator.of(context).push(
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                    secondaryAnimation) =>
+                                                BlocProvider(
+                                              create: (context) =>
+                                                  serviceLocator<
+                                                      NearbyServicesCubit>(),
+                                              child: RestaurantListPage(
+                                                locationId: widget.locationId,
+                                                locationName:
+                                                    widget.locationName,
+                                                latitude: latitude!,
+                                                longitude: longitude!,
+                                              ),
+                                            ),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              return child; // No transition for the rest of the page
+                                            },
+                                          ),
+                                        );
+                                      } else if (index == 3) {
+                                        Navigator.of(context).push(
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                    secondaryAnimation) =>
+                                                BlocProvider(
+                                              create: (context) =>
+                                                  serviceLocator<
+                                                      NearbyServicesCubit>(),
+                                              child: HotelListPage(
+                                                locationName:
+                                                    widget.locationName,
+                                                locationId: widget.locationId,
+                                                latitude: latitude!,
+                                                longitude: longitude!,
+                                              ),
+                                            ),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              return child; // No transition for the rest of the page
+                                            },
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: _selectedIndex == index
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .surface,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Ensures the button size matches the content
+                                      children: [
+                                        Icon(
+                                          _convertIcon(
+                                              index), // Replace with the desired icon
+                                          size: 20, // Adjust size as needed
+                                          color: _selectedIndex == index
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .surface
+                                              : Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                        ),
+                                        const SizedBox(
+                                            width:
+                                                8), // Spacing between the icon and text
+                                        Text(
+                                          options[index],
+                                          style: TextStyle(
                                             color: _selectedIndex == index
                                                 ? Theme.of(context)
                                                     .colorScheme
@@ -376,23 +330,8 @@ class LocationDetailMainState extends State<LocationDetailMain>
                                                     .colorScheme
                                                     .primary,
                                           ),
-                                          const SizedBox(
-                                              width:
-                                                  8), // Spacing between the icon and text
-                                          Text(
-                                            options[index],
-                                            style: TextStyle(
-                                              color: _selectedIndex == index
-                                                  ? Theme.of(context)
-                                                      .colorScheme
-                                                      .surface
-                                                  : Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -400,95 +339,92 @@ class LocationDetailMainState extends State<LocationDetailMain>
                             ),
                           ),
                         ),
-                      )
-                    ],
-                body: BlocConsumer<LocationBloc, LocationState>(
-                  listener: (context, state) {
-                    if (state is LocationFailure) {
-                      showSnackbar(context, state.message);
-                    }
-                    if (state is LocationDetailsLoadedSuccess) {
-                      setState(() {
-                        latitude = state.location.latitude;
-                        longitude = state.location.longitude;
-                      });
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is LocationLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    if (state is LocationDetailsLoadedSuccess) {
-                      final Location location = state.location;
-                      final imgList = [...location.images, location.cover];
-
-                      return BlocBuilder<LocationInfoCubit, LocationInfoState>(
-                        builder: (context, state2) {
-                          if (state2 is LocationInfoLoading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          if (state2 is LocationInfoFailure) {
-                            return const Center(
-                              child: Text('Không có dữ liệu'),
-                            );
-                          }
-
-                          final locationInfo =
-                              (state2 as LocationInfoLoaded).locationInfo;
-                          allServices = [
-                            ...locationInfo.attractions,
-                            ...locationInfo.restaurants,
-                            ...locationInfo.hotels,
-                          ];
-                          allServices.sort((a, b) {
-                            double distanceA = calculateDistance(
-                              a.latitude,
-                              a.longitude,
-                              state.location.latitude,
-                              state.location.longitude,
-                            );
-                            double distanceB = calculateDistance(
-                              b.latitude,
-                              b.longitude,
-                              state.location.latitude,
-                              state.location.longitude,
-                            );
-                            return distanceA.compareTo(
-                                distanceB); // Sort by ascending distance
-                          });
-                          return IndexedStack(
-                              index: mapView ? 0 : 1,
-                              children: [
-                                _buildMapView(location, state),
-                                _buildDetailsView(
-                                    location, locationInfo, imgList),
-                              ]);
-                        },
-                      );
-                    }
-                    return const Center(
-                      child: Text('Không có dữ liệu'),
-                    );
-                  },
-                )),
-            Positioned(
-              bottom: 70.0,
-              right: 16.0,
-              child: FloatingActionButton(
-                onPressed: () {
-                  setState(() {
-                    mapView = !mapView;
-                  });
+                      ),
+                    )
+                  ],
+              body: BlocConsumer<LocationBloc, LocationState>(
+                listener: (context, state) {
+                  if (state is LocationFailure) {
+                    showSnackbar(context, state.message);
+                  }
+                  if (state is LocationDetailsLoadedSuccess) {
+                    setState(() {
+                      latitude = state.location.latitude;
+                      longitude = state.location.longitude;
+                    });
+                  }
                 },
-                child: const Icon(Icons.map),
-              ),
+                builder: (context, state) {
+                  if (state is LocationLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (state is LocationDetailsLoadedSuccess) {
+                    final Location location = state.location;
+                    final imgList = [...location.images, location.cover];
+
+                    return BlocBuilder<LocationInfoCubit, LocationInfoState>(
+                      builder: (context, state2) {
+                        if (state2 is LocationInfoLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (state2 is LocationInfoFailure) {
+                          return const Center(
+                            child: Text('Không có dữ liệu'),
+                          );
+                        }
+
+                        final locationInfo =
+                            (state2 as LocationInfoLoaded).locationInfo;
+                        allServices = [
+                          ...locationInfo.attractions,
+                          ...locationInfo.restaurants,
+                          ...locationInfo.hotels,
+                        ];
+                        allServices.sort((a, b) {
+                          double distanceA = calculateDistance(
+                            a.latitude,
+                            a.longitude,
+                            state.location.latitude,
+                            state.location.longitude,
+                          );
+                          double distanceB = calculateDistance(
+                            b.latitude,
+                            b.longitude,
+                            state.location.latitude,
+                            state.location.longitude,
+                          );
+                          return distanceA.compareTo(
+                              distanceB); // Sort by ascending distance
+                        });
+                        return IndexedStack(index: mapView ? 0 : 1, children: [
+                          _buildMapView(location, state),
+                          _buildDetailsView(location, locationInfo, imgList),
+                        ]);
+                      },
+                    );
+                  }
+                  return const Center(
+                    child: Text('Không có dữ liệu'),
+                  );
+                },
+              )),
+          Positioned(
+            bottom: 70.0,
+            right: 16.0,
+            child: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  mapView = !mapView;
+                });
+              },
+              child: const Icon(Icons.map),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -758,38 +694,98 @@ class LocationDetailMainState extends State<LocationDetailMain>
     final userId =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     context.read<TripBloc>().add(GetSavedToTrips(
-        userId: userId, id: widget.locationId, type: 'location'));
-    displayModal(
-        context,
-        SavedToTripModal(
-          type: "location",
-          onTripsChanged:
-              (List<Trip> selectedTrips, List<Trip> unselectedTrips) {
-            setState(() {
-              changeSavedItemCount =
-                  selectedTrips.length + unselectedTrips.length;
+          userId: userId,
+          id: widget.locationId,
+        ));
 
-              currentSavedTripCount = currentSavedTripCount +
-                  selectedTrips.length -
-                  unselectedTrips.length;
-            });
-            for (var item in selectedTrips) {
-              context.read<TripLocationBloc>().add(InsertTripLocation(
-                    locationId: widget.locationId,
-                    tripId: item.id,
-                  ));
-            }
+    final locationDetails =
+        (context.read<LocationBloc>().state as LocationDetailsLoadedSuccess)
+            .location;
+    displayModal(context, SavedToTripModal(
+      onTripsChanged: (List<Trip> selectedTrips, List<Trip> unselectedTrips) {
+        setState(() {
+          changeSavedItemCount = selectedTrips.length + unselectedTrips.length;
 
-            for (var item in unselectedTrips) {
-              context.read<TripLocationBloc>().add(DeleteTripLocation(
-                    locationId: widget.locationId,
-                    tripId: item.id,
-                    locationName: widget.locationName,
-                  ));
-            }
-          },
-        ),
-        null,
-        false);
+          currentSavedTripCount = currentSavedTripCount +
+              selectedTrips.length -
+              unselectedTrips.length;
+        });
+
+        for (var item in selectedTrips) {
+          context.read<SavedServiceBloc>().add(InsertSavedService(
+                tripId: item.id,
+                linkId: widget.locationId,
+                cover: locationDetails.cover,
+                name: widget.locationName,
+                locationName: widget.locationName,
+                rating: 0,
+                ratingCount: 0,
+                typeId: 0,
+                latitude: locationDetails.latitude,
+                longitude: locationDetails.longitude,
+              ));
+        }
+
+        for (var item in unselectedTrips) {
+          context.read<SavedServiceBloc>().add(
+              DeleteSavedService(linkId: widget.locationId, tripId: item.id));
+        }
+      },
+    ), null, false);
   }
 }
+
+  //             !_dialogShown) {
+  //           setState(() {
+  //             _dialogShown = true; // Mark dialog as shown
+  //           });
+  //           showDialog(
+  //             context: context,
+  //             builder: (context) => Dialog(
+  //               child: Container(
+  //                 width: 200,
+  //                 padding: const EdgeInsets.all(20),
+  //                 child: Column(
+  //                   mainAxisSize: MainAxisSize.min,
+  //                   children: [
+  //                     const Icon(
+  //                       Icons.check_circle,
+  //                       color: Colors.green,
+  //                       size: 50,
+  //                     ),
+  //                     const SizedBox(height: 16),
+  //                     RichText(
+  //                       textAlign: TextAlign.center,
+  //                       text: TextSpan(
+  //                         text: 'Đã thay đổi lưu ',
+  //                         children: [
+  //                           TextSpan(
+  //                             text: widget.locationName,
+  //                             style: const TextStyle(
+  //                                 color: Colors.green,
+  //                                 fontWeight: FontWeight.bold),
+  //                           ),
+  //                           const TextSpan(
+  //                             text: ' tại ',
+  //                           ),
+  //                           TextSpan(
+  //                             text: '$changeSavedItemCount chuyến đi',
+  //                             style: const TextStyle(
+  //                                 color: Colors.green,
+  //                                 fontWeight: FontWeight.bold),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     const SizedBox(height: 16),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           ).then((_) {
+  //             // Reset _dialogShown to false when dialog is dismissed
+  //             setState(() {
+  //               _dialogShown = false;
+  //             });
+  //           });
+  //         }

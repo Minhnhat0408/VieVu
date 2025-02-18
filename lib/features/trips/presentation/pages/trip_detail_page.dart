@@ -5,7 +5,7 @@ import 'package:vn_travel_companion/features/explore/presentation/cubit/location
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_info_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_page.dart';
@@ -36,9 +36,10 @@ class _TripDetailPageState extends State<TripDetailPage> {
     context
         .read<SavedServiceBloc>()
         .add(GetSavedServices(tripId: widget.trip.id));
+
     context
-        .read<TripLocationBloc>()
-        .add(GetTripLocations(tripId: widget.trip.id));
+        .read<TripItineraryBloc>()
+        .add(GetTripItineraries(tripId: widget.trip.id));
   }
 
   @override
@@ -70,14 +71,18 @@ class _TripDetailPageState extends State<TripDetailPage> {
                     }
                   },
                 ),
-                BlocListener<TripLocationBloc, TripLocationState>(
+                BlocListener<SavedServiceBloc, SavedServiceState>(
                   listener: (context, state) {
                     // TODO: implement listener
-                    if (state is TripLocationAddedSuccess) {
-                      trip!.locations.add(state.tripLocation.location.name);
+                    if (state is SavedServiceActionSucess) {
+                      // check if the location is already in the trip
+                      if (!trip!.locations
+                          .contains(state.savedService.locationName)) {
+                        trip!.locations.add(state.savedService.locationName);
+                      }
                     }
-                    if (state is TripLocationDeletedSuccess) {
-                      trip!.locations.remove(state.locationName);
+                    if (state is SavedServiceDeleteSuccess) {
+                      // trip!.locations.remove(state.locationName);
                     }
                   },
                 ),
@@ -98,7 +103,7 @@ class _TripDetailPageState extends State<TripDetailPage> {
                             serviceLocator<LocationInfoCubit>(),
                         child: TripSavedServicesPage(trip: trip!),
                       ),
-                      const TripItineraryPage(),
+                      TripItineraryPage(trip: trip!),
                       const TripTodoListPage(),
                     ])),
                 Positioned.fill(

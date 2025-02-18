@@ -8,14 +8,14 @@ import 'package:vn_travel_companion/features/explore/presentation/bloc/location/
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_location.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class TripLocationBigCard extends StatefulWidget {
-  final TripLocation tripLocation;
+  final SavedService tripLocation;
   const TripLocationBigCard({
     super.key,
     required this.tripLocation,
@@ -35,8 +35,8 @@ class _TripLocationBigCardState extends State<TripLocationBigCard> {
             builder: (context) => BlocProvider(
               create: (context) => serviceLocator<LocationBloc>(),
               child: LocationDetailPage(
-                locationId: widget.tripLocation.location.id,
-                locationName: widget.tripLocation.location.name,
+                locationId: widget.tripLocation.id,
+                locationName: widget.tripLocation.locationName,
               ),
             ),
           ),
@@ -62,8 +62,7 @@ class _TripLocationBigCardState extends State<TripLocationBigCard> {
                       Radius.circular(10),
                     ),
                     child: CachedNetworkImage(
-                      imageUrl:
-                          "${widget.tripLocation.location.cover}?w=90&h=90",
+                      imageUrl: "${widget.tripLocation.cover}?w=90&h=90",
                       fadeInDuration: const Duration(milliseconds: 200),
                       filterQuality: FilterQuality.low,
                       width: double.infinity,
@@ -89,40 +88,38 @@ class _TripLocationBigCardState extends State<TripLocationBigCard> {
                                 .user
                                 .id;
                             context.read<TripBloc>().add(GetSavedToTrips(
-                                userId: userId,
-                                id: widget.tripLocation.location.id,
-                                type: 'location'));
-                            displayModal(
-                                context,
-                                SavedToTripModal(
-                                  type: "location",
-                                  onTripsChanged: (List<Trip> selectedTrips,
-                                      List<Trip> unselectedTrips) {
-                                    for (var item in selectedTrips) {
-                                      context
-                                          .read<TripLocationBloc>()
-                                          .add(InsertTripLocation(
-                                            locationId:
-                                                widget.tripLocation.location.id,
-                                            tripId: item.id,
-                                          ));
-                                    }
+                                  userId: userId,
+                                  id: widget.tripLocation.id,
+                                ));
+                            displayModal(context, SavedToTripModal(
+                              onTripsChanged: (List<Trip> selectedTrips,
+                                  List<Trip> unselectedTrips) {
+                                for (var item in selectedTrips) {
+                                  context
+                                      .read<SavedServiceBloc>()
+                                      .add(InsertSavedService(
+                                        tripId: item.id,
+                                        linkId: widget.tripLocation.id,
+                                        cover: widget.tripLocation.cover,
+                                        name: widget.tripLocation.name,
+                                        locationName: widget.tripLocation.name,
+                                        rating: 0,
+                                        ratingCount: 0,
+                                        typeId: 0,
+                                        latitude: widget.tripLocation.latitude,
+                                        longitude:
+                                            widget.tripLocation.longitude,
+                                      ));
+                                }
 
-                                    for (var item in unselectedTrips) {
-                                      context
-                                          .read<TripLocationBloc>()
-                                          .add(DeleteTripLocation(
-                                            locationId:
-                                                widget.tripLocation.location.id,
-                                            tripId: item.id,
-                                            locationName: widget
-                                                .tripLocation.location.name,
-                                          ));
-                                    }
-                                  },
-                                ),
-                                null,
-                                false);
+                                for (var item in unselectedTrips) {
+                                  context.read<SavedServiceBloc>().add(
+                                      DeleteSavedService(
+                                          linkId: widget.tripLocation.id,
+                                          tripId: item.id));
+                                }
+                              },
+                            ), null, false);
                           },
                           style: IconButton.styleFrom(
                             backgroundColor:
@@ -149,7 +146,7 @@ class _TripLocationBigCardState extends State<TripLocationBigCard> {
                     ),
 
                     AutoSizeText(
-                      widget.tripLocation.location.name,
+                      widget.tripLocation.locationName,
                       minFontSize: 14, // inimum font size to shrink to
                       maxLines: 2, // Allow up to 2 lines for wrapping
                       overflow: TextOverflow

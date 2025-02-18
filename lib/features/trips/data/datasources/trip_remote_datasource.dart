@@ -22,7 +22,6 @@ abstract interface class TripRemoteDatasource {
     String? status,
     bool? isPublished,
     required int id,
-    required String type,
   });
 
   Future<List<TripModel>> getTrips({
@@ -160,6 +159,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
               file,
             );
 
+        log('updated');
         return supabaseClient.storage.from('trip_cover_images').getPublicUrl(
               "$tripId.jpg",
             );
@@ -178,13 +178,12 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     String? status,
     bool? isPublished,
     required int id,
-    required String type,
   }) async {
     try {
       var query = supabaseClient
           .from('trips')
           .select(
-              '*, trip_locations(locations(name, id), is_starting_point), service_count:saved_services(count), saved_services(name,external_link, link_id)')
+              '*, saved_services(name,external_link, link_id, location_name)')
           .eq('owner_id', userId);
 
       if (status != null) {
@@ -198,32 +197,19 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       final response = await query.order('updated_at', ascending: false);
       return response.map((e) {
         final tripItem = e;
-        tripItem['service_count'] = e['service_count'][0]['count'];
-        final locations = e['trip_locations'] as List;
         final services = e['saved_services'] as List;
+
+        tripItem['service_count'] = e['saved_services'].length;
         tripItem['locations'] = <String>[];
-        if (type == "location" && locations.isNotEmpty) {
-          // check if the trip contains the location id
-          final locationIndex = locations.indexWhere((element) {
-            return element['locations']['id'] == id;
-          });
+        final locations = services.map((e) => e['location_name'] as String);
 
-          if (locationIndex != -1) {
-            tripItem['is_saved'] = true;
-          }
-          tripItem['locations'] = locations
-              .map<String>(
-                (e) => e['locations']['name'],
-              )
-              .toList();
-        } else if (type == "service" && services.isNotEmpty) {
-          final serviceIndex = services.indexWhere((element) {
-            return element['link_id'] == id;
-          });
+        tripItem['locations'] = locations.toSet().toList();
+        final serviceIndex = services.indexWhere((element) {
+          return element['link_id'] == id;
+        });
 
-          if (serviceIndex != -1) {
-            tripItem['is_saved'] = true;
-          }
+        if (serviceIndex != -1) {
+          tripItem['is_saved'] = true;
         }
 
         return TripModel.fromJson(tripItem);
@@ -245,9 +231,9 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       log('hellooo');
       var query = supabaseClient
           .from('trips')
-          .select(
-              '*, trip_locations(locations(name), is_starting_point), saved_services(count)')
+          .select('*, saved_services(location_name)')
           .eq('owner_id', userId);
+      // .eq('saved_services.type_id', 2);
 
       if (status != null) {
         query = query.eq('status', status);
@@ -263,26 +249,13 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
 
       return response.map((e) {
         final tripItem = e;
-        tripItem['service_count'] = e['saved_services'][0]['count'];
-        final locations = e['trip_locations'] as List;
+        tripItem['service_count'] = e['saved_services'].length;
 
         tripItem['locations'] = <String>[];
-        if (locations.isNotEmpty) {
-          final startingPointIndex = locations.indexWhere((element) {
-            return element['is_starting_point'] == true;
-          });
-          if (startingPointIndex != -1) {
-            final startingPoint = locations[startingPointIndex];
-            locations.removeAt(startingPointIndex);
-            locations.insert(0, startingPoint);
-          }
+        final locations = (e['saved_services'] as List)
+            .map((e) => e['location_name'] as String);
 
-          tripItem['locations'] = locations
-              .map<String>(
-                (e) => e['locations']['name'],
-              )
-              .toList();
-        }
+        tripItem['locations'] = locations.toSet().toList();
 
         return TripModel.fromJson(tripItem);
       }).toList();
@@ -300,31 +273,17 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     try {
       final res = await supabaseClient
           .from('trips')
-          .select(
-              '*, trip_locations(locations(name), is_starting_point),  saved_services(count)')
+          .select('*,  saved_services(location_name)')
           .eq('id', tripId)
           .single();
 
       final tripItem = res;
-      final locations = res['trip_locations'] as List;
-      tripItem['service_count'] = res['saved_services'][0]['count'];
+      tripItem['service_count'] = res['saved_services'].length;
       tripItem['locations'] = <String>[];
-      if (locations.isNotEmpty) {
-        final startingPointIndex = locations.indexWhere((element) {
-          return element['is_starting_point'] == true;
-        });
-        if (startingPointIndex != -1) {
-          final startingPoint = locations[startingPointIndex];
-          locations.removeAt(startingPointIndex);
-          locations.insert(0, startingPoint);
-        }
+      final locations = (res['saved_services'] as List)
+          .map((e) => e['location_name'] as String);
 
-        tripItem['locations'] = locations
-            .map<String>(
-              (e) => e['locations']['name'],
-            )
-            .toList();
-      }
+      tripItem['locations'] = locations.toSet().toList();
 
       return TripModel.fromJson(tripItem);
     } catch (e) {
@@ -365,14 +324,14 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         //check if trip have all the required fields
         final res = await supabaseClient
             .from('trips')
-            .select('*, trip_locations(count)')
+            .select('*, saved_services(count)')
             .eq('id', tripId)
             .maybeSingle(); // Prevents crash if no row is found
 
         if (res == null) {
           throw const ServerException('Không có quyền cập nhật chuyến đi');
         }
-        if (res['trip_locations'][0]['count'] == 0) {
+        if (res['saved_services'][0]['count'] == 0) {
           throw const ServerException(
               'Vui lòng thêm địa điểm cho chuyến đi trước khi công khai');
         }
@@ -409,7 +368,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
             .from('trips')
             .update(updateData)
             .eq('id', tripId)
-            .select('*, trip_locations(locations(name), is_starting_point)')
+            .select('*, saved_services(location_name)')
             .maybeSingle(); // Prevents crash if no row is found
 
         if (res == null) {
@@ -417,24 +376,12 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         }
 
         final tripItem = res;
-        final locations = res['trip_locations'] as List;
+        tripItem['service_count'] = res['saved_services'].length;
         tripItem['locations'] = <String>[];
-        if (locations.isNotEmpty) {
-          final startingPointIndex = locations.indexWhere((element) {
-            return element['is_starting_point'] == true;
-          });
-          if (startingPointIndex != -1) {
-            final startingPoint = locations[startingPointIndex];
-            locations.removeAt(startingPointIndex);
-            locations.insert(0, startingPoint);
-          }
+        final locations = (res['saved_services'] as List)
+            .map((e) => e['location_name'] as String);
 
-          tripItem['locations'] = locations
-              .map<String>(
-                (e) => e['locations']['name'],
-              )
-              .toList();
-        }
+        tripItem['locations'] = locations.toSet().toList();
 
         return TripModel.fromJson(tripItem);
       } else {

@@ -25,7 +25,6 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/slider
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class AttractionDetailPage extends StatelessWidget {
@@ -75,7 +74,7 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
     final userId =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     context.read<TripBloc>().add(GetSavedToTrips(
-        userId: userId, id: widget.attractionId, type: 'service'));
+        userId: userId, id: widget.attractionId));
     context
         .read<AttractionDetailsCubit>()
         .fetchAttractionDetails(widget.attractionId);
@@ -117,13 +116,13 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
                           .user
                           .id;
                       context.read<TripBloc>().add(GetSavedToTrips(
-                          userId: userId,
-                          id: state.attraction.id,
-                          type: 'service'));
+                            userId: userId,
+                            id: state.attraction.id,
+                          ));
                       displayModal(
                           context,
                           SavedToTripModal(
-                            type: "service",
+
                             onTripsChanged: (List<Trip> selectedTrips,
                                 List<Trip> unselectedTrips) {
                               setState(() {
@@ -152,17 +151,10 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
                                       tagInfoList: state.attraction.travelTypes!
                                           .map((e) => e['type_name'].toString())
                                           .toList(),
-
                                       latitude: state.attraction.latitude,
                                       longitude: state.attraction.longitude,
                                     ));
 
-                                context
-                                    .read<TripLocationBloc>()
-                                    .add(InsertTripLocation(
-                                      locationId: state.attraction.locationId,
-                                      tripId: item.id,
-                                    ));
                               }
 
                               for (var item in unselectedTrips) {

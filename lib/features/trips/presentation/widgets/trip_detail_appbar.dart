@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_settings_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/settings/trip_privacy_modal.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
 
 class TripDetailAppbar extends StatelessWidget {
   final Trip? trip;
@@ -93,6 +94,12 @@ class TripDetailAppbar extends StatelessWidget {
                           errorWidget: (context, url, error) => Image.asset(
                             'assets/images/trip_placeholder.avif', // Fallback if loading fails
                             fit: BoxFit.cover,
+                          ),
+                          cacheManager: CacheManager(
+                            Config(
+                              trip!.cover ?? "hello",
+                              stalePeriod: const Duration(seconds: 10),
+                            ),
                           ),
                           fit: BoxFit.cover,
                         ),

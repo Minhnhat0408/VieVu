@@ -28,12 +28,14 @@ final class LocationInfoGeoLoaded extends LocationInfoState {
   final double longitude;
   final int linkId;
   final int locationId;
+  final String locationName;
 
   LocationInfoGeoLoaded({
     required this.latitude,
     required this.linkId,
     required this.locationId,
     required this.longitude,
+    required this.locationName,
   });
 }
 

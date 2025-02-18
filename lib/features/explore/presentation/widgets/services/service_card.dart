@@ -15,7 +15,6 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class ServiceCard extends StatefulWidget {
   final Service service;
@@ -136,81 +135,66 @@ class _ServiceCardState extends State<ServiceCard> {
                                 }
 
                                 context.read<TripBloc>().add(GetSavedToTrips(
-                                    userId: userId,
-                                    id: widget.service.id,
-                                    type: 'service'));
+                                      userId: userId,
+                                      id: widget.service.id,
+                                    ));
 
                                 log('ServiceCard: ${widget.service.id}');
-                                displayModal(
-                                    context,
-                                    SavedToTripModal(
-                                      type: "service",
-                                      onTripsChanged: (List<Trip> selectedTrips,
-                                          List<Trip> unselectedTrips) {
-                                        setState(() {
-                                          changeSavedItemCount =
-                                              selectedTrips.length +
-                                                  unselectedTrips.length;
-                                          currentSavedTripCount ??= 0;
-                                          currentSavedTripCount =
-                                              currentSavedTripCount! +
-                                                  selectedTrips.length -
-                                                  unselectedTrips.length;
-                                        });
+                                displayModal(context, SavedToTripModal(
+                                  onTripsChanged: (List<Trip> selectedTrips,
+                                      List<Trip> unselectedTrips) {
+                                    setState(() {
+                                      changeSavedItemCount =
+                                          selectedTrips.length +
+                                              unselectedTrips.length;
+                                      currentSavedTripCount ??= 0;
+                                      currentSavedTripCount =
+                                          currentSavedTripCount! +
+                                              selectedTrips.length -
+                                              unselectedTrips.length;
+                                    });
 
-                                        for (var item in selectedTrips) {
-                                          context
-                                              .read<SavedServiceBloc>()
-                                              .add(InsertSavedService(
-                                                tripId: item.id,
-                                                linkId: widget.service.id,
-                                                cover: widget.service.cover,
-                                                name: widget.service.name,
-                                                locationName: locationName,
-                                                externalLink:
-                                                    widget.service.jumpUrl,
-                                                rating: widget.service.score,
-                                                ratingCount:
-                                                    widget.service.commentCount,
-                                                typeId: widget.service.typeId,
-                                                hotelStar: widget.service.star
-                                                    ?.toInt(),
-                                                price: widget.service.avgPrice
-                                                    ?.toInt(),
-                                                tagInfoList: widget
-                                                    .service.tagInfoList
-                                                    ?.map((item) =>
-                                                        item is String
-                                                            ? item
-                                                            : item['tagName']
-                                                                .toString())
-                                                    .toList(),
-                                                latitude:
-                                                    widget.service.latitude,
-                                                longitude:
-                                                    widget.service.longitude,
-                                              ));
+                                    for (var item in selectedTrips) {
+                                      context
+                                          .read<SavedServiceBloc>()
+                                          .add(InsertSavedService(
+                                            tripId: item.id,
+                                            linkId: widget.service.id,
+                                            cover: widget.service.cover,
+                                            name: widget.service.name,
+                                            locationName: locationName,
+                                            externalLink:
+                                                widget.service.jumpUrl,
+                                            rating: widget.service.score,
+                                            ratingCount:
+                                                widget.service.commentCount,
+                                            typeId: widget.service.typeId,
+                                            hotelStar:
+                                                widget.service.star?.toInt(),
+                                            price: widget.service.avgPrice
+                                                ?.toInt(),
+                                            tagInfoList: widget
+                                                .service.tagInfoList
+                                                ?.map((item) => item is String
+                                                    ? item
+                                                    : item['tagName']
+                                                        .toString())
+                                                .toList(),
+                                            latitude: widget.service.latitude,
+                                            longitude: widget.service.longitude,
+                                          ));
+                                    }
 
-                                          context
-                                              .read<TripLocationBloc>()
-                                              .add(InsertTripLocation(
-                                                locationId: locationId,
-                                                tripId: item.id,
-                                              ));
-                                        }
-
-                                        for (var item in unselectedTrips) {
-                                          context
-                                              .read<SavedServiceBloc>()
-                                              .add(DeleteSavedService(
-                                                tripId: item.id,
-                                                linkId: widget.service.id,
-                                              ));
-                                        }
-                                      },
-                                    ),
-                                    null,
-                                    false);
+                                    for (var item in unselectedTrips) {
+                                      context
+                                          .read<SavedServiceBloc>()
+                                          .add(DeleteSavedService(
+                                            tripId: item.id,
+                                            linkId: widget.service.id,
+                                          ));
+                                    }
+                                  },
+                                ), null, false);
                               },
                               iconSize: 18,
                               style: IconButton.styleFrom(

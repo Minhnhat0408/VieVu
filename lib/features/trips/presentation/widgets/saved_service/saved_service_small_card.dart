@@ -10,7 +10,6 @@ import 'package:vn_travel_companion/features/explore/presentation/cubit/location
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 
 class SavedServiceSmallCard extends StatefulWidget {
@@ -72,10 +71,7 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                     ),
                   );
 
-              context.read<TripLocationBloc>().add(InsertTripLocation(
-                    locationId: state.attraction.locationId,
-                    tripId: tripId,
-                  ));
+
             }
           },
         ),
@@ -86,10 +82,18 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                     as TripDetailsLoadedSuccess)
                 .trip
                 .id;
-            context.read<TripLocationBloc>().add(InsertTripLocation(
-                  locationId: state.location.id,
-                  tripId: tripId,
-                ));
+         context.read<SavedServiceBloc>().add(InsertSavedService(
+                tripId: tripId,
+                linkId: state.location.id,
+                cover: state.location.cover,
+                name: state.location.name,
+                locationName: state.location.name,
+                rating: 0,
+                ratingCount: 0,
+                typeId: 0,
+                latitude: state.location.latitude,
+                longitude: state.location.longitude,
+              ));
           }
         }),
         BlocListener<LocationInfoCubit, LocationInfoState>(
@@ -119,10 +123,6 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                   ),
                 );
 
-            context.read<TripLocationBloc>().add(InsertTripLocation(
-                  locationId: state.locationId,
-                  tripId: tripId,
-                ));
           }
         }),
         BlocListener<EventBloc, EventState>(listener: (context, state) {
@@ -151,10 +151,7 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                   ),
                 );
 
-            context.read<TripLocationBloc>().add(InsertTripLocation(
-                  locationId: state.event.locationId!,
-                  tripId: tripId,
-                ));
+
           }
         }),
       ],

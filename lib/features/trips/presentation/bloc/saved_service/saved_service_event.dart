@@ -43,9 +43,11 @@ class DeleteSavedService extends SavedServiceEvent {
   final int linkId;
   final String tripId;
 
-  DeleteSavedService({required this.linkId, required this.tripId});
+  DeleteSavedService({
+    required this.linkId,
+    required this.tripId,
+  });
 }
-
 
 class GetSavedServices extends SavedServiceEvent {
   final String tripId;

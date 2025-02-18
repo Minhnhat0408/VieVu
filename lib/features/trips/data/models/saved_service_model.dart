@@ -10,6 +10,7 @@ class SavedServiceModel extends SavedService {
     required super.locationName,
     required super.latitude,
     required super.longitude,
+    required super.dbId,
     required super.rating,
     required super.ratingCount,
     super.externalLink,
@@ -22,6 +23,7 @@ class SavedServiceModel extends SavedService {
 
   factory SavedServiceModel.fromJson(Map<String, dynamic> json) {
     return SavedServiceModel(
+      dbId: json['id'],
       id: json['link_id'],
       name: json['name'],
       tripId: json['trip_id'],

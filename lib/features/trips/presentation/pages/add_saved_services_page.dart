@@ -13,7 +13,7 @@ import 'package:vn_travel_companion/features/search/domain/entities/explore_sear
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service_small_card.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_small_card.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class AddSavedServicesPage extends StatelessWidget {

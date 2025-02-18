@@ -2,29 +2,39 @@ import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/trip_location_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_location.dart';
-import 'package:vn_travel_companion/features/trips/domain/repositories/trip_location_repository.dart';
+import 'package:vn_travel_companion/features/trips/data/datasources/trip_itinerary_remote_datasource.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vn_travel_companion/features/trips/domain/repositories/trip_itinerary_repository.dart';
 
-class TripLocationRepositoryImpl implements TripLocationRepository {
-  final TripLocationRemoteDatasource tripLocationRemoteDatasource;
+class TripItineraryRepositoryImpl implements TripItineraryRepository {
+  final TripItineraryRemoteDatasource tripItineraryRemoteDatasource;
   final ConnectionChecker connectionChecker;
 
-  TripLocationRepositoryImpl(
-      this.tripLocationRemoteDatasource, this.connectionChecker);
+  TripItineraryRepositoryImpl(
+      this.tripItineraryRemoteDatasource, this.connectionChecker);
 
   @override
-  Future<Either<Failure, TripLocation>> insertTripLocation({
+  Future<Either<Failure, TripItinerary>> insertTripItinerary({
     required String tripId,
-    required int locationId,
+    required DateTime time,
+    required double latitude,
+    required double longitude,
+    required String title,
+    String? note,
+    int? serviceId,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      final res = await tripLocationRemoteDatasource.insertTripLocation(
+      final res = await tripItineraryRemoteDatasource.insertTripItinerary(
         tripId: tripId,
-        locationId: locationId,
+        time: time,
+        latitude: latitude,
+        longitude: longitude,
+        title: title,
+        note: note,
+        serviceId: serviceId,
       );
       return right(res);
     } on ServerException catch (e) {
@@ -33,7 +43,7 @@ class TripLocationRepositoryImpl implements TripLocationRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> updateTripLocation({
+  Future<Either<Failure, Unit>> updateTripItinerary({
     required int id,
     required bool isStartingPoint,
   }) async {
@@ -41,7 +51,7 @@ class TripLocationRepositoryImpl implements TripLocationRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      await tripLocationRemoteDatasource.updateTripLocation(
+      await tripItineraryRemoteDatasource.updateTripItinerary(
         id: id,
         isStartingPoint: isStartingPoint,
       );
@@ -52,17 +62,17 @@ class TripLocationRepositoryImpl implements TripLocationRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> deleteTripLocation({
+  Future<Either<Failure, Unit>> deleteTripItinerary({
     required String tripId,
-    required int locationId,
+    required int itineraryId,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      await tripLocationRemoteDatasource.deleteTripLocation(
+      await tripItineraryRemoteDatasource.deleteTripItinerary(
         tripId: tripId,
-        locationId: locationId,
+        ItineraryId: itineraryId,
       );
       return right(unit);
     } on ServerException catch (e) {
@@ -70,19 +80,23 @@ class TripLocationRepositoryImpl implements TripLocationRepository {
     }
   }
 
+
   @override
-  Future<Either<Failure, List<TripLocation>>> getTripLocations({
+  Future<Either<Failure, List<TripItinerary>>> getTripItineraries({
     required String tripId,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      final tripLocations =
-          await tripLocationRemoteDatasource.getTripLocations(tripId: tripId);
-      return right(tripLocations);
+      final res = await tripItineraryRemoteDatasource.getTripItineraries(
+        tripId: tripId,
+      );
+      return right(res);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
   }
+
+
 }

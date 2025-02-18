@@ -13,7 +13,6 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class RestaurantBigCard extends StatefulWidget {
   final Restaurant restaurant;
@@ -94,11 +93,11 @@ class _RestaurantBigCardState extends State<RestaurantBigCard> {
                           context.read<TripBloc>().add(GetSavedToTrips(
                               userId: userId,
                               id: widget.restaurant.id,
-                              type: 'service'));
+                        ));
                           displayModal(
                               context,
                               SavedToTripModal(
-                                type: "service",
+
                                 onTripsChanged: (List<Trip> selectedTrips,
                                     List<Trip> unselectedTrips) {
                                   setState(() {
@@ -139,17 +138,7 @@ class _RestaurantBigCardState extends State<RestaurantBigCard> {
                                               widget.restaurant.longitude,
                                         ));
 
-                                    context
-                                        .read<TripLocationBloc>()
-                                        .add(InsertTripLocation(
-                                          locationId: (context
-                                                      .read<LocationBloc>()
-                                                      .state
-                                                  as LocationDetailsLoadedSuccess)
-                                              .location
-                                              .id,
-                                          tripId: item.id,
-                                        ));
+
                                   }
 
                                   for (var item in unselectedTrips) {

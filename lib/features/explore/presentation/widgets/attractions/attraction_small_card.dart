@@ -12,7 +12,6 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class AttractionSmallCard extends StatefulWidget {
   final Attraction attraction;
@@ -93,11 +92,11 @@ class _AttractionSmallCardState extends State<AttractionSmallCard> {
                             context.read<TripBloc>().add(GetSavedToTrips(
                                 userId: userId,
                                 id: widget.attraction.id,
-                                type: 'service'));
+                                ));
                             displayModal(
                                 context,
                                 SavedToTripModal(
-                                  type: "service",
+
                                   onTripsChanged: (List<Trip> selectedTrips,
                                       List<Trip> unselectedTrips) {
                                     setState(() {
@@ -141,13 +140,7 @@ class _AttractionSmallCardState extends State<AttractionSmallCard> {
                                                 widget.attraction.longitude,
                                           ));
 
-                                      context
-                                          .read<TripLocationBloc>()
-                                          .add(InsertTripLocation(
-                                            locationId:
-                                                widget.attraction.locationId,
-                                            tripId: item.id,
-                                          ));
+
                                     }
 
                                     for (var item in unselectedTrips) {

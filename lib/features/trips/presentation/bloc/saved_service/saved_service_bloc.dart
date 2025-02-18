@@ -71,7 +71,9 @@ class SavedServiceBloc extends Bloc<SavedServiceEvent, SavedServiceState> {
     res.fold(
       (l) => emit(SavedServiceFailure(message: l.message)),
       (r) => emit(SavedServiceDeleteSuccess(
-          tripId: event.tripId, linkId: event.linkId)),
+        tripId: event.tripId,
+        linkId: event.linkId,
+      )),
     );
   }
 }

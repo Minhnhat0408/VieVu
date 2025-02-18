@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:vn_travel_companion/core/constants/transport_options.dart';
@@ -15,6 +17,7 @@ import 'package:vn_travel_companion/core/utils/validators.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_cover_picker.dart';
 
 class TripEditModal extends StatefulWidget {
   const TripEditModal({super.key});
@@ -38,9 +41,26 @@ class _TripEditModalState extends State<TripEditModal> {
   void selectImage() async {
     log("Select image");
     final pickedImage = await pickImage();
+
     if (pickedImage != null) {
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedImage.path,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+            ],
+          ),
+        ],
+      );
+
       setState(() {
-        image = pickedImage;
+        if (croppedFile == null) return;
+        image = File(croppedFile.path);
       });
     }
   }
@@ -137,52 +157,16 @@ class _TripEditModalState extends State<TripEditModal> {
                               color: Theme.of(context).colorScheme.primary),
                         ),
                         const SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: () {
-                            selectImage();
-                          },
-                          child: DottedBorder(
-                            color: Theme.of(context).colorScheme.primary,
-                            dashPattern: const [10, 4],
-                            radius: const Radius.circular(10),
-                            borderType: BorderType.RRect,
-                            strokeCap: StrokeCap.round,
-                            child: SizedBox(
-                                height: 200,
-                                width: double.infinity,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: image != null
-                                      ? Image.file(
-                                          image!,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : coverImage.isNotEmpty
-                                          ? CachedNetworkImage(
-                                              imageUrl: coverImage,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : const Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.folder_open,
-                                                  size: 40,
-                                                ),
-                                                SizedBox(height: 15),
-                                                Text(
-                                                  'Select your image',
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                )),
-                          ),
-                        ),
                       ],
+                    ),
+                    TripCoverPicker(
+                      image: image,
+                      coverImage: coverImage,
+                      onImageSelected: (file) {
+                        setState(() {
+                          image = file;
+                        });
+                      },
                     ),
                     const SizedBox(height: 24),
                     Column(

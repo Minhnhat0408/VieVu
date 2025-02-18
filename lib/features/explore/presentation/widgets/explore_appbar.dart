@@ -42,7 +42,10 @@ class _ExploreAppbarState extends State<ExploreAppbar> {
         double appBarHeight = constraints.biggest.height;
         return FlexibleSpaceBar(
           titlePadding: EdgeInsets.only(
-              bottom: calculatePadding(appBarHeight), left: 20, right: 20),
+              bottom: calculatePadding(appBarHeight),
+              left: 20,
+              right: 20,
+             ),
           title: const Hero(
             tag: 'exploreSearch',
             child: ExploreSearchButton(showNotification: false),

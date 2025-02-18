@@ -164,7 +164,7 @@ class TripRepositoryImpl implements TripRepository {
     String? status,
     bool? isPublished,
     required int id,
-    required String type,
+
   }) async {
     try {
       final trips = await tripRemoteDatasource.getCurrentUserTripsForSave(
@@ -172,7 +172,7 @@ class TripRepositoryImpl implements TripRepository {
         status: status,
         isPublished: isPublished,
         id: id,
-        type: type,
+       
       );
       return right(trips);
     } on ServerException catch (e) {

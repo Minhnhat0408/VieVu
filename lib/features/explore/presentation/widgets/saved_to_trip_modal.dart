@@ -8,11 +8,10 @@ import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_b
 
 class SavedToTripModal extends StatefulWidget {
   final Function(List<Trip> trips, List<Trip> trips2) onTripsChanged;
-  final String type;
+
   const SavedToTripModal({
     super.key,
     required this.onTripsChanged,
-    required this.type,
   });
 
   @override
@@ -121,9 +120,7 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
-                                        widget.type == "location"
-                                            ? "${trip.locations.length} điểm đến"
-                                            : "${trip.serviceCount} dịch vụ",
+                                        "${trip.serviceCount} dịch vụ",
                                         style: const TextStyle(fontSize: 14),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,

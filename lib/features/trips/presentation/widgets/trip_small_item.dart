@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
@@ -29,12 +30,18 @@ class TripSmallItem extends StatelessWidget {
                 Hero(
                   tag: trip.id,
                   child: CachedNetworkImage(
-                    imageUrl: trip.cover ?? '',
+                    imageUrl: "${trip.cover}",
                     errorWidget: (context, url, error) => Image.asset(
                       'assets/images/trip_placeholder.avif', // Fallback if loading fails
                       fit: BoxFit.cover,
                     ),
                     height: 200,
+                    cacheManager: CacheManager(
+                      Config(
+                        trip.cover ?? "hello",
+                        stalePeriod: const Duration(seconds: 10),
+                      ),
+                    ),
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
@@ -91,7 +98,7 @@ class TripSmallItem extends StatelessWidget {
                 children: [
                   RichText(
                     text: TextSpan(
-                      text: "${trip.name} " ,
+                      text: "${trip.name} ",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

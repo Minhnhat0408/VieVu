@@ -69,7 +69,7 @@ class TripBloc extends Bloc<TripEvent, TripState> {
     final res = await _tripRepository.getCurrentUserTripsForSave(
         userId: event.userId,
         id: event.id,
-        type: event.type,
+     
         status: "planning");
 
     res.fold(

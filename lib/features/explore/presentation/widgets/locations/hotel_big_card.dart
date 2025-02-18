@@ -12,7 +12,6 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class HotelBigCard extends StatefulWidget {
   final Hotel hotel;
@@ -90,72 +89,54 @@ class _HotelBigCardState extends State<HotelBigCard> {
                               .user
                               .id;
                           context.read<TripBloc>().add(GetSavedToTrips(
-                              userId: userId,
-                              id: widget.hotel.id,
-                              type: 'service'));
-                          displayModal(
-                              context,
-                              SavedToTripModal(
-                                type: "service",
-                                onTripsChanged: (List<Trip> selectedTrips,
-                                    List<Trip> unselectedTrips) {
-                                  setState(() {
-                                    changeSavedItemCount =
-                                        selectedTrips.length +
-                                            unselectedTrips.length;
-                                    currentSavedTripCount ??= 0;
-                                    currentSavedTripCount =
-                                        currentSavedTripCount! +
-                                            selectedTrips.length -
-                                            unselectedTrips.length;
-                                  });
+                                userId: userId,
+                                id: widget.hotel.id,
+                              ));
+                          displayModal(context, SavedToTripModal(
+                            onTripsChanged: (List<Trip> selectedTrips,
+                                List<Trip> unselectedTrips) {
+                              setState(() {
+                                changeSavedItemCount = selectedTrips.length +
+                                    unselectedTrips.length;
+                                currentSavedTripCount ??= 0;
+                                currentSavedTripCount = currentSavedTripCount! +
+                                    selectedTrips.length -
+                                    unselectedTrips.length;
+                              });
 
-                                  for (var item in selectedTrips) {
-                                    context
-                                        .read<SavedServiceBloc>()
-                                        .add(InsertSavedService(
-                                          tripId: item.id,
-                                          linkId: widget.hotel.id,
-                                          cover: widget.hotel.cover,
-                                          name: widget.hotel.name,
-                                          locationName: (context
-                                                      .read<LocationBloc>()
-                                                      .state
-                                                  as LocationDetailsLoadedSuccess)
-                                              .location
-                                              .name,
-                                          rating: widget.hotel.avgRating,
-                                          ratingCount: widget.hotel.ratingCount,
-                                          hotelStar: widget.hotel.star,
-                                          price: widget.hotel.price,
-                                          typeId: 3,
-                                          latitude: widget.hotel.latitude,
-                                          longitude: widget.hotel.longitude,
-                                        ));
+                              for (var item in selectedTrips) {
+                                context
+                                    .read<SavedServiceBloc>()
+                                    .add(InsertSavedService(
+                                      tripId: item.id,
+                                      linkId: widget.hotel.id,
+                                      cover: widget.hotel.cover,
+                                      name: widget.hotel.name,
+                                      locationName: (context
+                                                  .read<LocationBloc>()
+                                                  .state
+                                              as LocationDetailsLoadedSuccess)
+                                          .location
+                                          .name,
+                                      externalLink: widget.hotel.jumpUrl,
+                                      rating: widget.hotel.avgRating,
+                                      ratingCount: widget.hotel.ratingCount,
+                                      hotelStar: widget.hotel.star,
+                                      price: widget.hotel.price,
+                                      typeId: 4,
+                                      latitude: widget.hotel.latitude,
+                                      longitude: widget.hotel.longitude,
+                                    ));
+                              }
 
-                                    context
-                                        .read<TripLocationBloc>()
-                                        .add(InsertTripLocation(
-                                          locationId: (context
-                                                      .read<LocationBloc>()
-                                                      .state
-                                                  as LocationDetailsLoadedSuccess)
-                                              .location
-                                              .id,
-                                          tripId: item.id,
-                                        ));
-                                  }
-
-                                  for (var item in unselectedTrips) {
-                                    context.read<SavedServiceBloc>().add(
-                                        DeleteSavedService(
-                                            linkId: widget.hotel.id,
-                                            tripId: item.id));
-                                  }
-                                },
-                              ),
-                              null,
-                              false);
+                              for (var item in unselectedTrips) {
+                                context.read<SavedServiceBloc>().add(
+                                    DeleteSavedService(
+                                        linkId: widget.hotel.id,
+                                        tripId: item.id));
+                              }
+                            },
+                          ), null, false);
                         },
                         style: IconButton.styleFrom(
                           backgroundColor:

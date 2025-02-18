@@ -12,7 +12,6 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class EventBigCard extends StatefulWidget {
   final Event event;
@@ -28,6 +27,7 @@ class _EventBigCardState extends State<EventBigCard> {
   int? currentSavedTripCount;
   double? latitude;
   double? longitude;
+  String? locationName;
   int? locationId;
   bool isSaved = false;
 
@@ -47,6 +47,7 @@ class _EventBigCardState extends State<EventBigCard> {
             latitude = state.latitude;
             longitude = state.longitude;
             locationId = state.locationId;
+            locationName = state.locationName;
           });
         }
       },
@@ -109,9 +110,9 @@ class _EventBigCardState extends State<EventBigCard> {
                                 .id;
 
                             context.read<TripBloc>().add(GetSavedToTrips(
-                                userId: userId,
-                                id: widget.event.id,
-                                type: 'service'));
+                                  userId: userId,
+                                  id: widget.event.id,
+                                ));
 
                             // If latitude and longitude are not available, fetch them
                             if (latitude == null || longitude == null) {
@@ -126,7 +127,6 @@ class _EventBigCardState extends State<EventBigCard> {
                             displayModal(
                               context,
                               SavedToTripModal(
-                                type: "service",
                                 onTripsChanged: (List<Trip> selectedTrips,
                                     List<Trip> unselectedTrips) {
                                   setState(() {
@@ -164,7 +164,8 @@ class _EventBigCardState extends State<EventBigCard> {
                                             externalLink: widget.event.deepLink,
                                             cover: widget.event.image,
                                             name: widget.event.name,
-                                            locationName: widget.event.venue,
+                                            locationName: locationName ??
+                                                widget.event.venue,
                                             rating: 0,
                                             ratingCount: 0,
                                             typeId: 5,
@@ -175,12 +176,6 @@ class _EventBigCardState extends State<EventBigCard> {
                                                 0, // Use fetched latitude
                                             longitude: longitude ??
                                                 0, // Use fetched longitude
-                                          ));
-                                      context
-                                          .read<TripLocationBloc>()
-                                          .add(InsertTripLocation(
-                                            locationId: locationId!,
-                                            tripId: item.id,
                                           ));
                                     }
                                   }

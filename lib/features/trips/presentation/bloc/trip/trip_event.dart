@@ -63,10 +63,9 @@ final class GetCurrentUserTrips extends TripEvent {
 final class GetSavedToTrips extends TripEvent {
   final String userId;
   final int id;
-  final String type;
+
   GetSavedToTrips({
     required this.userId,
     required this.id,
-    required this.type,
   });
 }

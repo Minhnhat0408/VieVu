@@ -13,7 +13,6 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class HotelSmallCard extends StatefulWidget {
   final Hotel hotel;
@@ -103,11 +102,11 @@ class _HotelSmallCardState extends State<HotelSmallCard> {
                                 context.read<TripBloc>().add(GetSavedToTrips(
                                     userId: userId,
                                     id: widget.hotel.id,
-                                    type: 'service'));
+                                ));
                                 displayModal(
                                     context,
                                     SavedToTripModal(
-                                      type: "service",
+
                                       onTripsChanged: (List<Trip> selectedTrips,
                                           List<Trip> unselectedTrips) {
                                         setState(() {
@@ -144,12 +143,7 @@ class _HotelSmallCardState extends State<HotelSmallCard> {
                                                     widget.hotel.longitude,
                                               ));
 
-                                          context
-                                              .read<TripLocationBloc>()
-                                              .add(InsertTripLocation(
-                                                locationId: widget.locationId,
-                                                tripId: item.id,
-                                              ));
+
                                         }
 
                                         for (var item in unselectedTrips) {

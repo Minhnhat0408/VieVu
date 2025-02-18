@@ -49,7 +49,8 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
           latitude: geo.latitude,
           longitude: geo.longitude,
           linkId: id,
-          locationId: geo.id)),
+          locationId: geo.id,
+          locationName: geo.cityName)),
     );
   }
 }

@@ -75,6 +75,10 @@ dependencies:
   image_picker: ^1.1.2
   dotted_border: ^2.1.0
   circular_menu: ^4.0.0
+  timeline_tile: ^2.0.0
+  image_cropper: ^9.0.0
+  flutter_cache_manager: ^3.4.1
+  timelines: ^0.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -29,7 +29,14 @@ abstract interface class SavedServiceRemoteDatasource {
     required String tripId,
     int? typeId,
   });
-    Future<List<int>> getListSavedServiceIdsForTrip(
+
+  Future getSavedServicesForDate({
+    required String tripId,
+    int? typeId,
+    required DateTime date,
+  });
+
+  Future<List<int>> getListSavedServiceIdsForTrip(
       {required String tripId, required List<int> serviceIds});
   Future<List<int>> getListSavedServiceIds(
       {required String userId, required List<int> serviceIds});
@@ -61,6 +68,9 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
     required double longitude,
   }) async {
     try {
+      if (locationName.isEmpty) {
+        throw const ServerException('Location name is required');
+      }
       final res = await supabaseClient
           .from('saved_services')
           .insert({
@@ -86,6 +96,13 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
       if (res == null) {
         throw const ServerException('Failed to insert saved service');
       }
+      await supabaseClient
+          .from('trips')
+          .update({
+            'cover': res['cover'],
+          })
+          .eq('id', tripId)
+          .isFilter('cover', null);
 
       return SavedServiceModel.fromJson(res);
     } catch (e) {
@@ -120,6 +137,33 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
           .from('saved_services')
           .select('*')
           .eq('trip_id', tripId);
+
+      if (typeId != null) {
+        query = query.eq('type_id', typeId);
+      }
+
+      final response = await query.order('created_at', ascending: false);
+      return response.map((e) => SavedServiceModel.fromJson(e)).toList();
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future getSavedServicesForDate({
+    required String tripId,
+    int? typeId,
+    required DateTime date,
+  }) async {
+    try {
+      var query = supabaseClient
+          .from('saved_services')
+          .select('*')
+          .eq('trip_id', tripId)
+          .gte('event_date', date.toUtc().toIso8601String())
+          .lt('event_date',
+              date.add(const Duration(days: 1)).toUtc().toIso8601String());
 
       if (typeId != null) {
         query = query.eq('type_id', typeId);

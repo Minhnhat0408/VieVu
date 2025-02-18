@@ -1,6 +1,7 @@
 class SavedService {
   final DateTime createdAt;
   final int id;
+  final int dbId;
   final String tripId;
   final String? externalLink;
   final double latitude;
@@ -19,6 +20,7 @@ class SavedService {
 
   SavedService({
     required this.id,
+    required this.dbId,
     required this.typeId,
     required this.createdAt,
     required this.tripId,

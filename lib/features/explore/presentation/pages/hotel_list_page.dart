@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -88,7 +90,6 @@ class _HotelListPageState extends State<HotelListPage>
       lastDate: DateTime.now().add(const Duration(days: 90)),
       initialDateRange: selectedDateRange,
       locale: const Locale('vi', 'VN'),
-      
     );
     if (picked != null && picked != selectedDateRange) {
       setState(() {
@@ -332,6 +333,7 @@ class _HotelListPageState extends State<HotelListPage>
           body: BlocConsumer<NearbyServicesCubit, NearbyServicesState>(
             listener: (context, state) {
               if (state is HotelLoadedSuccess) {
+                log('Page key:fdsafdsss');
                 totalRecordCount += state.hotels.length;
                 final next = totalRecordCount;
                 final isLastPage = state.hotels.length < pageSize;

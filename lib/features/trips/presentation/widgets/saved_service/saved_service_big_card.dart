@@ -13,7 +13,6 @@ import 'package:vn_travel_companion/features/trips/domain/entities/saved_service
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_location/trip_location_bloc.dart';
 
 class SavedServiceBigCard extends StatefulWidget {
   final SavedService service;
@@ -93,56 +92,40 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
                                 .user
                                 .id;
                             context.read<TripBloc>().add(GetSavedToTrips(
-                                userId: userId,
-                                id: widget.service.id,
-                                type: 'service'));
-                            displayModal(
-                                context,
-                                SavedToTripModal(
-                                  type: "service",
-                                  onTripsChanged: (List<Trip> selectedTrips,
-                                      List<Trip> unselectedTrips) {
-                                    for (var item in selectedTrips) {
-                                      context
-                                          .read<SavedServiceBloc>()
-                                          .add(InsertSavedService(
-                                            tripId: item.id,
-                                            linkId: widget.service.id,
-                                            cover: widget.service.cover,
-                                            name: widget.service.name,
-                                            locationName: state
-                                                    is LocationInfoAddressLoaded
+                                  userId: userId,
+                                  id: widget.service.id,
+                                ));
+                            displayModal(context, SavedToTripModal(
+                              onTripsChanged: (List<Trip> selectedTrips,
+                                  List<Trip> unselectedTrips) {
+                                for (var item in selectedTrips) {
+                                  context
+                                      .read<SavedServiceBloc>()
+                                      .add(InsertSavedService(
+                                        tripId: item.id,
+                                        linkId: widget.service.id,
+                                        cover: widget.service.cover,
+                                        name: widget.service.name,
+                                        locationName:
+                                            state is LocationInfoAddressLoaded
                                                 ? state.cityName
                                                 : '',
-                                            rating: widget.service.rating,
-                                            ratingCount:
-                                                widget.service.ratingCount,
-                                            typeId: widget.service.typeId,
-                                            latitude: widget.service.latitude,
-                                            longitude: widget.service.longitude,
-                                          ));
+                                        rating: widget.service.rating,
+                                        ratingCount: widget.service.ratingCount,
+                                        typeId: widget.service.typeId,
+                                        latitude: widget.service.latitude,
+                                        longitude: widget.service.longitude,
+                                      ));
+                                }
 
-                                      context
-                                          .read<TripLocationBloc>()
-                                          .add(InsertTripLocation(
-                                            locationId: state
-                                                    is LocationInfoAddressLoaded
-                                                ? state.locationId
-                                                : 0,
-                                            tripId: item.id,
-                                          ));
-                                    }
-
-                                    for (var item in unselectedTrips) {
-                                      context.read<SavedServiceBloc>().add(
-                                          DeleteSavedService(
-                                              linkId: widget.service.id,
-                                              tripId: item.id));
-                                    }
-                                  },
-                                ),
-                                null,
-                                false);
+                                for (var item in unselectedTrips) {
+                                  context.read<SavedServiceBloc>().add(
+                                      DeleteSavedService(
+                                          linkId: widget.service.id,
+                                          tripId: item.id));
+                                }
+                              },
+                            ), null, false);
                           },
                           style: IconButton.styleFrom(
                             backgroundColor:
@@ -223,7 +206,8 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
 
                     const SizedBox(height: 6),
                     // Rating
-                    if (widget.service.typeId != 5)
+                    if (widget.service.typeId != 5 &&
+                        widget.service.typeId != 0)
                       Column(
                         children: [
                           Row(

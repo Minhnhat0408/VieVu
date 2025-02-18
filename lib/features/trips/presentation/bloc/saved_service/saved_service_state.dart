@@ -19,9 +19,13 @@ final class SavedServiceActionSucess extends SavedServiceState {
 final class SavedServiceDeleteSuccess extends SavedServiceState {
   final String tripId;
   final int linkId;
+
+
+
   SavedServiceDeleteSuccess({
     required this.tripId,
     required this.linkId,
+
   });
 }
 
