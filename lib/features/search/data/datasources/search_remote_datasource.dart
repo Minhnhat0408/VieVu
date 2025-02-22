@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/search/data/models/explore_search_result_model.dart';
 import 'package:http/http.dart' as http;
@@ -10,6 +11,12 @@ abstract interface class SearchRemoteDataSource {
     required int limit,
     required int offset,
     String searchType = 'all',
+  });
+
+  Future<List<ExploreSearchResultModel>> searchAll({
+    required String searchText,
+    required int limit,
+    required int offset,
   });
 
   Future<List<ExploreSearchResultModel>> searchEvents({
@@ -47,6 +54,42 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
     this.supabaseClient,
     this.client,
   );
+
+  @override
+  Future<List<ExploreSearchResultModel>> searchAll({
+    required String searchText,
+    required int limit,
+    required int offset,
+  }) async {
+    try {
+      final url =
+          Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/search_all/');
+
+      final body = {
+        "search_text": searchText,
+        "limit": limit,
+        "offset": offset
+      };
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json", // Specify the content type
+        },
+        body: jsonEncode(body), // Convert the body to JSON
+      );
+      final jsonResponse = utf8.decode(response.bodyBytes);
+      final eventData = json.decode(
+        jsonResponse,
+      );
+      final List<Map<String, dynamic>> data =
+          List<Map<String, dynamic>>.from(eventData['results']);
+
+      return data.map((e) => ExploreSearchResultModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 
   @override
   Future<List<ExploreSearchResultModel>> exploreSearch({

@@ -15,6 +15,17 @@ final class TripItineraryAddedSuccess extends TripItineraryState {
   });
 }
 
+final class TripItineraryUpdatedSuccess extends TripItineraryState {
+  final TripItinerary tripItinerary;
+
+  TripItineraryUpdatedSuccess({
+    required this.tripItinerary,
+  });
+}
+
+
+
+
 final class TripItineraryFailure extends TripItineraryState {
   final String message;
 

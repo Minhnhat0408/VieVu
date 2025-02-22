@@ -1,4 +1,3 @@
-
 class Trip {
   final String id;
   final String name;

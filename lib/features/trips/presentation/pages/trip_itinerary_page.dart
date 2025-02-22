@@ -4,14 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:timelines/timelines.dart';
+import 'package:vn_travel_companion/core/utils/conversions.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/open_url.dart';
+import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_custom_place_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_itinerary_options_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/select_saved_service_to_itinerary_modal.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/timeline_item.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class TripItineraryPage extends StatefulWidget {
   final Trip trip;
@@ -23,9 +29,10 @@ class TripItineraryPage extends StatefulWidget {
 
 class _TripItineraryPageState extends State<TripItineraryPage> {
   List<TripItinerary>? _tripItineraries;
-  final List<bool> _expanded = List.generate(6, (index) => false);
+  List<bool> _expanded = [];
 
   final List<DateTime> _panels = [];
+  final List<DateTime> _selectedDates = [];
   @override
   void initState() {
     super.initState();
@@ -36,6 +43,7 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
       final endDate = widget.trip.endDate!;
       for (var i = 0; i <= endDate.difference(startDate).inDays; i++) {
         _panels.add(startDate.add(Duration(days: i)));
+        _expanded.add(false);
       }
     }
     log('panels: $_panels');
@@ -46,28 +54,40 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
       setState(() {
         _tripItineraries = state.tripItineraries;
       });
-    }
-  }
 
-  @override
-  void didUpdateWidget(covariant TripItineraryPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // Check if the trip has changed
-    if (widget.trip != oldWidget.trip) {
-      // Trigger the rebuild
-      _panels.clear();
-      if (widget.trip.startDate != null && widget.trip.endDate != null) {
-        final startDate = widget.trip.startDate!;
-        final endDate = widget.trip.endDate!;
-        for (var i = 0; i <= endDate.difference(startDate).inDays; i++) {
-          _panels.add(startDate.add(Duration(days: i)));
+      // set panel expanded if there is itinerary
+      for (var i = 0; i < _panels.length; i++) {
+        final panel = _panels[i];
+        final itineraries = _tripItineraries!.where((element) {
+          return element.time.toIso8601String().split('T')[0] ==
+              panel.toIso8601String().split('T')[0];
+        }).toList();
+        if (itineraries.isNotEmpty) {
+          _expanded[i] = true;
         }
       }
-      log('panels updated: $_panels');
-      setState(() {});
     }
   }
+
+  // @override
+  // void didUpdateWidget(covariant TripItineraryPage oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+
+  //   // Check if the trip has changed
+  //   if (widget.trip != oldWidget.trip) {
+  //     // Trigger the rebuild
+  //     _panels.clear();
+  //     if (widget.trip.startDate != null && widget.trip.endDate != null) {
+  //       final startDate = widget.trip.startDate!;
+  //       final endDate = widget.trip.endDate!;
+  //       for (var i = 0; i <= endDate.difference(startDate).inDays; i++) {
+  //         _panels.add(startDate.add(Duration(days: i)));
+  //       }
+  //     }
+  //     log('panels updated: $_panels');
+  //     setState(() {});
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -89,12 +109,60 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 10.0),
                   child: OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Toggle selection
+                      if (_selectedDates.contains(_panels[index])) {
+                        _selectedDates.remove(_panels[index]);
+                      } else {
+                        _selectedDates.add(_panels[index]);
+                      }
+                      if (_selectedDates.isEmpty) {
+                        _expanded = List.filled(_panels.length, false);
+                        for (var i = 0; i < _panels.length; i++) {
+                          final panel = _panels[i];
+                          final itineraries =
+                              _tripItineraries!.where((element) {
+                            return element.time
+                                    .toIso8601String()
+                                    .split('T')[0] ==
+                                panel.toIso8601String().split('T')[0];
+                          }).toList();
+                          if (itineraries.isNotEmpty) {
+                            _expanded[i] = true;
+                          }
+                        }
+                      } else {
+                        _expanded = List.filled(_selectedDates.length, true);
+                      }
+
+                      setState(() {});
+                    },
                     style: OutlinedButton.styleFrom(
                       backgroundColor:
                           Theme.of(context).colorScheme.surfaceBright,
+                      side: BorderSide(
+                        color: _selectedDates.contains(_panels[index])
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary // Selected color
+                            : Theme.of(context)
+                                .colorScheme
+                                .outline, // Default color
+                        width: 2, // Border width
+                      ),
                     ),
-                    child: Text(DateFormat('dd/MM').format(_panels[index])),
+                    child: Text(
+                      DateFormat('dd/MM').format(_panels[index]),
+                      style: TextStyle(
+                        color: _selectedDates.contains(_panels[index])
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary // Text color for selected state
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant, // Default text color
+                      ),
+                    ),
                   ),
                 );
               },
@@ -104,9 +172,12 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
             _panels.isNotEmpty
                 ? IconButton(
                     onPressed: () {},
-                    icon: const Icon(
-                      Icons.edit,
-                    ))
+                    style: IconButton.styleFrom(
+                      side: BorderSide(
+                          width: 2,
+                          color: Theme.of(context).colorScheme.outline),
+                    ),
+                    icon: const Icon(Icons.edit, size: 20))
                 : ElevatedButton(
                     onPressed: () async {
                       final DateTimeRange? picked = await showDateRangePicker(
@@ -144,8 +215,37 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
 
             if (state is TripItineraryAddedSuccess) {
               log(state.tripItinerary.toString());
+
               setState(() {
                 _tripItineraries!.add(state.tripItinerary);
+              });
+            }
+
+            if (state is TripItineraryUpdatedSuccess) {
+              log(state.tripItinerary.toString());
+
+              setState(() {
+                // Find the index of the updated itinerary
+                final index = _tripItineraries!.indexWhere(
+                    (element) => element.id == state.tripItinerary.id);
+
+                if (index != -1 &&
+                    _tripItineraries![index].time != state.tripItinerary.time) {
+                  // Remove the old itinerary
+                  _tripItineraries!.removeAt(index);
+
+                  // Find the correct index to insert the new itinerary
+                  int newIndex = _tripItineraries!.indexWhere((element) =>
+                      element.time.isAfter(state.tripItinerary.time));
+
+                  if (newIndex == -1) {
+                    // Nếu không tìm thấy, thêm vào cuối danh sách
+                    _tripItineraries!.add(state.tripItinerary);
+                  } else {
+                    // Insert vào vị trí phù hợp
+                    _tripItineraries!.insert(newIndex, state.tripItinerary);
+                  }
+                }
               });
             }
           },
@@ -160,7 +260,6 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                               ExpansionPanelList(
                                   expansionCallback:
                                       (int index, bool isExpanded) {
-                                    log(index.toString());
                                     setState(() {
                                       _expanded[index] = isExpanded;
                                     });
@@ -170,10 +269,23 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                                   animationDuration:
                                       const Duration(milliseconds: 1000),
                                   children: [
-                                    ..._panels.asMap().entries.map((entry) {
+                                    ...(_selectedDates.isNotEmpty
+                                            ? _selectedDates
+                                            : _panels)
+                                        .asMap()
+                                        .entries
+                                        .map((entry) {
                                       final panel = entry.value;
                                       int index = entry.key;
-
+                                      final List<TripItinerary> itineraries =
+                                          _tripItineraries!.where((element) {
+                                        return element.time
+                                                .toIso8601String()
+                                                .split('T')[0] ==
+                                            panel
+                                                .toIso8601String()
+                                                .split('T')[0];
+                                      }).toList();
                                       return ExpansionPanel(
                                         headerBuilder: (BuildContext context,
                                             bool isExpanded) {
@@ -195,153 +307,15 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                                         canTapOnHeader: true,
 
                                         body: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          child: _tripItineraries!
-                                                      .where((element) =>
-                                                          element.time
-                                                              .toLocal()
-                                                              .toIso8601String()
-                                                              .split('T')[0] ==
-                                                          panel
-                                                              .toLocal()
-                                                              .toIso8601String()
-                                                              .split('T')[0])
-                                                      .isEmpty &&
-                                                  _expanded[index]
-                                              ? Center(
-                                                  child: Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 50.0,
-                                                          vertical: 28),
-                                                      child: Column(
-                                                        children: [
-                                                          const Text(
-                                                            "Thêm các mục đã lưu cho ngày này để hoàn thiện lịch trình",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .italic),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 10),
-                                                          Container(
-                                                            alignment: Alignment
-                                                                .center, // Aligns the button to the center
-                                                            width: null,
-                                                            child:
-                                                                ElevatedButton(
-                                                              onPressed:
-                                                                  () async {
-                                                                // Your action here
-                                                                final opt =
-                                                                    await displayModal(
-                                                                        context,
-                                                                        const AddItineraryOptionsModal(),
-                                                                        null,
-                                                                        false);
-
-                                                                if (opt ==
-                                                                    'select_saved') {
-                                                                  context
-                                                                      .read<
-                                                                          SavedServiceBloc>()
-                                                                      .add(
-                                                                          GetSavedServices(
-                                                                        tripId: widget
-                                                                            .trip
-                                                                            .id,
-                                                                      ));
-
-                                                                  displayModal(
-                                                                      context,
-                                                                      SelectSavedServiceToItineraryModal(
-                                                                          tripId: widget
-                                                                              .trip
-                                                                              .id,
-                                                                          time:
-                                                                              panel),
-                                                                      null,
-                                                                      true);
-                                                                }
-                                                              },
-                                                              child: const Text(
-                                                                  'Thêm'),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      )),
-                                                )
-                                              : FixedTimeline.tileBuilder(
-                                                  theme: TimelineThemeData(
-                                                    nodePosition: 0,
-                                                    color:
-                                                        const Color(0xff989898),
-                                                    indicatorTheme:
-                                                        const IndicatorThemeData(
-                                                      position: 0,
-                                                      size: 20.0,
-                                                    ),
-                                                    connectorTheme:
-                                                        const ConnectorThemeData(
-                                                      thickness: 2.5,
-                                                    ),
-                                                  ),
-                                                  builder: TimelineTileBuilder
-                                                      .connected(
-                                                    connectionDirection:
-                                                        ConnectionDirection
-                                                            .before,
-                                                    contentsBuilder:
-                                                        (context, index) =>
-                                                            Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              40.0),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
-                                                        border: Border.all(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .primaryContainer,
-                                                            width: 2),
-                                                      ),
-                                                      child: Text(
-                                                          'Timeline Event $index'),
-                                                    ),
-                                                    itemCount: 10,
-                                                    indicatorBuilder:
-                                                        (_, index) {
-                                                      return const OutlinedDotIndicator(
-                                                        color:
-                                                            Color(0xff66c97f),
-                                                        size: 32.0,
-                                                        borderWidth: 2,
-                                                        child: Icon(
-                                                          Icons.check,
-                                                          color: Colors.white,
-                                                          size: 20.0,
-                                                        ),
-                                                      );
-                                                    },
-                                                    connectorBuilder: (_, index,
-                                                            ___) =>
-                                                        const DashedLineConnector(
-                                                            gap: 5,
-                                                            thickness: 2,
-                                                            dash: 1,
-                                                            color: Color(
-                                                                0xff66c97f)),
-                                                  ),
-                                                ),
-                                        ),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            child: itineraries.isEmpty &&
+                                                    _expanded[index]
+                                                ? _emptyItineraryDisplay(panel)
+                                                : _itinerariesDisplay(
+                                                    itineraries,
+                                                    panel,
+                                                  )),
 
                                         isExpanded: _expanded[
                                             index], // Use the correct index
@@ -394,65 +368,162 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
     );
   }
 
-  // Widget _buildTimelineTile(
-  //     bool isFirst, TripItinerary item, String time, bool isLast, int index) {
-  //   return TimelineTile(
-  //     isFirst: isFirst,
-  //     isLast: isLast,
-  //     beforeLineStyle: LineStyle(
-  //       thickness: 3,
-  //       color: Theme.of(context).colorScheme.primaryContainer,
-  //     ),
-  //     indicatorStyle: IndicatorStyle(
-  //       width: 40,
-  //       height: 40,
-  //       indicator: _IndicatorExample(number: '${index + 1}'),
-  //       drawGap: true,
-  //       padding: const EdgeInsets.only(right: 8),
-  //     ),
-  //     endChild: Container(
-  //         padding: const EdgeInsets.all(16),
-  //         height: 200,
-  //         margin: const EdgeInsets.symmetric(vertical: 10),
-  //         decoration: BoxDecoration(
-  //           borderRadius: BorderRadius.circular(10),
-  //           border: Border.all(
-  //             color: Theme.of(context).colorScheme.primaryContainer,
-  //             width: 2,
-  //           ),
-  //         ),
-  //         child: Column(
-  //           children: [
-  //             SavedServiceMedCard(service: item.service!, isSelected: false)
-  //           ],
-  //         )),
-  //   );
-  // }
-}
+  Widget _emptyItineraryDisplay(DateTime panel) {
+    return Center(
+      child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 28),
+          child: Column(
+            children: [
+              const Text(
+                "Thêm các mục đã lưu cho ngày này để hoàn thiện lịch trình",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 20, 10),
+                ),
+                onPressed: () async {
+                  // Your action here
+                  final opt = await displayModal(
+                      context, const AddItineraryOptionsModal(), null, false);
 
-class _IndicatorExample extends StatelessWidget {
-  const _IndicatorExample({super.key, required this.number});
+                  if (opt == 'select_saved') {
+                    context.read<SavedServiceBloc>().add(GetSavedServices(
+                          tripId: widget.trip.id,
+                        ));
 
-  final String number;
+                    displayModal(
+                        context,
+                        SelectSavedServiceToItineraryModal(
+                            tripId: widget.trip.id, time: panel),
+                        null,
+                        true);
+                  } else {
+                    displayFullScreenModal(
+                        context,
+                        BlocProvider(
+                          create: (context) =>
+                              serviceLocator<LocationInfoCubit>(),
+                          child: AddCustomPlaceModal(
+                            tripId: widget.trip.id,
+                            date: panel,
+                          ),
+                        ));
+                  }
+                },
+                child: const IntrinsicWidth(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.add,
+                        size: 20,
+                      ),
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Text('Thêm'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          )),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.fromBorderSide(
-          BorderSide(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            width: 4,
+  Widget _itinerariesDisplay(List<TripItinerary> itineraries, DateTime panel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FixedTimeline.tileBuilder(
+          theme: TimelineThemeData(
+            nodePosition: 0,
+            color: Theme.of(context).colorScheme.outline,
+            indicatorTheme: const IndicatorThemeData(
+              position: 0,
+              size: 20.0,
+            ),
+            connectorTheme: const ConnectorThemeData(
+              thickness: 2.5,
+            ),
+          ),
+          builder: TimelineTileBuilder.connected(
+            connectionDirection: ConnectionDirection.before,
+            contentsBuilder: (context, index) => TimelineItem(
+              itineraries: itineraries,
+              index: index,
+              panel: panel,
+            ),
+            itemCount: itineraries.length,
+            indicatorBuilder: (_, index) {
+              return OutlinedDotIndicator(
+                size: 36.0,
+                borderWidth: 2,
+                child: Tooltip(
+                  message:
+                      convertTypeIdToString(itineraries[index].service?.typeId),
+                  child: convertTypeIdToIcons(
+                      itineraries[index].service?.typeId, 20),
+                ),
+              );
+            },
+            connectorBuilder: (_, index, ___) => const DashedLineConnector(
+              gap: 5,
+              thickness: 2,
+              dash: 1,
+            ),
           ),
         ),
-      ),
-      child: Center(
-        child: Text(
-          number,
-          style: const TextStyle(fontSize: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.fromLTRB(14, 10, 20, 10),
+          ),
+          onPressed: () async {
+            // Your action here
+            final opt = await displayModal(
+                context, const AddItineraryOptionsModal(), null, false);
+
+            if (opt == 'select_saved') {
+              context.read<SavedServiceBloc>().add(GetSavedServices(
+                    tripId: widget.trip.id,
+                  ));
+
+              displayModal(
+                  context,
+                  SelectSavedServiceToItineraryModal(
+                      tripId: widget.trip.id, time: panel),
+                  null,
+                  true);
+            } else {
+              displayFullScreenModal(
+                  context,
+                  BlocProvider(
+                    create: (context) => serviceLocator<LocationInfoCubit>(),
+                    child: AddCustomPlaceModal(
+                      tripId: widget.trip.id,
+                      date: panel,
+                    ),
+                  ));
+            }
+          },
+          child: const IntrinsicWidth(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.add,
+                  size: 20,
+                ),
+                SizedBox(
+                  width: 4,
+                ),
+                Text('Thêm'),
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }

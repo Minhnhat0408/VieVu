@@ -27,7 +27,7 @@ class ExploreSearchResultModel extends ExploreSearchResult {
           : json['id'],
       type: json['table_name'],
       cover: json['cover'],
-      price: json['price'],
+      price: json['price']?.toInt(),
       ratingCount: json['rating_count'],
       avgRating: json['avg_rating']?.toDouble(),
       hotScore: json['hot_score']?.toDouble(),

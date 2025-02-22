@@ -107,13 +107,23 @@ class _AddSavedServicesPageViewState extends State<AddSavedServicesPageView> {
               searchType: _mapFilterToSearchType(_selectedFilter),
             ));
       } else {
-        context.read<SearchBloc>().add(ExploreSearch(
-              searchText: _keyword,
-              limit: pageSize - 1,
-              offset: pageKey,
-              searchType: _mapFilterToSearchType(_selectedFilter),
-              tripId: widget.trip.id,
-            ));
+        final searchType = _mapFilterToSearchType(_selectedFilter);
+        if (searchType == 'all') {
+          context.read<SearchBloc>().add(SearchAll(
+                searchText: _keyword,
+                limit: pageSize,
+                offset: pageKey,
+                tripId: widget.trip.id,
+              ));
+        } else {
+          context.read<SearchBloc>().add(ExploreSearch(
+                searchText: _keyword,
+                limit: pageSize - 1,
+                offset: pageKey,
+                searchType: searchType,
+                tripId: widget.trip.id,
+              ));
+      }
       }
     });
   }
@@ -265,7 +275,6 @@ class _AddSavedServicesPageViewState extends State<AddSavedServicesPageView> {
                       padding: const EdgeInsets.only(bottom: 4.0),
                       child: FilterOptionsBig(
                           options: _filterOptions,
-
                           selectedOption: _selectedFilter,
                           onOptionSelected: _onFilterChanged,
                           isFiltering: state is SearchLoading)),

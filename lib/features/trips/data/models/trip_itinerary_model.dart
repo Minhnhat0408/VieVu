@@ -18,7 +18,9 @@ class TripItineraryModel extends TripItinerary {
     return TripItineraryModel(
       id: json['id'],
       tripId: json['trip_id'],
-      service: SavedServiceModel.fromJson(json['saved_services']),
+      service: json['saved_services'] != null
+          ? SavedServiceModel.fromJson(json['saved_services'])
+          : null,
       latitude: json['latitude'],
       longitude: json['longitude'],
       title: json['title'],

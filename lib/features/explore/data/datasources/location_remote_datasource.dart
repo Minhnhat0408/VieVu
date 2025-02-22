@@ -270,7 +270,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
         // return jsonResponse['results'][0]['address_line2'];
-
+        log(jsonResponse.toString());
         final res = await supabaseClient
             .from('locations')
             .select('id, name')
@@ -283,14 +283,19 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
 
         if (res != null) {
           return GeoApiLocationModel(
-              address: jsonResponse['results'][0]['address_line2'],
+              address: jsonResponse['results'][0]['formatted'],
               cityName: res['name'],
               latitude: latitude,
               id: res['id'],
               longitude: longitude);
+        } else {
+          return GeoApiLocationModel(
+              address: jsonResponse['results'][0]['formatted'],
+              cityName: jsonResponse['results'][0]['state'],
+              latitude: latitude,
+              id: 0,
+              longitude: longitude);
         }
-
-        throw const ServerException('Location not found');
       } else {
         throw ServerException(response.body);
       }

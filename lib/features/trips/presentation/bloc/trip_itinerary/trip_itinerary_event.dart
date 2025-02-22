@@ -12,7 +12,6 @@ class InsertTripItinerary extends TripItineraryEvent {
   final String? note;
   final DateTime time;
 
-
   InsertTripItinerary({
     required this.tripId,
     this.serviceId,
@@ -21,7 +20,6 @@ class InsertTripItinerary extends TripItineraryEvent {
     required this.title,
     this.note,
     required this.time,
-
   });
 }
 
@@ -30,5 +28,17 @@ class GetTripItineraries extends TripItineraryEvent {
 
   GetTripItineraries({
     required this.tripId,
+  });
+}
+
+class UpdateTripItinerary extends TripItineraryEvent {
+  final int id;
+  final String? note;
+  final DateTime? time;
+
+  UpdateTripItinerary({
+    required this.id,
+    this.note,
+    this.time,
   });
 }

@@ -99,12 +99,21 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
               searchType: _mapFilterToSearchType(_selectedFilter),
             ));
       } else {
-        context.read<SearchBloc>().add(ExploreSearch(
-              searchText: _keyword,
-              limit: pageSize,
-              offset: pageKey,
-              searchType: _mapFilterToSearchType(_selectedFilter),
-            ));
+        final searchType = _mapFilterToSearchType(_selectedFilter);
+        if (searchType == 'all') {
+          context.read<SearchBloc>().add(SearchAll(
+                searchText: _keyword,
+                limit: pageSize,
+                offset: pageKey,
+              ));
+        } else {
+          context.read<SearchBloc>().add(ExploreSearch(
+                searchText: _keyword,
+                limit: pageSize - 1,
+                offset: pageKey,
+                searchType: searchType,
+              ));
+        }
       }
     });
   }

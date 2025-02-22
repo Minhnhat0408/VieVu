@@ -15,6 +15,14 @@ import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.da
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vn_travel_companion/features/chat/data/datasources/chat_remote_datasource.dart';
+import 'package:vn_travel_companion/features/chat/data/datasources/message_remote_datasource.dart';
+import 'package:vn_travel_companion/features/chat/data/repositories/chat_repository_implementation.dart';
+import 'package:vn_travel_companion/features/chat/data/repositories/message_repository_implementation.dart';
+import 'package:vn_travel_companion/features/chat/domain/repositories/chat_repository.dart';
+import 'package:vn_travel_companion/features/chat/domain/repositories/message_repository.dart';
+import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/event_remote_datasource.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
@@ -74,6 +82,8 @@ Future<void> initDependencies() async {
   _initSearch();
   _initReview();
   _initTrip();
+  _initChat();
+  _initMessage();
 
   _initSavedService();
   _initTripItinerary();
@@ -345,7 +355,6 @@ void _initTrip() {
     );
 }
 
-
 void _initSavedService() {
   serviceLocator
     ..registerFactory<SavedServiceRemoteDatasource>(
@@ -382,6 +391,46 @@ void _initTripItinerary() {
     ..registerLazySingleton(
       () => TripItineraryBloc(
         tripItineraryRepository: serviceLocator(),
+      ),
+    );
+}
+
+void _initChat() {
+  serviceLocator
+    ..registerFactory<ChatRemoteDatasource>(
+      () => ChatRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<ChatRepository>(
+      () => ChatRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => ChatBloc(
+        chatRepository: serviceLocator(),
+      ),
+    );
+}
+
+void _initMessage() {
+  serviceLocator
+    ..registerFactory<MessageRemoteDatasource>(
+      () => MessageRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<MessageRepository>(
+      () => MessageRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => MessageBloc(
+        messageRepository: serviceLocator(),
       ),
     );
 }

@@ -13,9 +13,10 @@ abstract interface class TripItineraryRepository {
     int? serviceId,
   });
 
-  Future<Either<Failure, Unit>> updateTripItinerary({
+  Future<Either<Failure, TripItinerary>> updateTripItinerary({
     required int id,
-    required bool isStartingPoint,
+    String? note,
+    DateTime? time,
   });
 
   Future<Either<Failure, Unit>> deleteTripItinerary({

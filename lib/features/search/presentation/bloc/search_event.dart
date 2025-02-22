@@ -2,6 +2,20 @@ part of 'search_bloc.dart';
 
 @immutable
 sealed class SearchEvent {}
+class SearchAll extends SearchEvent {
+  final String searchText;
+  final int limit;
+  final int offset;
+  final String? tripId;
+
+  SearchAll({
+     this.tripId,
+    required this.searchText,
+    required this.limit,
+    required this.offset,
+
+  });
+}
 
 class ExploreSearch extends SearchEvent {
   final String searchText;

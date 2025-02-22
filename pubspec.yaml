@@ -79,6 +79,7 @@ dependencies:
   image_cropper: ^9.0.0
   flutter_cache_manager: ^3.4.1
   timelines: ^0.1.0
+  emoji_picker_flutter: ^4.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

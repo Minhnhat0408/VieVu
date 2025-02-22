@@ -15,9 +15,10 @@ abstract interface class TripItineraryRemoteDatasource {
     int? serviceId,
   });
 
-  Future updateTripItinerary({
+  Future<TripItineraryModel> updateTripItinerary({
     required int id,
-    required bool isStartingPoint,
+    String? note,
+    DateTime? time,
   });
 
   Future deleteTripItinerary({
@@ -71,15 +72,32 @@ class TripItineraryRemoteDatasourceImpl
   }
 
   @override
-  Future updateTripItinerary({
+  Future<TripItineraryModel> updateTripItinerary({
     required int id,
-    required bool isStartingPoint,
+    String? note,
+    DateTime? time,
   }) async {
     try {
-      await supabaseClient.from('trip_itinerary').update({
-        'is_starting_point': isStartingPoint,
-      }).eq('id', id);
+      Map<String, dynamic> updateObject = {};
+
+      if (note != null && note.isNotEmpty) {
+        updateObject['note'] = note;
+      }
+      if (time != null) {
+        updateObject['time'] = time.toIso8601String();
+      }
+
+      log(time.toString());
+      final res = await supabaseClient
+          .from('trip_itineraries')
+          .update(updateObject)
+          .eq('id', id)
+          .select('*, saved_services(*)')
+          .single();
+
+      return TripItineraryModel.fromJson(res);
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

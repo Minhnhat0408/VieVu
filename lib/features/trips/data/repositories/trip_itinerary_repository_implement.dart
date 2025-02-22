@@ -43,19 +43,21 @@ class TripItineraryRepositoryImpl implements TripItineraryRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> updateTripItinerary({
+  Future<Either<Failure, TripItinerary>> updateTripItinerary({
     required int id,
-    required bool isStartingPoint,
+    String? note,
+    DateTime? time,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      await tripItineraryRemoteDatasource.updateTripItinerary(
+      final res = await tripItineraryRemoteDatasource.updateTripItinerary(
         id: id,
-        isStartingPoint: isStartingPoint,
+        note: note,
+        time: time,
       );
-      return right(unit);
+      return right(res);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -80,7 +82,6 @@ class TripItineraryRepositoryImpl implements TripItineraryRepository {
     }
   }
 
-
   @override
   Future<Either<Failure, List<TripItinerary>>> getTripItineraries({
     required String tripId,
@@ -97,6 +98,4 @@ class TripItineraryRepositoryImpl implements TripItineraryRepository {
       return left(Failure(e.message));
     }
   }
-
-
 }
