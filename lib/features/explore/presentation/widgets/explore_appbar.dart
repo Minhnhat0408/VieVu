@@ -24,7 +24,7 @@ class _ExploreAppbarState extends State<ExploreAppbar> {
     const double minHeight = 121.0; // Threshold height for minimum padding
     const double maxHeight = 400.0; // Approximate max expanded height
     const double minPadding = 16.0; // Minimum bottom padding
-    const double maxPadding = 220.0; // Maximum bottom padding
+    const double maxPadding = 240.0; // Maximum bottom padding
 
     // Clamp appBarHeight to the valid range
     appBarHeight = appBarHeight.clamp(minHeight, maxHeight);
@@ -40,12 +40,13 @@ class _ExploreAppbarState extends State<ExploreAppbar> {
       builder: (BuildContext context, BoxConstraints constraints) {
         // Calculate the current height of the FlexibleSpace
         double appBarHeight = constraints.biggest.height;
+
         return FlexibleSpaceBar(
           titlePadding: EdgeInsets.only(
-              bottom: calculatePadding(appBarHeight),
-              left: 20,
-              right: 20,
-             ),
+            bottom: calculatePadding(appBarHeight),
+            left: 20,
+            right: 20,
+          ),
           title: const Hero(
             tag: 'exploreSearch',
             child: ExploreSearchButton(showNotification: false),

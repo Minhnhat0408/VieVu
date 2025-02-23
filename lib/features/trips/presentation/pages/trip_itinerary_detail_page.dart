@@ -305,6 +305,9 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
                       ],
                     ),
                   ),
+                  const SizedBox(
+                    height: 20,
+                  )
                 ],
               ),
             )),
@@ -320,7 +323,7 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 8),
+                          horizontal: 10, vertical: 8),
                       backgroundColor: Theme.of(context).colorScheme.onSurface,
                       foregroundColor: Theme.of(context).colorScheme.surface,
                     ),
@@ -360,7 +363,7 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
                             size: 30,
                           )),
                       const SizedBox(
-                        width: 20,
+                        width: 10,
                       ),
                       OutlinedButton.icon(
                           onPressed: () {

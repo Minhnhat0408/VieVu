@@ -51,7 +51,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Đánh giá từ cộng đồng',
+                'Đánh giá',
                 style: Theme.of(context)
                     .textTheme
                     .titleLarge!

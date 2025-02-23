@@ -50,159 +50,161 @@ class _SignUpPageState extends State<SignUpPage> {
           return Stack(
             children: [
               Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
                 child: Form(
                   key: formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: 'Đăng ký tài khoản ', // Normal text
-                          style: Theme.of(context).textTheme.headlineMedium,
-                          children: [
-                            TextSpan(
-                              text: 'TravelCompanion', // Styled text
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary, // Custom color
-                                fontWeight:
-                                    FontWeight.bold, // Optional: adjust weight
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Đăng ký tài khoản ', // Normal text
+                            style: Theme.of(context).textTheme.headlineMedium,
+                            children: [
+                              TextSpan(
+                                text: 'TravelCompanion', // Styled text
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary, // Custom color
+                                  fontWeight: FontWeight
+                                      .bold, // Optional: adjust weight
+                                ),
                               ),
-                            ),
-                            const TextSpan(
-                              text: '.', // Trailing text
-                            ),
+                              const TextSpan(
+                                text: '.', // Trailing text
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        AuthField(
+                          hintText: 'Họ và Tên',
+                          controller: nameController,
+                          validators: const [Validators.checkEmpty],
+                        ),
+                        const SizedBox(height: 24),
+                        AuthField(
+                          hintText: 'Email',
+                          controller: emailController,
+                          validators: const [Validators.checkEmail],
+                        ),
+                        const SizedBox(height: 24),
+                        AuthField(
+                          hintText: 'Mật khẩu',
+                          controller: passwordController,
+                          isObscureText: true,
+                          validators: const [
+                            Validators.checkPassword,
+                            Validators.checkPasswordSpecialChar
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 40),
-                      AuthField(
-                        hintText: 'Họ và Tên',
-                        controller: nameController,
-                        validators: const [Validators.checkEmpty],
-                      ),
-                      const SizedBox(height: 24),
-                      AuthField(
-                        hintText: 'Email',
-                        controller: emailController,
-                        validators: const [Validators.checkEmail],
-                      ),
-                      const SizedBox(height: 24),
-                      AuthField(
-                        hintText: 'Mật khẩu',
-                        controller: passwordController,
-                        isObscureText: true,
-                        validators: const [
-                          Validators.checkPassword,
-                          Validators.checkPasswordSpecialChar
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "x Ít nhất 8 ký tự",
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary),
-                      ),
-                      Text(
-                        "x Bao gồm một ký tự đặc biệt",
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary),
-                      ),
-                      const SizedBox(height: 24),
-                      AuthSubmitBtn(
-                        btnText: "Đăng ký",
-                        onPressed: () {
-                          if (formKey.currentState!.validate()) {
-                            context.read<AuthBloc>().add(AuthSignUp(
-                                  email: emailController.text.trim(),
-                                  password: passwordController.text.trim(),
-                                  name: nameController.text.trim(),
-                                ));
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/login');
+                        const SizedBox(height: 16),
+                        Text(
+                          "x Ít nhất 8 ký tự",
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary),
+                        ),
+                        Text(
+                          "x Bao gồm một ký tự đặc biệt",
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary),
+                        ),
+                        const SizedBox(height: 24),
+                        AuthSubmitBtn(
+                          btnText: "Đăng ký",
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              context.read<AuthBloc>().add(AuthSignUp(
+                                    email: emailController.text.trim(),
+                                    password: passwordController.text.trim(),
+                                    name: nameController.text.trim(),
+                                  ));
+                            }
                           },
-                          child: RichText(
-                            text: TextSpan(
-                                text: 'Đã có tài khoản? ',
-                                style: Theme.of(context).textTheme.titleMedium,
-                                children: [
-                                  TextSpan(
-                                    text: 'Đăng nhập',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                ]),
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/login');
+                            },
+                            child: RichText(
+                              text: TextSpan(
+                                  text: 'Đã có tài khoản? ',
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                  children: [
+                                    TextSpan(
+                                      text: 'Đăng nhập',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ]),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 36),
-                      const Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              thickness: 1,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              "Hình thức khác",
-                              style: TextStyle(
-                                fontSize: 14,
+                        const SizedBox(height: 24),
+                        const Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                thickness: 1,
                               ),
                             ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              thickness: 1,
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                "Hình thức khác",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 50,
-                              vertical: 16,
-                            )),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/google-icon.svg',
-                              width: 20,
-                              height: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            const Text(
-                              'Tiếp tục bằng Google',
-                              style: TextStyle(
-                                fontSize: 16,
+                            Expanded(
+                              child: Divider(
+                                thickness: 1,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 24),
+                        OutlinedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 50,
+                                vertical: 16,
+                              )),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/google-icon.svg',
+                                width: 20,
+                                height: 20,
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Tiếp tục bằng Google',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

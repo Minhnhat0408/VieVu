@@ -43,7 +43,7 @@ class PasswordForgotPage extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.only(
                       left: 24, top: 18, bottom: 18, right: 54),
-                  textStyle: const TextStyle(fontSize: 20),
+                  textStyle: const TextStyle(fontSize: 16),
                   side: BorderSide(
                     color: Theme.of(context).colorScheme.outline,
                     // Customizes the border
@@ -72,7 +72,7 @@ class PasswordForgotPage extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.only(
                       left: 24, top: 18, bottom: 18, right: 54),
-                  textStyle: const TextStyle(fontSize: 20),
+                  textStyle: const TextStyle(fontSize: 16),
                   side: BorderSide(
                     // Customizes the border
                     color: Theme.of(context).colorScheme.outline,

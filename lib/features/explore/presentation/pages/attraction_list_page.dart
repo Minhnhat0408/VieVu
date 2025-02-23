@@ -626,6 +626,7 @@ class _AttractionListPageState extends State<AttractionListPage>
                       ),
                       PagedSliverList<int, Attraction>(
                         pagingController: _pagingController,
+                        
                         builderDelegate: PagedChildBuilderDelegate<Attraction>(
                           itemBuilder: (context, item, index) {
                             return AttractionMedCard(

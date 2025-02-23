@@ -34,27 +34,27 @@ class ExploreSearchItem extends StatelessWidget {
       case 'attractions':
         return const Icon(
           Icons.attractions,
-          size: 40,
+          size: 30,
         );
       case 'locations':
         return const Icon(
           Icons.place,
-          size: 40,
+          size: 30,
         );
       case 'keyword':
         return const Icon(
           Icons.search,
-          size: 40,
+          size: 30,
         );
       case 'travel_types':
         return const Icon(
           Icons.terrain_outlined,
-          size: 40,
+          size: 30,
         );
       default:
         return const FaIcon(
           FontAwesomeIcons.locationArrow,
-          size: 40,
+          size: 30,
         );
     }
   }
@@ -145,7 +145,6 @@ class ExploreSearchItem extends StatelessWidget {
                 title: result!.title,
                 address: result!.address,
                 linkId: result!.id,
-
               ));
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => LocationDetailPage(
@@ -174,8 +173,8 @@ class ExploreSearchItem extends StatelessWidget {
                   width: 2.0,
                 ),
               ),
-              width: 90,
-              height: 90,
+              width: 80,
+              height: 80,
               alignment: Alignment.center,
               clipBehavior: Clip.antiAliasWithSaveLayer,
               child: (result == null ||
@@ -194,8 +193,8 @@ class ExploreSearchItem extends StatelessWidget {
                           .zero, // Remove fade-in animation for faster display
                       filterQuality: FilterQuality.low,
                       useOldImageOnUrlChange: true, // Avoid unnecessary reloads
-                      width: 90,
-                      height: 90,
+                      width: 80,
+                      height: 80,
                       fit: BoxFit.cover,
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),

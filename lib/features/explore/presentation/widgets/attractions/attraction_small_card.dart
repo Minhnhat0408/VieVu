@@ -70,8 +70,8 @@ class _AttractionSmallCardState extends State<AttractionSmallCard> {
                         filterQuality: FilterQuality.low,
                         useOldImageOnUrlChange:
                             true, // Avoid unnecessary reloads
-                        width: 110,
-                        height: 110,
+                        width: 100,
+                        height: 100,
                         fit: BoxFit.cover,
                         errorWidget: (context, url, error) =>
                             const Icon(Icons.error),
@@ -90,71 +90,59 @@ class _AttractionSmallCardState extends State<AttractionSmallCard> {
                                 .user
                                 .id;
                             context.read<TripBloc>().add(GetSavedToTrips(
-                                userId: userId,
-                                id: widget.attraction.id,
+                                  userId: userId,
+                                  id: widget.attraction.id,
                                 ));
-                            displayModal(
-                                context,
-                                SavedToTripModal(
+                            displayModal(context, SavedToTripModal(
+                              onTripsChanged: (List<Trip> selectedTrips,
+                                  List<Trip> unselectedTrips) {
+                                setState(() {
+                                  changeSavedItemCount = selectedTrips.length +
+                                      unselectedTrips.length;
+                                  currentSavedTripCount ??= 0;
+                                  currentSavedTripCount =
+                                      currentSavedTripCount! +
+                                          selectedTrips.length -
+                                          unselectedTrips.length;
+                                });
 
-                                  onTripsChanged: (List<Trip> selectedTrips,
-                                      List<Trip> unselectedTrips) {
-                                    setState(() {
-                                      changeSavedItemCount =
-                                          selectedTrips.length +
-                                              unselectedTrips.length;
-                                      currentSavedTripCount ??= 0;
-                                      currentSavedTripCount =
-                                          currentSavedTripCount! +
-                                              selectedTrips.length -
-                                              unselectedTrips.length;
-                                    });
+                                for (var item in selectedTrips) {
+                                  context
+                                      .read<SavedServiceBloc>()
+                                      .add(InsertSavedService(
+                                        tripId: item.id,
+                                        linkId: widget.attraction.id,
+                                        cover: widget.attraction.cover,
+                                        name: widget.attraction.name,
+                                        locationName:
+                                            widget.attraction.locationName,
+                                        rating:
+                                            widget.attraction.avgRating ?? 0,
+                                        ratingCount:
+                                            widget.attraction.ratingCount ?? 0,
+                                        typeId: 2,
+                                        price: widget.attraction.price,
+                                        tagInfoList: widget
+                                            .attraction.travelTypes
+                                            ?.map((e) => e is String
+                                                ? e
+                                                : e['type_name'] as String)
+                                            .toList(),
+                                        latitude: widget.attraction.latitude,
+                                        longitude: widget.attraction.longitude,
+                                      ));
+                                }
 
-                                    for (var item in selectedTrips) {
-                                      context
-                                          .read<SavedServiceBloc>()
-                                          .add(InsertSavedService(
-                                            tripId: item.id,
-                                            linkId: widget.attraction.id,
-                                            cover: widget.attraction.cover,
-                                            name: widget.attraction.name,
-                                            locationName:
-                                                widget.attraction.locationName,
-                                            rating:
-                                                widget.attraction.avgRating ??
-                                                    0,
-                                            ratingCount:
-                                                widget.attraction.ratingCount ??
-                                                    0,
-                                            typeId: 2,
-                                            price: widget.attraction.price,
-                                            tagInfoList: widget
-                                                .attraction.travelTypes
-                                                ?.map((e) => e is String
-                                                    ? e
-                                                    : e['type_name'] as String)
-                                                .toList(),
-                                            latitude:
-                                                widget.attraction.latitude,
-                                            longitude:
-                                                widget.attraction.longitude,
-                                          ));
-
-
-                                    }
-
-                                    for (var item in unselectedTrips) {
-                                      context
-                                          .read<SavedServiceBloc>()
-                                          .add(DeleteSavedService(
-                                            linkId: widget.attraction.id,
-                                            tripId: item.id,
-                                          ));
-                                    }
-                                  },
-                                ),
-                                null,
-                                false);
+                                for (var item in unselectedTrips) {
+                                  context
+                                      .read<SavedServiceBloc>()
+                                      .add(DeleteSavedService(
+                                        linkId: widget.attraction.id,
+                                        tripId: item.id,
+                                      ));
+                                }
+                              },
+                            ), null, false);
                           },
                           iconSize: 18,
                           style: IconButton.styleFrom(
@@ -192,23 +180,23 @@ class _AttractionSmallCardState extends State<AttractionSmallCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AutoSizeText(
-                        widget.attraction.name,
-                        minFontSize: 14, // Minimum font size to shrink to
-                        maxLines: 2, // Allow up to 2 lines for wrapping
-                        overflow: TextOverflow
-                            .ellipsis, // Add ellipsis if it exceeds maxLines
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16, // Default starting font size
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 190,
+                        child: Text(
+                          widget.attraction.name,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
                           RatingBarIndicator(
                             rating: widget.attraction.avgRating ?? 0,
-                            itemSize: 20,
+                            itemSize: 18,
                             direction: Axis.horizontal,
                             itemCount: 5,
                             itemBuilder: (context, _) => Icon(
@@ -221,6 +209,9 @@ class _AttractionSmallCardState extends State<AttractionSmallCard> {
                           Text(
                             '(${widget.attraction.ratingCount})',
                             style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                          const SizedBox(
+                            width: 10,
                           ),
                           Container(
                             decoration: BoxDecoration(

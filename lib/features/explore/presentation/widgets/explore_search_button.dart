@@ -24,6 +24,8 @@ class ExploreSearchButton extends StatelessWidget {
           Expanded(
             child: Text(
               'Tìm kiếm địa điểm du lịch...',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),

@@ -55,13 +55,16 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                 : Colors.transparent,
             child: Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
+                  const EdgeInsets.symmetric(horizontal: 2.0, vertical: 10),
               child: Row(
                 crossAxisAlignment: widget.slider
                     ? CrossAxisAlignment.center
                     : CrossAxisAlignment.start,
                 children: [
                   // Image and Icon
+                  const SizedBox(
+                    width: 10,
+                  ),
                   Stack(
                     children: [
                       ClipRRect(
@@ -79,16 +82,16 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                           filterQuality: FilterQuality.low,
                           useOldImageOnUrlChange:
                               true, // Avoid unnecessary reloads
-                          width: 110,
-                          height: 110,
+                          width: 100,
+                          height: 100,
                           fit: BoxFit.cover,
                           errorWidget: (context, url, error) =>
                               const Icon(Icons.error),
                         ),
                       ),
                       Positioned(
-                        top: 8,
-                        right: 8,
+                        top: 4,
+                        right: 4,
                         child: SizedBox(
                           width: 28,
                           height: 28,
@@ -99,70 +102,60 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                                   .user
                                   .id;
                               context.read<TripBloc>().add(GetSavedToTrips(
-                                  userId: userId,
-                                  id: widget.attraction.id,
-                                 ));
-                              displayModal(
-                                  context,
-                                  SavedToTripModal(
+                                    userId: userId,
+                                    id: widget.attraction.id,
+                                  ));
+                              displayModal(context, SavedToTripModal(
+                                onTripsChanged: (List<Trip> selectedTrips,
+                                    List<Trip> unselectedTrips) {
+                                  setState(() {
+                                    changeSavedItemCount =
+                                        selectedTrips.length +
+                                            unselectedTrips.length;
+                                    currentSavedTripCount ??= 0;
+                                    currentSavedTripCount =
+                                        currentSavedTripCount! +
+                                            selectedTrips.length -
+                                            unselectedTrips.length;
+                                  });
 
-                                    onTripsChanged: (List<Trip> selectedTrips,
-                                        List<Trip> unselectedTrips) {
-                                      setState(() {
-                                        changeSavedItemCount =
-                                            selectedTrips.length +
-                                                unselectedTrips.length;
-                                        currentSavedTripCount ??= 0;
-                                        currentSavedTripCount =
-                                            currentSavedTripCount! +
-                                                selectedTrips.length -
-                                                unselectedTrips.length;
-                                      });
-
-                                      for (var item in selectedTrips) {
-                                        context
-                                            .read<SavedServiceBloc>()
-                                            .add(InsertSavedService(
-                                              tripId: item.id,
-                                              linkId: widget.attraction.id,
-                                              cover: widget.attraction.cover,
-                                              name: widget.attraction.name,
-                                              locationName: widget
-                                                  .attraction.locationName,
-                                              rating:
-                                                  widget.attraction.avgRating ??
-                                                      0,
-                                              ratingCount: widget
-                                                      .attraction.ratingCount ??
+                                  for (var item in selectedTrips) {
+                                    context
+                                        .read<SavedServiceBloc>()
+                                        .add(InsertSavedService(
+                                          tripId: item.id,
+                                          linkId: widget.attraction.id,
+                                          cover: widget.attraction.cover,
+                                          name: widget.attraction.name,
+                                          locationName:
+                                              widget.attraction.locationName,
+                                          rating:
+                                              widget.attraction.avgRating ?? 0,
+                                          ratingCount:
+                                              widget.attraction.ratingCount ??
                                                   0,
-                                              typeId: 2,
-                                              price: widget.attraction.price,
-                                              tagInfoList: widget
-                                                  .attraction.travelTypes
-                                                  ?.map((e) => e is String
-                                                      ? e
-                                                      : e['type_name']
-                                                          .toString())
-                                                  .toList(),
-                                              latitude:
-                                                  widget.attraction.latitude,
-                                              longitude:
-                                                  widget.attraction.longitude,
-                                            ));
+                                          typeId: 2,
+                                          price: widget.attraction.price,
+                                          tagInfoList: widget
+                                              .attraction.travelTypes
+                                              ?.map((e) => e is String
+                                                  ? e
+                                                  : e['type_name'].toString())
+                                              .toList(),
+                                          latitude: widget.attraction.latitude,
+                                          longitude:
+                                              widget.attraction.longitude,
+                                        ));
+                                  }
 
-
-                                      }
-
-                                      for (var item in unselectedTrips) {
-                                        context.read<SavedServiceBloc>().add(
-                                            DeleteSavedService(
-                                                linkId: widget.attraction.id,
-                                                tripId: item.id));
-                                      }
-                                    },
-                                  ),
-                                  null,
-                                  false);
+                                  for (var item in unselectedTrips) {
+                                    context.read<SavedServiceBloc>().add(
+                                        DeleteSavedService(
+                                            linkId: widget.attraction.id,
+                                            tripId: item.id));
+                                  }
+                                },
+                              ), null, false);
                             },
                             iconSize: 18,
                             style: IconButton.styleFrom(
@@ -193,8 +186,8 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                       ),
                       if (widget.slider)
                         Positioned(
-                            bottom: 8,
-                            left: 8,
+                            bottom: 4,
+                            left: 4,
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Theme.of(context)
@@ -229,7 +222,7 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                             )),
                     ],
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 10),
                   Expanded(
                     // Ensure this widget allows text to take available space
                     child: Padding(
@@ -275,7 +268,7 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                             children: [
                               RatingBarIndicator(
                                 rating: widget.attraction.avgRating ?? 0,
-                                itemSize: 20,
+                                itemSize: 18,
                                 direction: Axis.horizontal,
                                 itemCount: 5,
                                 itemBuilder: (context, _) => Icon(

@@ -36,7 +36,7 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
           icon: const Icon(Icons.menu),
           onPressed: () {},
         ),
-        title: const Text('All Messages'),
+        title: const Text('Liên hệ'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),

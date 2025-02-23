@@ -51,167 +51,165 @@ class _LogInPageState extends State<LogInPage> {
           return Stack(
             children: [
               Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
                 child: Form(
                   key: formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: 'Chào mừng đến với ', // Normal text
-                          style: Theme.of(context).textTheme.headlineMedium,
-                          children: [
-                            TextSpan(
-                              text: 'TravelCompanion', // Styled text
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary, // Custom color
-                                fontWeight:
-                                    FontWeight.bold, // Optional: adjust weight
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Chào mừng đến với ', // Normal text
+                            style: Theme.of(context).textTheme.headlineMedium,
+                            children: [
+                              TextSpan(
+                                text: 'TravelCompanion', // Styled text
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary, // Custom color
+                                  fontWeight: FontWeight
+                                      .bold, // Optional: adjust weight
+                                ),
                               ),
-                            ),
-                            const TextSpan(
-                              text: '.', // Trailing text
-                            ),
-                          ],
+                              const TextSpan(
+                                text: '.', // Trailing text
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Hãy nhập email và mật khẩu của bạn để đăng nhập',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      AuthField(
-                        hintText: 'Email',
-                        controller: emailController,
-                        validators: const [Validators.checkEmail],
-                      ),
-                      const SizedBox(height: 24),
-                      AuthField(
-                        hintText: 'Mật khẩu',
-                        controller: passwordController,
-                        isObscureText: true,
-                        validators: const [
-                          Validators.checkPassword,
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/password-forgot');
-                        },
-                        child: Text(
-                          'Quên mật khẩu?',
+                        const SizedBox(height: 20),
+                        Text(
+                          'Hãy nhập email và mật khẩu của bạn để đăng nhập',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontWeight: FontWeight.w500,
+                            fontStyle: FontStyle.italic,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      AuthSubmitBtn(
-                        btnText: "Đăng Nhập",
-                        onPressed: () {
-                          if (formKey.currentState!.validate()) {
-                            context.read<AuthBloc>().add(
-                                  AuthLogin(
-                                    email: emailController.text.trim(),
-                                    password: passwordController.text.trim(),
-                                  ),
-                                );
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      Center(
-                        child: GestureDetector(
+                        const SizedBox(height: 20),
+                        AuthField(
+                          hintText: 'Email',
+                          controller: emailController,
+                          validators: const [Validators.checkEmail],
+                        ),
+                        const SizedBox(height: 24),
+                        AuthField(
+                          hintText: 'Mật khẩu',
+                          controller: passwordController,
+                          isObscureText: true,
+                          validators: const [
+                            Validators.checkPassword,
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, '/sign-up');
+                            Navigator.pushNamed(context, '/password-forgot');
                           },
-                          child: RichText(
-                            text: TextSpan(
-                                text: 'Chưa có tài khoản? ',
-                                style: Theme.of(context).textTheme.titleMedium,
-                                children: [
-                                  TextSpan(
-                                    text: 'Đăng ký',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                ]),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 36),
-                      const Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              thickness: 1,
+                          child: Text(
+                            'Quên mật khẩu?',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              "Hình thức khác",
-                              style: TextStyle(
-                                fontSize: 14,
+                        ),
+                        const SizedBox(height: 24),
+                        AuthSubmitBtn(
+                          btnText: "Đăng Nhập",
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              context.read<AuthBloc>().add(
+                                    AuthLogin(
+                                      email: emailController.text.trim(),
+                                      password: passwordController.text.trim(),
+                                    ),
+                                  );
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/sign-up');
+                            },
+                            child: RichText(
+                              text: TextSpan(
+                                  text: 'Chưa có tài khoản? ',
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                  children: [
+                                    TextSpan(
+                                      text: 'Đăng ký',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ]),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                        const Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                thickness: 1,
                               ),
                             ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              thickness: 1,
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                "Hình thức khác",
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
-                      OutlinedButton(
-                        onPressed: () {
-                          context.read<AuthBloc>().add(AuthLoginWithGoogle());
-                        },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 50,
-                              vertical: 16,
-                            )),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/google-icon.svg',
-                              width: 20,
-                              height: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            const Text(
-                              'Tiếp tục bằng Google',
-                              style: TextStyle(
-                                fontSize: 16,
+                            Expanded(
+                              child: Divider(
+                                thickness: 1,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 28),
+                        OutlinedButton(
+                          onPressed: () {
+                            context.read<AuthBloc>().add(AuthLoginWithGoogle());
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 50,
+                                vertical: 14,
+                              )),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/google-icon.svg',
+                                width: 20,
+                                height: 20,
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Tiếp tục bằng Google',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

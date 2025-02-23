@@ -53,7 +53,7 @@ class _HotelSmallCardState extends State<HotelSmallCard> {
               ? Theme.of(context).colorScheme.surfaceContainerLowest
               : Colors.transparent,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 10),
             child: Column(
               children: [
                 Row(
@@ -62,7 +62,9 @@ class _HotelSmallCardState extends State<HotelSmallCard> {
                       : CrossAxisAlignment.start,
                   children: [
                     // Image and Icon
-
+                    const SizedBox(
+                      width: 10,
+                    ),
                     Stack(
                       children: [
                         ClipRRect(
@@ -79,16 +81,16 @@ class _HotelSmallCardState extends State<HotelSmallCard> {
                             filterQuality: FilterQuality.low,
                             useOldImageOnUrlChange:
                                 true, // Avoid unnecessary reloads
-                            width: 110,
-                            height: 110,
+                            width: 100,
+                            height: 100,
                             fit: BoxFit.cover,
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
                           ),
                         ),
                         Positioned(
-                          top: 8,
-                          right: 8,
+                          top: 4,
+                          right: 4,
                           child: SizedBox(
                             width: 28,
                             height: 28,
@@ -100,62 +102,52 @@ class _HotelSmallCardState extends State<HotelSmallCard> {
                                     .user
                                     .id;
                                 context.read<TripBloc>().add(GetSavedToTrips(
-                                    userId: userId,
-                                    id: widget.hotel.id,
-                                ));
-                                displayModal(
-                                    context,
-                                    SavedToTripModal(
+                                      userId: userId,
+                                      id: widget.hotel.id,
+                                    ));
+                                displayModal(context, SavedToTripModal(
+                                  onTripsChanged: (List<Trip> selectedTrips,
+                                      List<Trip> unselectedTrips) {
+                                    setState(() {
+                                      changeSavedItemCount =
+                                          selectedTrips.length +
+                                              unselectedTrips.length;
+                                      currentSavedTripCount ??= 0;
+                                      currentSavedTripCount =
+                                          currentSavedTripCount! +
+                                              selectedTrips.length -
+                                              unselectedTrips.length;
+                                    });
 
-                                      onTripsChanged: (List<Trip> selectedTrips,
-                                          List<Trip> unselectedTrips) {
-                                        setState(() {
-                                          changeSavedItemCount =
-                                              selectedTrips.length +
-                                                  unselectedTrips.length;
-                                          currentSavedTripCount ??= 0;
-                                          currentSavedTripCount =
-                                              currentSavedTripCount! +
-                                                  selectedTrips.length -
-                                                  unselectedTrips.length;
-                                        });
+                                    for (var item in selectedTrips) {
+                                      context
+                                          .read<SavedServiceBloc>()
+                                          .add(InsertSavedService(
+                                            tripId: item.id,
+                                            linkId: widget.hotel.id,
+                                            cover: widget.hotel.cover,
+                                            name: widget.hotel.name,
+                                            locationName: widget.locationName,
+                                            rating: widget.hotel.avgRating,
+                                            ratingCount:
+                                                widget.hotel.ratingCount,
+                                            typeId: 4,
+                                            externalLink: widget.hotel.jumpUrl,
+                                            latitude: widget.hotel.latitude,
+                                            hotelStar: widget.hotel.star,
+                                            price: widget.hotel.price,
+                                            longitude: widget.hotel.longitude,
+                                          ));
+                                    }
 
-                                        for (var item in selectedTrips) {
-                                          context
-                                              .read<SavedServiceBloc>()
-                                              .add(InsertSavedService(
-                                                tripId: item.id,
-                                                linkId: widget.hotel.id,
-                                                cover: widget.hotel.cover,
-                                                name: widget.hotel.name,
-                                                locationName:
-                                                    widget.locationName,
-                                                rating: widget.hotel.avgRating,
-                                                ratingCount:
-                                                    widget.hotel.ratingCount,
-                                                typeId: 4,
-                                                externalLink:
-                                                    widget.hotel.jumpUrl,
-                                                latitude: widget.hotel.latitude,
-                                                hotelStar: widget.hotel.star,
-                                                price: widget.hotel.price,
-                                                longitude:
-                                                    widget.hotel.longitude,
-                                              ));
-
-
-                                        }
-
-                                        for (var item in unselectedTrips) {
-                                          context.read<SavedServiceBloc>().add(
-                                              DeleteSavedService(
-                                                  linkId: widget.hotel.id,
-                                                  tripId: item.id));
-                                        }
-                                      },
-                                    ),
-                                    null,
-                                    false);
+                                    for (var item in unselectedTrips) {
+                                      context.read<SavedServiceBloc>().add(
+                                          DeleteSavedService(
+                                              linkId: widget.hotel.id,
+                                              tripId: item.id));
+                                    }
+                                  },
+                                ), null, false);
                               },
                               iconSize: 18,
                               style: IconButton.styleFrom(

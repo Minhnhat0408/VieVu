@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
+import 'package:vn_travel_companion/features/chat/presentation/widgets/message_item.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   final Chat chat;
@@ -27,25 +29,33 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isEmojiVisible = false;
+  late MessageBloc _messageBloc;
   final List<Message> messages = [];
+  int totalRecordCount = 0;
+  final PagingController<int, Message> _pagingController =
+      PagingController(firstPageKey: 0); // Start at page 0
+  final _pageSize = 5;
   @override
   void initState() {
     super.initState();
-
-    context.read<MessageBloc>().add(GetMessagesInChat(
-          chatId: widget.chat.id,
-          limit: 10,
-          offset: 0,
-        ));
-    context.read<MessageBloc>().add(ListenToMessagesChannel(
-          chatId: widget.chat.id,
-        ));
+    _messageBloc = context.read<MessageBloc>(); // Lưu tham chiếu
+    _pagingController.addPageRequestListener((pageKey) {
+      _messageBloc.add(GetMessagesInChat(
+        chatId: widget.chat.id,
+        limit: _pageSize,
+        offset: pageKey,
+      ));
+    });
+    _messageBloc.add(ListenToMessagesChannel(chatId: widget.chat.id));
   }
 
   @override
   void dispose() {
+    _pagingController.dispose();
     _messageController.dispose();
     _scrollController.dispose();
+    _messageBloc.add(
+        UnSubcribeToMessagesChannel(channelName: 'chat:${widget.chat.id}'));
     super.dispose();
   }
 
@@ -63,6 +73,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                 },
               )
             : null,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.transparent,
         titleSpacing: 0,
         title: ListTile(
           leading: CircleAvatar(
@@ -99,16 +111,30 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             listener: (context, state) {
               // TODO: implement listener
               if (state is MessagesLoadedSuccess) {
+                totalRecordCount += state.messages.length;
+
+                log("Total record count: $totalRecordCount");
+
+                final next = totalRecordCount;
+                final isLastPage = state.messages.length < _pageSize;
+                if (isLastPage) {
+                  _pagingController.appendLastPage(state.messages);
+                } else {
+                  _pagingController.appendPage(state.messages, next);
+                }
                 log('Messages loaded successfully');
-                setState(() {
-                  messages.addAll(state.messages);
-                });
               }
 
               if (state is MessageInsertSuccess) {
-                setState(() {
-                  messages.add(state.message);
-                });
+                // add message to first index of list
+
+                if (_pagingController.itemList != null) {
+                  _pagingController.itemList = [
+                    state.message, // Tin nhắn mới
+                    ..._pagingController.itemList!,
+                  ];
+                }
+                totalRecordCount++;
               }
 
               if (state is MessageFailure) {
@@ -117,30 +143,44 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               }
             },
             builder: (context, state) {
-              return messages.isEmpty
-                  ? Expanded(
-                      child: ListView(
-                        children: const [
-                          SizedBox(height: 20),
-                          Text('Chat details page'),
-                        ],
-                      ),
-                    )
-                  : Expanded(
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          final message = messages[index];
-                          return ListTile(
-                            title: Text(message.content),
-                            subtitle: Text(
-                              DateFormat('HH:mm').format(message.createdAt),
-                            ),
-                          );
-                        },
-                      ),
-                    );
+              return Expanded(
+                child: PagedListView<int, Message>(
+                  reverse: true, // Show latest messages at the bottom
+                  pagingController: _pagingController,
+
+                  builderDelegate: PagedChildBuilderDelegate<Message>(
+                    itemBuilder: (context, message, index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: MessageItem(
+                          key: Key(message.id.toString()), message: message),
+                    ),
+                    firstPageProgressIndicatorBuilder: (context) =>
+                        const Center(child: CircularProgressIndicator()),
+                    animateTransitions: true,
+                    newPageProgressIndicatorBuilder: (context) =>
+                        const Center(child: CircularProgressIndicator()),
+                    noItemsFoundIndicatorBuilder: (context) => Column(
+                      children: [
+                        const SizedBox(height: 200),
+                        Icon(
+                          Icons.folder_open,
+                          size: 100,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'No messages',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.outline,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
             },
           ),
           Padding(

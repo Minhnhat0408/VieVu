@@ -43,7 +43,6 @@ class _AuthFieldState extends State<AuthField> {
           borderRadius: BorderRadius.circular(8),
         ),
         labelText: widget.hintText,
-        
         suffixIcon: widget.isObscureText
             ? IconButton(
                 icon: Icon(
