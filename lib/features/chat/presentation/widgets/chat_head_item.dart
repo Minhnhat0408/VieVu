@@ -6,8 +6,10 @@ import 'package:vn_travel_companion/features/chat/presentation/pages/chat_detail
 
 class ChatHeadItem extends StatefulWidget {
   final Chat chat;
+  final Function onMessageSeen;
   const ChatHeadItem({
     super.key,
+    required this.onMessageSeen,
     required this.chat,
   });
 
@@ -20,7 +22,13 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        displayFullScreenModal(context, ChatDetailsPage(chat: widget.chat));
+        displayFullScreenModal(
+            context,
+            ChatDetailsPage(
+              chat: widget.chat,
+            )).then((value) {
+          widget.onMessageSeen();
+        });
       },
       child: ListTile(
         leading: CircleAvatar(
@@ -48,8 +56,10 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
               ),
             ),
             Text(
-                widget.chat.lastMessageTime?.toString() ??
-                    DateFormat('HH:mm').format(DateTime.now()),
+                widget.chat.lastMessageTime != null
+                    ? DateFormat('HH:mm')
+                        .format(widget.chat.lastMessageTime!.toLocal())
+                    : DateFormat('HH:mm').format(DateTime.now()),
                 style: TextStyle(color: Theme.of(context).colorScheme.outline)),
           ],
         ),

@@ -20,6 +20,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     on<UnSubcribeToMessagesChannel>(_onUnSubcribeToMessagesChannel);
     on<GetMessagesInChat>(_onGetMessagesInChat);
     on<MessageReceived>(_onMessageReceived);
+    on<UpdateSeenMessage>(_onUpdateSeenMessage);
   }
 
   void _onInsertMessage(InsertMessage event, Emitter<MessageState> emit) async {
@@ -32,6 +33,15 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     res.fold(
       (l) => emit(MessageFailure(message: l.message)),
       (r) => emit(MessageInsertSuccess(message: r)),
+    );
+  }
+
+  void _onUpdateSeenMessage(
+      UpdateSeenMessage event, Emitter<MessageState> emit) async {
+    emit(MessageLoading());
+    await _messageRepository.updateSeenMessage(
+      chatId: event.chatId,
+      messageId: event.messageId,
     );
   }
 
@@ -51,10 +61,9 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
 
   void _onListenToMessagesChannel(
       ListenToMessagesChannel event, Emitter<MessageState> emit) {
-     _messageRepository.listenToMessagesChannel(
+    _messageRepository.listenToMessagesChannel(
       chatId: event.chatId,
       callback: (payload) {
-  
         if (payload != null) add(MessageReceived(message: payload));
       },
     );

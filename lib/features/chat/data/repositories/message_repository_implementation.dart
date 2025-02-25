@@ -17,7 +17,7 @@ class MessageRepositoryImpl implements MessageRepository {
   Future<Either<Failure, Message>> insertMessage({
     required int chatId,
     required String message,
-    Map<String, dynamic>? metaData,
+    List<Map<String, dynamic>>? metaData,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -29,6 +29,25 @@ class MessageRepositoryImpl implements MessageRepository {
         metaData: metaData,
       );
       return right(res);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> updateSeenMessage({
+    required int chatId,
+    required int messageId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      await messageRemoteDatasource.updateSeenMessage(
+        chatId: chatId,
+        messageId: messageId,
+      );
+      return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
@@ -58,12 +77,12 @@ class MessageRepositoryImpl implements MessageRepository {
   @override
   RealtimeChannel listenToMessagesChannel({
     required int chatId,
-
     required Function(Message?) callback,
   }) {
     return messageRemoteDatasource.listenToMessagesChannel(
-        callback: callback, chatId: chatId,
-      );
+      callback: callback,
+      chatId: chatId,
+    );
   }
 
   @override

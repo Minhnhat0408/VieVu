@@ -1,10 +1,13 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
+
 abstract interface class ChatRepository {
   Future<Either<Failure, Chat>> insertChat({
     String? name,
-    required bool isGroup,
+    String? tripId,
     String? imageUrl,
   });
 
@@ -17,7 +20,9 @@ abstract interface class ChatRepository {
     required int id,
   });
 
-  Future<Either<Failure,List<Chat>>> getChatHeads({
-    required String userId,
+  Future<Either<Failure, List<Chat>>> getChatHeads();
+
+  RealtimeChannel listenToUpdateChannels({
+    required Function(Message?) callback,
   });
 }

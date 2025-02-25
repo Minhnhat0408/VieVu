@@ -9,7 +9,6 @@ class ExploreSearchResult {
   final String? cover;
   final int? ratingCount;
   final double? avgRating;
-
   final double? hotScore;
   bool isSaved;
 
@@ -27,4 +26,21 @@ class ExploreSearchResult {
     this.avgRating,
     this.hotScore,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'address': address,
+      'id': id,
+      'externalLink': externalLink,
+      'type': type,
+      'locationName': locationName,
+      'price': price,
+      'cover': cover,
+      'ratingCount': ratingCount,
+      'avgRating': avgRating,
+      'hotScore': hotScore,
+      'isSaved': isSaved,
+    };
+  }
 }

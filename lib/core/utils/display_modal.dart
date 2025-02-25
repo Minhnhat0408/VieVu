@@ -22,8 +22,8 @@ Future<dynamic> displayModal(
   );
 }
 
-void displayFullScreenModal(BuildContext context, Widget child) {
-  showGeneralDialog(
+Future displayFullScreenModal(BuildContext context, Widget child) {
+  return showGeneralDialog(
     context: context,
     pageBuilder: (context, animation1, animation2) {
       return child;

@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vn_travel_companion/features/chat/presentation/pages/chat_details_page.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/chat_head_item.dart';
 
 class AllMessagesPage extends StatefulWidget {
@@ -21,11 +23,9 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
   @override
   void initState() {
     super.initState();
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
-    context.read<ChatBloc>().add(GetChatHeads(
-          userId: userId,
-        ));
+
+    context.read<ChatBloc>().add(GetChatHeads());
+    context.read<ChatBloc>().add(ListenToUpdateChannels());
   }
 
   @override
@@ -85,7 +85,7 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
               }
             },
             builder: (context, state) {
-              return state is ChatLoading
+              return state is ChatLoading && chats.isEmpty
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
@@ -95,7 +95,14 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
                           child: ListView.builder(
                             itemCount: chats.length,
                             itemBuilder: (context, index) {
-                              return ChatHeadItem(chat: chats[index]);
+                              return ChatHeadItem(
+                                chat: chats[index],
+                                onMessageSeen: () {
+                                  setState(() {
+                                    chats[index].isSeen = true;
+                                  });
+                                },
+                              );
                             },
                           ),
                         )

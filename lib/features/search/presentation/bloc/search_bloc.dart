@@ -81,6 +81,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       searchText: event.searchText,
       limit: event.limit,
       offset: event.offset,
+      tripId: event.tripId,
     );
     res.fold(
       (l) => emit(SearchError(message: l.message)),

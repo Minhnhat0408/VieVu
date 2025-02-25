@@ -20,11 +20,7 @@ class ExploreSearchResultModel extends ExploreSearchResult {
     return ExploreSearchResultModel(
       title: json['title'],
       address: json['address'],
-      id: json['id'] is String
-          ? int.tryParse(json['id']) != null
-              ? int.parse(json['id'])
-              : int.parse((json['id'] as String).replaceAll('-', ''))
-          : json['id'],
+      id: json['id'],
       type: json['table_name'],
       cover: json['cover'],
       price: json['price']?.toInt(),
@@ -41,8 +37,15 @@ class ExploreSearchResultModel extends ExploreSearchResult {
       id: json['id'],
       locationName: json['districtName'] is String
           ? (() {
-              List<String> parts = (json['districtName'] as String).split(', ');
-              return parts.length >= 2 ? parts[parts.length - 2] : parts[0];
+              if ((json['districtName'] as String).contains('·')) {
+                List<String> parts =
+                    (json['districtName'] as String).split(' · ');
+                return parts.length >= 2 ? parts[parts.length - 2] : parts[0];
+              } else {
+                List<String> parts =
+                    (json['districtName'] as String).split(', ');
+                return parts.length >= 2 ? parts[parts.length - 2] : parts[0];
+              }
             })()
           : json['cityName'],
       type: json['type'],

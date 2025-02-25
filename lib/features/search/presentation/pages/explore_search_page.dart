@@ -134,8 +134,6 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
         return 'locations';
       case 'Sự kiện':
         return 'events';
-      case 'Loại hình du lịch':
-        return 'travel_types';
       case 'Khách sạn':
         return 'hotel';
       case 'Nhà hàng':

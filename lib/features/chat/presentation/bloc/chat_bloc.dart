@@ -17,14 +17,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<InsertChatMembers>(_onInsertChatMembers);
 
     on<GetChatHeads>(_onGetChatHeads);
+    on<ListenToUpdateChannels>(_onListenToUpdateChannels);
   }
 
   void _onInsertChat(InsertChat event, Emitter<ChatState> emit) async {
     emit(ChatLoading());
     final res = await _chatRepository.insertChat(
       name: event.name,
-      isGroup: event.isGroup,
       imageUrl: event.imageUrl,
+      tripId: event.tripId,
     );
     res.fold(
       (l) => emit(ChatFailure(message: l.message)),
@@ -47,12 +48,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   void _onGetChatHeads(GetChatHeads event, Emitter<ChatState> emit) async {
     emit(ChatLoading());
-    final res = await _chatRepository.getChatHeads(
-      userId: event.userId,
-    );
+    final res = await _chatRepository.getChatHeads();
     res.fold(
       (l) => emit(ChatFailure(message: l.message)),
       (r) => emit(ChatsLoadedSuccess(chatHeads: r)),
+    );
+  }
+
+  void _onListenToUpdateChannels(
+      ListenToUpdateChannels event, Emitter<ChatState> emit) async {
+    emit(ChatLoading());
+    _chatRepository.listenToUpdateChannels(
+      callback: (message) {
+        add(GetChatHeads());
+      },
     );
   }
 }

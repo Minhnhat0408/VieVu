@@ -3,19 +3,27 @@ import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/chat/data/datasources/chat_remote_datasource.dart';
+import 'package:vn_travel_companion/features/chat/data/datasources/message_remote_datasource.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
+import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
 import 'package:vn_travel_companion/features/chat/domain/repositories/chat_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
   final ChatRemoteDatasource chatRemoteDatasource;
+  final MessageRemoteDatasource messageRemoteDatasource;
   final ConnectionChecker connectionChecker;
 
-  ChatRepositoryImpl(this.chatRemoteDatasource, this.connectionChecker);
+  ChatRepositoryImpl({
+    required this.chatRemoteDatasource,
+    required this.messageRemoteDatasource,
+    required this.connectionChecker,
+  });
 
   @override
   Future<Either<Failure, Chat>> insertChat({
     String? name,
-    required bool isGroup,
+    String? tripId,
     String? imageUrl,
   }) async {
     try {
@@ -24,7 +32,7 @@ class ChatRepositoryImpl implements ChatRepository {
       }
       final res = await chatRemoteDatasource.insertChat(
         name: name,
-        isGroup: isGroup,
+        tripId: tripId,
         imageUrl: imageUrl,
       );
       return right(res);
@@ -34,7 +42,7 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Either<Failure,Unit>> insertChatMembers({
+  Future<Either<Failure, Unit>> insertChatMembers({
     required int id,
     required String userId,
   }) async {
@@ -42,7 +50,7 @@ class ChatRepositoryImpl implements ChatRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-     await chatRemoteDatasource.insertChatMembers(
+      await chatRemoteDatasource.insertChatMembers(
         id: id,
         userId: userId,
       );
@@ -70,19 +78,24 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Either<Failure, List<Chat>>> getChatHeads({
-    required String userId,
-  }) async {
+  Future<Either<Failure, List<Chat>>> getChatHeads() async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      final res = await chatRemoteDatasource.getChatHeads(
-        userId: userId,
-      );
+      final res = await chatRemoteDatasource.getChatHeads();
       return right(res);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
+  }
+
+  @override
+  RealtimeChannel listenToUpdateChannels({
+    required Function(Message?) callback,
+  }) {
+    return messageRemoteDatasource.listenToMessagesChannel(
+      callback: callback,
+    );
   }
 }

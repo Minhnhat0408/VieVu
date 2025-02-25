@@ -404,8 +404,9 @@ void _initChat() {
     )
     ..registerFactory<ChatRepository>(
       () => ChatRepositoryImpl(
-        serviceLocator(),
-        serviceLocator(),
+        chatRemoteDatasource: serviceLocator(),
+        messageRemoteDatasource: serviceLocator(),
+        connectionChecker: serviceLocator(),
       ),
     )
     ..registerLazySingleton(

@@ -4,7 +4,7 @@ part of 'message_bloc.dart';
 sealed class MessageEvent {}
 
 final class InsertMessage extends MessageEvent {
-  final Map<String, dynamic>? metaData;
+  final List<Map<String, dynamic>>? metaData;
   final String message;
   final int chatId;
 
@@ -32,6 +32,15 @@ final class ListenToMessagesChannel extends MessageEvent {
 
   ListenToMessagesChannel({
     required this.chatId,
+  });
+}
+final class UpdateSeenMessage extends MessageEvent {
+  final int chatId;
+  final int messageId;
+
+  UpdateSeenMessage({
+    required this.chatId,
+    required this.messageId,
   });
 }
 final class MessageReceived extends MessageEvent {

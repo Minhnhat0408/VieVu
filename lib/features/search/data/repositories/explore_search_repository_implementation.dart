@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
@@ -30,10 +32,10 @@ class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
         searchText: searchText,
         limit: limit,
         offset: offset,
-
       );
 
       if (tripId != null) {
+        log(tripId);
         final List<int> savedServiceIds = searchResults
             .map((e) => e.id)
             .toList()

@@ -17,7 +17,9 @@ class MessageModel extends Message {
       chatId: json['chat_id'],
       content: json['content'],
       createdAt: DateTime.parse(json['created_at']),
-      metaData: json['meta_data'],
+      metaData: json['meta_data'] != null
+          ? List<Map<String, dynamic>>.from(json['meta_data'])
+          : null,
       user: UserModel.fromJson(json['profiles']),
     );
   }

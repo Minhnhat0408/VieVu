@@ -7,7 +7,7 @@ import 'package:vn_travel_companion/features/chat/data/models/chat_model.dart';
 abstract class ChatRemoteDatasource {
   Future<ChatModel> insertChat({
     String? name,
-    required bool isGroup,
+    String? tripId,
     String? imageUrl,
   });
 
@@ -20,9 +20,7 @@ abstract class ChatRemoteDatasource {
     required int id,
   });
 
-  Future<List<ChatModel>> getChatHeads({
-    required String userId,
-  });
+  Future<List<ChatModel>> getChatHeads();
 }
 
 class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
@@ -35,7 +33,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   @override
   Future<ChatModel> insertChat({
     String? name,
-    required bool isGroup,
+    String? tripId,
     String? imageUrl,
   }) async {
     try {
@@ -43,8 +41,8 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           .from('chats')
           .insert({
             'name': name,
-            'is_group': isGroup,
             'avatar': imageUrl,
+            'trip_id': tripId,
           })
           .select("*")
           .single();
@@ -82,12 +80,19 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   }
 
   @override
-  Future<List<ChatModel>> getChatHeads({
-    required String userId,
-  }) async {
+  Future<List<ChatModel>> getChatHeads() async {
     try {
+
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+
       final res = await supabaseClient
-          .rpc('get_chat_heads', params: {'user_id_param': userId});
+          .rpc('get_chat_heads', params: {'user_id_param': user.id}).order(
+        'last_message_time',
+        ascending: false,
+      );
 
       final List<Map<String, dynamic>> data =
           List<Map<String, dynamic>>.from(res);

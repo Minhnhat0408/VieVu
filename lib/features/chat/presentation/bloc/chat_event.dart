@@ -4,14 +4,14 @@ part of 'chat_bloc.dart';
 sealed class ChatEvent {}
 
 final class InsertChat extends ChatEvent {
-  final String name;
-  final bool isGroup;
-  final String imageUrl;
+  final String? name;
+  final String? imageUrl;
+  final String? tripId;
 
   InsertChat({
-    required this.name,
-    required this.isGroup,
-    required this.imageUrl,
+    this.name,
+    this.imageUrl,
+    this.tripId,
   });
 }
 
@@ -33,10 +33,6 @@ final class DeleteChat extends ChatEvent {
   });
 }
 
-final class GetChatHeads extends ChatEvent {
-  final String userId;
+final class GetChatHeads extends ChatEvent {}
 
-  GetChatHeads({
-    required this.userId,
-  });
-}
+final class ListenToUpdateChannels extends ChatEvent {}
