@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:vn_travel_companion/features/chat/data/models/chat_model.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
 import 'package:vn_travel_companion/features/chat/domain/repositories/chat_repository.dart';
@@ -15,9 +16,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         super(ChatInitial()) {
     on<InsertChat>(_onInsertChat);
     on<InsertChatMembers>(_onInsertChatMembers);
-
+    on<SummarizeItineraries>(_onSummarizeItineraries);
     on<GetChatHeads>(_onGetChatHeads);
     on<ListenToUpdateChannels>(_onListenToUpdateChannels);
+    on<ListenToChatMembersChannel>(
+        _onListenToChatMembersChannel);
+    on<GetSeenUser>(_onGetSeenUser);
+    on<UnSubcribeToChatMembersChannel>(_onUnSubcribeToChatMembersChannel);
+  }
+
+  void _onUnSubcribeToChatMembersChannel(
+      UnSubcribeToChatMembersChannel event, Emitter<ChatState> emit) async {
+    _chatRepository.unSubcribeToChatMembersChannel(
+      channelName: event.channelName,
+    );
   }
 
   void _onInsertChat(InsertChat event, Emitter<ChatState> emit) async {
@@ -57,11 +69,43 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   void _onListenToUpdateChannels(
       ListenToUpdateChannels event, Emitter<ChatState> emit) async {
-    emit(ChatLoading());
     _chatRepository.listenToUpdateChannels(
       callback: (message) {
         add(GetChatHeads());
       },
+    );
+  }
+
+  void _onSummarizeItineraries(
+      SummarizeItineraries event, Emitter<ChatState> emit) async {
+    emit(ChatLoading());
+    final res = await _chatRepository.summarizeItineraries(
+      chatId: event.chatId,
+    );
+    res.fold(
+      (l) => emit(ChatFailure(message: l.message)),
+      (r) => emit(SummarizeItinerariesSuccess(itineraries: r)),
+    );
+  }
+
+  void _onListenToChatMembersChannel(
+      ListenToChatMembersChannel event,
+      Emitter<ChatState> emit) async {
+    _chatRepository.listenToChatMembersChannel(
+      chatId: event.chatId,
+      callback: () {
+        add(GetSeenUser(chatId: event.chatId));
+      },
+    );
+  }
+
+  void _onGetSeenUser(GetSeenUser event, Emitter<ChatState> emit) async {
+    final res = await _chatRepository.getSeenUser(
+      chatId: event.chatId,
+    );
+    res.fold(
+      (l) => emit(ChatFailure(message: l.message)),
+      (r) => emit(SeenUpdatedSuccess(seenUser: r)),
     );
   }
 }

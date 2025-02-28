@@ -44,3 +44,20 @@ final class ChatFailure extends ChatState {
     required this.message,
   });
 }
+
+final class SummarizeItinerariesSuccess extends ChatState {
+  final List<Map<String, dynamic>> itineraries;
+
+  SummarizeItinerariesSuccess({
+    required this.itineraries,
+  });
+}
+
+
+final class SeenUpdatedSuccess extends ChatState {
+  final List<Map<int, User>> seenUser;
+
+  SeenUpdatedSuccess({
+    required this.seenUser,
+  });
+}

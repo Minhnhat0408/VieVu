@@ -35,7 +35,6 @@ class _ChatInputState extends State<ChatInput> {
   final FocusNode _messageFocusNode = FocusNode();
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   String previousText = '';
   late FocusNode _focusNode;
@@ -57,7 +56,6 @@ class _ChatInputState extends State<ChatInput> {
     _messageController.dispose();
 
     _scrollController.dispose();
-    _searchController.dispose();
     _debounce?.cancel();
 
     super.dispose();
@@ -82,34 +80,7 @@ class _ChatInputState extends State<ChatInput> {
     // _messageController.;
   }
 
-  // void _handleTextChange() {
-  //   final currentText = _messageController.text;
-  //   final selection = _messageController.selection;
 
-  //   // Check if text was deleted
-  //   if (currentText.length < previousText.length) {
-  //     final cursorPos = selection.start;
-  //     final matches = _messageController.pattern.allMatches(currentText);
-
-  //     for (final match in matches) {
-  //       if (match.start < cursorPos && match.end >= cursorPos) {
-  //         //  remote the item from _selectedItems
-  //         final item = _selectedItems.firstWhere(
-  //           (element) => element.title == match.group(1),
-  //         );
-  //         _selectedItems.remove(item);
-  //         final newText = currentText.replaceRange(match.start, match.end, '');
-  //         _messageController.value = TextEditingValue(
-  //           text: newText,
-  //           selection: TextSelection.collapsed(offset: match.start),
-  //         );
-  //         break;
-  //       }
-  //     }
-  //   }
-
-  //   previousText = currentText;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +95,7 @@ class _ChatInputState extends State<ChatInput> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               IconButton(
                 onPressed: () {
@@ -143,6 +115,7 @@ class _ChatInputState extends State<ChatInput> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Expanded(
                         child: TextField(

@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
@@ -29,7 +30,7 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
           duration: const Duration(seconds: 1),
           curve: Curves.easeInOut,
           cancelPreviousAnimations: true);
-
+  final TextEditingController textController = TextEditingController();
   Marker? _selectedMarker; // Store the single marker
   bool openPanel = false;
   double longitude = 0.0;
@@ -48,7 +49,7 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
           longitude = tappedLocation.longitude;
           panelController.open();
         });
-        _addMarker(tappedLocation);
+        _addMarker(tappedLocation, 12);
         context.read<LocationInfoCubit>().convertGeoLocationToAddress(
             tappedLocation.latitude, tappedLocation.longitude);
       }
@@ -64,7 +65,7 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
     super.dispose();
   }
 
-  void _addMarker(LatLng position) {
+  void _addMarker(LatLng position, double? zoom) {
     setState(() {
       _selectedMarker = Marker(
         point: position,
@@ -75,7 +76,7 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
     });
     _animatedMapController.animateTo(
       dest: position,
-      zoom: 12,
+      zoom: zoom ?? 12,
       rotation: 0.0,
     );
   }
@@ -98,7 +99,16 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
           return BlocConsumer<LocationInfoCubit, LocationInfoState>(
             listener: (context, state) {
               // TODO: implement listener
-              if (state is LocationInfoAddressLoaded) {}
+              if (state is LocationInfoAddressLoaded) {
+                textController.text = state.address;
+                panelController.open();
+              }
+              if (state is LatLngLoaded) {
+                latitude = state.latLng.latitude;
+                longitude = state.latLng.longitude;
+                panelController.open();
+                _addMarker(LatLng(latitude, longitude), 15);
+              }
             },
             builder: (context, state) {
               return Padding(
@@ -117,50 +127,66 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
                     padding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                     width: double.infinity,
-                    child: state is LocationInfoLoading
-                        ? const Column(children: [
-                            SizedBox(height: 50),
-                            Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ])
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                state is LocationInfoAddressLoaded
-                                    ? state.address
-                                    : "Chọn vị trí trên bản đồ",
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                "Tọa độ: ${latitude.toStringAsPrecision(10)}, ${longitude.toStringAsPrecision(10)}",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (state is LocationInfoAddressLoaded) {
-                                    context.read<TripItineraryBloc>().add(
-                                        InsertTripItinerary(
-                                            latitude: latitude,
-                                            longitude: longitude,
-                                            title: state.address,
-                                            time: widget.date,
-                                            tripId: widget.tripId));
-                                  }
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('Thêm địa điểm'),
-                              ),
-                            ],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Chọn vị trí trên bản đồ hoặc nhập địa chỉ ",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: textController,
+                          enabled: state is LocationInfoLoading ? false : true,
+                          decoration: InputDecoration(
+                            hintText: "Nhập địa chỉ",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            suffixIcon: state is LocationInfoLoading
+                                ? Container(
+                                    width: 30,
+                                    alignment: Alignment.center,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          onSubmitted: (value) {
+                            context
+                                .read<LocationInfoCubit>()
+                                .convertAddressToLatLng(value);
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "Tọa độ: ${latitude.toStringAsPrecision(10)}, ${longitude.toStringAsPrecision(10)}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (state is LocationInfoAddressLoaded) {
+                              context.read<TripItineraryBloc>().add(
+                                  InsertTripItinerary(
+                                      latitude: latitude,
+                                      longitude: longitude,
+                                      title: state.address,
+                                      time: widget.date,
+                                      tripId: widget.tripId));
+                            }
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Thêm địa điểm'),
+                        ),
+                      ],
+                    ),
                   )
                 ]),
               );

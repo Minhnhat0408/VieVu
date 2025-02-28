@@ -4,8 +4,8 @@ class TripItinerary {
   final int id;
   final String tripId;
   final SavedService? service;
-  final double latitude;
-  final double longitude;
+  final double? latitude;
+  final double? longitude;
   final String title;
   final String? note;
   final DateTime time;
@@ -16,8 +16,8 @@ class TripItinerary {
     required this.id,
     required this.tripId,
     this.service,
-    required this.latitude,
-    required this.longitude,
+     this.latitude,
+     this.longitude,
     required this.title,
     this.note,
     required this.time,

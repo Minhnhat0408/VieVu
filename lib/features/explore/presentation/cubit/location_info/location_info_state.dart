@@ -15,6 +15,13 @@ final class LocationInfoLoaded extends LocationInfoState {
   });
 }
 
+final class LatLngLoaded extends LocationInfoState {
+  final LatLng latLng;
+
+  LatLngLoaded({
+    required this.latLng,
+  });
+}
 final class LocationInfoFailure extends LocationInfoState {
   final String message;
 
@@ -26,13 +33,13 @@ final class LocationInfoFailure extends LocationInfoState {
 final class LocationInfoGeoLoaded extends LocationInfoState {
   final double latitude;
   final double longitude;
-  final int linkId;
+  final int? linkId;
   final int locationId;
   final String locationName;
 
   LocationInfoGeoLoaded({
     required this.latitude,
-    required this.linkId,
+     this.linkId,
     required this.locationId,
     required this.longitude,
     required this.locationName,

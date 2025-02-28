@@ -33,3 +33,12 @@ final class MessageFailure extends MessageState {
     required this.message,
   });
 }
+
+
+final class MessageUpdateReceivedSuccess extends MessageState {
+  final Map<String, dynamic> message;
+
+  MessageUpdateReceivedSuccess({
+    required this.message,
+  });
+}

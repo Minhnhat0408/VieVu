@@ -75,6 +75,38 @@ class MessageRepositoryImpl implements MessageRepository {
   }
 
   @override
+  Future<Either<Failure, Unit>> updateMessage({
+    required int messageId,
+    String? content,
+    List<Map<String, dynamic>>? metaData,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      await messageRemoteDatasource.updateMessage(
+        messageId: messageId,
+        content: content,
+        metaData: metaData,
+      );
+      return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  RealtimeChannel listenToMessageUpdateChannel({
+    required int chatId,
+    required Function(Map<String, dynamic>) callback,
+  }) {
+    return messageRemoteDatasource.listenToMessageUpdateChannel(
+      callback: callback,
+      chatId: chatId,
+    );
+  }
+
+  @override
   RealtimeChannel listenToMessagesChannel({
     required int chatId,
     required Function(Message?) callback,

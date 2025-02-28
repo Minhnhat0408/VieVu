@@ -74,15 +74,16 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: itineraries[index].service?.cover ?? "",
-                    fit: BoxFit.cover,
-                    errorWidget: (context, url, error) => Image.asset(
-                      'assets/images/trip_placeholder.avif',
+                  if (itineraries[index].service != null)
+                    CachedNetworkImage(
+                      imageUrl: itineraries[index].service?.cover ?? "",
+                      fit: BoxFit.cover,
+                      errorWidget: (context, url, error) => Image.asset(
+                        'assets/images/trip_placeholder.avif',
+                      ),
+                      height: 300,
+                      width: double.infinity,
                     ),
-                    height: 300,
-                    width: double.infinity,
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),

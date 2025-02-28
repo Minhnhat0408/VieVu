@@ -1,9 +1,16 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/open_url.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/chat/presentation/widgets/add_place_by_name_modal.dart';
+import 'package:vn_travel_companion/features/chat/presentation/widgets/highlight_location_details_modal.dart';
 
 class MessageItem extends StatefulWidget {
   final Message message;
@@ -40,65 +47,94 @@ class _MessageItemState extends State<MessageItem> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment:
-              _isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        return Column(
           children: [
-            if (!_isMe)
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundImage: CachedNetworkImageProvider(
-                      widget.message.user.avatarUrl ??
-                          "https://images.viblo.asia/01e51425-fff9-41b3-9f6f-1a24b66ab3d8.jpg",
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                ],
-              ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment:
+                  _isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
               children: [
                 if (!_isMe)
-                  Text(
-                    widget.message.user.firstName,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12),
-                  ),
-                if (isEmojiOnly)
-                  Text(
-                    widget.message.content,
-                    style: const TextStyle(
-                        fontSize: 40), // Kích thước lớn hơn cho emoji
-                  )
-                else
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: constraints.maxWidth * 2 / 3,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(_isMe ? 20 : 0),
-                          topRight: Radius.circular(_isMe ? 0 : 20),
-                          bottomLeft: const Radius.circular(20),
-                          bottomRight: const Radius.circular(20),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundImage: CachedNetworkImageProvider(
+                          widget.message.user.avatarUrl ??
+                              "https://images.viblo.asia/01e51425-fff9-41b3-9f6f-1a24b66ab3d8.jpg",
                         ),
                       ),
-                      padding: const EdgeInsets.all(10),
-                      child: RichText(
-                        text: _buildHighlightedText(
-                            widget.message.content, highlights, context),
-                      ),
-                    ),
+                      const SizedBox(width: 10),
+                    ],
                   ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (!_isMe)
+                      Text(
+                        widget.message.user.firstName,
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12),
+                      ),
+                    if (isEmojiOnly)
+                      Text(
+                        widget.message.content,
+                        style: const TextStyle(
+                            fontSize: 40), // Kích thước lớn hơn cho emoji
+                      )
+                    else
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth * 2 / 3,
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(_isMe ? 20 : 0),
+                              topRight: Radius.circular(_isMe ? 0 : 20),
+                              bottomLeft: const Radius.circular(20),
+                              bottomRight: const Radius.circular(20),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(10),
+                          child: RichText(
+                            text: _buildHighlightedText(
+                                widget.message.content,
+                                widget.message.metaData ?? [],
+                                widget.message,
+                                context),
+                          ),
+                        ),
+                      ),
+                  ],
+                )
               ],
-            )
+            ),
+            if (widget.message.seenUser != null &&
+                widget.message.seenUser!.isNotEmpty)
+              Column(
+                children: [
+                  const SizedBox(height: 5),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    ...widget.message.seenUser!.map((user) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 2.0),
+                        child: CircleAvatar(
+                          radius: 8,
+                          backgroundImage:
+                              CachedNetworkImageProvider(user.avatarUrl ?? ""),
+                        ),
+                      );
+                    }),
+                    const SizedBox(width: 5),
+                  ]),
+                ],
+              ),
           ],
         );
       },
@@ -106,9 +142,13 @@ class _MessageItemState extends State<MessageItem> {
   }
 
   TextSpan _buildHighlightedText(
-      String text, List<String> highlights, BuildContext context) {
-    List<TextSpan> spans = [];
+      String text,
+      List<Map<String, dynamic>> metaData,
+      Message mesage,
+      BuildContext context) {
+    List<InlineSpan> spans = [];
     int start = 0;
+    final highlights = metaData.map((item) => item['title'] as String).toList();
 
     // Sắp xếp danh sách highlights theo độ dài giảm dần để xử lý các tiêu đề lồng nhau
     highlights.sort((a, b) => b.length.compareTo(a.length));
@@ -131,14 +171,59 @@ class _MessageItemState extends State<MessageItem> {
         if (start < highlightStart) {
           spans.add(TextSpan(text: text.substring(start, highlightStart)));
         }
-        // Thêm phần văn bản được highlight
-        spans.add(TextSpan(
-          text: matchedHighlight,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
+
+        // Thêm phần văn bản được highlight với GestureDetector
+        spans.add(WidgetSpan(
+          child: GestureDetector(
+            onTap: () {
+              final tmp = metaData.firstWhere(
+                  (element) => element['title'] == matchedHighlight);
+              if (tmp['type'] == 'address') {
+                String googleMapsUrl =
+                    "https://www.google.com/maps/search/?api=1&query=$matchedHighlight";
+                openDeepLink(googleMapsUrl);
+              } else {
+                if (tmp['id'] != null) {
+                  displayModal(
+                      context,
+                      HighlightLocationDetailsModal(
+                        locationDetails: tmp,
+                      ),
+                      null,
+                      false);
+                } else {
+                  final userId =
+                      (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                          .user
+                          .id;
+                  if (userId != widget.message.user.id) {
+                    showSnackbar(
+                        context, "Chưa có thông tin chi tiết cho địa điểm này");
+                    return;
+                  }
+                  displayModal(
+                      context,
+                      AddPlaceByNameModal(
+                        searchKey: matchedHighlight!,
+                        message: mesage,
+                      ),
+                      null,
+                      true);
+                }
+              }
+            },
+            child: Text(
+              matchedHighlight,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+                decoration: TextDecoration.underline, // Tạo hiệu ứng giống link
+              ),
+            ),
           ),
         ));
+
         start = highlightStart + matchedHighlight.length;
       } else {
         // Không còn highlight nào, thêm phần còn lại của văn bản
@@ -148,11 +233,12 @@ class _MessageItemState extends State<MessageItem> {
     }
 
     return TextSpan(
-        children: spans,
-        style: TextStyle(
-          fontSize: 16,
-          color: Theme.of(context).colorScheme.onSurface,
-          fontFamily: GoogleFonts.merriweather().fontFamily,
-        ));
+      children: spans,
+      style: TextStyle(
+        fontSize: 16,
+        color: Theme.of(context).colorScheme.onSurface,
+        fontFamily: GoogleFonts.merriweather().fontFamily,
+      ),
+    );
   }
 }

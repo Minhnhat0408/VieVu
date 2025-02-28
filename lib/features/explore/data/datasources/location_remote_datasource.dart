@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
@@ -40,6 +41,9 @@ abstract interface class LocationRemoteDatasource {
   });
 
   Future<GeoApiLocationModel> convertAddressToGeoLocation({
+    required String address,
+  });
+  Future<LatLng> convertAddressToLatLng({
     required String address,
   });
 }
@@ -344,6 +348,74 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
       }
     } catch (e) {
       log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<LatLng> convertAddressToLatLng({
+    required String address,
+  }) async {
+    String baseUrl = "https://www.latlong.net/_spm4.php";
+
+    final convertAddressLongLat = Uri.parse(baseUrl);
+    final body = {
+      "action": "gpcm",
+      "c1": address,
+      "cp": "",
+    };
+
+    try {
+      var client = http.Client();
+      var request = http.Request(
+          'GET',
+          Uri.parse(
+              'https://www.google.com/maps/dir/?api=1&destination=$address'))
+        ..followRedirects = false;
+      var res = await client.send(request);
+
+      if (res.isRedirect) {
+        log("Redirected to: ${res.headers['location']}");
+      }
+      // final response = await http.post(
+      //   convertAddressLongLat,
+      //   headers: {
+      //     "sec-ch-ua-platform": "Windows",
+      //     "X-Requested-With": "XMLHttpRequest",
+      //     "Content-Type": "application/x-www-form-urlencoded",
+      //     "Cookie":
+      //         "PHPSESSID=oo3jtd2mtih0as2uq99dkvdlp0; Path=/; Secure; HttpOnly;",
+      //   },
+      //   body: body.entries
+      //       .map((e) =>
+      //           '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+      //       .join('&'),
+      // );
+
+      // log("Response Status: ${response.statusCode}");
+      // log("Response Body: ${response.body}");
+
+      // if (response.statusCode == 200) {
+      //   if (response.body.isEmpty) {
+      //     throw const FormatException("Empty response body");
+      //   }
+
+      //   // ✅ Split response and convert to double
+      //   final parts = response.body.split(',');
+      //   if (parts.length != 2) {
+      //     throw FormatException("Unexpected response format: ${response.body}");
+      //   }
+
+      //   final double latitude = double.parse(parts[0].trim());
+      //   final double longitude = double.parse(parts[1].trim());
+
+      //   return LatLng(latitude, longitude);
+      // } else {
+      //   throw ServerException(response.body);
+      // }
+      return const LatLng(0, 0);
+    } catch (e) {
+      log("Error: $e");
       throw ServerException(e.toString());
     }
   }

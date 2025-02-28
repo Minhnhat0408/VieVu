@@ -34,6 +34,16 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
             '/attraction',
             arguments: widget.service.id,
           );
+        } else if (widget.service.typeId == 0) {
+          Navigator.pushNamed(
+            context,
+            '/location',
+            arguments: {
+              'locationId': widget.service.id,
+              'locationName': widget.service.name,
+            },
+          );
+
         } else {
           if (widget.service.externalLink != null &&
               (widget.service.externalLink!.contains('http') ||

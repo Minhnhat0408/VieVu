@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/location_repository.dart';
 
@@ -38,11 +41,12 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
     );
   }
 
-  Future<void> convertAddressToGeoLocation(String address, int id) async {
+  Future<void> convertAddressToGeoLocation(String address, int? id) async {
     emit(LocationInfoLoading());
     final result = await _locationRepository.convertAddressToGeoLocation(
       address: address,
     );
+    log('result: $result');
     result.fold(
       (failure) => emit(LocationInfoFailure(message: failure.message)),
       (geo) => emit(LocationInfoGeoLoaded(
@@ -51,6 +55,17 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
           linkId: id,
           locationId: geo.id,
           locationName: geo.cityName)),
+    );
+  }
+
+  Future<void> convertAddressToLatLng(String address) async {
+    emit(LocationInfoLoading());
+    final result = await _locationRepository.convertAddressToLatLng(
+      address: address,
+    );
+    result.fold(
+      (failure) => emit(LocationInfoFailure(message: failure.message)),
+      (latLng) => emit(LatLngLoaded(latLng: latLng)),
     );
   }
 }

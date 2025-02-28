@@ -39,27 +39,30 @@ class TimelineItem extends StatelessWidget {
           const SizedBox(
             height: 6,
           ),
-          GestureDetector(
-            onTap: () {
-              openDeepLink(
-                  "https://www.google.com/maps?q=${itineraries[index].latitude},${itineraries[index].longitude}");
-            },
-            child: IntrinsicWidth(
-              child: Row(
-                children: [
-                  Image.asset('assets/icons/gg-pin.png', width: 20, height: 20),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    "Xem trên Google Maps",
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.primary),
-                  ),
-                ],
+          if (itineraries[index].latitude != null &&
+              itineraries[index].longitude != null)
+            GestureDetector(
+              onTap: () {
+                openDeepLink(
+                    "https://www.google.com/maps?q=${itineraries[index].latitude},${itineraries[index].longitude}");
+              },
+              child: IntrinsicWidth(
+                child: Row(
+                  children: [
+                    Image.asset('assets/icons/gg-pin.png',
+                        width: 20, height: 20),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      "Xem trên Google Maps",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
           const SizedBox(
             height: 6,
           ),

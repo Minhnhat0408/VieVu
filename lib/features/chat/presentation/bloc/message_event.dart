@@ -34,6 +34,7 @@ final class ListenToMessagesChannel extends MessageEvent {
     required this.chatId,
   });
 }
+
 final class UpdateSeenMessage extends MessageEvent {
   final int chatId;
   final int messageId;
@@ -43,10 +44,38 @@ final class UpdateSeenMessage extends MessageEvent {
     required this.messageId,
   });
 }
+
+final class UpdateMessageContent extends MessageEvent {
+  final int messageId;
+  final String? content;
+  final List<Map<String, dynamic>>? metaData;
+
+  UpdateMessageContent({
+    required this.messageId,
+    this.content,
+    this.metaData,
+  });
+}
+
 final class MessageReceived extends MessageEvent {
   final Message message;
 
   MessageReceived({
+    required this.message,
+  });
+}
+
+final class ListenToMessageUpdateChannel extends MessageEvent {
+  final int chatId;
+
+  ListenToMessageUpdateChannel({
+    required this.chatId,
+  });
+}
+final class MessageUpdateReceived extends MessageEvent {
+  final Map<String, dynamic> message;
+
+  MessageUpdateReceived({
     required this.message,
   });
 }

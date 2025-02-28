@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
-
+import 'package:latlong2/latlong.dart';
 abstract interface class LocationRepository {
   Future<Either<Failure, Location>> getLocation({
     required int locationId,
@@ -32,6 +32,10 @@ abstract interface class LocationRepository {
   });
 
   Future<Either<Failure, GeoApiLocation>> convertAddressToGeoLocation({
+    required String address,
+  });
+
+   Future<Either<Failure, LatLng>> convertAddressToLatLng({
     required String address,
   });
 }

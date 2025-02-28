@@ -21,6 +21,9 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     on<GetMessagesInChat>(_onGetMessagesInChat);
     on<MessageReceived>(_onMessageReceived);
     on<UpdateSeenMessage>(_onUpdateSeenMessage);
+    on<ListenToMessageUpdateChannel>(_onListenToMessageUpdateChannel);
+    on<UpdateMessageContent>(_onUpdateMessageContent);
+    on<MessageUpdateReceived>(_onMessageUpdateReceived);
   }
 
   void _onInsertMessage(InsertMessage event, Emitter<MessageState> emit) async {
@@ -59,6 +62,16 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     );
   }
 
+  void _onUpdateMessageContent(
+      UpdateMessageContent event, Emitter<MessageState> emit) async {
+    emit(MessageLoading());
+    await _messageRepository.updateMessage(
+      messageId: event.messageId,
+      content: event.content,
+      metaData: event.metaData,
+    );
+  }
+
   void _onListenToMessagesChannel(
       ListenToMessagesChannel event, Emitter<MessageState> emit) {
     _messageRepository.listenToMessagesChannel(
@@ -79,5 +92,21 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   void _onMessageReceived(
       MessageReceived event, Emitter<MessageState> emit) async {
     emit(MessageInsertSuccess(message: event.message));
+  }
+
+  void _onListenToMessageUpdateChannel(
+      ListenToMessageUpdateChannel event, Emitter<MessageState> emit) {
+    _messageRepository.listenToMessageUpdateChannel(
+      chatId: event.chatId,
+      callback: (payload) {
+        log('hello');
+        add(MessageUpdateReceived(message: payload));
+      },
+    );
+  }
+
+  void _onMessageUpdateReceived(
+      MessageUpdateReceived event, Emitter<MessageState> emit) {
+    emit(MessageUpdateReceivedSuccess(message: event.message));
   }
 }

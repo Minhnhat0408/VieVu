@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:vn_travel_companion/core/error/exceptions.dart';
+import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
 import 'package:vn_travel_companion/features/chat/data/models/message_model.dart';
 
 abstract interface class MessageRemoteDatasource {
@@ -15,18 +18,21 @@ abstract interface class MessageRemoteDatasource {
     required int chatId,
     required int messageId,
   });
-
-  // Future deleteTripItinerary({
-  //   required String tripId,
-  //   required int ItineraryId,
-  // });
+  Future updateMessage({
+    required int messageId,
+    String? content,
+    List<Map<String, dynamic>>? metaData,
+  });
 
   Future<List<MessageModel>> getMessagesInChat({
     required int chatId,
     required int limit,
     required int offset,
   });
-
+  RealtimeChannel listenToMessageUpdateChannel({
+    required int chatId,
+    required Function(Map<String, dynamic>) callback,
+  });
   RealtimeChannel listenToMessagesChannel({
     int? chatId,
     required Function(MessageModel?) callback,
@@ -35,6 +41,8 @@ abstract interface class MessageRemoteDatasource {
   void unSubcribeToMessagesChannel({
     required String channelName,
   });
+
+  
 }
 
 class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
@@ -55,6 +63,37 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
       if (user == null) {
         throw const ServerException("Không tìm thấy người dùng");
       }
+      // final url =
+      //     Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/ner_message');
+
+      // final body = {
+      //   "message": message,
+      // };
+
+      // final response = await http.post(
+      //   url,
+      //   headers: {
+      //     "Content-Type": "application/json", // Specify the content type
+      //   },
+      //   body: jsonEncode(body), // Convert the body to JSON
+      // );
+      // final jsonResponse = jsonDecode(
+      //   utf8.decode(response.bodyBytes),
+      // );
+
+      // final List<Map<String, dynamic>> data =
+      //     List<Map<String, dynamic>>.from(jsonResponse['data']);
+
+      // //check if metadata .title contain the  data .title from the response if not add it in the metadata
+      // final metaDataNew = metaData ?? [];
+      // if (data.isNotEmpty) {
+      //   for (var element in data) {
+      //     final title = element['title'];
+      //     if (!metaDataNew.any((element) => element['title'] == title)) {
+      //       metaDataNew.add(element);
+      //     }
+      //   }
+      // }
 
       final res = await supabaseClient
           .from('messages')
@@ -67,6 +106,37 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .select("*, profiles(*)")
           .single();
       return MessageModel.fromJson(res);
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+
+
+  @override
+  Future updateMessage({
+    required int messageId,
+    String? content,
+    List<Map<String, dynamic>>? metaData,
+  }) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+      log(content.toString());
+      log(metaData.toString());
+
+      await supabaseClient
+          .from('messages')
+          .update({
+            'content': content,
+            'meta_data': metaData,
+          })
+          .eq('id', messageId)
+          .eq('user_id', user.id);
+      log('update message success');
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());
@@ -109,7 +179,11 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .eq('chat_id', chatId)
           .range(offset, offset + limit)
           .order('created_at', ascending: false);
-      return res.map((e) => MessageModel.fromJson(e)).toList();
+      // final userSeen = await getSeenUser(chatId: chatId);
+
+      return res
+          .map((e) => MessageModel.fromJson(e))
+          .toList();
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -121,7 +195,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
     required Function(MessageModel?) callback,
   }) {
     return supabaseClient
-        .channel('chat:$chatId')
+        .channel('chat_insert:$chatId')
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
           schema: 'public',
@@ -157,6 +231,31 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
                 callback(message);
               }
             }
+          },
+        )
+        .subscribe();
+  }
+
+  @override
+  RealtimeChannel listenToMessageUpdateChannel({
+    required int chatId,
+    required Function(Map<String, dynamic>) callback,
+  }) {
+    return supabaseClient
+        .channel('chat_update:$chatId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'messages',
+          filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'chat_id',
+              value: chatId),
+          callback: (payload) async {
+            final data = payload.newRecord;
+            log('listen to message update channel');
+            log(data.toString());
+            callback(data);
           },
         )
         .subscribe();

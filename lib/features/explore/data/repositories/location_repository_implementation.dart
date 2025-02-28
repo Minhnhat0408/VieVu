@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
@@ -230,6 +231,24 @@ class LocationRepositoryImpl implements LocationRepository {
       );
 
       return right(geo);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+    Future<Either<Failure, LatLng>> convertAddressToLatLng({
+    required String address,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final latLng = await locationRemoteDatasource.convertAddressToLatLng(
+        address: address,
+      );
+
+      return right(latLng);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

@@ -8,6 +8,7 @@ class MessageModel extends Message {
     required super.content,
     required super.createdAt,
     super.metaData,
+    super.seenUser,
     required super.user,
   });
 
@@ -21,6 +22,33 @@ class MessageModel extends Message {
           ? List<Map<String, dynamic>>.from(json['meta_data'])
           : null,
       user: UserModel.fromJson(json['profiles']),
+      seenUser: json['seen_user'] != null
+          ? List<UserModel>.from(json['seen_user'])
+          : null,
+    );
+  }
+
+  MessageModel copyWith({
+    int? id,
+    int? chatId,
+    String? content,
+    DateTime? createdAt,
+    List<Map<String, dynamic>>? metaData,
+    List<UserModel>? seenUser,
+    UserModel? user,
+  }) {
+    return MessageModel(
+      id: id ?? this.id,
+      chatId: chatId ?? this.chatId,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      metaData: metaData ?? this.metaData,
+      seenUser: seenUser != null
+          ? seenUser.isNotEmpty
+              ? seenUser
+              : this.seenUser
+          : this.seenUser,
+      user: user ?? this.user,
     );
   }
 }

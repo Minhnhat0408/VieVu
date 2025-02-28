@@ -35,4 +35,36 @@ final class DeleteChat extends ChatEvent {
 
 final class GetChatHeads extends ChatEvent {}
 
+final class SummarizeItineraries extends ChatEvent {
+  final int chatId;
+
+
+  SummarizeItineraries({
+    required this.chatId,
+  });
+}
 final class ListenToUpdateChannels extends ChatEvent {}
+
+final class ListenToChatMembersChannel extends ChatEvent {
+  final int chatId;
+
+  ListenToChatMembersChannel({
+    required this.chatId,
+  });
+}
+
+final class GetSeenUser extends ChatEvent {
+  final int chatId;
+
+  GetSeenUser({
+    required this.chatId,
+  });
+}
+
+final class UnSubcribeToChatMembersChannel extends ChatEvent {
+  final String channelName;
+
+  UnSubcribeToChatMembersChannel({
+    required this.channelName,
+  });
+}
