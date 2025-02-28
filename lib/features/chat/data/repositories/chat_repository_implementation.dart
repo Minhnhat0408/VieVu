@@ -102,7 +102,7 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Either<Failure, List<Map<String, dynamic>>>> summarizeItineraries({
+  Future<Either<Failure, ChatSummarize>> summarizeItineraries({
     required int chatId,
   }) async {
     try {
@@ -154,5 +154,22 @@ class ChatRepositoryImpl implements ChatRepository {
     chatRemoteDatasource.unSubcribeToChatMembersChannel(
       channelName: channelName,
     );
+  }
+
+  @override
+  Future<Either<Failure, ChatSummarize?>> getCurrentChatSummary({
+    required int chatId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final res = await chatRemoteDatasource.getCurrentChatSummary(
+        chatId: chatId,
+      );
+      return right(res);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
   }
 }

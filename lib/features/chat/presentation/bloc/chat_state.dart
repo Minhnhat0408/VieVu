@@ -61,3 +61,12 @@ final class SeenUpdatedSuccess extends ChatState {
     required this.seenUser,
   });
 }
+
+final class ChatSummarizedSuccess extends ChatState {
+  final ChatSummarize? chatSummarize;
+
+  ChatSummarizedSuccess({
+     this.chatSummarize,
+  });
+
+}

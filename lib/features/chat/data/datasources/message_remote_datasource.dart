@@ -42,7 +42,7 @@ abstract interface class MessageRemoteDatasource {
     required String channelName,
   });
 
-  
+
 }
 
 class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
@@ -125,8 +125,6 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
       if (user == null) {
         throw const ServerException("Không tìm thấy người dùng");
       }
-      log(content.toString());
-      log(metaData.toString());
 
       await supabaseClient
           .from('messages')
@@ -136,7 +134,6 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           })
           .eq('id', messageId)
           .eq('user_id', user.id);
-      log('update message success');
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());
@@ -159,7 +156,6 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .update({'last_seen_message_id': messageId})
           .eq('chat_id', chatId)
           .eq('user_id', user.id);
-      log('update seen message success');
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());
@@ -209,7 +205,6 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           callback: (payload) async {
             final data = payload.newRecord;
             final user = supabaseClient.auth.currentUser;
-            log('listen to message channel');
             if (user == null) {
               throw const ServerException("Không tìm thấy người dùng");
             }
@@ -253,8 +248,6 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
               value: chatId),
           callback: (payload) async {
             final data = payload.newRecord;
-            log('listen to message update channel');
-            log(data.toString());
             callback(data);
           },
         )

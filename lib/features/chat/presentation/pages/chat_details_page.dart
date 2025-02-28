@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
@@ -10,6 +11,7 @@ import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.da
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/chat_input.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/message_item.dart';
+import 'package:vn_travel_companion/features/chat/presentation/widgets/summarize_chat_modal.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   final Chat chat;
@@ -40,6 +42,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       PagingController(firstPageKey: 0); // Start at page 0
   final _pageSize = 5;
   List<Map<int, User>> seenUser = [];
+
   @override
   void initState() {
     super.initState();
@@ -119,11 +122,21 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           actions: [
             IconButton(
                 onPressed: () {
-                  context
-                      .read<ChatBloc>()
-                      .add(SummarizeItineraries(chatId: widget.chat.id));
+                  displayModal(
+                      context,
+                      SummarizeChatModal(
+                        chat: widget.chat,
+                      ),
+                      null,
+                      true);
+                  // context
+                  //     .read<ChatBloc>()
+                  //     .add(SummarizeItineraries(chatId: widget.chat.id));
                 },
-                icon: const Icon(Icons.summarize)),
+                icon: Icon(
+                  Icons.document_scanner,
+                  color: Theme.of(context).colorScheme.primary,
+                )),
             IconButton(
               icon: const Icon(Icons.more_vert),
               onPressed: () {},
@@ -224,6 +237,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                               message.seenUser = seenUserList
                                   .map((e) => e.values.first)
                                   .toList();
+                            } else {
+                              message.seenUser = null;
                             }
 
                             return Padding(

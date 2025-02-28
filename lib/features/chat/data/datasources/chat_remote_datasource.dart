@@ -27,11 +27,15 @@ abstract class ChatRemoteDatasource {
 
   Future<List<ChatModel>> getChatHeads();
 
-  Future<List<Map<String, dynamic>>> summarizeItineraries({
+  Future<ChatSummarizeModel> summarizeItineraries({
     required int chatId,
   });
 
   Future<List<Map<int, UserModel>>> getSeenUser({
+    required int chatId,
+  });
+
+  Future<ChatSummarizeModel?> getCurrentChatSummary({
     required int chatId,
   });
 
@@ -71,6 +75,27 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
 
       return ChatModel.fromJson(res);
     } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<ChatSummarizeModel?> getCurrentChatSummary({
+    required int chatId,
+  }) async {
+    try {
+      final res = await supabaseClient
+          .from('chat_summaries')
+          .select('*')
+          .eq('chat_id', chatId)
+          .maybeSingle();
+      if (res == null) {
+        return null;
+      }
+
+      return ChatSummarizeModel.fromJson(res);
+    } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }
@@ -148,7 +173,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> summarizeItineraries({
+  Future<ChatSummarizeModel> summarizeItineraries({
     required int chatId,
   }) async {
     try {
@@ -157,14 +182,19 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
 
       final chat = await supabaseClient
           .from('chats')
-          .select('trip_id, trips(start_date,end_date)')
+          .select('trip_id, trips(start_date,end_date), chat_summaries(*)')
           .eq('id', chatId)
           .single();
+
+      final lastSummarizedMessageId = chat['chat_summaries'] != null
+          ? chat['chat_summaries']['last_message_id']
+          : 0;
       final message = await supabaseClient
           .from('messages')
           .select('id,content,meta_data')
           .eq('chat_id', chatId)
           .eq('is_travel_related', true)
+          .gt('id', lastSummarizedMessageId)
           .order('created_at', ascending: true);
 
       final body = {
@@ -177,7 +207,9 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         "end_date": chat['trips']['end_date'],
       };
 
-      log(body.toString());
+      if (chat['chat_summaries'] != null) {
+        body['previous_summary'] = chat['chat_summaries']['summary'];
+      }
 
       final response = await http.post(
         url,
@@ -194,13 +226,17 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           List<Map<String, dynamic>>.from(jsonResponse['data']);
 
       //check if metadata .title contain the  data .title from the response if not add it in the metadata
-
-      return [
-        {
-          "title": "Itineraries",
-          "data": data,
-        }
-      ];
+      final res = await supabaseClient
+          .from('chat_summaries')
+          .upsert({
+            'chat_id': chatId,
+            'summary': data,
+            'updated_at': DateTime.now().toIso8601String(),
+            'last_message_id': message.last['id'],
+          }, onConflict: 'chat_id')
+          .select("*")
+          .single();
+      return ChatSummarizeModel.fromJson(res);
     } catch (e) {
       throw ServerException(e.toString());
     }

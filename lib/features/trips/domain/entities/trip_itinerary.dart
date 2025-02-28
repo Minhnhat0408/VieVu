@@ -9,7 +9,6 @@ class TripItinerary {
   final String title;
   final String? note;
   final DateTime time;
-
   final DateTime createdAt;
 
   TripItinerary({

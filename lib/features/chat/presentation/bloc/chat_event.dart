@@ -68,3 +68,11 @@ final class UnSubcribeToChatMembersChannel extends ChatEvent {
     required this.channelName,
   });
 }
+
+final class GetChatSummary extends ChatEvent {
+  final int chatId;
+
+  GetChatSummary({
+    required this.chatId,
+  });
+}

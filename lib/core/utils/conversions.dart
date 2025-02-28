@@ -17,6 +17,45 @@ String convertTypeIdToString(int? typeId) {
   }
 }
 
+Icon convertTypeStringToIcons(String? type, double size) {
+  switch (type) {
+    case 'restaurant':
+      return Icon(
+        size: size,
+        Icons.restaurant,
+        color: Colors.orangeAccent,
+      );
+    case 'attractions':
+      return Icon(
+        size: size,
+        Icons.attractions,
+        color: Colors.greenAccent,
+      );
+    case 'locations':
+      return Icon(
+        size: size,
+        Icons.location_pin,
+      );
+    case 'hotel':
+      return Icon(
+        size: size,
+        Icons.hotel,
+        color: Colors.blueAccent,
+      );
+    case 'event':
+      return Icon(
+        size: size,
+        Icons.liquor,
+        color: Colors.redAccent,
+      );
+    default:
+      return Icon(
+        size: size,
+        Icons.location_pin,
+      );
+  }
+}
+
 Icon convertTypeIdToIcons(int? typeId, double size) {
   switch (typeId) {
     case 1:

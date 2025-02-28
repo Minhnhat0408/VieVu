@@ -19,10 +19,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SummarizeItineraries>(_onSummarizeItineraries);
     on<GetChatHeads>(_onGetChatHeads);
     on<ListenToUpdateChannels>(_onListenToUpdateChannels);
-    on<ListenToChatMembersChannel>(
-        _onListenToChatMembersChannel);
+    on<ListenToChatMembersChannel>(_onListenToChatMembersChannel);
     on<GetSeenUser>(_onGetSeenUser);
     on<UnSubcribeToChatMembersChannel>(_onUnSubcribeToChatMembersChannel);
+    on<GetChatSummary>(_onGetChatSummary);
   }
 
   void _onUnSubcribeToChatMembersChannel(
@@ -84,13 +84,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     );
     res.fold(
       (l) => emit(ChatFailure(message: l.message)),
-      (r) => emit(SummarizeItinerariesSuccess(itineraries: r)),
+      (r) => emit(ChatSummarizedSuccess(chatSummarize: r)),
     );
   }
 
   void _onListenToChatMembersChannel(
-      ListenToChatMembersChannel event,
-      Emitter<ChatState> emit) async {
+      ListenToChatMembersChannel event, Emitter<ChatState> emit) async {
     _chatRepository.listenToChatMembersChannel(
       chatId: event.chatId,
       callback: () {
@@ -106,6 +105,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     res.fold(
       (l) => emit(ChatFailure(message: l.message)),
       (r) => emit(SeenUpdatedSuccess(seenUser: r)),
+    );
+  }
+
+  void _onGetChatSummary(GetChatSummary event, Emitter<ChatState> emit) async {
+    emit(ChatLoading());
+    final res = await _chatRepository.getCurrentChatSummary(
+      chatId: event.chatId,
+    );
+    res.fold(
+      (l) => emit(ChatFailure(message: l.message)),
+      (r) => emit(ChatSummarizedSuccess(chatSummarize: r)),
     );
   }
 }

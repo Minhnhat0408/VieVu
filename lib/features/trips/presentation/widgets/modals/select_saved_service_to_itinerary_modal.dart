@@ -58,7 +58,7 @@ class _SelectSavedServiceToItineraryModalState
           preferredSize: const Size.fromHeight(1.0),
           child: Divider(
             thickness: 1,
-            color: Theme.of(context).colorScheme.primary,
+            color:  Theme.of(context).colorScheme.primary,
           ),
         ),
         actions: [

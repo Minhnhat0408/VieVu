@@ -28,7 +28,7 @@ abstract interface class ChatRepository {
     required Function(Message?) callback,
   });
 
-  Future<Either<Failure, List<Map<String, dynamic>>>> summarizeItineraries({
+  Future<Either<Failure, ChatSummarize>> summarizeItineraries({
     required int chatId,
   });
 
@@ -43,5 +43,9 @@ abstract interface class ChatRepository {
 
   void unSubcribeToChatMembersChannel({
     required String channelName,
+  });
+
+  Future<Either<Failure, ChatSummarize?>> getCurrentChatSummary({
+    required int chatId,
   });
 }
