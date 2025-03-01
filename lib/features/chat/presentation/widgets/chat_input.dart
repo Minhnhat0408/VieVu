@@ -80,8 +80,6 @@ class _ChatInputState extends State<ChatInput> {
     // _messageController.;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -296,8 +294,7 @@ class _ChatInputState extends State<ChatInput> {
                                   ? null
                                   : _messageController.searchResults
                                       .add(result);
-                              log(_messageController.text);
-                              log(_messageController.selection.toString());
+
                               _messageFocusNode.requestFocus();
                               widget.onOverlayToggle(false);
                             },

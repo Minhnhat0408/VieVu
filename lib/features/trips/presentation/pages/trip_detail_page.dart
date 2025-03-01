@@ -17,134 +17,146 @@ import 'package:vn_travel_companion/init_dependencies.dart';
 
 class TripDetailPage extends StatefulWidget {
   static const String routeName = '/trip-detail';
-  final Trip trip;
-  const TripDetailPage({super.key, required this.trip});
+  final String? tripCover;
+  final int? initialIndex;
+  final String tripId;
+  const TripDetailPage(
+      {super.key, this.tripCover, required this.tripId, this.initialIndex});
 
   @override
   State<TripDetailPage> createState() => _TripDetailPageState();
 }
 
-class _TripDetailPageState extends State<TripDetailPage> {
+class _TripDetailPageState extends State<TripDetailPage>
+    with TickerProviderStateMixin {
+  late TabController tabController;
   Trip? trip;
   @override
   void initState() {
     super.initState();
-
-    trip = widget.trip;
-
-    context.read<TripDetailsCubit>().getTripDetails(tripId: widget.trip.id);
+    tabController = TabController(
+      initialIndex: widget.initialIndex ?? 0,
+      length: 4,
+      vsync: this,
+    );
+    context.read<TripDetailsCubit>().getTripDetails(tripId: widget.tripId);
     context
         .read<SavedServiceBloc>()
-        .add(GetSavedServices(tripId: widget.trip.id));
+        .add(GetSavedServices(tripId: widget.tripId));
 
     context
         .read<TripItineraryBloc>()
-        .add(GetTripItineraries(tripId: widget.trip.id));
+        .add(GetTripItineraries(tripId: widget.tripId));
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        body: BlocConsumer<TripDetailsCubit, TripDetailsState>(
-          listener: (context, state) {
-            // TODO: implement listener
-            if (state is TripDetailsLoadedSuccess) {
-              setState(() {
-                trip = state.trip;
-              });
-            }
-            if (state is TripDetailsLoadedFailure) {
-              showSnackbar(context, state.message, 'error');
-            }
-          },
-          builder: (context, state) {
-            return MultiBlocListener(
-              listeners: [
-                BlocListener<TripBloc, TripState>(
-                  listener: (context, state) {
-                    if (state is TripActionSuccess) {
-                      setState(() {
-                        trip = state.trip;
-                      });
+    return Scaffold(
+      body: BlocConsumer<TripDetailsCubit, TripDetailsState>(
+        listener: (context, state) {
+          // TODO: implement listener
+          if (state is TripDetailsLoadedSuccess) {
+            setState(() {
+              trip = state.trip;
+            });
+          }
+          if (state is TripDetailsLoadedFailure) {
+            showSnackbar(context, state.message, 'error');
+          }
+        },
+        builder: (context, state) {
+          return MultiBlocListener(
+            listeners: [
+              BlocListener<TripBloc, TripState>(
+                listener: (context, state) {
+                  if (state is TripActionSuccess) {
+                    setState(() {
+                      trip = state.trip;
+                    });
+                  }
+                },
+              ),
+              BlocListener<SavedServiceBloc, SavedServiceState>(
+                listener: (context, state) {
+                  // TODO: implement listener
+                  if (state is SavedServiceActionSucess) {
+                    // check if the location is already in the trip
+                    if (!trip!.locations
+                        .contains(state.savedService.locationName)) {
+                      trip!.locations.add(state.savedService.locationName);
                     }
-                  },
-                ),
-                BlocListener<SavedServiceBloc, SavedServiceState>(
-                  listener: (context, state) {
-                    // TODO: implement listener
-                    if (state is SavedServiceActionSucess) {
-                      // check if the location is already in the trip
-                      if (!trip!.locations
-                          .contains(state.savedService.locationName)) {
-                        trip!.locations.add(state.savedService.locationName);
-                      }
-                    }
-                    if (state is SavedServiceDeleteSuccess) {
-                      // trip!.locations.remove(state.locationName);
-                    }
-                  },
-                ),
-              ],
-              child: Stack(children: [
-                NestedScrollView(
-                    floatHeaderSlivers: false,
-                    headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                          SliverOverlapAbsorber(
-                              handle: NestedScrollView
-                                  .sliverOverlapAbsorberHandleFor(context),
-                              sliver: TripDetailAppbar(trip: trip)),
-                        ],
-                    body: TabBarView(children: [
-                      TripInfoPage(trip: trip!),
-                      BlocProvider(
-                        create: (context) =>
-                            serviceLocator<LocationInfoCubit>(),
-                        child: TripSavedServicesPage(trip: trip!),
-                      ),
-                      TripItineraryPage(trip: trip!),
-                      const TripTodoListPage(),
-                    ])),
-                Positioned.fill(
-                    child: CircularMenu(
-                        toggleButtonColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        alignment: const Alignment(0.95, 0.85),
-                        toggleButtonIconColor:
-                            Theme.of(context).colorScheme.primary,
-                        startingAngleInRadian:
-                            3.14, // Example: 180 degrees (π radians)
-                        endingAngleInRadian:
-                            3.14 * 3 / 2, // Example: 360 degrees (2π radians)
-                        items: [
-                      CircularMenuItem(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          icon: Icons.message,
-                          iconColor: Theme.of(context).colorScheme.primary,
-                          onTap: () {
-                            // callback
-                          }),
-                      CircularMenuItem(
+                  }
+                  if (state is SavedServiceDeleteSuccess) {
+                    // trip!.locations.remove(state.locationName);
+                  }
+                },
+              ),
+            ],
+            child: Stack(children: [
+              NestedScrollView(
+                  floatHeaderSlivers: false,
+                  headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                        SliverOverlapAbsorber(
+                            handle:
+                                NestedScrollView.sliverOverlapAbsorberHandleFor(
+                                    context),
+                            sliver: TripDetailAppbar(
+                              trip: trip,
+                              tripCover: widget.tripCover,
+                              tripId: widget.tripId,
+                              tabController: tabController,
+                            )),
+                      ],
+                  body: trip != null
+                      ? TabBarView(controller: tabController, children: [
+                          TripInfoPage(trip: trip!),
+                          BlocProvider(
+                            create: (context) =>
+                                serviceLocator<LocationInfoCubit>(),
+                            child: TripSavedServicesPage(trip: trip!),
+                          ),
+                          TripItineraryPage(trip: trip!),
+                          const TripTodoListPage(),
+                        ])
+                      : const Center(child: CircularProgressIndicator())),
+              Positioned.fill(
+                  child: CircularMenu(
+                      toggleButtonColor:
+                          Theme.of(context).colorScheme.primaryContainer,
+                      alignment: const Alignment(0.95, 0.85),
+                      toggleButtonIconColor:
+                          Theme.of(context).colorScheme.primary,
+                      startingAngleInRadian:
+                          3.14, // Example: 180 degrees (π radians)
+                      endingAngleInRadian:
+                          3.14 * 3 / 2, // Example: 360 degrees (2π radians)
+                      items: [
+                    CircularMenuItem(
                         color: Theme.of(context).colorScheme.primaryContainer,
-                        icon: Icons.map_outlined,
+                        icon: Icons.message,
+                        iconColor: Theme.of(context).colorScheme.primary,
+                        onTap: () {
+                          // callback
+                        }),
+                    CircularMenuItem(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      icon: Icons.map_outlined,
+                      onTap: () {
+                        //callback
+                      },
+                      iconColor: Theme.of(context).colorScheme.primary,
+                    ),
+                    CircularMenuItem(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        icon: Icons.people_alt,
+                        iconColor: Theme.of(context).colorScheme.primary,
                         onTap: () {
                           //callback
-                        },
-                        iconColor: Theme.of(context).colorScheme.primary,
-                      ),
-                      CircularMenuItem(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          icon: Icons.people_alt,
-                          iconColor: Theme.of(context).colorScheme.primary,
-                          onTap: () {
-                            //callback
-                          }),
-                    ]))
-              ]),
-            );
-          },
-        ),
+                        }),
+                  ]))
+            ]),
+          );
+        },
       ),
     );
   }

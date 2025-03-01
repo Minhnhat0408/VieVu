@@ -34,12 +34,14 @@ class ChatSummarizeModel extends ChatSummarize {
   ChatSummarizeModel({
     required super.chatId,
     required super.createdAt,
+    required super.tripId,
     required super.summary,
     required super.lastMessageId,
   });
 
   factory ChatSummarizeModel.fromJson(Map<String, dynamic> json) {
     return ChatSummarizeModel(
+      tripId: json['chats']['trip_id'] ?? json['trip_id'],
       chatId: json['chat_id'],
       createdAt: DateTime.parse(json['updated_at']),
       summary: json['summary'] != null

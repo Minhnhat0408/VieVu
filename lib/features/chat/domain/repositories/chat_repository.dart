@@ -48,4 +48,7 @@ abstract interface class ChatRepository {
   Future<Either<Failure, ChatSummarize?>> getCurrentChatSummary({
     required int chatId,
   });
+  Future<Either<Failure, Unit>> createItineraryFromSummary({
+    required int chatId,
+  });
 }

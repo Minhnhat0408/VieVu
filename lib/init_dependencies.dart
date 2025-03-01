@@ -407,6 +407,9 @@ void _initChat() {
         chatRemoteDatasource: serviceLocator(),
         messageRemoteDatasource: serviceLocator(),
         connectionChecker: serviceLocator(),
+        locationRemoteDatasource: serviceLocator(),
+        savedServiceRemoteDatasource: serviceLocator(),
+        tripItineraryRemoteDatasource: serviceLocator(),
       ),
     )
     ..registerLazySingleton(

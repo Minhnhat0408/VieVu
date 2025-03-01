@@ -4,6 +4,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 
 class TripSmallItem extends StatelessWidget {
   final Trip trip;
@@ -13,9 +14,13 @@ class TripSmallItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed(
-          '/trip-detail',
-          arguments: trip,
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => TripDetailPage(
+              tripId: trip.id,
+              tripCover: trip.cover,
+            ),
+          ),
         );
       },
       child: Card(

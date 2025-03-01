@@ -12,6 +12,7 @@ import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc
 import 'package:vn_travel_companion/features/chat/presentation/widgets/chat_input.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/message_item.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/summarize_chat_modal.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   final Chat chat;
@@ -137,9 +138,38 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   Icons.document_scanner,
                   color: Theme.of(context).colorScheme.primary,
                 )),
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () {},
+            PopupMenuButton(
+              onSelected: (item) {
+                if (item == "itinerary") {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TripDetailPage(
+                                tripId: widget.chat.tripId!,
+                                initialIndex: 2,
+                              )));
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                const PopupMenuItem(
+                    value: "itinerary",
+                    child: ListTile(
+                      leading: Icon(Icons.card_travel),
+                      title: Text('Xem lịch trình'),
+                    )),
+                const PopupMenuItem(
+                    value: "h2",
+                    child: ListTile(
+                      leading: Icon(Icons.delete),
+                      title: Text('Xóa cuộc trò chuyện'),
+                    )),
+                const PopupMenuItem(
+                    value: "leave",
+                    child: ListTile(
+                      leading: Icon(Icons.output),
+                      title: Text('Thoát khỏi nhóm'),
+                    )),
+              ],
             ),
           ],
         ),
@@ -200,7 +230,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                           .indexWhere(
                               (element) => element.id == state.message['id']);
 
-                      log('Message index: ${state.message}');
                       if (messageIndex != -1) {
                         final updatedList = _pagingController.itemList!;
                         updatedList[messageIndex].metaData =
@@ -225,7 +254,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                       child: PagedListView<int, Message>(
                         reverse: true, // Show latest messages at the bottom
                         pagingController: _pagingController,
-
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         builderDelegate: PagedChildBuilderDelegate<Message>(
                           itemBuilder: (context, message, index) {
                             // fillter out seen user

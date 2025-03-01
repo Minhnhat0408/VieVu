@@ -38,11 +38,11 @@ final class GetChatHeads extends ChatEvent {}
 final class SummarizeItineraries extends ChatEvent {
   final int chatId;
 
-
   SummarizeItineraries({
     required this.chatId,
   });
 }
+
 final class ListenToUpdateChannels extends ChatEvent {}
 
 final class ListenToChatMembersChannel extends ChatEvent {
@@ -73,6 +73,14 @@ final class GetChatSummary extends ChatEvent {
   final int chatId;
 
   GetChatSummary({
+    required this.chatId,
+  });
+}
+
+final class CreateItineraryFromSummary extends ChatEvent {
+  final int chatId;
+
+  CreateItineraryFromSummary({
     required this.chatId,
   });
 }

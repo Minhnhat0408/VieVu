@@ -8,8 +8,8 @@ abstract interface class TripItineraryRemoteDatasource {
   Future<TripItineraryModel> insertTripItinerary({
     required String tripId,
     required DateTime time,
-    required double latitude,
-    required double longitude,
+     double? latitude,
+     double? longitude,
     required String title,
     String? note,
     int? serviceId,
@@ -43,8 +43,8 @@ class TripItineraryRemoteDatasourceImpl
   Future<TripItineraryModel> insertTripItinerary({
     required String tripId,
     required DateTime time,
-    required double latitude,
-    required double longitude,
+     double? latitude,
+     double? longitude,
     required String title,
     String? note,
     int? serviceId,

@@ -18,10 +18,7 @@ class TripManageNestedRoutes extends StatelessWidget {
         onGenerateRoute: (RouteSettings settings) {
           Widget page;
           switch (settings.name) {
-            case '/trip-detail':
-              final trip = settings.arguments;
-              page = TripDetailPage(trip: trip as Trip);
-              break;
+       
 
             case '/trip-settings':
               final trip = settings.arguments;

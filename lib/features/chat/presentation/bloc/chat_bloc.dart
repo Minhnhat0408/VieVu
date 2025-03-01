@@ -23,6 +23,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<GetSeenUser>(_onGetSeenUser);
     on<UnSubcribeToChatMembersChannel>(_onUnSubcribeToChatMembersChannel);
     on<GetChatSummary>(_onGetChatSummary);
+    on<CreateItineraryFromSummary>(_onCreateItineraryFromSummary);
   }
 
   void _onUnSubcribeToChatMembersChannel(
@@ -116,6 +117,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     res.fold(
       (l) => emit(ChatFailure(message: l.message)),
       (r) => emit(ChatSummarizedSuccess(chatSummarize: r)),
+    );
+  }
+
+  void _onCreateItineraryFromSummary(
+      CreateItineraryFromSummary event, Emitter<ChatState> emit) async {
+    emit(ChatCreateTripItineraryLoading());
+    final res = await _chatRepository.createItineraryFromSummary(
+      chatId: event.chatId,
+    );
+    res.fold(
+      (l) => emit(ChatFailure(message: l.message)),
+      (r) => emit(ChatCreateTripItinerarySuccess()),
     );
   }
 }

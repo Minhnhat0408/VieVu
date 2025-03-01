@@ -7,6 +7,10 @@ final class ChatInitial extends ChatState {}
 
 final class ChatLoading extends ChatState {}
 
+final class ChatCreateTripItineraryLoading extends ChatState {}
+
+final class ChatCreateTripItinerarySuccess extends ChatState {}
+
 final class ChatsLoadedSuccess extends ChatState {
   final List<Chat> chatHeads;
 

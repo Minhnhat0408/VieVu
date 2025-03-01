@@ -47,6 +47,10 @@ abstract class ChatRemoteDatasource {
   void unSubcribeToChatMembersChannel({
     required String channelName,
   });
+
+  // Future createItineraryFromSummary({
+  //   required int chatId,
+  // });
 }
 
 class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
@@ -86,7 +90,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     try {
       final res = await supabaseClient
           .from('chat_summaries')
-          .select('*')
+          .select('*, chats(trip_id)')
           .eq('chat_id', chatId)
           .maybeSingle();
       if (res == null) {
@@ -164,13 +168,13 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
       final List<Map<String, dynamic>> data =
           List<Map<String, dynamic>>.from(res);
 
-      log(data.toString());
       return data.map((e) => ChatModel.fromJson(e)).toList();
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());
     }
   }
+
 
   @override
   Future<ChatSummarizeModel> summarizeItineraries({
@@ -258,7 +262,6 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
               column: 'chat_id',
               value: chatId),
           callback: (payload) async {
-            log("ehlloo : ${payload.newRecord.toString()}");
 
             callback();
           },

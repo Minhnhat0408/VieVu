@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +10,8 @@ import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/summary_timeline.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_page.dart';
 
 class SummarizeChatModal extends StatefulWidget {
   final Chat chat;
@@ -62,7 +65,9 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
           ),
         ],
       ),
@@ -77,180 +82,253 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
               });
             }
           }
+
+          if (state is ChatCreateTripItinerarySuccess) {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.check_circle),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Tạo lịch trình thành công',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontFamily: GoogleFonts.merriweather().fontFamily,
+                            ),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TripDetailPage(
+                                        tripId: widget.chat.tripId!,
+                                        initialIndex: 2,
+                                      )));
+                        },
+                        child: Text('Xem ngay',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                              decorationColor:
+                                  Theme.of(context).colorScheme.onSurface,
+                            )),
+                      ),
+                    ],
+                  ),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
+              );
+          }
         },
         builder: (context, state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: Text(
-                  'Tổng hợp lịch trình từ cuộc trò chuyện',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+          return Stack(children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Text(
+                    'Tổng hợp lịch trình từ cuộc trò chuyện',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Expanded(
+                  child: state is ChatLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : chatSummarize != null
+                          ? SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ExpansionPanelList(
+                                      expansionCallback:
+                                          (int index, bool isExpanded) {
+                                        setState(() {
+                                          _expanded[index] = isExpanded;
+                                        });
+                                      },
+                                      expandedHeaderPadding:
+                                          const EdgeInsets.all(0),
+                                      animationDuration:
+                                          const Duration(milliseconds: 1000),
+                                      children: [
+                                        ...chatSummarize!.summary
+                                            .asMap()
+                                            .entries
+                                            .map((item) {
+                                          final panel = item.value;
+                                          final index = item.key;
+                                          return ExpansionPanel(
+                                            headerBuilder:
+                                                (BuildContext context,
+                                                    bool isExpanded) {
+                                              return ListTile(
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 10),
+                                                title: Text(panel['day'],
+                                                    style: const TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              );
+                                            },
+
+                                            canTapOnHeader: true,
+
+                                            body: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 20),
+                                                child: panel['events']
+                                                            .isEmpty &&
+                                                        _expanded[index]
+                                                    ? _emptyItineraryDisplay(
+                                                        DateTime.parse(
+                                                            panel['day']))
+                                                    : _itinerariesDisplay(
+                                                        List<
+                                                                Map<String,
+                                                                    dynamic>>.from(
+                                                            panel['events']),
+                                                      )),
+
+                                            isExpanded: _expanded[
+                                                index], // Use the correct index
+                                          );
+                                        }),
+                                      ]),
+                                ],
+                              ),
+                            )
+                          : Center(
+                              child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 100,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(height: 10),
+                                OutlinedButton(
+                                    onPressed: () {
+                                      context.read<ChatBloc>().add(
+                                          SummarizeItineraries(
+                                              chatId: widget.chat.id));
+                                    },
+                                    child: const Text('Tổng hợp ngay')),
+                              ],
+                            )),
+                ),
+                Divider(
+                  thickness: 1,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: OutlinedButton(
+                          onPressed: () {
+                            context.read<ChatBloc>().add(
+                                SummarizeItineraries(chatId: widget.chat.id));
+                            showSnackbar(
+                                context,
+                                'Có thể mất một chút thời gian để tổng hợp lịch trình',
+                                SnackBarState.warning);
+                          },
+                          child: const Text(
+                            'Tổng hợp',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )),
+                    ),
+                    BlocBuilder<ChatBloc, ChatState>(
+                      builder: (context, state) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 10.0),
+                          child: ElevatedButton(
+                              onPressed: chatSummarize != null
+                                  ? () {
+                                      context.read<ChatBloc>().add(
+                                          CreateItineraryFromSummary(
+                                              chatId: widget.chat.id));
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.onPrimary,
+                              ),
+                              child: const Text('Tạo lịch trình',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold))),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
+            if (state is ChatCreateTripItineraryLoading)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 10),
+                        Text(
+                          'Đang tạo lịch trình...',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              Expanded(
-                child: state is ChatLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : chatSummarize != null
-                        ? SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ExpansionPanelList(
-                                    expansionCallback:
-                                        (int index, bool isExpanded) {
-                                      setState(() {
-                                        _expanded[index] = isExpanded;
-                                      });
-                                    },
-                                    expandedHeaderPadding:
-                                        const EdgeInsets.all(0),
-                                    animationDuration:
-                                        const Duration(milliseconds: 1000),
-                                    children: [
-                                      ...chatSummarize!.summary
-                                          .asMap()
-                                          .entries
-                                          .map((item) {
-                                        final panel = item.value;
-                                        final index = item.key;
-                                        return ExpansionPanel(
-                                          headerBuilder: (BuildContext context,
-                                              bool isExpanded) {
-                                            return ListTile(
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10),
-                                              title: Text(panel['day'],
-                                                  style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                            );
-                                          },
-
-                                          canTapOnHeader: true,
-
-                                          body: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 20),
-                                              child: panel['events'].isEmpty &&
-                                                      _expanded[index]
-                                                  ? _emptyItineraryDisplay(
-                                                      DateTime.parse(
-                                                          panel['day']))
-                                                  : _itinerariesDisplay(
-                                                      List<
-                                                              Map<String,
-                                                                  dynamic>>.from(
-                                                          panel['events']),
-                                                    )),
-
-                                          isExpanded: _expanded[
-                                              index], // Use the correct index
-                                        );
-                                      }),
-                                    ]),
-                              ],
-                            ),
-                          )
-                        : Center(
-                            child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 100,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              const SizedBox(height: 10),
-                              OutlinedButton(
-                                  onPressed: () {
-                                    context.read<ChatBloc>().add(
-                                        SummarizeItineraries(
-                                            chatId: widget.chat.id));
-                                  },
-                                  child: const Text('Tổng hợp ngay')),
-                            ],
-                          )),
-              ),
-              Divider(
-                thickness: 1,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: OutlinedButton(
-                        onPressed: () {
-                          context.read<ChatBloc>().add(
-                              SummarizeItineraries(chatId: widget.chat.id));
-                          showSnackbar(
-                              context,
-                              'Có thể mất một chút thời gian để tổng hợp lịch trình',
-                              SnackBarState.warning);
-                        },
-                        child: const Text(
-                          'Tổng hợp',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-                  ),
-                  BlocBuilder<ChatBloc, ChatState>(
-                    builder: (context, state) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 10.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
-                          ),
-                          child: state is! ChatLoading
-                              ? const Text('Tạo lịch trình',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold))
-                              : SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  ),
-                                ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-            ],
-          );
+          ]);
         },
       ),
     );
@@ -259,7 +337,6 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
   Widget _itinerariesDisplay(
     List<Map<String, dynamic>> itineraries,
   ) {
-    log(itineraries.toString());
     return FixedTimeline.tileBuilder(
       theme: TimelineThemeData(
         nodePosition: 0,

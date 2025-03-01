@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -7,10 +9,24 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_settings_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
 
-class TripDetailAppbar extends StatelessWidget {
+class TripDetailAppbar extends StatefulWidget {
   final Trip? trip;
-  const TripDetailAppbar({super.key, required this.trip});
+  final String? tripCover;
+  final TabController tabController;
+  final String tripId;
+  const TripDetailAppbar({
+    super.key,
+    required this.tabController,
+    required this.trip,
+    this.tripCover,
+    required this.tripId,
+  });
 
+  @override
+  State<TripDetailAppbar> createState() => _TripDetailAppbarState();
+}
+
+class _TripDetailAppbarState extends State<TripDetailAppbar> {
   @override
   Widget build(BuildContext context) {
     return SliverSafeArea(
@@ -40,16 +56,18 @@ class TripDetailAppbar extends StatelessWidget {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
-                  _tripStatusSnachBar(trip, context),
+                  _tripStatusSnachBar(widget.trip, context),
                 );
             },
             icon: Icon(
-              trip != null && trip!.isPublished ? Icons.public : Icons.lock,
+              widget.trip != null && widget.trip!.isPublished
+                  ? Icons.public
+                  : Icons.lock,
               color: Colors.black,
             ),
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(
-                  trip != null && trip!.isPublished
+                  widget.trip != null && widget.trip!.isPublished
                       ? const Color.fromARGB(255, 91, 218, 95)
                       : const Color.fromARGB(255, 255, 138, 130)),
             ),
@@ -62,7 +80,7 @@ class TripDetailAppbar extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.of(context).pushNamed(TripSettingsPage.routeName,
-                  arguments: trip!); // Navigate to settings page
+                  arguments: widget.trip!); // Navigate to settings page
             },
           ),
           const SizedBox(width: 10),
@@ -88,16 +106,17 @@ class TripDetailAppbar extends StatelessWidget {
                   children: [
                     Positioned.fill(
                       child: Hero(
-                        tag: trip!.id,
+                        tag: widget.tripId,
                         child: CachedNetworkImage(
-                          imageUrl: trip!.cover ?? "",
+                          imageUrl:
+                              widget.tripCover ?? widget.trip?.cover ?? "",
                           errorWidget: (context, url, error) => Image.asset(
                             'assets/images/trip_placeholder.avif', // Fallback if loading fails
                             fit: BoxFit.cover,
                           ),
                           cacheManager: CacheManager(
                             Config(
-                              trip!.cover ?? "hello",
+                              widget.tripCover ?? widget.trip?.cover ?? "hello",
                               stalePeriod: const Duration(seconds: 10),
                             ),
                           ),
@@ -134,7 +153,7 @@ class TripDetailAppbar extends StatelessWidget {
                               Text(
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                trip!.name,
+                                widget.trip?.name ?? "Đang tải...",
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
@@ -142,7 +161,8 @@ class TripDetailAppbar extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              if (trip!.locations.isNotEmpty)
+                              if (widget.trip != null &&
+                                  widget.trip!.locations.isNotEmpty)
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment
                                       .start, // Align text to the start
@@ -155,7 +175,7 @@ class TripDetailAppbar extends StatelessWidget {
                                     const SizedBox(width: 4),
                                     Flexible(
                                       child: Text(
-                                        trip!.locations.join(' - '),
+                                        widget.trip!.locations.join(' - '),
                                         style: const TextStyle(
                                           color: Colors.white,
                                         ),
@@ -178,8 +198,9 @@ class TripDetailAppbar extends StatelessWidget {
           preferredSize: const Size.fromHeight(50.0),
           child: Container(
             color: Theme.of(context).colorScheme.surface, // TabBar background
-            child: const TabBar(
-              tabs: [
+            child: TabBar(
+              controller: widget.tabController,
+              tabs: const [
                 Tab(
                   text: 'Thông tin',
                   icon: Icon(

@@ -7,9 +7,12 @@ class ExploreSearchResult {
   final String? locationName;
   final int? price;
   final String? cover;
+  final DateTime? eventDate;
   final int? ratingCount;
   final double? avgRating;
   final double? hotScore;
+  final double? latitude;
+  final double? longitude;
   bool isSaved;
 
   ExploreSearchResult({
@@ -19,7 +22,10 @@ class ExploreSearchResult {
     this.externalLink,
     required this.isSaved,
     this.address,
+    this.eventDate,
     required this.id,
+    this.latitude,
+    this.longitude,
     required this.type,
     this.cover,
     this.ratingCount,
@@ -37,6 +43,9 @@ class ExploreSearchResult {
       'locationName': locationName,
       'price': price,
       'cover': cover,
+      'eventDate': eventDate,
+      'latitude': latitude,
+      'longitude': longitude,
       'ratingCount': ratingCount,
       'avgRating': avgRating,
       'hotScore': hotScore,
