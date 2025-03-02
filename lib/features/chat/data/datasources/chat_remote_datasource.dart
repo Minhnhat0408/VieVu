@@ -175,7 +175,6 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     }
   }
 
-
   @override
   Future<ChatSummarizeModel> summarizeItineraries({
     required int chatId,
@@ -252,7 +251,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     required Function callback,
   }) {
     return supabaseClient
-        .channel('chat_members: $chatId')
+        .channel('chat_members:$chatId')
         .onPostgresChanges(
           event: PostgresChangeEvent.update,
           schema: 'public',
@@ -262,7 +261,6 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
               column: 'chat_id',
               value: chatId),
           callback: (payload) async {
-
             callback();
           },
         )

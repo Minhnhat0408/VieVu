@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/custom_text_editing_controller.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/overlay_button_builder.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
@@ -31,7 +32,7 @@ class ChatInput extends StatefulWidget {
 
 class _ChatInputState extends State<ChatInput> {
   late CustomTextEditingController _messageController;
-  bool _isEmojiVisible = false;
+  final bool _isEmojiVisible = false;
   final FocusNode _messageFocusNode = FocusNode();
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -138,9 +139,56 @@ class _ChatInputState extends State<ChatInput> {
                       IconButton(
                         icon: const Icon(Icons.emoji_emotions),
                         onPressed: () {
-                          setState(() {
-                            _isEmojiVisible = !_isEmojiVisible;
-                          });
+                          // showTopDialog(context);
+                          displayModal(
+                              context,
+                              EmojiPicker(
+                                textEditingController: _messageController,
+                                scrollController: _scrollController,
+                                onBackspacePressed: () {
+                                  final text = _messageController.text;
+                                  if (text.isNotEmpty) {
+                                    _messageController.text =
+                                        text.substring(0, text.length - 1);
+                                  }
+                                },
+                                config: Config(
+                                  height: 256,
+                                  checkPlatformCompatibility: true,
+                                  viewOrderConfig: const ViewOrderConfig(),
+                                  emojiViewConfig: EmojiViewConfig(
+                                    emojiSizeMax: 28 *
+                                        (defaultTargetPlatform ==
+                                                TargetPlatform.iOS
+                                            ? 1.2
+                                            : 1.0),
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.surface,
+                                  ),
+                                  skinToneConfig: const SkinToneConfig(),
+                                  categoryViewConfig: CategoryViewConfig(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.surface,
+                                  ),
+                                  bottomActionBarConfig: BottomActionBarConfig(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.surface,
+                                  ),
+                                  searchViewConfig: SearchViewConfig(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.surface,
+                                    buttonIconColor:
+                                        Theme.of(context).colorScheme.outline,
+                                    inputTextStyle: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              null,
+                              false);
                         },
                       ),
                     ],
@@ -173,44 +221,6 @@ class _ChatInputState extends State<ChatInput> {
                 },
               ),
             ],
-          ),
-        ),
-      ),
-      Offstage(
-        offstage: !_isEmojiVisible,
-        child: EmojiPicker(
-          textEditingController: _messageController,
-          scrollController: _scrollController,
-          onBackspacePressed: () {
-            final text = _messageController.text;
-            if (text.isNotEmpty) {
-              _messageController.text = text.substring(0, text.length - 1);
-            }
-          },
-          config: Config(
-            height: 256,
-            checkPlatformCompatibility: true,
-            viewOrderConfig: const ViewOrderConfig(),
-            emojiViewConfig: EmojiViewConfig(
-              emojiSizeMax: 28 *
-                  (defaultTargetPlatform == TargetPlatform.iOS ? 1.2 : 1.0),
-              backgroundColor: Theme.of(context).colorScheme.surface,
-            ),
-            skinToneConfig: const SkinToneConfig(),
-            categoryViewConfig: CategoryViewConfig(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-            ),
-            bottomActionBarConfig: BottomActionBarConfig(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-            ),
-            searchViewConfig: SearchViewConfig(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              buttonIconColor: Theme.of(context).colorScheme.outline,
-              inputTextStyle: TextStyle(
-                fontSize: 18,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
           ),
         ),
       ),

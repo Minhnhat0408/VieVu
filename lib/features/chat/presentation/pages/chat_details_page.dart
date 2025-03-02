@@ -1,9 +1,16 @@
 import 'dart:developer';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_chat_reactions/flutter_chat_reactions.dart';
+import 'package:flutter_chat_reactions/model/menu_item.dart';
+import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
+import 'package:vn_travel_companion/features/chat/data/models/message_model.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
@@ -13,6 +20,7 @@ import 'package:vn_travel_companion/features/chat/presentation/widgets/chat_inpu
 import 'package:vn_travel_companion/features/chat/presentation/widgets/message_item.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/summarize_chat_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ChatDetailsPage extends StatefulWidget {
   final Chat chat;
@@ -47,6 +55,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   @override
   void initState() {
     super.initState();
+    timeago.setLocaleMessages('vi', timeago.ViMessages());
+
     _messageBloc = context.read<MessageBloc>(); // Lưu tham chiếu
     _chatBloc = context.read<ChatBloc>();
     _pagingController.addPageRequestListener((pageKey) {
@@ -56,6 +66,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         offset: pageKey,
       ));
     });
+    _messageBloc.add(ListenToMessageReactionChannel(chatId: widget.chat.id));
     _chatBloc.add(GetSeenUser(chatId: widget.chat.id));
     _messageBloc.add(ListenToMessagesChannel(chatId: widget.chat.id));
     _messageBloc.add(ListenToMessageUpdateChannel(chatId: widget.chat.id));
@@ -68,9 +79,89 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     // _chatBloc.add(UnSubcribeToSeenUserChannel(chatId: widget.chat.id));
     _chatBloc.add(UnSubcribeToChatMembersChannel(
         channelName: 'chat_members:${widget.chat.id}'));
-    _messageBloc.add(
-        UnSubcribeToMessagesChannel(channelName: 'chat:${widget.chat.id}'));
+    _messageBloc.add(UnSubcribeToMessagesChannel(
+        channelName: 'chat_insert:${widget.chat.id}'));
+    _messageBloc.add(UnSubcribeToMessagesChannel(
+        channelName: 'chat_update:${widget.chat.id}'));
+    _messageBloc.add(UnSubcribeToMessagesChannel(
+        channelName: 'message_reactions:${widget.chat.id}'));
     super.dispose();
+  }
+
+  void addReactionToMessage({
+    required Message message,
+    required MessageReaction reaction,
+  }) {
+    if (message.reactions.any((element) =>
+        element.reaction == reaction.reaction &&
+        element.user.id == reaction.user.id)) {
+      message.reactions
+          .removeWhere((element) => element.user.id == reaction.user.id);
+      context.read<MessageBloc>().add(RemoveReaction(
+            messageId: message.id,
+          ));
+    } else {
+      message.reactions
+          .removeWhere((element) => element.user.id == reaction.user.id);
+      message.reactions.add(reaction);
+      context.read<MessageBloc>().add(InsertReaction(
+            messageId: message.id,
+            chatId: widget.chat.id,
+            reaction: reaction.reaction,
+          ));
+    }
+
+    setState(() {});
+  }
+
+  void showEmojiBottomSheet({
+    required Message message,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return EmojiPicker(
+          onEmojiSelected: ((category, emoji) {
+            // pop the bottom sheet
+            Navigator.pop(context);
+            addReactionToMessage(
+              message: message,
+              reaction: MessageReactionModel(
+                id: 0,
+                messageId: message.id,
+                user: (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                    .user,
+                reaction: emoji.emoji,
+              ),
+            );
+          }),
+          config: Config(
+            height: 256,
+            checkPlatformCompatibility: true,
+            viewOrderConfig: const ViewOrderConfig(),
+            emojiViewConfig: EmojiViewConfig(
+              emojiSizeMax: 28,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+            ),
+            skinToneConfig: const SkinToneConfig(),
+            categoryViewConfig: CategoryViewConfig(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+            ),
+            bottomActionBarConfig: BottomActionBarConfig(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+            ),
+            searchViewConfig: SearchViewConfig(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              buttonIconColor: Theme.of(context).colorScheme.outline,
+              inputTextStyle: TextStyle(
+                fontSize: 18,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -113,7 +204,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
-              'Online',
+              widget.chat.lastMessageTime != null
+                  ? "Online ${timeago.format(widget.chat.lastMessageTime!, locale: 'vi')}"
+                  : "Offline",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -130,9 +223,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                       ),
                       null,
                       true);
-                  // context
-                  //     .read<ChatBloc>()
-                  //     .add(SummarizeItineraries(chatId: widget.chat.id));
                 },
                 icon: Icon(
                   Icons.document_scanner,
@@ -212,6 +302,53 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                       log('Messages loaded successfully');
                     }
 
+                    if (state is MessageReactionSuccess) {
+                      // add reaction to message
+                      if (state.eventType == "insert") {
+                        final messageIndex = _pagingController.itemList!
+                            .indexWhere((element) =>
+                                element.id == state.reaction!.messageId);
+
+                        if (messageIndex != -1) {
+                          final updatedList = _pagingController.itemList!;
+                          updatedList[messageIndex]
+                              .reactions
+                              .add(state.reaction!);
+                          setState(() {
+                            _pagingController.itemList = updatedList;
+                          });
+                        }
+                      } else if (state.eventType == "remove") {
+                        // final messageIndex = _pagingController.itemList!
+                        //     .indexWhere((element) =>
+                        // element.id == state.reaction!.messageId);
+
+                        // if (messageIndex != -1) {
+                        //   final updatedList = _pagingController.itemList!;
+                        //   updatedList[messageIndex].reactions.removeWhere((element) => element.user.id == state.reaction!.user.id);
+                        //   setState(() {
+                        //     _pagingController.itemList = updatedList;
+                        //   });
+                        // }
+                      } else {
+                        final messageIndex = _pagingController.itemList!
+                            .indexWhere((element) =>
+                                element.id == state.reaction!.messageId);
+
+                        if (messageIndex != -1) {
+                          final updatedList = _pagingController.itemList!;
+                          updatedList[messageIndex].reactions.removeWhere(
+                              (element) => element.id == state.reaction!.id);
+                          updatedList[messageIndex]
+                              .reactions
+                              .add(state.reaction!);
+                          setState(() {
+                            _pagingController.itemList = updatedList;
+                          });
+                        }
+                      }
+                    }
+
                     if (state is MessageInsertSuccess) {
                       // add message to first index of list
 
@@ -272,9 +409,89 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 8.0),
-                              child: MessageItem(
-                                  key: Key(message.id.toString()),
-                                  message: message),
+                              child: GestureDetector(
+                                onLongPress: () {
+                                  Navigator.of(context).push(
+                                    HeroDialogRoute(
+                                      builder: (context) {
+                                        return ReactionsDialogWidget(
+                                          id: message.id
+                                              .toString(), // unique id for message
+                                          messageWidget: MessageItem(
+                                            // key: Key(message.id.toString()),
+                                            message: message,
+                                          ),
+                                          reactions: const [
+                                            '❤️',
+                                            '👍',
+                                            '👎',
+                                            '😩',
+                                            '😢',
+                                            '😂',
+                                            '➕'
+                                          ],
+                                          onReactionTap: (reaction) {
+                                            if (reaction == '➕') {
+                                              showEmojiBottomSheet(
+                                                message: message,
+                                              );
+                                              return;
+                                            }
+
+                                            final user = (context
+                                                    .read<AppUserCubit>()
+                                                    .state as AppUserLoggedIn)
+                                                .user;
+
+                                            addReactionToMessage(
+                                              message: message,
+                                              reaction: MessageReactionModel(
+                                                  id: 0,
+                                                  messageId: message.id,
+                                                  user: user,
+                                                  reaction: reaction),
+                                            );
+                                          },
+
+                                          onContextMenuTap: (menuItem) {
+                                            print('menu item: $menuItem');
+                                            if (menuItem.label == "Copy") {
+                                              Clipboard.setData(ClipboardData(
+                                                  text: message.content));
+                                            }
+                                          },
+                                          menuItems: const [
+                                            MenuItem(
+                                              label: "Copy",
+                                              icon: Icons.copy,
+                                            ),
+                                            MenuItem(
+                                              label: "Delete",
+                                              icon: Icons.delete,
+                                              isDestuctive: true,
+                                            ),
+                                          ],
+                                          widgetAlignment: message.user.id ==
+                                                  (context
+                                                              .read<AppUserCubit>()
+                                                              .state
+                                                          as AppUserLoggedIn)
+                                                      .user
+                                                      .id
+                                              ? Alignment.centerRight
+                                              : Alignment.centerLeft,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: Hero(
+                                  tag: message.id,
+                                  child: MessageItem(
+                                      key: Key(message.id.toString()),
+                                      message: message),
+                                ),
+                              ),
                             );
                           },
                           firstPageProgressIndicatorBuilder: (context) =>

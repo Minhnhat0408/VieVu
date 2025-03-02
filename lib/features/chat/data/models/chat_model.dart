@@ -23,7 +23,7 @@ class ChatModel extends Chat {
       lastMessageTime: json['last_message_time'] != null
           ? DateTime.parse(json['last_message_time'])
           : null,
-      isSeen: json['is_seen'],
+      isSeen: json['is_seen'] ?? false,
       // summarizeItineraries: json['summarize_itineraries'],
       // lastSummarizedMessageId: json['last_summarized_message_id'],
     );

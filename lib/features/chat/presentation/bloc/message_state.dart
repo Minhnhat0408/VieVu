@@ -42,3 +42,15 @@ final class MessageUpdateReceivedSuccess extends MessageState {
     required this.message,
   });
 }
+
+final class MessageReactionSuccess extends MessageState {
+  final String eventType;
+  final MessageReaction? reaction;
+
+  MessageReactionSuccess({
+    required this.reaction,
+    required this.eventType,
+
+  });
+}
+

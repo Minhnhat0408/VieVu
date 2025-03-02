@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_reactions/widgets/stacked_reactions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
@@ -67,52 +68,77 @@ class _MessageItemState extends State<MessageItem> {
                       const SizedBox(width: 10),
                     ],
                   ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (!_isMe)
-                      Text(
-                        widget.message.user.firstName,
-                        style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12),
-                      ),
-                    if (isEmojiOnly)
-                      Text(
-                        widget.message.content,
-                        style: const TextStyle(
-                            fontSize: 40), // Kích thước lớn hơn cho emoji
-                      )
-                    else
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth * 2 / 3,
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(_isMe ? 20 : 0),
-                              topRight: Radius.circular(_isMe ? 0 : 20),
-                              bottomLeft: const Radius.circular(20),
-                              bottomRight: const Radius.circular(20),
+                Stack(children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        bottom: widget.message.reactions.isEmpty ? 0 : 14.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!_isMe)
+                          Text(
+                            widget.message.user.firstName,
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12),
+                          ),
+                        if (isEmojiOnly)
+                          Text(
+                            widget.message.content,
+                            style: const TextStyle(
+                                fontSize: 40), // Kích thước lớn hơn cho emoji
+                          )
+                        else
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: constraints.maxWidth * 2 / 3,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(_isMe ? 20 : 0),
+                                  topRight: Radius.circular(_isMe ? 0 : 20),
+                                  bottomLeft: const Radius.circular(20),
+                                  bottomRight: const Radius.circular(20),
+                                ),
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              child: RichText(
+                                text: _buildHighlightedText(
+                                    widget.message.content,
+                                    widget.message.metaData ?? [],
+                                    widget.message,
+                                    context),
+                              ),
                             ),
                           ),
-                          padding: const EdgeInsets.all(10),
-                          child: RichText(
-                            text: _buildHighlightedText(
-                                widget.message.content,
-                                widget.message.metaData ?? [],
-                                widget.message,
-                                context),
-                          ),
-                        ),
-                      ),
-                  ],
-                )
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    // the position where to show your reaction
+                    bottom: 0,
+                    right: !_isMe ? 0 : null,
+                    left: _isMe ? 0 : null,
+                    child: StackedReactions(
+                      size: 14,
+                      // reactions widget
+                      reactions: widget.message.reactions.map(
+                        (reaction) {
+                          return reaction.reaction;
+                        },
+                      ).toList(), // list of reaction strings
+                      stackedValue:
+                          -5.0, // Value used to calculate the horizontal offset of each reaction
+                    ),
+                  ),
+                ])
               ],
             ),
             if (widget.message.seenUser != null &&

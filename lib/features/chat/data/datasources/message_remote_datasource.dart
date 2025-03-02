@@ -42,7 +42,24 @@ abstract interface class MessageRemoteDatasource {
     required String channelName,
   });
 
+  Future<MessageReactionModel> insertReaction({
+    required int messageId,
+    required String reaction,
+    required int chatId,
+  });
 
+  Future removeReaction({
+    required int messageId,
+  });
+
+  RealtimeChannel listenToMessageReactionChannel({
+    required int chatId,
+    required Function({
+      MessageReactionModel? messageReaction,
+      required int reactionId,
+      required String eventType,
+    }) callback,
+  });
 }
 
 class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
@@ -112,8 +129,6 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
     }
   }
 
-
-
   @override
   Future updateMessage({
     required int messageId,
@@ -171,15 +186,13 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
     try {
       final res = await supabaseClient
           .from('messages')
-          .select("*, profiles(*)")
+          .select("*, profiles(*), message_reactions(*, profiles(*))")
           .eq('chat_id', chatId)
           .range(offset, offset + limit)
           .order('created_at', ascending: false);
       // final userSeen = await getSeenUser(chatId: chatId);
 
-      return res
-          .map((e) => MessageModel.fromJson(e))
-          .toList();
+      return res.map((e) => MessageModel.fromJson(e)).toList();
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -255,9 +268,120 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
   }
 
   @override
+  RealtimeChannel listenToMessageReactionChannel({
+    required int chatId,
+    required Function({
+      MessageReactionModel? messageReaction,
+      required int reactionId,
+      required String eventType,
+    }) callback,
+  }) {
+    return supabaseClient
+        .channel('message_reactions:$chatId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'message_reactions',
+          filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'chat_id',
+              value: chatId),
+          callback: (payload) async {
+            log(payload.toString());
+            final event = payload.eventType;
+            log(event.name);
+            final user = supabaseClient.auth.currentUser;
+            if (user == null) {
+              throw const ServerException("Không tìm thấy người dùng");
+            }
+            if (event == PostgresChangeEvent.insert ||
+                event == PostgresChangeEvent.update) {
+              final data = payload.newRecord;
+              log(data.toString());
+              if (data['user_id'] != user.id) {
+                final user = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', data['user_id'])
+                    .single();
+                data['profiles'] = user;
+                callback(
+                  messageReaction: MessageReactionModel.fromJson(data),
+                  reactionId: data['id'],
+                  eventType: event.name,
+                );
+              }
+            } else {
+              final data = payload.oldRecord;
+              log("delete");
+              log(data.toString());
+              if (data['user_id'] != user.id) {
+                callback(
+                  messageReaction: null,
+                  reactionId: data['id'],
+                  eventType: event.name,
+                );
+              }
+            }
+          },
+        )
+        .subscribe();
+  }
+
+  @override
   void unSubcribeToMessagesChannel({
     required String channelName,
   }) {
     supabaseClient.channel(channelName).unsubscribe();
+  }
+
+  @override
+  Future<MessageReactionModel> insertReaction({
+    required int messageId,
+    required int chatId,
+    required String reaction,
+  }) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+
+      final res = await supabaseClient
+          .from('message_reactions')
+          .upsert({
+            'message_id': messageId,
+            'user_id': user.id,
+            'reaction': reaction,
+            'chat_id': chatId,
+          }, onConflict: 'user_id, message_id')
+          .select("*, profiles(*)")
+          .single();
+      return MessageReactionModel.fromJson(res);
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future removeReaction({
+    required int messageId,
+  }) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+
+      await supabaseClient
+          .from('message_reactions')
+          .delete()
+          .eq('message_id', messageId)
+          .eq('user_id', user.id);
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
   }
 }

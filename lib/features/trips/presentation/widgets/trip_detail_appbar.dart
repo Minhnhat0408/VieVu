@@ -208,7 +208,7 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                   ),
                 ),
                 Tab(
-                  text: 'Đã lưu',
+                  text: 'Mục đã lưu',
                   icon: Icon(
                     Icons.favorite_border_outlined,
                   ),
@@ -218,11 +218,11 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                     icon: Icon(
                       Icons.map_outlined,
                     )),
-                Tab(
-                    text: 'Công việc',
-                    icon: Icon(
-                      Icons.checklist,
-                    )),
+                // Tab(
+                //     text: 'Công việc',
+                //     icon: Icon(
+                //       Icons.checklist,
+                //     )),
               ],
             ),
           ),

@@ -124,4 +124,57 @@ class MessageRepositoryImpl implements MessageRepository {
     messageRemoteDatasource.unSubcribeToMessagesChannel(
         channelName: channelName);
   }
+
+  @override
+  Future<Either<Failure, MessageReaction>> insertReaction({
+    required int messageId,
+    required String reaction,
+    required int chatId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final res = await messageRemoteDatasource.insertReaction(
+        messageId: messageId,
+        reaction: reaction,
+        chatId: chatId,
+      );
+      return right(res);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> removeReaction({
+    required int messageId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      await messageRemoteDatasource.removeReaction(
+        messageId: messageId,
+      );
+      return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  RealtimeChannel listenToMessageReactionChannel({
+    required int chatId,
+    required Function({
+      MessageReaction? messageReaction,
+      required int reactionId,
+      required String eventType,
+    }) callback,
+  }) {
+    return messageRemoteDatasource.listenToMessageReactionChannel(
+      callback: callback,
+      chatId: chatId,
+    );
+  }
 }

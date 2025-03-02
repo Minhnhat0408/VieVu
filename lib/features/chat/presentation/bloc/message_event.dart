@@ -87,3 +87,43 @@ final class UnSubcribeToMessagesChannel extends MessageEvent {
     required this.channelName,
   });
 }
+
+final class InsertReaction extends MessageEvent {
+  final int messageId;
+  final String reaction;
+  final int chatId;
+
+  InsertReaction({
+    required this.messageId,
+    required this.chatId,
+    required this.reaction,
+  });
+}
+
+final class RemoveReaction extends MessageEvent {
+  final int messageId;
+
+  RemoveReaction({
+    required this.messageId,
+  });
+}
+
+final class ListenToMessageReactionChannel extends MessageEvent {
+  final int chatId;
+
+  ListenToMessageReactionChannel({
+    required this.chatId,
+  });
+}
+
+final class MessageReactionReceived extends MessageEvent {
+  final String eventType;
+  final MessageReaction? reaction;
+  final int reactionId;
+
+  MessageReactionReceived({
+     this.reaction,
+    required this.eventType,
+    required this.reactionId,
+  });
+}

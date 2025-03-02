@@ -36,7 +36,7 @@ class _TripDetailPageState extends State<TripDetailPage>
     super.initState();
     tabController = TabController(
       initialIndex: widget.initialIndex ?? 0,
-      length: 4,
+      length: 3,
       vsync: this,
     );
     context.read<TripDetailsCubit>().getTripDetails(tripId: widget.tripId);
@@ -116,7 +116,7 @@ class _TripDetailPageState extends State<TripDetailPage>
                             child: TripSavedServicesPage(trip: trip!),
                           ),
                           TripItineraryPage(trip: trip!),
-                          const TripTodoListPage(),
+                          // const TripTodoListPage(),
                         ])
                       : const Center(child: CircularProgressIndicator())),
               Positioned.fill(

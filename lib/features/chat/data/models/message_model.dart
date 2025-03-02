@@ -7,6 +7,7 @@ class MessageModel extends Message {
     required super.chatId,
     required super.content,
     required super.createdAt,
+    required super.reactions,
     super.metaData,
     super.seenUser,
     required super.user,
@@ -15,6 +16,10 @@ class MessageModel extends Message {
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
       id: json['id'],
+      reactions: json['message_reactions'] != null
+          ? List<MessageReactionModel>.from(
+              json['message_reactions'].map((x) => MessageReactionModel.fromJson(x)))
+          : [],
       chatId: json['chat_id'],
       content: json['content'],
       createdAt: DateTime.parse(json['created_at']),
@@ -36,9 +41,11 @@ class MessageModel extends Message {
     List<Map<String, dynamic>>? metaData,
     List<UserModel>? seenUser,
     UserModel? user,
+    List<MessageReactionModel>? reactions,
   }) {
     return MessageModel(
       id: id ?? this.id,
+      reactions: reactions ?? this.reactions,
       chatId: chatId ?? this.chatId,
       content: content ?? this.content,
       createdAt: createdAt ?? this.createdAt,
@@ -49,6 +56,38 @@ class MessageModel extends Message {
               : this.seenUser
           : this.seenUser,
       user: user ?? this.user,
+    );
+  }
+}
+
+class MessageReactionModel extends MessageReaction {
+  MessageReactionModel({
+    required super.messageId,
+    required super.user,
+    required super.reaction,
+    required super.id
+  });
+
+  factory MessageReactionModel.fromJson(Map<String, dynamic> json) {
+    return MessageReactionModel(
+      messageId: json['message_id'],
+      user: UserModel.fromJson(json['profiles']),
+      reaction: json['reaction'],
+      id: json['id'],
+    );
+  }
+
+  MessageReactionModel copyWith({
+    int? messageId,
+    UserModel? user,
+    String? reaction,
+    int? id,
+  }) {
+    return MessageReactionModel(
+      id: id ?? this.id,
+      messageId: messageId ?? this.messageId,
+      user: user ?? this.user,
+      reaction: reaction ?? this.reaction,
     );
   }
 }

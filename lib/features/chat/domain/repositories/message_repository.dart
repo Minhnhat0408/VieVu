@@ -37,7 +37,26 @@ abstract interface class MessageRepository {
     required Function(Map<String, dynamic>) callback,
   });
 
+  Future<Either<Failure, MessageReaction>> insertReaction({
+    required int messageId,
+    required String reaction,
+    required int chatId,
+  });
+
+  RealtimeChannel listenToMessageReactionChannel({
+    required int chatId,
+    required Function({
+      MessageReaction? messageReaction,
+      required int reactionId,
+      required String eventType,
+    }) callback,
+  });
+
   void unSubcribeToMessagesChannel({
     required String channelName,
+  });
+
+  Future<Either<Failure, Unit>> removeReaction({
+    required int messageId,
   });
 }

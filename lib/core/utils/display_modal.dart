@@ -58,3 +58,62 @@ Future displayFullScreenModal(BuildContext context, Widget child) {
     transitionDuration: const Duration(milliseconds: 400),
   );
 }
+
+void showTopDialog(BuildContext context) {
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: true, // Close when tapping outside
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    transitionDuration: const Duration(milliseconds: 300), // Animation duration
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return Align(
+        alignment: Alignment.topCenter,
+        child: Material(
+          color: Colors.transparent,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, -1), // Start from above
+              end: const Offset(0, 0), // Slide to position
+            ).animate(animation),
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(top: 50), // Adjust top position
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 5)
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text("Top Slide Modal",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  const Text("This modal slides down from the top."),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Close"),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, -1), // Slide from top
+          end: const Offset(0, 0), // Stop at original position
+        ).animate(animation),
+        child: child,
+      );
+    },
+  );
+}
