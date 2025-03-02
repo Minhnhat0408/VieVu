@@ -60,6 +60,10 @@ abstract interface class MessageRemoteDatasource {
       required String eventType,
     }) callback,
   });
+
+  Future<MessageModel> removeMessage({
+    required int messageId,
+  });
 }
 
 class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
@@ -287,9 +291,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
               column: 'chat_id',
               value: chatId),
           callback: (payload) async {
-            log(payload.toString());
             final event = payload.eventType;
-            log(event.name);
             final user = supabaseClient.auth.currentUser;
             if (user == null) {
               throw const ServerException("Không tìm thấy người dùng");
@@ -297,7 +299,6 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
             if (event == PostgresChangeEvent.insert ||
                 event == PostgresChangeEvent.update) {
               final data = payload.newRecord;
-              log(data.toString());
               if (data['user_id'] != user.id) {
                 final user = await supabaseClient
                     .from('profiles')
@@ -313,15 +314,12 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
               }
             } else {
               final data = payload.oldRecord;
-              log("delete");
-              log(data.toString());
-              if (data['user_id'] != user.id) {
-                callback(
-                  messageReaction: null,
-                  reactionId: data['id'],
-                  eventType: event.name,
-                );
-              }
+
+              callback(
+                messageReaction: null,
+                reactionId: data['id'],
+                eventType: event.name,
+              );
             }
           },
         )
@@ -379,6 +377,39 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .delete()
           .eq('message_id', messageId)
           .eq('user_id', user.id);
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<MessageModel> removeMessage({
+    required int messageId,
+  }) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+
+      final res = await supabaseClient
+          .from('messages')
+          .update({
+            'content': null,
+            'is_travel_related': false,
+            'meta_data': [],
+          })
+          .eq('id', messageId)
+          .eq('user_id', user.id)
+          .select("*, profiles(*)")
+          .single();
+      // remove any reactions
+      await supabaseClient
+          .from('message_reactions')
+          .delete()
+          .eq('message_id', messageId);
+      return MessageModel.fromJson(res);
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());

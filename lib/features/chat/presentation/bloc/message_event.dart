@@ -127,3 +127,11 @@ final class MessageReactionReceived extends MessageEvent {
     required this.reactionId,
   });
 }
+
+final class RemoveMessage extends MessageEvent {
+  final int messageId;
+
+  RemoveMessage({
+    required this.messageId,
+  });
+}

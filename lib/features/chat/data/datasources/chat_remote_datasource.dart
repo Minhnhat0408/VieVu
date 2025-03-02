@@ -188,20 +188,31 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           .select('trip_id, trips(start_date,end_date), chat_summaries(*)')
           .eq('id', chatId)
           .single();
-
+      log(chat.toString());
       final lastSummarizedMessageId = chat['chat_summaries'] != null
           ? chat['chat_summaries']['last_message_id']
           : 0;
       final message = await supabaseClient
           .from('messages')
-          .select('id,content,meta_data')
+          .select('id,content,meta_data, message_reactions(reaction)')
           .eq('chat_id', chatId)
           .eq('is_travel_related', true)
           .gt('id', lastSummarizedMessageId)
           .order('created_at', ascending: true);
-
+      if (message.isEmpty) {
+        throw const ServerException("Không có tin nhắn mới để tóm tắt");
+      }
       final body = {
-        "conversation": message.map((e) => e['content']).toList(),
+        "conversation": message.map((e) {
+          final reactions = (e['message_reactions'] as List).map((react) {
+            return react['reaction'];
+          }).toList();
+          // check if 👍 have more than 👎 or not
+          final isPositive = reactions.where((e) => e == '👍').length >
+              reactions.where((e) => e == '👎').length;
+
+          return e['content'] + (isPositive ? '|Yes|' : '|No|');
+        }).toList(),
         "metadata": message
             .where((e) => e['meta_data'] != null)
             .expand((e) => e['meta_data'])
@@ -239,8 +250,10 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           }, onConflict: 'chat_id')
           .select("*")
           .single();
+      res['trip_id'] = chat['trip_id'];
       return ChatSummarizeModel.fromJson(res);
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

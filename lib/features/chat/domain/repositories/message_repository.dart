@@ -59,4 +59,8 @@ abstract interface class MessageRepository {
   Future<Either<Failure, Unit>> removeReaction({
     required int messageId,
   });
+
+  Future<Either<Failure, Message>> removeMessage({
+    required int messageId,
+  });
 }

@@ -49,7 +49,7 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
           children: [
             Expanded(
               child: Text(
-                widget.chat.lastMessage ?? 'Không có tin nhắn ',
+                widget.chat.lastMessage ?? 'Không có tin nhắn',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),

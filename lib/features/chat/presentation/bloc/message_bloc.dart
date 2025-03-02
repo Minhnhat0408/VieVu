@@ -29,6 +29,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     on<ListenToMessageReactionChannel>(_onListenToMessageReactionChannel);
     on<RemoveReaction>(_onRemoveReaction);
     on<MessageReactionReceived>(_onMessageReactionReceived);
+    on<RemoveMessage>(_onRemoveMessage);
   }
 
   void _onInsertMessage(InsertMessage event, Emitter<MessageState> emit) async {
@@ -41,6 +42,17 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     res.fold(
       (l) => emit(MessageFailure(message: l.message)),
       (r) => emit(MessageInsertSuccess(message: r)),
+    );
+  }
+
+  void _onRemoveMessage(RemoveMessage event, Emitter<MessageState> emit) async {
+    emit(MessageLoading());
+    final res = await _messageRepository.removeMessage(
+      messageId: event.messageId,
+    );
+    res.fold(
+      (l) => emit(MessageFailure(message: l.message)),
+      (r) => emit(MessageUpdateSuccess(message: r)),
     );
   }
 
@@ -104,7 +116,6 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     _messageRepository.listenToMessageUpdateChannel(
       chatId: event.chatId,
       callback: (payload) {
-        log('hello');
         add(MessageUpdateReceived(message: payload));
       },
     );
@@ -118,7 +129,9 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   void _onMessageReactionReceived(
       MessageReactionReceived event, Emitter<MessageState> emit) {
     emit(MessageReactionSuccess(
-        reaction: event.reaction, eventType: event.eventType));
+        reaction: event.reaction,
+        eventType: event.eventType,
+        reactionId: event.reactionId));
   }
 
   void _onInsertReaction(

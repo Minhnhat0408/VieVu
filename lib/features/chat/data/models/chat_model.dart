@@ -19,7 +19,8 @@ class ChatModel extends Chat {
       tripId: json['trip_id'],
       name: json['chat_name'],
       imageUrl: json['chat_avatar'],
-      lastMessage: json['last_message'],
+      lastMessage: json['last_message'] ??
+          (json['last_message_time'] != null ? 'Tin nhắn đã bị gỡ' : null),
       lastMessageTime: json['last_message_time'] != null
           ? DateTime.parse(json['last_message_time'])
           : null,

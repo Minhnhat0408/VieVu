@@ -177,4 +177,21 @@ class MessageRepositoryImpl implements MessageRepository {
       chatId: chatId,
     );
   }
+
+  @override
+  Future<Either<Failure, Message>> removeMessage({
+    required int messageId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final res = await messageRemoteDatasource.removeMessage(
+        messageId: messageId,
+      );
+      return right(res);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

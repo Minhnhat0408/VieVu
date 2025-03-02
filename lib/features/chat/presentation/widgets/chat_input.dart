@@ -8,6 +8,7 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/custom_text_editing_controller.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/onboarding_help.dart';
 import 'package:vn_travel_companion/core/utils/overlay_button_builder.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
@@ -104,6 +105,27 @@ class _ChatInputState extends State<ChatInput> {
                     widget.onOverlayToggle(false);
                   }
                   _searchFocusNode.requestFocus();
+                  OnboardingHelper.resetSeenTagGuide();
+                  OnboardingHelper.hasSeenTagGuide().then((value) {
+                    if (!value) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Hướng dẫn'),
+                          content: const Text(
+                              'Tra và chọn địa điểm bạn muốn chia sẻ để thêm vào tin nhắn. Đia điểm sẽ được highlight và bạn có thể nhấn vào để xem chi tiết.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Đã hiểu'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  });
                 },
                 icon: const Icon(Icons.add_location_sharp),
               ),
@@ -118,6 +140,7 @@ class _ChatInputState extends State<ChatInput> {
                     children: [
                       Expanded(
                         child: TextField(
+                          onTapOutside: (event) => _messageFocusNode.unfocus(),
                           focusNode: _messageFocusNode,
                           controller: _messageController,
                           maxLines: 3,
@@ -126,7 +149,7 @@ class _ChatInputState extends State<ChatInput> {
                             filled: true,
                             fillColor:
                                 Theme.of(context).colorScheme.primaryContainer,
-                            hintText: 'Type a message',
+                            hintText: 'Nhập tin nhắn',
                             contentPadding:
                                 const EdgeInsets.fromLTRB(20, 8, 2, 8),
                             border: OutlineInputBorder(

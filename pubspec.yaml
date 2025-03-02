@@ -81,6 +81,7 @@ dependencies:
   timelines: ^0.1.0
   emoji_picker_flutter: ^4.3.0
   flutter_chat_reactions: ^0.1.1
+  shared_preferences: ^2.5.2
 
 
 dev_dependencies:

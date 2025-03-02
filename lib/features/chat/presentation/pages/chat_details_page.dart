@@ -8,6 +8,7 @@ import 'package:flutter_chat_reactions/utilities/hero_dialog_route.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/onboarding_help.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:vn_travel_companion/features/chat/data/models/message_model.dart';
@@ -269,7 +270,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               listener: (context, state) {
                 // TODO: implement listener
                 if (state is SeenUpdatedSuccess) {
-                  log('Seen user updated successfully: ${state.seenUser.toString()}');
                   setState(() {
                     seenUser = state.seenUser;
                   });
@@ -282,15 +282,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                     if (state is MessagesLoadedSuccess) {
                       if (widget.chat.isSeen == false &&
                           totalRecordCount == 0) {
-                        log('Update seen message');
                         _messageBloc.add(UpdateSeenMessage(
                           chatId: widget.chat.id,
                           messageId: state.messages.first.id,
                         ));
                       }
                       totalRecordCount += state.messages.length;
-
-                      log("Total record count: $totalRecordCount");
 
                       final next = totalRecordCount;
                       final isLastPage = state.messages.length < _pageSize;
@@ -299,7 +296,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                       } else {
                         _pagingController.appendPage(state.messages, next);
                       }
-                      log('Messages loaded successfully');
                     }
 
                     if (state is MessageReactionSuccess) {
@@ -318,18 +314,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                             _pagingController.itemList = updatedList;
                           });
                         }
-                      } else if (state.eventType == "remove") {
-                        // final messageIndex = _pagingController.itemList!
-                        //     .indexWhere((element) =>
-                        // element.id == state.reaction!.messageId);
+                      } else if (state.eventType == "delete") {
+                        final messageIndex = _pagingController.itemList!
+                            .indexWhere((element) => element.reactions.any(
+                                (element) => element.id == state.reactionId));
 
-                        // if (messageIndex != -1) {
-                        //   final updatedList = _pagingController.itemList!;
-                        //   updatedList[messageIndex].reactions.removeWhere((element) => element.user.id == state.reaction!.user.id);
-                        //   setState(() {
-                        //     _pagingController.itemList = updatedList;
-                        //   });
-                        // }
+                        if (messageIndex != -1) {
+                          final updatedList = _pagingController.itemList!;
+                          updatedList[messageIndex].reactions.removeWhere(
+                              (element) => element.id == state.reactionId);
+                          setState(() {
+                            _pagingController.itemList = updatedList;
+                          });
+                        }
                       } else {
                         final messageIndex = _pagingController.itemList!
                             .indexWhere((element) =>
@@ -359,6 +356,47 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                         ];
                       }
                       totalRecordCount++;
+
+                      OnboardingHelper.hasSeenChatGuide()
+                          .then((hasSeenChatGuide) {
+                        if (!hasSeenChatGuide) {
+                          // Hiển thị thông báo hướng dẫn
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("Hướng dẫn"),
+                              content: const Text(
+                                  "Tên địa điểm sẽ được tự động highlight trong tin nhắn của bạn. Hãy bấm vào phần highlight để thêm thông tin chi tiết cho địa điểm."),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text("Đã hiểu"),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          // Đánh dấu là đã xem hướng dẫn
+                          OnboardingHelper.setSeenChatGuide();
+                        }
+                      });
+                    }
+
+                    if (state is MessageUpdateSuccess) {
+                      // add message to first index of list
+                      final messageIndex = _pagingController.itemList!
+                          .indexWhere(
+                              (element) => element.id == state.message.id);
+
+                      if (messageIndex != -1) {
+                        final updatedList = _pagingController.itemList!;
+                        updatedList[messageIndex] = state.message;
+                        setState(() {
+                          _pagingController.itemList = updatedList;
+                        });
+                      }
                     }
 
                     if (state is MessageUpdateReceivedSuccess) {
@@ -411,6 +449,31 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                               padding: const EdgeInsets.only(bottom: 8.0),
                               child: GestureDetector(
                                 onLongPress: () {
+                                  OnboardingHelper.hasSeenReactionGuide()
+                                      .then((hasSeen) {
+                                    if (!hasSeen) {
+                                      // Hiển thị thông báo hướng dẫn
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text("Hướng dẫn"),
+                                          content: const Text(
+                                              "Lựa chọn 👍👎 sẽ có tính vote quyết định ý kiến. Ý kiến được vote 👍 sẽ được tính trong việc tổng hợp lịch trình"),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text("Đã hiểu"),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+
+                                      // Đánh dấu là đã xem hướng dẫn
+                                      OnboardingHelper.setSeenReactionGuide();
+                                    }
+                                  });
                                   Navigator.of(context).push(
                                     HeroDialogRoute(
                                       builder: (context) {
@@ -454,19 +517,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                                           },
 
                                           onContextMenuTap: (menuItem) {
-                                            print('menu item: $menuItem');
-                                            if (menuItem.label == "Copy") {
+                                            if (menuItem.label == "Sao chép") {
                                               Clipboard.setData(ClipboardData(
                                                   text: message.content));
+                                            } else if (menuItem.label ==
+                                                "Gỡ tin nhắn") {
+                                              context.read<MessageBloc>().add(
+                                                  RemoveMessage(
+                                                      messageId: message.id));
                                             }
                                           },
                                           menuItems: const [
                                             MenuItem(
-                                              label: "Copy",
+                                              label: "Sao chép",
                                               icon: Icons.copy,
                                             ),
                                             MenuItem(
-                                              label: "Delete",
+                                              label: "Gỡ tin nhắn",
                                               icon: Icons.delete,
                                               isDestuctive: true,
                                             ),

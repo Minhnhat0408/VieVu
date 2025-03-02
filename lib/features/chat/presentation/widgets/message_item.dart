@@ -195,7 +195,14 @@ class _MessageItemState extends State<MessageItem> {
       if (highlightStart != null && matchedHighlight != null) {
         // Thêm phần văn bản trước highlight
         if (start < highlightStart) {
-          spans.add(TextSpan(text: text.substring(start, highlightStart)));
+          spans.add(TextSpan(
+              text: text.substring(start, highlightStart),
+              style: TextStyle(
+                decoration:
+                    text.substring(start, highlightStart).contains("http")
+                        ? TextDecoration.underline
+                        : TextDecoration.none,
+              )));
         }
 
         // Thêm phần văn bản được highlight với GestureDetector
@@ -244,7 +251,9 @@ class _MessageItemState extends State<MessageItem> {
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
-                decoration: TextDecoration.underline, // Tạo hiệu ứng giống link
+                decoration: matchedHighlight.contains("http")
+                    ? TextDecoration.underline
+                    : TextDecoration.none,
               ),
             ),
           ),
@@ -253,7 +262,16 @@ class _MessageItemState extends State<MessageItem> {
         start = highlightStart + matchedHighlight.length;
       } else {
         // Không còn highlight nào, thêm phần còn lại của văn bản
-        spans.add(TextSpan(text: text.substring(start)));
+        spans.add(TextSpan(
+            text: text.substring(start),
+            style: TextStyle(
+              fontStyle: text.substring(start) == "Tin nhắn đã bị gỡ"
+                  ? FontStyle.italic
+                  : FontStyle.normal,
+              color: text.substring(start) == "Tin nhắn đã bị gỡ"
+                  ? Theme.of(context).colorScheme.outline
+                  : Theme.of(context).colorScheme.onSurface,
+            )));
         break;
       }
     }

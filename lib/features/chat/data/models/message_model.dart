@@ -17,11 +17,11 @@ class MessageModel extends Message {
     return MessageModel(
       id: json['id'],
       reactions: json['message_reactions'] != null
-          ? List<MessageReactionModel>.from(
-              json['message_reactions'].map((x) => MessageReactionModel.fromJson(x)))
+          ? List<MessageReactionModel>.from(json['message_reactions']
+              .map((x) => MessageReactionModel.fromJson(x)))
           : [],
       chatId: json['chat_id'],
-      content: json['content'],
+      content: json['content'] ?? 'Tin nhắn đã bị gỡ',
       createdAt: DateTime.parse(json['created_at']),
       metaData: json['meta_data'] != null
           ? List<Map<String, dynamic>>.from(json['meta_data'])
@@ -61,12 +61,11 @@ class MessageModel extends Message {
 }
 
 class MessageReactionModel extends MessageReaction {
-  MessageReactionModel({
-    required super.messageId,
-    required super.user,
-    required super.reaction,
-    required super.id
-  });
+  MessageReactionModel(
+      {required super.messageId,
+      required super.user,
+      required super.reaction,
+      required super.id});
 
   factory MessageReactionModel.fromJson(Map<String, dynamic> json) {
     return MessageReactionModel(

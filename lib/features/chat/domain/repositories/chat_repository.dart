@@ -40,7 +40,7 @@ abstract interface class ChatRepository {
   Future<Either<Failure, List<Map<int, my_user.User>>>> getSeenUser({
     required int chatId,
   });
-
+ 
   void unSubcribeToChatMembersChannel({
     required String channelName,
   });

@@ -25,6 +25,13 @@ final class MessageInsertSuccess extends MessageState {
   });
 }
 
+final class MessageUpdateSuccess extends MessageState {
+  final Message message;
+
+  MessageUpdateSuccess({
+    required this.message,
+  });
+}
 
 final class MessageFailure extends MessageState {
   final String message;
@@ -46,11 +53,12 @@ final class MessageUpdateReceivedSuccess extends MessageState {
 final class MessageReactionSuccess extends MessageState {
   final String eventType;
   final MessageReaction? reaction;
+  final int reactionId;
 
   MessageReactionSuccess({
     required this.reaction,
     required this.eventType,
+    required this.reactionId,
 
   });
 }
-

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
@@ -96,6 +97,13 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
                   onPressed: () {
                     // widget.onStatusChanged(_status);
                     if (_published != widget.trip.isPublished) {
+                      if (_published) {
+                        context.read<ChatBloc>().add(InsertChat(
+                              tripId: widget.trip.id,
+                              imageUrl: widget.trip.cover,
+                              name: widget.trip.name,
+                            ));
+                      }
                       context.read<TripBloc>().add(UpdateTrip(
                             isPublished: _published,
                             tripId: widget.trip.id,
