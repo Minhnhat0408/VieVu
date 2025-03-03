@@ -8,6 +8,7 @@ class ChatModel extends Chat {
     super.lastMessage,
     super.lastMessageTime,
     super.tripId,
+    super.lastSeenUserAvatar,
     required super.isSeen,
     // required super.summarizeItineraries,
     // required super.lastSummarizedMessageId,
@@ -18,6 +19,7 @@ class ChatModel extends Chat {
       id: json['chat_id'],
       tripId: json['trip_id'],
       name: json['chat_name'],
+      lastSeenUserAvatar: json['last_seen_user_avatar'],
       imageUrl: json['chat_avatar'],
       lastMessage: json['last_message'] ??
           (json['last_message_time'] != null ? 'Tin nhắn đã bị gỡ' : null),

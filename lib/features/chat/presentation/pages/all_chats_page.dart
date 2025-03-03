@@ -20,30 +20,47 @@ class AllMessagesPage extends StatefulWidget {
 class _AllMessagesPageState extends State<AllMessagesPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Chat> chats = [];
+  List<Chat> filteredChats = [];
+  bool _listentoNotification = true;
   @override
   void initState() {
     super.initState();
 
     context.read<ChatBloc>().add(GetChatHeads());
     context.read<ChatBloc>().add(ListenToUpdateChannels());
+
+    _searchController.addListener(() {
+      setState(() {
+        filteredChats = chats
+            .where((element) => element.name
+                .toLowerCase()
+                .contains(_searchController.text.toLowerCase()))
+            .toList();
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {},
-        ),
+
         title: const Text('Liên hệ'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // Navigator.of(context).pushNamed('/new-message');
+          Switch(
+            value: _listentoNotification,
+            thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
+                (Set<WidgetState> states) {
+              return const Icon(Icons.notifications_active_outlined);
+            }),
+            onChanged: (value) {
+      
+              setState(() {
+                _listentoNotification = value;
+              });
             },
           ),
+          const SizedBox(width: 10),
         ],
       ),
       body: Column(
@@ -53,11 +70,8 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
             child: SearchBar(
               controller: _searchController,
               elevation: const WidgetStatePropertyAll(0),
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
               leading: const Icon(Icons.search),
-              onSubmitted: (value) {},
-              onChanged: (value) {
-                setState(() {});
-              },
               trailing: _searchController.text.isEmpty
                   ? null
                   : [
@@ -78,6 +92,7 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
               if (state is ChatsLoadedSuccess) {
                 setState(() {
                   chats = state.chatHeads;
+                  filteredChats = state.chatHeads;
                 });
               }
               if (state is ChatFailure) {
@@ -85,21 +100,21 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
               }
             },
             builder: (context, state) {
-              return state is ChatLoading && chats.isEmpty
+              return state is ChatLoading && filteredChats.isEmpty
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
-                  : chats.isNotEmpty
+                  : filteredChats.isNotEmpty
                       ? Expanded(
                           // <-- Thêm Expanded ở đây
                           child: ListView.builder(
-                            itemCount: chats.length,
+                            itemCount: filteredChats.length,
                             itemBuilder: (context, index) {
                               return ChatHeadItem(
-                                chat: chats[index],
+                                chat: filteredChats[index],
                                 onMessageSeen: () {
                                   setState(() {
-                                    chats[index].isSeen = true;
+                                    filteredChats[index].isSeen = true;
                                   });
                                 },
                               );

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
@@ -64,10 +65,17 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
           ],
         ),
         trailing: widget.chat.isSeen
-            ? const SizedBox()
+            ? widget.chat.lastSeenUserAvatar != null
+                ? CircleAvatar(
+                    radius: 8,
+                    backgroundImage: CachedNetworkImageProvider(
+                      widget.chat.lastSeenUserAvatar!,
+                    ),
+                  )
+                : const SizedBox()
             : Container(
-                height: 14,
-                width: 14,
+                height: 16,
+                width: 16   ,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(10),

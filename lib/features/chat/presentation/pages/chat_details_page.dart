@@ -470,7 +470,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                                         ),
                                       );
 
-                                      // Đánh dấu là đã xem hướng dẫn
+
                                       OnboardingHelper.setSeenReactionGuide();
                                     }
                                   });
@@ -500,7 +500,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                                               );
                                               return;
                                             }
-
                                             final user = (context
                                                     .read<AppUserCubit>()
                                                     .state as AppUserLoggedIn)

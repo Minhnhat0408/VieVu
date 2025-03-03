@@ -12,6 +12,7 @@ import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/add_place_by_name_modal.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/highlight_location_details_modal.dart';
+import 'package:vn_travel_companion/features/chat/presentation/widgets/reaction_modal.dart';
 
 class MessageItem extends StatefulWidget {
   final Message message;
@@ -126,16 +127,24 @@ class _MessageItemState extends State<MessageItem> {
                     bottom: 0,
                     right: !_isMe ? 0 : null,
                     left: _isMe ? 0 : null,
-                    child: StackedReactions(
-                      size: 14,
-                      // reactions widget
-                      reactions: widget.message.reactions.map(
-                        (reaction) {
-                          return reaction.reaction;
-                        },
-                      ).toList(), // list of reaction strings
-                      stackedValue:
-                          -5.0, // Value used to calculate the horizontal offset of each reaction
+                    child: GestureDetector(
+                      onTap: () {
+                        displayModal(context,
+                            ReactionsModal(message: widget.message)
+                        , 400, false);
+                      },
+                      child: StackedReactions(
+                        size: 14,
+                        // reactions widget
+
+                        reactions: widget.message.reactions.map(
+                          (reaction) {
+                            return reaction.reaction;
+                          },
+                        ).toList(), // list of reaction strings
+                        stackedValue:
+                            -5.0, // Value used to calculate the horizontal offset of each reaction
+                      ),
                     ),
                   ),
                 ])
