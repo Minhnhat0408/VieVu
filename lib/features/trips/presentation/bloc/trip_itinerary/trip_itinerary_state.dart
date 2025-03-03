@@ -23,8 +23,13 @@ final class TripItineraryUpdatedSuccess extends TripItineraryState {
   });
 }
 
+final class TripItineraryDeletedSuccess extends TripItineraryState {
+  final int itineraryId;
 
-
+  TripItineraryDeletedSuccess({
+    required this.itineraryId,
+  });
+}
 
 final class TripItineraryFailure extends TripItineraryState {
   final String message;

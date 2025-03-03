@@ -189,6 +189,7 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
           child: SearchBar(
             controller: _searchController,
             autoFocus: true,
+            onTapOutside: (event) => FocusScope.of(context).unfocus(),
             elevation: const WidgetStatePropertyAll(0),
             leading: const Icon(Icons.search),
             onSubmitted: (value) {

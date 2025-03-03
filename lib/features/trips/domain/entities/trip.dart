@@ -14,13 +14,15 @@ class Trip {
   final int serviceCount;
   final List<String>? transports;
   final bool isSaved;
+  bool hasTripItineraries;
 
   Trip({
     required this.id,
     required this.name,
+    required this.hasTripItineraries,
     this.description,
     this.cover,
-    required  this.isSaved,
+    required this.isSaved,
     this.startDate,
     this.endDate,
     required this.createdAt,

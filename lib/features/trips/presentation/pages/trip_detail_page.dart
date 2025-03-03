@@ -31,12 +31,13 @@ class _TripDetailPageState extends State<TripDetailPage>
     with TickerProviderStateMixin {
   late TabController tabController;
   Trip? trip;
+
   @override
   void initState() {
     super.initState();
     tabController = TabController(
       initialIndex: widget.initialIndex ?? 0,
-      length: 3,
+      length: 4,
       vsync: this,
     );
     context.read<TripDetailsCubit>().getTripDetails(tripId: widget.tripId);
@@ -91,6 +92,18 @@ class _TripDetailPageState extends State<TripDetailPage>
                   }
                 },
               ),
+              BlocListener<TripItineraryBloc, TripItineraryState>(
+                listener: (context, state) {
+                  if (state is TripItineraryLoadedSuccess) {
+                    setState(() {
+                      setState(() {
+                        trip!.hasTripItineraries =
+                            state.tripItineraries.isNotEmpty;
+                      });
+                    });
+                  }
+                },
+              ),
             ],
             child: Stack(children: [
               NestedScrollView(
@@ -116,7 +129,7 @@ class _TripDetailPageState extends State<TripDetailPage>
                             child: TripSavedServicesPage(trip: trip!),
                           ),
                           TripItineraryPage(trip: trip!),
-                          // const TripTodoListPage(),
+                          const TripTodoListPage(),
                         ])
                       : const Center(child: CircularProgressIndicator())),
               Positioned.fill(

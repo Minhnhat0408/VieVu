@@ -65,7 +65,6 @@ class TripItineraryRepositoryImpl implements TripItineraryRepository {
 
   @override
   Future<Either<Failure, Unit>> deleteTripItinerary({
-    required String tripId,
     required int itineraryId,
   }) async {
     try {
@@ -73,8 +72,7 @@ class TripItineraryRepositoryImpl implements TripItineraryRepository {
         return left(Failure("Không có kết nối mạng"));
       }
       await tripItineraryRemoteDatasource.deleteTripItinerary(
-        tripId: tripId,
-        ItineraryId: itineraryId,
+        id: itineraryId,
       );
       return right(unit);
     } on ServerException catch (e) {

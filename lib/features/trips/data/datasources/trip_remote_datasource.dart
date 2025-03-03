@@ -320,6 +320,14 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         transports: transports,
       );
 
+      if (startDate != null && endDate != null) {
+        await supabaseClient
+            .from('trip_itineraries')
+            .delete()
+            .gt('time', endDate.toIso8601String())
+            .lt('time', startDate.toIso8601String());
+      }
+
       if (isPublished != null) {
         //check if trip have all the required fields
         final res = await supabaseClient

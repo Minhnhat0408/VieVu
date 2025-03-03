@@ -18,6 +18,18 @@ class TripItineraryBloc extends Bloc<TripItineraryEvent, TripItineraryState> {
     on<InsertTripItinerary>(_onInsertTripItinerary);
     on<GetTripItineraries>(_onGetTripItineraries);
     on<UpdateTripItinerary>(_onUpdateTripItinerary);
+    on<DeleteTripItinerary>(_onDeleteTripItinerary);
+  }
+  void _onDeleteTripItinerary(
+      DeleteTripItinerary event, Emitter<TripItineraryState> emit) async {
+    emit(TripItineraryLoading());
+    final res = await _tripItineraryRepository.deleteTripItinerary(
+      itineraryId: event.itineraryId,
+    );
+    res.fold(
+      (l) => emit(TripItineraryFailure(message: l.message)),
+      (r) => emit(TripItineraryDeletedSuccess(itineraryId: event.itineraryId)),
+    );
   }
 
   void _onInsertTripItinerary(

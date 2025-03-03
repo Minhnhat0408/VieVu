@@ -42,3 +42,11 @@ class UpdateTripItinerary extends TripItineraryEvent {
     this.time,
   });
 }
+
+class DeleteTripItinerary extends TripItineraryEvent {
+  final int itineraryId;
+
+  DeleteTripItinerary({
+    required this.itineraryId,
+  });
+}

@@ -8,8 +8,8 @@ abstract interface class TripItineraryRemoteDatasource {
   Future<TripItineraryModel> insertTripItinerary({
     required String tripId,
     required DateTime time,
-     double? latitude,
-     double? longitude,
+    double? latitude,
+    double? longitude,
     required String title,
     String? note,
     int? serviceId,
@@ -22,8 +22,7 @@ abstract interface class TripItineraryRemoteDatasource {
   });
 
   Future deleteTripItinerary({
-    required String tripId,
-    required int ItineraryId,
+    required int id,
   });
 
   Future<List<TripItineraryModel>> getTripItineraries({
@@ -43,8 +42,8 @@ class TripItineraryRemoteDatasourceImpl
   Future<TripItineraryModel> insertTripItinerary({
     required String tripId,
     required DateTime time,
-     double? latitude,
-     double? longitude,
+    double? latitude,
+    double? longitude,
     required String title,
     String? note,
     int? serviceId,
@@ -104,14 +103,10 @@ class TripItineraryRemoteDatasourceImpl
 
   @override
   Future deleteTripItinerary({
-    required String tripId,
-    required int ItineraryId,
+    required int id,
   }) async {
     try {
-      await supabaseClient
-          .from('trip_itinerary')
-          .delete()
-          .eq('id', ItineraryId);
+      await supabaseClient.from('trip_itineraries').delete().eq('id', id);
     } catch (e) {
       throw ServerException(e.toString());
     }

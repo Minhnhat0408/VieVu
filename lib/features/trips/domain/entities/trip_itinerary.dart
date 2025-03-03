@@ -8,18 +8,42 @@ class TripItinerary {
   final double? longitude;
   final String title;
   final String? note;
-  final DateTime time;
+  DateTime time;
   final DateTime createdAt;
 
   TripItinerary({
     required this.id,
     required this.tripId,
     this.service,
-     this.latitude,
-     this.longitude,
+    this.latitude,
+    this.longitude,
     required this.title,
     this.note,
     required this.time,
     required this.createdAt,
   });
+
+  TripItinerary copyWith({
+    int? id,
+    String? tripId,
+    SavedService? service,
+    double? latitude,
+    double? longitude,
+    String? title,
+    String? note,
+    DateTime? time,
+    DateTime? createdAt,
+  }) {
+    return TripItinerary(
+      id: id ?? this.id,
+      tripId: tripId ?? this.tripId,
+      service: service ?? this.service,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      title: title ?? this.title,
+      note: note ?? this.note,
+      time: time ?? this.time,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

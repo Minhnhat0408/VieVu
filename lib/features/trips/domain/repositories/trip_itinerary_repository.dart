@@ -20,7 +20,6 @@ abstract interface class TripItineraryRepository {
   });
 
   Future<Either<Failure, Unit>> deleteTripItinerary({
-    required String tripId,
     required int itineraryId,
   });
 

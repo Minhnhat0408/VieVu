@@ -15,12 +15,19 @@ import 'package:vn_travel_companion/core/utils/image_picker.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/validators.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_cover_picker.dart';
 
 class TripEditModal extends StatefulWidget {
-  const TripEditModal({super.key});
+  final Trip trip;
+  const TripEditModal({
+    super.key,
+    required this.trip,
+  });
 
   @override
   State<TripEditModal> createState() => _TripEditModalState();
@@ -77,15 +84,7 @@ class _TripEditModalState extends State<TripEditModal> {
   @override
   void initState() {
     super.initState();
-    var tripTmp =
-        (context.read<TripDetailsCubit>().state as TripDetailsLoadedSuccess)
-            .trip;
-    if (context.read<TripBloc>().state is TripActionSuccess) {
-      if ((context.read<TripBloc>().state as TripActionSuccess).trip.id ==
-          tripTmp.id) {
-        tripTmp = (context.read<TripBloc>().state as TripActionSuccess).trip;
-      }
-    }
+    var tripTmp = widget.trip;
 
     nameController.text = tripTmp.name;
     descriptionController.text = tripTmp.description ?? "";
@@ -194,6 +193,8 @@ class _TripEditModalState extends State<TripEditModal> {
                         TextFormField(
                           controller: nameController,
                           onChanged: (value) => setState(() {}),
+                          onTapOutside: (event) =>
+                              FocusScope.of(context).unfocus(),
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
@@ -234,10 +235,38 @@ class _TripEditModalState extends State<TripEditModal> {
                             height: 8), // Space between label and input box
                         OutlinedButton(
                           onPressed: () async {
+                            bool answer = true;
+
+                            if (widget.trip.hasTripItineraries) {
+                              answer = await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('Thông báo'),
+                                      content: const Text(
+                                          'Chuyến đi đã có lịch trình, thay đổi thời gian có thể ảnh hưởng đến lịch trình của bạn. Bạn có chắc chắn muốn thay đổi không?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop(false);
+                                          },
+                                          child: const Text('Hủy'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop(true);
+                                          },
+                                          child: const Text('Tiếp tục'),
+                                        ),
+                                      ],
+                                    );
+                                  });
+                            }
+                            if (!answer) return;
                             final DateTimeRange? picked =
                                 await showDateRangePicker(
                               context: context,
-                              firstDate: DateTime.now(),
+                              firstDate: DateTime(2000),
                               lastDate: DateTime(2100),
                               initialDateRange: selectedDateRange,
                               locale: const Locale('vi', 'VN'),
@@ -291,6 +320,8 @@ class _TripEditModalState extends State<TripEditModal> {
                         TextFormField(
                           onChanged: (value) => setState(() {}),
                           maxLines: 5,
+                          onTapOutside: (event) =>
+                              FocusScope.of(context).unfocus(),
                           controller: descriptionController,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(
@@ -327,6 +358,8 @@ class _TripEditModalState extends State<TripEditModal> {
                             height: 8), // Space between label and input box
                         TextFormField(
                           controller: maxMemberController,
+                          onTapOutside: (event) =>
+                              FocusScope.of(context).unfocus(),
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(

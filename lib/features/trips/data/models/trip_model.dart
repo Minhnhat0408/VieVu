@@ -1,4 +1,3 @@
-
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 
 class TripModel extends Trip {
@@ -16,6 +15,7 @@ class TripModel extends Trip {
     required super.locations,
     super.transports,
     required super.isSaved,
+    required super.hasTripItineraries,
     super.cover,
     required super.serviceCount,
   });
@@ -28,6 +28,7 @@ class TripModel extends Trip {
       id: json['id'],
       isSaved: json['is_saved'] ?? false,
       name: json['name'],
+      hasTripItineraries: json['has_trip_itineraries'] ?? false,
       cover: json['cover'],
       serviceCount: json['service_count'] ?? 0,
       description: json['description'],

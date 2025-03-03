@@ -200,15 +200,16 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
             color: Theme.of(context).colorScheme.surface, // TabBar background
             child: TabBar(
               controller: widget.tabController,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 10),
               tabs: const [
                 Tab(
-                  text: 'Thông tin',
+                  text: 'Chi tiết',
                   icon: Icon(
                     Icons.info_outline,
                   ),
                 ),
                 Tab(
-                  text: 'Mục đã lưu',
+                  text: 'Mục lưu',
                   icon: Icon(
                     Icons.favorite_border_outlined,
                   ),
@@ -218,11 +219,11 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                     icon: Icon(
                       Icons.map_outlined,
                     )),
-                // Tab(
-                //     text: 'Công việc',
-                //     icon: Icon(
-                //       Icons.checklist,
-                //     )),
+                Tab(
+                    text: 'Thành viên',
+                    icon: Icon(
+                      Icons.group_outlined,
+                    )),
               ],
             ),
           ),

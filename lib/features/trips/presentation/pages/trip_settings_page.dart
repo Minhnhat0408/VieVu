@@ -81,7 +81,9 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                       if (entry.key == 'Chỉnh sửa') {
                         displayFullScreenModal(
                           context,
-                          const TripEditModal(),
+                          TripEditModal(
+                            trip: widget.trip!,
+                          ),
                         );
                       } else if (entry.key == 'Quyền riêng tư') {
                         // Change privacy
