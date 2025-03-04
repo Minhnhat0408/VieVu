@@ -238,6 +238,10 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
                                 const SizedBox(height: 10),
                                 OutlinedButton(
                                     onPressed: () {
+                                      showSnackbar(
+                                          context,
+                                          'Có thể mất một chút thời gian để tổng hợp lịch trình',
+                                          SnackBarState.warning);
                                       context.read<ChatBloc>().add(
                                           SummarizeItineraries(
                                               chatId: widget.chat.id));
@@ -279,9 +283,16 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
                           child: ElevatedButton(
                               onPressed: chatSummarize != null
                                   ? () {
-                                      context.read<ChatBloc>().add(
-                                          CreateItineraryFromSummary(
-                                              chatId: widget.chat.id));
+                                      if (chatSummarize!.isConverted) {
+                                        showSnackbar(
+                                            context,
+                                            'Lịch trình đã được tạo với cuộc trò chuyện này',
+                                            SnackBarState.warning);
+                                      } else {
+                                        context.read<ChatBloc>().add(
+                                            CreateItineraryFromSummary(
+                                                chatId: widget.chat.id));
+                                      }
                                     }
                                   : null,
                               style: ElevatedButton.styleFrom(

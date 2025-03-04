@@ -1,8 +1,16 @@
+import 'dart:developer';
+
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:circular_menu/circular_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
@@ -31,6 +39,24 @@ class _TripDetailPageState extends State<TripDetailPage>
     with TickerProviderStateMixin {
   late TabController tabController;
   Trip? trip;
+  bool isFavorite = false;
+  late final AnimatedMapController _animatedMapController =
+      AnimatedMapController(
+          vsync: this,
+          // mapController: _mapController,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeInOut,
+          cancelPreviousAnimations: true);
+  CarouselSliderController buttonCarouselController =
+      CarouselSliderController();
+      
+  void _animateMapTo(LatLng destination) {
+    _animatedMapController.animateTo(
+      dest: destination,
+      zoom: 15,
+      rotation: 0.0,
+    );
+  }
 
   @override
   void initState() {
@@ -40,6 +66,19 @@ class _TripDetailPageState extends State<TripDetailPage>
       length: 4,
       vsync: this,
     );
+    tabController.addListener(() {
+      if (tabController.indexIsChanging) {
+        if (tabController.index == 1) {
+          setState(() {
+            isFavorite = true;
+          });
+        } else {
+          setState(() {
+            isFavorite = false;
+          });
+        }
+      }
+    });
     context.read<TripDetailsCubit>().getTripDetails(tripId: widget.tripId);
     context
         .read<SavedServiceBloc>()
@@ -48,6 +87,13 @@ class _TripDetailPageState extends State<TripDetailPage>
     context
         .read<TripItineraryBloc>()
         .add(GetTripItineraries(tripId: widget.tripId));
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    _animatedMapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -132,41 +178,42 @@ class _TripDetailPageState extends State<TripDetailPage>
                           const TripTodoListPage(),
                         ])
                       : const Center(child: CircularProgressIndicator())),
-              Positioned.fill(
-                  child: CircularMenu(
-                      toggleButtonColor:
-                          Theme.of(context).colorScheme.primaryContainer,
-                      alignment: const Alignment(0.95, 0.85),
-                      toggleButtonIconColor:
-                          Theme.of(context).colorScheme.primary,
-                      startingAngleInRadian:
-                          3.14, // Example: 180 degrees (π radians)
-                      endingAngleInRadian:
-                          3.14 * 3 / 2, // Example: 360 degrees (2π radians)
-                      items: [
-                    CircularMenuItem(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        icon: Icons.message,
-                        iconColor: Theme.of(context).colorScheme.primary,
-                        onTap: () {
-                          // callback
-                        }),
-                    CircularMenuItem(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      icon: Icons.map_outlined,
-                      onTap: () {
-                        //callback
-                      },
-                      iconColor: Theme.of(context).colorScheme.primary,
-                    ),
-                    CircularMenuItem(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        icon: Icons.people_alt,
-                        iconColor: Theme.of(context).colorScheme.primary,
-                        onTap: () {
-                          //callback
-                        }),
-                  ]))
+
+              // Positioned.fill(
+              //     child: CircularMenu(
+              //         toggleButtonColor:
+              //             Theme.of(context).colorScheme.primaryContainer,
+              //         alignment: const Alignment(0.95, 0.85),
+              //         toggleButtonIconColor:
+              //             Theme.of(context).colorScheme.primary,
+              //         startingAngleInRadian:
+              //             3.14, // Example: 180 degrees (π radians)
+              //         endingAngleInRadian:
+              //             3.14 * 3 / 2, // Example: 360 degrees (2π radians)
+              //         items: [
+              //       CircularMenuItem(
+              //           color: Theme.of(context).colorScheme.primaryContainer,
+              //           icon: Icons.message,
+              //           iconColor: Theme.of(context).colorScheme.primary,
+              //           onTap: () {
+              //             // callback
+              //           }),
+              //       CircularMenuItem(
+              //         color: Theme.of(context).colorScheme.primaryContainer,
+              //         icon: Icons.map_outlined,
+              //         onTap: () {
+              //           //callback
+              //         },
+              //         iconColor: Theme.of(context).colorScheme.primary,
+              //       ),
+              //       CircularMenuItem(
+              //           color: Theme.of(context).colorScheme.primaryContainer,
+              //           icon: Icons.people_alt,
+              //           iconColor: Theme.of(context).colorScheme.primary,
+              //           onTap: () {
+              //             //callback
+              //           }),
+              //     ]))
             ]),
           );
         },

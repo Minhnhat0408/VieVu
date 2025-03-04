@@ -40,11 +40,13 @@ class ChatSummarizeModel extends ChatSummarize {
     required super.tripId,
     required super.summary,
     required super.lastMessageId,
+    required super.isConverted,
   });
 
   factory ChatSummarizeModel.fromJson(Map<String, dynamic> json) {
     return ChatSummarizeModel(
-      tripId: json['chats']['trip_id'] ?? json['trip_id'],
+      isConverted: json['is_converted'] ?? false,
+      tripId: json['trip_id'] ?? json['chats']['trip_id'],
       chatId: json['chat_id'],
       createdAt: DateTime.parse(json['updated_at']),
       summary: json['summary'] != null

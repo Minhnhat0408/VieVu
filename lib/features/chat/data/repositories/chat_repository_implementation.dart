@@ -197,14 +197,22 @@ class ChatRepositoryImpl implements ChatRepository {
       if (chat == null) {
         return left(Failure("Không tìm thấy lịch trình"));
       }
-
+//  {
+//         "note": "Khởi hành đến Tuyên Quang, bắt đầu hành trình khám phá vùng đất mới.",
+//         "time": "2025-02-16T08:00:00",
+//         "place": "tuyên quang",
+//         "metaData": {
+//           "type": "name",
+//           "title": "tuyên quang"
+//         }
+//       },
       final summary = chat.summary;
       for (var item in summary) {
         final itineraries = List<Map<String, dynamic>>.from(item['events']);
         for (var itinerary in itineraries) {
           if (itinerary['metaData']['isSaved'] != null &&
               itinerary['metaData']['isSaved'] == true) {
-            final svId =
+            final service =
                 await savedServiceRemoteDatasource.getSavedServiceIdsForLinkid(
                     linkId: itinerary['metaData']['id'], tripId: chat.tripId);
             await tripItineraryRemoteDatasource.insertTripItinerary(
@@ -212,9 +220,9 @@ class ChatRepositoryImpl implements ChatRepository {
               note: itinerary['note'],
               title: itinerary['place'],
               time: DateTime.parse(itinerary['time']),
-              serviceId: svId,
-              latitude: itinerary['metaData']['latitude'],
-              longitude: itinerary['metaData']['longitude'],
+              serviceId: service.dbId,
+              latitude: service.latitude,
+              longitude: service.longitude,
             );
           } else {
             if (itinerary['metaData']['type'] == 'address') {
@@ -227,6 +235,18 @@ class ChatRepositoryImpl implements ChatRepository {
                 time: DateTime.parse(itinerary['time']),
                 latitude: res.latitude,
                 longitude: res.longitude,
+              );
+            } else if (itinerary['metaData']['type'] == 'name') {
+              final loc =
+                  await locationRemoteDatasource.convertAddressToGeoLocation(
+                      address: itinerary['metaData']['title']);
+              await tripItineraryRemoteDatasource.insertTripItinerary(
+                tripId: chat.tripId,
+                note: itinerary['note'],
+                title: itinerary['place'],
+                time: DateTime.parse(itinerary['time']),
+                latitude: loc.latitude,
+                longitude: loc.longitude,
               );
             } else if (itinerary['metaData']['type'] == 'attractions' ||
                 itinerary['metaData']['type'] == 'locations') {
@@ -246,7 +266,7 @@ class ChatRepositoryImpl implements ChatRepository {
                 tripId: chat.tripId,
                 note: itinerary['note'],
                 title: itinerary['place'],
-                serviceId: res.id,
+                serviceId: res.dbId,
                 time: DateTime.parse(itinerary['time']),
                 latitude: itinerary['metaData']['latitude'],
                 longitude: itinerary['metaData']['longitude'],
@@ -274,12 +294,12 @@ class ChatRepositoryImpl implements ChatRepository {
                 tripId: chat.tripId,
                 note: itinerary['note'],
                 title: itinerary['place'],
-                serviceId: res.id,
+                serviceId: res.dbId,
                 time: DateTime.parse(itinerary['time']),
-                latitude: itinerary['metaData']['latitude'],
-                longitude: itinerary['metaData']['longitude'],
+                latitude: loc.latitude,
+                longitude: loc.longitude,
               );
-            } else {
+            } else if (itinerary['metaData']['type'] == 'event') {
               final loc = await locationRemoteDatasource.convertAddressToLatLng(
                   address: itinerary['metaData']['address']);
               final res = await savedServiceRemoteDatasource.insertSavedService(
@@ -292,6 +312,8 @@ class ChatRepositoryImpl implements ChatRepository {
                 ratingCount: itinerary['metaData']['ratingCount'] ?? 0,
                 typeId: 5,
                 latitude: loc.latitude,
+                eventDate:
+                    DateTime.tryParse(itinerary['metaData']['eventDate']),
                 longitude: loc.longitude,
                 externalLink: itinerary['metaData']['externalLink'],
                 price: itinerary['metaData']['price'],
@@ -301,7 +323,7 @@ class ChatRepositoryImpl implements ChatRepository {
                 tripId: chat.tripId,
                 note: itinerary['note'],
                 title: itinerary['place'],
-                serviceId: res.id,
+                serviceId: res.dbId,
                 time: DateTime.parse(itinerary['time']),
                 latitude: loc.latitude,
                 longitude: loc.longitude,
@@ -310,6 +332,10 @@ class ChatRepositoryImpl implements ChatRepository {
           }
         }
       }
+      await chatRemoteDatasource.updateSummarize(
+        isConverted: true,
+        chatId: chatId,
+      );
       return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));

@@ -48,9 +48,10 @@ abstract class ChatRemoteDatasource {
     required String channelName,
   });
 
-  // Future createItineraryFromSummary({
-  //   required int chatId,
-  // });
+  Future updateSummarize({
+    required bool isConverted,
+    required int chatId,
+  });
 }
 
 class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
@@ -176,6 +177,20 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   }
 
   @override
+  Future updateSummarize({
+    required bool isConverted,
+    required int chatId,
+  }) async {
+    try {
+      await supabaseClient
+          .from('chat_summaries')
+          .update({'is_converted': isConverted}).eq('chat_id', chatId);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
   Future<ChatSummarizeModel> summarizeItineraries({
     required int chatId,
   }) async {
@@ -208,10 +223,15 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
             return react['reaction'];
           }).toList();
           // check if 👍 have more than 👎 or not
-          final isPositive = reactions.where((e) => e == '👍').length >
-              reactions.where((e) => e == '👎').length;
+          final isPositive =
+              reactions.contains('👎') || reactions.contains('👍')
+                  ? reactions.where((e) => e == '👍').length >
+                          reactions.where((e) => e == '👎').length
+                      ? '|Yes|'
+                      : '|No|'
+                  : '';
 
-          return e['content'] + (isPositive ? '|Yes|' : '|No|');
+          return e['content'] + isPositive;
         }).toList(),
         "metadata": message
             .where((e) => e['meta_data'] != null)
@@ -247,9 +267,11 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
             'summary': data,
             'updated_at': DateTime.now().toIso8601String(),
             'last_message_id': message.last['id'],
+            'is_converted': false,
           }, onConflict: 'chat_id')
           .select("*")
           .single();
+
       res['trip_id'] = chat['trip_id'];
       return ChatSummarizeModel.fromJson(res);
     } catch (e) {

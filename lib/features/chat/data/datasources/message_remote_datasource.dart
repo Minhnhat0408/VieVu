@@ -115,14 +115,21 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
       //     }
       //   }
       // }
-
+      List<Map<String, dynamic>>? processedMetaData = metaData?.map((item) {
+        return item.map((key, value) {
+          if (value is DateTime) {
+            return MapEntry(key, value.toIso8601String());
+          }
+          return MapEntry(key, value);
+        });
+      }).toList();
       final res = await supabaseClient
           .from('messages')
           .insert({
             'chat_id': chatId,
             'content': message,
             'user_id': user.id,
-            'meta_data': metaData,
+            'meta_data': processedMetaData,
           })
           .select("*, profiles(*)")
           .single();

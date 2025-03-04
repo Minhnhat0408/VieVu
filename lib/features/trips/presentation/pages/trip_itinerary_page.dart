@@ -16,6 +16,7 @@ import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itiner
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_custom_place_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_itinerary_options_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/edit_trip_itinerary_modal.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/map_view_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/select_saved_service_to_itinerary_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/timeline_item.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
@@ -37,7 +38,6 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
   @override
   void initState() {
     super.initState();
-
     // add date to _panels
     if (widget.trip.startDate != null && widget.trip.endDate != null) {
       final startDate = widget.trip.startDate!;
@@ -48,7 +48,6 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
       }
     }
 
-    setState(() {});
     if (context.read<TripItineraryBloc>().state is TripItineraryLoadedSuccess) {
       final state =
           context.read<TripItineraryBloc>().state as TripItineraryLoadedSuccess;
@@ -220,6 +219,16 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                   log(state.tripItineraries.toString());
                   setState(() {
                     _tripItineraries = state.tripItineraries;
+                    for (var i = 0; i < _panels.length; i++) {
+                      final panel = _panels[i];
+                      final itineraries = _tripItineraries!.where((element) {
+                        return element.time.toIso8601String().split('T')[0] ==
+                            panel.toIso8601String().split('T')[0];
+                      }).toList();
+                      if (itineraries.isNotEmpty) {
+                        _expanded[i] = true;
+                      }
+                    }
                   });
                 }
 
@@ -315,17 +324,39 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                                                         horizontal: 20,
                                                         vertical: 10),
                                                 title: Text(
-                                                    DateFormat("EEE, MMM d, y")
-                                                        .format(panel),
-                                                    style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
+                                                  DateFormat("EEE, MMM d, y")
+                                                      .format(panel),
+                                                  style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                trailing: ElevatedButton(
+                                                  onPressed: itineraries
+                                                          .isNotEmpty
+                                                      ? () {
+                                                          displayFullScreenModal(
+                                                              context,
+                                                              MapViewModal(
+                                                                tripItineraries:
+                                                                    itineraries,
+                                                                panel: panel,
+                                                              ));
+                                                        }
+                                                      : null,
+                                                  child: const Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Icon(Icons.map),
+                                                      SizedBox(width: 5),
+                                                      Text('Bản đồ'),
+                                                    ],
+                                                  ),
+                                                ),
                                               );
                                             },
-
                                             canTapOnHeader: true,
-
                                             body: Padding(
                                                 padding:
                                                     const EdgeInsets.symmetric(

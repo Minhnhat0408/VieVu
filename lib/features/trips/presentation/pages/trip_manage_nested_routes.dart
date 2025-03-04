@@ -9,6 +9,7 @@ import 'package:vn_travel_companion/features/trips/presentation/pages/trip_setti
 
 class TripManageNestedRoutes extends StatelessWidget {
   const TripManageNestedRoutes({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class TripManageNestedRoutes extends StatelessWidget {
         onGenerateRoute: (RouteSettings settings) {
           Widget page;
           switch (settings.name) {
-       
+
 
             case '/trip-settings':
               final trip = settings.arguments;

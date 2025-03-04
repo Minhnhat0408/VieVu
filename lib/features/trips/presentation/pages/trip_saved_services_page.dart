@@ -17,7 +17,8 @@ class TripSavedServicesPage extends StatefulWidget {
   State<TripSavedServicesPage> createState() => _TripSavedServicesPageState();
 }
 
-class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
+class _TripSavedServicesPageState extends State<TripSavedServicesPage>
+    with AutomaticKeepAliveClientMixin<TripSavedServicesPage> {
   final Map<String, int> _panels = {
     "Địa điểm tham quan": 2,
     "Đồ ăn & đồ uống": 1,
@@ -25,7 +26,8 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
     "Sự kiện & giải trí": 5,
     "Điểm đến du lịch": 0,
   };
-
+  @override
+  bool get wantKeepAlive => true;
   final List<bool> _expanded = List.generate(6, (index) => false);
   List<SavedService>? _savedServices;
   @override
@@ -53,6 +55,7 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return CustomScrollView(
       key: const PageStorageKey('trip-saved-services-page'),
       slivers: [
