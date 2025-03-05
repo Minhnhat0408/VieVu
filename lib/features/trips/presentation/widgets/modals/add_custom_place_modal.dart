@@ -98,7 +98,6 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
         panelBuilder: (scrollController) {
           return BlocConsumer<LocationInfoCubit, LocationInfoState>(
             listener: (context, state) {
-              // TODO: implement listener
               if (state is LocationInfoAddressLoaded) {
                 textController.text = state.address;
                 panelController.open();

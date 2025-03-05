@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:intl/intl.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
@@ -146,7 +145,6 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     required int id,
   }) async {
     try {
-      final res = await supabaseClient.from('chats').delete().eq('id', id);
     } catch (e) {
       throw ServerException(e.toString());
     }

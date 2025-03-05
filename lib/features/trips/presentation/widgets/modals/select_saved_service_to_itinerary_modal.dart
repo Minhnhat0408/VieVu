@@ -6,7 +6,6 @@ import 'package:vn_travel_companion/core/utils/conversions.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_big_card.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_med_card.dart';
 
 class SelectSavedServiceToItineraryModal extends StatefulWidget {

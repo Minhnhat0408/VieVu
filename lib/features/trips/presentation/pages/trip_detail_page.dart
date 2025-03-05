@@ -1,16 +1,10 @@
-import 'dart:developer';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:circular_menu/circular_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
@@ -49,14 +43,8 @@ class _TripDetailPageState extends State<TripDetailPage>
           cancelPreviousAnimations: true);
   CarouselSliderController buttonCarouselController =
       CarouselSliderController();
-      
-  void _animateMapTo(LatLng destination) {
-    _animatedMapController.animateTo(
-      dest: destination,
-      zoom: 15,
-      rotation: 0.0,
-    );
-  }
+
+
 
   @override
   void initState() {
@@ -101,7 +89,6 @@ class _TripDetailPageState extends State<TripDetailPage>
     return Scaffold(
       body: BlocConsumer<TripDetailsCubit, TripDetailsState>(
         listener: (context, state) {
-          // TODO: implement listener
           if (state is TripDetailsLoadedSuccess) {
             setState(() {
               trip = state.trip;
@@ -125,7 +112,6 @@ class _TripDetailPageState extends State<TripDetailPage>
               ),
               BlocListener<SavedServiceBloc, SavedServiceState>(
                 listener: (context, state) {
-                  // TODO: implement listener
                   if (state is SavedServiceActionSucess) {
                     // check if the location is already in the trip
                     if (!trip!.locations

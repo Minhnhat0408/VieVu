@@ -12,9 +12,7 @@ class SavedServiceBloc extends Bloc<SavedServiceEvent, SavedServiceState> {
     required SavedServiceRepository savedServiceRepository,
   })  : _savedServiceRepository = savedServiceRepository,
         super(SavedServiceInitial()) {
-    // on<SavedServiceEvent>((event, emit) {
-    //   // TODO: implement event handler
-    // });
+  
 
     on<InsertSavedService>(_onInsertSavedService);
     on<DeleteSavedService>(_onDeleteSavedService);

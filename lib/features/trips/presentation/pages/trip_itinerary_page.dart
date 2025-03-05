@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:timelines/timelines.dart';
 import 'package:vn_travel_companion/core/utils/conversions.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';

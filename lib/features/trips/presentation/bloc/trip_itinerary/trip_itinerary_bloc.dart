@@ -12,9 +12,7 @@ class TripItineraryBloc extends Bloc<TripItineraryEvent, TripItineraryState> {
     required TripItineraryRepository tripItineraryRepository,
   })  : _tripItineraryRepository = tripItineraryRepository,
         super(TripItineraryInitial()) {
-    // on<TripItineraryEvent>((event, emit) {
-    //   // TODO: implement event handler
-    // });
+
     on<InsertTripItinerary>(_onInsertTripItinerary);
     on<GetTripItineraries>(_onGetTripItineraries);
     on<UpdateTripItinerary>(_onUpdateTripItinerary);

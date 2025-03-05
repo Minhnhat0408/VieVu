@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
@@ -12,7 +11,6 @@ import 'package:vn_travel_companion/core/utils/onboarding_help.dart';
 import 'package:vn_travel_companion/core/utils/overlay_button_builder.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 
@@ -33,7 +31,6 @@ class ChatInput extends StatefulWidget {
 
 class _ChatInputState extends State<ChatInput> {
   late CustomTextEditingController _messageController;
-  final bool _isEmojiVisible = false;
   final FocusNode _messageFocusNode = FocusNode();
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -105,7 +102,7 @@ class _ChatInputState extends State<ChatInput> {
                     widget.onOverlayToggle(false);
                   }
                   _searchFocusNode.requestFocus();
-                  OnboardingHelper.resetSeenTagGuide();
+                  // OnboardingHelper.resetSeenTagGuide();
                   OnboardingHelper.hasSeenTagGuide().then((value) {
                     if (!value) {
                       showDialog(

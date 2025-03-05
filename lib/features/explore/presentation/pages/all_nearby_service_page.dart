@@ -119,7 +119,6 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
       ),
       body: BlocConsumer<NearbyServicesCubit, NearbyServicesState>(
         listener: (context, state) {
-          // TODO: implement listener
           if (state is AllNearbyServicesLoadedSuccess) {
             final servicesTmp = state.services;
             final restaurants = servicesTmp['restaurants']!;

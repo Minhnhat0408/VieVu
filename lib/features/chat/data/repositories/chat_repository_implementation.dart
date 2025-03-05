@@ -13,7 +13,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_itinerary_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
   final ChatRemoteDatasource chatRemoteDatasource;

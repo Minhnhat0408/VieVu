@@ -49,7 +49,7 @@ class AnimSearchBar extends StatefulWidget {
   });
 
   @override
-  _AnimSearchBarState createState() => _AnimSearchBarState();
+  State<AnimSearchBar> createState() => _AnimSearchBarState();
 }
 
 String textFieldValue = '';

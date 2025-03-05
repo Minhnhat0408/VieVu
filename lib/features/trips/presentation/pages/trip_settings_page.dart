@@ -11,14 +11,15 @@ import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/t
 
 final Map<String, String> optionLists = {
   'Chỉnh sửa': 'Thay đổi các thông tin hiển thị của chuyến đi',
-  'Người tham gia': 'Quản lý thành viên trong chuyến đi',
+  // 'Người tham gia': 'Quản lý thành viên trong chuyến đi',
+  'Nhóm chat': 'Chat với mọi người trong chuyến đi',
   'Quyền riêng tư': 'Công khai hoặc ẩn chuyến đi',
-  'Báo cáo': 'Báo cáo chuyến đi không phù hợp',
+  // 'Báo cáo': 'Báo cáo chuyến đi không phù hợp',
 };
 
 final List<TripSettingOptions> tripSettingOptions = [
   TripSettingOptions('Chia sẻ chuyến đi', const Icon(Icons.share)),
-  TripSettingOptions('Tạo bản sao chuyến đi', const Icon(Icons.copy)),
+  // TripSettingOptions('Tạo bản sao chuyến đi', const Icon(Icons.copy)),
   TripSettingOptions(
     'Xóa chuyến đi',
     const Icon(Icons.delete, color: Colors.red),
@@ -50,7 +51,6 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
       centerTitle: true,
       body: BlocListener<TripBloc, TripState>(
         listener: (context, state) {
-          // TODO: implement listener
           if (state is TripActionSuccess) {
             Navigator.of(context).pop();
           }

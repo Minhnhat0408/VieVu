@@ -107,15 +107,10 @@ class _ServiceCardState extends State<ServiceCard> {
                                   .user
                                   .id;
 
-                              int locationId;
+
                               String locationName;
                               if (!widget.slider) {
-                                locationId = (context
-                                            .read<AttractionDetailsCubit>()
-                                            .state
-                                        as AttractionDetailsLoadedSuccess)
-                                    .attraction
-                                    .locationId;
+
                                 locationName = (context
                                             .read<AttractionDetailsCubit>()
                                             .state
@@ -123,10 +118,7 @@ class _ServiceCardState extends State<ServiceCard> {
                                     .attraction
                                     .locationName;
                               } else {
-                                locationId = (context
-                                        .read<LocationInfoCubit>()
-                                        .state as LocationInfoAddressLoaded)
-                                    .locationId;
+                        
                                 locationName = (context
                                         .read<LocationInfoCubit>()
                                         .state as LocationInfoAddressLoaded)

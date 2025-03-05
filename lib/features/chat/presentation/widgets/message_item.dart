@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_reactions/widgets/stacked_reactions.dart';
@@ -42,10 +40,6 @@ class _MessageItemState extends State<MessageItem> {
         RegExp(r'^[\p{Emoji_Presentation}\p{Emoji}]+$', unicode: true)
             .hasMatch(widget.message.content.trim());
 
-    // Lấy danh sách các tiêu đề từ metadata
-    List<String> highlights = (widget.message.metaData ?? [])
-        .map((item) => item['title'] as String)
-        .toList();
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -129,9 +123,11 @@ class _MessageItemState extends State<MessageItem> {
                     left: _isMe ? 0 : null,
                     child: GestureDetector(
                       onTap: () {
-                        displayModal(context,
-                            ReactionsModal(message: widget.message)
-                        , 400, false);
+                        displayModal(
+                            context,
+                            ReactionsModal(message: widget.message),
+                            400,
+                            false);
                       },
                       child: StackedReactions(
                         size: 14,

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -268,7 +267,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           children: [
             BlocConsumer<ChatBloc, ChatState>(
               listener: (context, state) {
-                // TODO: implement listener
                 if (state is SeenUpdatedSuccess) {
                   setState(() {
                     seenUser = state.seenUser;
@@ -278,7 +276,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               builder: (context, state) {
                 return BlocConsumer<MessageBloc, MessageState>(
                   listener: (context, state) {
-                    // TODO: implement listener
                     if (state is MessagesLoadedSuccess) {
                       if (widget.chat.isSeen == false &&
                           totalRecordCount == 0) {

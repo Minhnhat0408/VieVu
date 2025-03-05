@@ -56,7 +56,7 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
       ],
       body: BlocListener<TripItineraryBloc, TripItineraryState>(
         listener: (context, state) {
-          // TODO: implement listener
+          // 
           if (state is TripItineraryUpdatedSuccess) {
             // change the updated itinerary in the list
 

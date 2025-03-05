@@ -4,18 +4,12 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/conversions.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_big_card.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_med_card.dart';
 
 class AddPlaceByNameModal extends StatefulWidget {
   final String searchKey;
@@ -35,7 +29,6 @@ class _AddPlaceByNameModalState extends State<AddPlaceByNameModal> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   final List<SavedService> _seletedServices = [];
-  late TabController _tabController;
   void _onSearchChanged(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 1000), () async {

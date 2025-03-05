@@ -30,7 +30,7 @@ class _RestaurantBigCardState extends State<RestaurantBigCard> {
   Widget build(BuildContext context) {
     return BlocListener<TripBloc, TripState>(
       listener: (context, state) {
-        // TODO: implement listener
+        // 
         if (state is SavedToTripLoadedSuccess) {
           currentSavedTripCount =
               state.trips.where((trip) => trip.isSaved).length;

@@ -26,9 +26,6 @@ class _TripPostsPageState extends State<TripPostsPage> {
     textController.clear();
   }
 
-  void onSubmitted(String value) {
-    print(value);
-  }
 
   @override
   void initState() {

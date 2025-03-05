@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +17,28 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, Icon> optionLists = {
+      'Hồ sơ': const Icon(
+        Icons.person_outline,
+        size: 30,
+      ),
+      'Thông báo': const Icon(
+        Icons.notifications_outlined,
+        size: 30,
+      ),
+      'Phiên bản': const Icon(
+        Icons.info_outline,
+        size: 30,
+      ),
+      'Hỗ trợ': const Icon(
+        Icons.help_outline,
+        size: 30,
+      ),
+
+      // 'Báo cáo': 'Báo cáo chuyến đi không phù hợp',
+    };
     return CustomAppbar(
-      appBarTitle: 'Settings',
+      appBarTitle: 'Tài khoản',
       actions: [
         Consumer<ThemeProvider>(builder: (context, notifier, child) {
           return IconButton(
@@ -52,36 +71,60 @@ class SettingsPage extends StatelessWidget {
             builder: (context, state) {
               return Column(
                 children: [
-                  _box(
-                      title: "Application Theme",
-                      subtitle:
-                          notifier.isDarkMode ? "Dark Theme" : "Light Theme",
-                      leading: Icons.color_lens,
-                      context: context),
-                  _box(
-                      title: "Language",
-                      subtitle: "English",
-                      leading: Icons.language,
-                      context: context),
-                  _box(
-                      title: "Settings",
-                      subtitle: "System configurations",
-                      leading: Icons.settings,
-                      context: context),
-                  _box(
-                      title: "Full Name",
-                      subtitle: (state is AppUserLoggedIn)
-                          ? '${state.user.firstName} ${state.user.lastName}'
-                          : "Companion",
-                      leading: Icons.settings,
-                      context: context),
-                  _box(
-                      title: "Email",
-                      subtitle: (state is AppUserLoggedIn)
-                          ? state.user.email
-                          : "companion@gmail.com",
-                      leading: Icons.settings,
-                      context: context),
+                  ...optionLists.entries.map(
+                    (entry) {
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(entry.key,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                )),
+                            minVerticalPadding: 16,
+                            leading: entry.value,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            trailing: const Icon(Icons.arrow_forward_ios),
+                            onTap: () {
+                              if (entry.key == 'Hồ sơ') {
+                                // Navigator.of(context).pushNamed('/profile');
+                              } else if (entry.key == 'Thông báo') {
+                                // Navigator.of(context)
+                                //     .pushNamed('/notification');
+                              } else if (entry.key == 'Phiên bản') {
+                                showAboutDialog(
+                                    context: context,
+                                    applicationName: 'Vietnam Travel Companion',
+                                    applicationVersion: '1.0.0',
+                                    applicationIcon: ImageIcon(
+                                      const AssetImage(
+                                        'assets/images/icon_logo.png',
+                                      ),
+                                      size: 50,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    applicationLegalese:
+                                        '© 2021 Travel Companion');
+                              } else if (entry.key == 'Hỗ trợ') {
+                                // Navigator.of(context).pushNamed('/support');
+                              }
+                            },
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14.0),
+                            child: Divider(
+                              thickness: 1,
+                              height: 2,
+                              color: Colors.grey[300],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: 15),
                   SizedBox(
                     width: MediaQuery.sizeOf(context).width * .95,
@@ -102,26 +145,27 @@ class SettingsPage extends StatelessWidget {
                         child: Text(
                           "Đăng xuất",
                           style: TextStyle(
+                              fontSize: 18,
                               color: Theme.of(context)
                                   .colorScheme
                                   .onSecondaryContainer),
                         )),
                   ),
-                  OpenContainer(
-                    closedBuilder: (context, VoidCallback openContainer) {
-                      return ElevatedButton(
-                          onPressed: openContainer,
-                          style: ElevatedButton.styleFrom(
-                            elevation: 0,
-                          ),
-                          child: const Text('Test Animation'));
-                    },
-                    closedElevation: 0,
-                    transitionDuration: const Duration(milliseconds: 2000),
-                    closedShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
-                    openBuilder: (context, _) => const SettingsPage(),
-                  )
+                  // OpenContainer(
+                  //   closedBuilder: (context, VoidCallback openContainer) {
+                  //     return ElevatedButton(
+                  //         onPressed: openContainer,
+                  //         style: ElevatedButton.styleFrom(
+                  //           elevation: 0,
+                  //         ),
+                  //         child: const Text('Test Animation'));
+                  //   },
+                  //   closedElevation: 0,
+                  //   transitionDuration: const Duration(milliseconds: 2000),
+                  //   closedShape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(50)),
+                  //   openBuilder: (context, _) => const SettingsPage(),
+                  // )
                 ],
               );
             },

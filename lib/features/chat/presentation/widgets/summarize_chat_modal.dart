@@ -1,8 +1,6 @@
-import 'dart:developer';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:timelines/timelines.dart';
 import 'package:vn_travel_companion/core/utils/conversions.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
@@ -11,7 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/widgets/summary_timeline.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_page.dart';
 
 class SummarizeChatModal extends StatefulWidget {
   final Chat chat;
@@ -73,7 +70,6 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
       ),
       body: BlocConsumer<ChatBloc, ChatState>(
         listener: (context, state) {
-          // TODO: implement listener
           if (state is ChatSummarizedSuccess) {
             chatSummarize = state.chatSummarize;
             if (chatSummarize != null) {

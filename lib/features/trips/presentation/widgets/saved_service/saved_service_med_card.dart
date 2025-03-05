@@ -91,7 +91,7 @@ class SavedServiceMedCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '(${service.ratingCount ?? 0})',
+                          '(${service.ratingCount})',
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                       ],
