@@ -207,7 +207,8 @@ class ChatRepositoryImpl implements ChatRepository {
 //       },
       final summary = chat.summary;
       for (var item in summary) {
-        final itineraries = List<Map<String, dynamic>>.from(item['events']);
+        final itineraries = item['events'];
+
         for (var itinerary in itineraries) {
           if (itinerary['metaData']['isSaved'] != null &&
               itinerary['metaData']['isSaved'] == true) {
@@ -261,6 +262,8 @@ class ChatRepositoryImpl implements ChatRepository {
                 latitude: itinerary['metaData']['latitude'],
                 longitude: itinerary['metaData']['longitude'],
               );
+              itinerary['metaData']['isSaved'] = true;
+              itinerary['metaData']['id'] = res.id;
               await tripItineraryRemoteDatasource.insertTripItinerary(
                 tripId: chat.tripId,
                 note: itinerary['note'],
@@ -289,6 +292,8 @@ class ChatRepositoryImpl implements ChatRepository {
                 externalLink: itinerary['metaData']['externalLink'],
                 price: itinerary['metaData']['price'],
               );
+              itinerary['metaData']['isSaved'] = true;
+              itinerary['metaData']['id'] = res.id;
               await tripItineraryRemoteDatasource.insertTripItinerary(
                 tripId: chat.tripId,
                 note: itinerary['note'],
@@ -317,6 +322,8 @@ class ChatRepositoryImpl implements ChatRepository {
                 externalLink: itinerary['metaData']['externalLink'],
                 price: itinerary['metaData']['price'],
               );
+              itinerary['metaData']['isSaved'] = true;
+              itinerary['metaData']['id'] = res.id;
 
               await tripItineraryRemoteDatasource.insertTripItinerary(
                 tripId: chat.tripId,
@@ -334,6 +341,7 @@ class ChatRepositoryImpl implements ChatRepository {
       await chatRemoteDatasource.updateSummarize(
         isConverted: true,
         chatId: chatId,
+        metaData: summary,
       );
       return right(unit);
     } on ServerException catch (e) {

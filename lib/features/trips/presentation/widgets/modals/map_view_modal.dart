@@ -120,13 +120,16 @@ class _MapViewModalState extends State<MapViewModal>
                           ),
                         ),
                         child: CircleAvatar(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.onSurface,
+                          backgroundColor: activeIndex == tripItinerary.id
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.white, // ,
                           child: Text(
                             (index + 1).toString(),
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 18,
+                              color: activeIndex == tripItinerary.id
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.primary,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

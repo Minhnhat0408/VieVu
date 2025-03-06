@@ -72,6 +72,7 @@ final class ListenToMessageUpdateChannel extends MessageEvent {
     required this.chatId,
   });
 }
+
 final class MessageUpdateReceived extends MessageEvent {
   final Map<String, dynamic> message;
 
@@ -122,7 +123,7 @@ final class MessageReactionReceived extends MessageEvent {
   final int reactionId;
 
   MessageReactionReceived({
-     this.reaction,
+    this.reaction,
     required this.eventType,
     required this.reactionId,
   });
@@ -132,6 +133,18 @@ final class RemoveMessage extends MessageEvent {
   final int messageId;
 
   RemoveMessage({
+    required this.messageId,
+  });
+}
+
+final class GetScrollToMessages extends MessageEvent {
+  final int chatId;
+  final int messageId;
+  final int lastMessageId;
+
+  GetScrollToMessages({
+    required this.lastMessageId,
+    required this.chatId,
     required this.messageId,
   });
 }

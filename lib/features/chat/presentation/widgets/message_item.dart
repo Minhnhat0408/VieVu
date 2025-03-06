@@ -14,9 +14,11 @@ import 'package:vn_travel_companion/features/chat/presentation/widgets/reaction_
 
 class MessageItem extends StatefulWidget {
   final Message message;
+  final bool highlight;
   const MessageItem({
     super.key,
     required this.message,
+    this.highlight = false,
   });
 
   @override
@@ -39,7 +41,6 @@ class _MessageItemState extends State<MessageItem> {
     bool isEmojiOnly =
         RegExp(r'^[\p{Emoji_Presentation}\p{Emoji}]+$', unicode: true)
             .hasMatch(widget.message.content.trim());
-
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -93,9 +94,13 @@ class _MessageItemState extends State<MessageItem> {
                             ),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
+                                color: !widget.highlight
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .tertiaryContainer,
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(_isMe ? 20 : 0),
                                   topRight: Radius.circular(_isMe ? 0 : 20),

@@ -330,7 +330,7 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
-                                                trailing: ElevatedButton(
+                                                trailing: FilledButton(
                                                   onPressed: itineraries
                                                           .isNotEmpty
                                                       ? () {

@@ -63,4 +63,9 @@ abstract interface class MessageRepository {
   Future<Either<Failure, Message>> removeMessage({
     required int messageId,
   });
+  Future<Either<Failure, List<Message>>> getScrollToMessages({
+    required int chatId,
+    required int messageId,
+    required int lastMessageId,
+  });
 }

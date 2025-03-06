@@ -7,7 +7,7 @@ class User {
   final String? gender; //TODO: Change to ENUM
   final String? phoneNumber;
   final String? avatarUrl;
-  final String? dob;
+  final String? city;
 
   User({
     required this.id,
@@ -15,7 +15,7 @@ class User {
     required this.firstName,
     required this.lastName,
     this.avatarUrl,
-    this.dob,
+    this.city,
     this.gender,
     this.phoneNumber,
   });

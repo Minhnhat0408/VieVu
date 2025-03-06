@@ -82,6 +82,7 @@ dependencies:
   emoji_picker_flutter: ^4.3.0
   flutter_chat_reactions: ^0.1.1
   shared_preferences: ^2.5.2
+  scrollable_positioned_list: ^0.3.8
 
 
 dev_dependencies:

@@ -60,6 +60,12 @@ abstract interface class MessageRemoteDatasource {
   Future<MessageModel> removeMessage({
     required int messageId,
   });
+
+  Future<List<MessageModel>> getScrollToMessages({
+    required int messageId,
+    required int lastMessageId,
+    required int chatId,
+  });
 }
 
 class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
@@ -80,37 +86,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
       if (user == null) {
         throw const ServerException("Không tìm thấy người dùng");
       }
-      // final url =
-      //     Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/ner_message');
 
-      // final body = {
-      //   "message": message,
-      // };
-
-      // final response = await http.post(
-      //   url,
-      //   headers: {
-      //     "Content-Type": "application/json", // Specify the content type
-      //   },
-      //   body: jsonEncode(body), // Convert the body to JSON
-      // );
-      // final jsonResponse = jsonDecode(
-      //   utf8.decode(response.bodyBytes),
-      // );
-
-      // final List<Map<String, dynamic>> data =
-      //     List<Map<String, dynamic>>.from(jsonResponse['data']);
-
-      // //check if metadata .title contain the  data .title from the response if not add it in the metadata
-      // final metaDataNew = metaData ?? [];
-      // if (data.isNotEmpty) {
-      //   for (var element in data) {
-      //     final title = element['title'];
-      //     if (!metaDataNew.any((element) => element['title'] == title)) {
-      //       metaDataNew.add(element);
-      //     }
-      //   }
-      // }
       List<Map<String, dynamic>>? processedMetaData = metaData?.map((item) {
         return item.map((key, value) {
           if (value is DateTime) {
@@ -119,6 +95,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           return MapEntry(key, value);
         });
       }).toList();
+
       final res = await supabaseClient
           .from('messages')
           .insert({
@@ -132,6 +109,28 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
       return MessageModel.fromJson(res);
     } catch (e) {
       log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<MessageModel>> getScrollToMessages({
+    required int messageId,
+    required int lastMessageId,
+    required int chatId,
+  }) async {
+    try {
+      final res = await supabaseClient
+          .from('messages')
+          .select("*, profiles(*), message_reactions(*, profiles(*))")
+          .eq('chat_id', chatId)
+          .lt('id', lastMessageId)
+          .gte('id', messageId)
+          .order('created_at', ascending: false);
+
+      log(res.map((e) => e['content']).toList().toString());
+      return res.map((e) => MessageModel.fromJson(e)).toList();
+    } catch (e) {
       throw ServerException(e.toString());
     }
   }

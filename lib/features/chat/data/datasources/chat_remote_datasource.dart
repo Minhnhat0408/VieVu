@@ -49,6 +49,7 @@ abstract class ChatRemoteDatasource {
 
   Future updateSummarize({
     required bool isConverted,
+    List<Map<String, dynamic>>? metaData,
     required int chatId,
   });
 }
@@ -144,8 +145,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   Future deleteChat({
     required int id,
   }) async {
-    try {
-    } catch (e) {
+    try {} catch (e) {
       throw ServerException(e.toString());
     }
   }
@@ -178,11 +178,32 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   Future updateSummarize({
     required bool isConverted,
     required int chatId,
+    List<Map<String, dynamic>>? metaData,
   }) async {
     try {
+      List<Map<String, dynamic>>? processedMetaData = metaData?.map((item) {
+        return item.map((key, value) {
+          if (value is DateTime) {
+            return MapEntry(key, value.toIso8601String());
+          }
+          return MapEntry(key, value);
+        });
+      }).toList();
+
+      final updateObject = processedMetaData != null
+          ? {
+              'is_converted': isConverted,
+              'summary': processedMetaData,
+            }
+          : {
+              'is_converted': isConverted,
+            };
       await supabaseClient
           .from('chat_summaries')
-          .update({'is_converted': isConverted}).eq('chat_id', chatId);
+          .update(
+            updateObject,
+          )
+          .eq('chat_id', chatId);
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -233,7 +254,10 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         }).toList(),
         "metadata": message
             .where((e) => e['meta_data'] != null)
-            .expand((e) => e['meta_data'])
+            .expand((e) => e['meta_data'].map((meta) => {
+                  ...meta, // Spread existing metadata
+                  'message_id': e['id'] // Add 'message_id' from parent
+                }))
             .toList(),
         "start_date": chat['trips']['start_date'],
         "end_date": chat['trips']['end_date'],

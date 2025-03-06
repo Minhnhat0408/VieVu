@@ -71,6 +71,9 @@ class SettingsPage extends StatelessWidget {
             builder: (context, state) {
               return Column(
                 children: [
+                  const SizedBox(
+                    height: 20,
+                  ),
                   ...optionLists.entries.map(
                     (entry) {
                       return Column(
@@ -84,11 +87,19 @@ class SettingsPage extends StatelessWidget {
                             minVerticalPadding: 16,
                             leading: entry.value,
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
+                              horizontal: 20,
+                            ),
                             trailing: const Icon(Icons.arrow_forward_ios),
                             onTap: () {
                               if (entry.key == 'Hồ sơ') {
-                                // Navigator.of(context).pushNamed('/profile');
+                                final userId = (context
+                                        .read<AppUserCubit>()
+                                        .state as AppUserLoggedIn)
+                                    .user
+                                    .id;
+
+                                Navigator.of(context)
+                                    .pushNamed('/profile', arguments: userId);
                               } else if (entry.key == 'Thông báo') {
                                 // Navigator.of(context)
                                 //     .pushNamed('/notification');
@@ -112,14 +123,9 @@ class SettingsPage extends StatelessWidget {
                               }
                             },
                           ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 14.0),
-                            child: Divider(
-                              thickness: 1,
-                              height: 2,
-                              color: Colors.grey[300],
-                            ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 14.0),
+                            child: Divider(),
                           ),
                         ],
                       );

@@ -280,10 +280,40 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
                               onPressed: chatSummarize != null
                                   ? () {
                                       if (chatSummarize!.isConverted) {
-                                        showSnackbar(
-                                            context,
-                                            'Lịch trình đã được tạo với cuộc trò chuyện này',
-                                            SnackBarState.warning);
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                    'Lịch trình đã được tạo'),
+                                                content: const Text(
+                                                    'Lịch trình đã được tạo từ cuộc trò chuyện này'),
+                                                actions: <Widget>[
+                                                  FilledButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: const Text('Đóng'),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  OutlinedButton(
+                                                    onPressed: () {
+                                                      context.read<ChatBloc>().add(
+                                                          CreateItineraryFromSummary(
+                                                              chatId: widget
+                                                                  .chat.id));
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child:
+                                                        const Text('Tạo lại'),
+                                                  ),
+                                                ],
+                                              );
+                                            });
                                       } else {
                                         context.read<ChatBloc>().add(
                                             CreateItineraryFromSummary(

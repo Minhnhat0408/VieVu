@@ -7,7 +7,7 @@ class UserModel extends User {
       required super.firstName,
       required super.lastName,
       super.avatarUrl,
-      super.dob,
+      super.city,
       super.gender,
       super.phoneNumber});
 
@@ -18,7 +18,7 @@ class UserModel extends User {
       firstName: json['first_name'] ?? '',
       lastName: json['last_name'] ?? '',
       avatarUrl: json['avatar_url'],
-      dob: json['dob'] ?? '',
+      city: json['city'] ?? '',
       gender: json['gender'] ?? '',
       phoneNumber: json['phone'] ?? '',
     );
@@ -30,7 +30,7 @@ class UserModel extends User {
     String? firstName,
     String? lastName,
     String? avatarUrl,
-    String? dob,
+    String? city,
     String? gender,
     String? phoneNumber,
   }) {
@@ -40,7 +40,7 @@ class UserModel extends User {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       avatarUrl: avatarUrl ?? this.avatarUrl,
-      dob: dob ?? this.dob,
+      city: city ?? this.city,
       gender: gender ?? this.gender,
       phoneNumber: phoneNumber ?? this.phoneNumber,
     );

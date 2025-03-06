@@ -4,7 +4,7 @@ import 'package:vn_travel_companion/features/auth/presentation/pages/reset_passw
 import 'package:vn_travel_companion/features/auth/presentation/pages/log_in.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/send_email_reset.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/sign_up.dart';
-import 'package:vn_travel_companion/features/settings/presentation/pages/settings.dart';
+import 'package:vn_travel_companion/core/common/pages/settings.dart';
 
 Map<String, Widget Function(BuildContext)> routes = {
   '/settings': (context) => const SettingsPage(),

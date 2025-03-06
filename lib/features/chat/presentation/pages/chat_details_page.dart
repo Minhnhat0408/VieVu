@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,10 +38,12 @@ class ChatDetailsPage extends StatefulWidget {
 
 class _ChatDetailsPageState extends State<ChatDetailsPage> {
   late MessageBloc _messageBloc;
+  final ScrollController _scrollController = ScrollController();
   late ChatBloc _chatBloc;
+  final Map<int, GlobalKey> _messageKeys = {};
   final List<Message> messages = [];
   bool _isOverlayVisible = false;
-
+  int? _scrollToMessageId;
   void _toggleOverlay(bool isVisible) {
     setState(() {
       _isOverlayVisible = isVisible;
@@ -60,6 +64,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     _messageBloc = context.read<MessageBloc>(); // Lưu tham chiếu
     _chatBloc = context.read<ChatBloc>();
     _pagingController.addPageRequestListener((pageKey) {
+      log('pageKey: $pageKey');
       _messageBloc.add(GetMessagesInChat(
         chatId: widget.chat.id,
         limit: _pageSize,
@@ -164,6 +169,35 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     );
   }
 
+  void scrollToMessage(int messageId) {
+    final key = _messageKeys[messageId];
+    setState(() {
+      _scrollToMessageId = messageId;
+    });
+    if (key != null) {
+      final index = _pagingController.itemList!
+          .indexWhere((message) => message.id == messageId);
+      if (index != -1) {
+        final offset = index * 50; // Calculate the offset based on item height
+        _scrollController.animateTo(
+          offset.toDouble(),
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    } else {
+      final lastMessageId = getSmallestKey(_messageKeys);
+      _messageBloc.add(GetScrollToMessages(
+          chatId: widget.chat.id,
+          messageId: messageId,
+          lastMessageId: lastMessageId));
+    }
+  }
+
+  int getSmallestKey(Map<int, GlobalKey> map) {
+    return map.keys.reduce((a, b) => a < b ? a : b);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -215,14 +249,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           ),
           actions: [
             IconButton(
-                onPressed: () {
-                  displayModal(
+                onPressed: () async {
+                  final messageId = await displayModal(
                       context,
                       SummarizeChatModal(
                         chat: widget.chat,
                       ),
                       null,
                       true);
+                  log("messageId: $messageId");
+
+                  if (messageId != null) {
+                    scrollToMessage(messageId);
+                  }
                 },
                 icon: Icon(
                   Icons.document_scanner,
@@ -284,6 +323,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                           messageId: state.messages.first.id,
                         ));
                       }
+
+                      for (var message in state.messages) {
+                        _messageKeys[message.id] =
+                            GlobalKey(); // Tạo key cho mỗi message
+                      }
+                      if (state.messages.last.id == _scrollToMessageId) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          log('Post frame callback');
+                          _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent + 230,
+                            duration: const Duration(milliseconds: 1000),
+                            curve: Curves.easeInOut,
+                          );
+                        });
+                      }
+
                       totalRecordCount += state.messages.length;
 
                       final next = totalRecordCount;
@@ -424,6 +479,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   builder: (context, state) {
                     return Expanded(
                       child: PagedListView<int, Message>(
+                        scrollController: _scrollController,
                         reverse: true, // Show latest messages at the bottom
                         pagingController: _pagingController,
                         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -443,6 +499,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                             }
 
                             return Padding(
+                              key: _messageKeys[message.id],
                               padding: const EdgeInsets.only(bottom: 8.0),
                               child: GestureDetector(
                                 onLongPress: () {
@@ -467,7 +524,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                                         ),
                                       );
 
-
                                       OnboardingHelper.setSeenReactionGuide();
                                     }
                                   });
@@ -480,6 +536,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                                           messageWidget: MessageItem(
                                             // key: Key(message.id.toString()),
                                             message: message,
+                                            highlight: _scrollToMessageId ==
+                                                message.id,
                                           ),
                                           reactions: const [
                                             '❤️',
@@ -551,8 +609,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                                 child: Hero(
                                   tag: message.id,
                                   child: MessageItem(
-                                      key: Key(message.id.toString()),
-                                      message: message),
+                                    key: Key(message.id.toString()),
+                                    message: message,
+                                    highlight: _scrollToMessageId == message.id,
+                                  ),
                                 ),
                               ),
                             );

@@ -194,4 +194,25 @@ class MessageRepositoryImpl implements MessageRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Message>>> getScrollToMessages({
+    required int chatId,
+    required int messageId,
+    required int lastMessageId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final res = await messageRemoteDatasource.getScrollToMessages(
+        chatId: chatId,
+        lastMessageId: lastMessageId,
+        messageId: messageId,
+      );
+      return right(res);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

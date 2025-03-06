@@ -26,6 +26,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     on<RemoveReaction>(_onRemoveReaction);
     on<MessageReactionReceived>(_onMessageReactionReceived);
     on<RemoveMessage>(_onRemoveMessage);
+    on<GetScrollToMessages>(_onGetScrollToMessages);
   }
 
   void _onInsertMessage(InsertMessage event, Emitter<MessageState> emit) async {
@@ -166,6 +167,20 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
             reactionId: reactionId,
             eventType: eventType));
       },
+    );
+  }
+
+  void _onGetScrollToMessages(
+      GetScrollToMessages event, Emitter<MessageState> emit) async {
+    emit(MessageLoading());
+    final res = await _messageRepository.getScrollToMessages(
+      chatId: event.chatId,
+      lastMessageId: event.lastMessageId,
+      messageId: event.messageId,
+    );
+    res.fold(
+      (l) => emit(MessageFailure(message: l.message)),
+      (r) => emit(MessagesLoadedSuccess(messages: r)),
     );
   }
 }
