@@ -47,7 +47,7 @@ abstract class ChatRemoteDatasource {
     required String channelName,
   });
 
-  Future updateSummarize({
+  Future<ChatSummarizeModel> updateSummarize({
     required bool isConverted,
     List<Map<String, dynamic>>? metaData,
     required int chatId,
@@ -175,7 +175,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   }
 
   @override
-  Future updateSummarize({
+  Future<ChatSummarizeModel> updateSummarize({
     required bool isConverted,
     required int chatId,
     List<Map<String, dynamic>>? metaData,
@@ -198,12 +198,16 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           : {
               'is_converted': isConverted,
             };
-      await supabaseClient
+      final res = await supabaseClient
           .from('chat_summaries')
           .update(
             updateObject,
           )
-          .eq('chat_id', chatId);
+          .eq('chat_id', chatId)
+          .select("*, chats(trip_id)")
+          .single();
+
+      return ChatSummarizeModel.fromJson(res);
     } catch (e) {
       throw ServerException(e.toString());
     }

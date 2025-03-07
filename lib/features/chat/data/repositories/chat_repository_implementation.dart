@@ -182,7 +182,7 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> createItineraryFromSummary({
+  Future<Either<Failure, ChatSummarize>> createItineraryFromSummary({
     required int chatId,
   }) async {
     try {
@@ -196,15 +196,7 @@ class ChatRepositoryImpl implements ChatRepository {
       if (chat == null) {
         return left(Failure("Không tìm thấy lịch trình"));
       }
-//  {
-//         "note": "Khởi hành đến Tuyên Quang, bắt đầu hành trình khám phá vùng đất mới.",
-//         "time": "2025-02-16T08:00:00",
-//         "place": "tuyên quang",
-//         "metaData": {
-//           "type": "name",
-//           "title": "tuyên quang"
-//         }
-//       },
+
       final summary = chat.summary;
       for (var item in summary) {
         final itineraries = item['events'];
@@ -338,12 +330,12 @@ class ChatRepositoryImpl implements ChatRepository {
           }
         }
       }
-      await chatRemoteDatasource.updateSummarize(
+     final summarize = await chatRemoteDatasource.updateSummarize(
         isConverted: true,
         chatId: chatId,
         metaData: summary,
       );
-      return right(unit);
+      return right(summarize);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

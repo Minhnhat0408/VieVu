@@ -1,4 +1,3 @@
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -43,8 +42,6 @@ class _TripDetailPageState extends State<TripDetailPage>
           cancelPreviousAnimations: true);
   CarouselSliderController buttonCarouselController =
       CarouselSliderController();
-
-
 
   @override
   void initState() {
@@ -138,69 +135,68 @@ class _TripDetailPageState extends State<TripDetailPage>
               ),
             ],
             child: Stack(children: [
-              NestedScrollView(
-                  floatHeaderSlivers: false,
-                  headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                        SliverOverlapAbsorber(
-                            handle:
-                                NestedScrollView.sliverOverlapAbsorberHandleFor(
-                                    context),
-                            sliver: TripDetailAppbar(
-                              trip: trip,
-                              tripCover: widget.tripCover,
-                              tripId: widget.tripId,
-                              tabController: tabController,
-                            )),
-                      ],
-                  body: trip != null
-                      ? TabBarView(controller: tabController, children: [
-                          TripInfoPage(trip: trip!),
-                          BlocProvider(
-                            create: (context) =>
-                                serviceLocator<LocationInfoCubit>(),
-                            child: TripSavedServicesPage(trip: trip!),
-                          ),
-                          TripItineraryPage(trip: trip!),
-                          const TripTodoListPage(),
-                        ])
-                      : const Center(child: CircularProgressIndicator())),
+                NestedScrollView(
+                    floatHeaderSlivers: false,
+                    headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                          SliverOverlapAbsorber(
+                              handle: NestedScrollView
+                                  .sliverOverlapAbsorberHandleFor(context),
+                              sliver: TripDetailAppbar(
+                                trip: trip,
+                                tripCover: widget.tripCover,
+                                tripId: widget.tripId,
+                                tabController: tabController,
+                              )),
+                        ],
+                    body: trip != null
+                        ? TabBarView(controller: tabController, children: [
+                            TripInfoPage(trip: trip!),
+                            BlocProvider(
+                              create: (context) =>
+                                  serviceLocator<LocationInfoCubit>(),
+                              child: TripSavedServicesPage(trip: trip!),
+                            ),
+                            TripItineraryPage(trip: trip!),
+                            const TripTodoListPage(),
+                          ])
+                        : const Center(child: CircularProgressIndicator())),
 
-              // Positioned.fill(
-              //     child: CircularMenu(
-              //         toggleButtonColor:
-              //             Theme.of(context).colorScheme.primaryContainer,
-              //         alignment: const Alignment(0.95, 0.85),
-              //         toggleButtonIconColor:
-              //             Theme.of(context).colorScheme.primary,
-              //         startingAngleInRadian:
-              //             3.14, // Example: 180 degrees (π radians)
-              //         endingAngleInRadian:
-              //             3.14 * 3 / 2, // Example: 360 degrees (2π radians)
-              //         items: [
-              //       CircularMenuItem(
-              //           color: Theme.of(context).colorScheme.primaryContainer,
-              //           icon: Icons.message,
-              //           iconColor: Theme.of(context).colorScheme.primary,
-              //           onTap: () {
-              //             // callback
-              //           }),
-              //       CircularMenuItem(
-              //         color: Theme.of(context).colorScheme.primaryContainer,
-              //         icon: Icons.map_outlined,
-              //         onTap: () {
-              //           //callback
-              //         },
-              //         iconColor: Theme.of(context).colorScheme.primary,
-              //       ),
-              //       CircularMenuItem(
-              //           color: Theme.of(context).colorScheme.primaryContainer,
-              //           icon: Icons.people_alt,
-              //           iconColor: Theme.of(context).colorScheme.primary,
-              //           onTap: () {
-              //             //callback
-              //           }),
-              //     ]))
-            ]),
+                // Positioned.fill(
+                //     child: CircularMenu(
+                //         toggleButtonColor:
+                //             Theme.of(context).colorScheme.primaryContainer,
+                //         alignment: const Alignment(0.95, 0.85),
+                //         toggleButtonIconColor:
+                //             Theme.of(context).colorScheme.primary,
+                //         startingAngleInRadian:
+                //             3.14, // Example: 180 degrees (π radians)
+                //         endingAngleInRadian:
+                //             3.14 * 3 / 2, // Example: 360 degrees (2π radians)
+                //         items: [
+                //       CircularMenuItem(
+                //           color: Theme.of(context).colorScheme.primaryContainer,
+                //           icon: Icons.message,
+                //           iconColor: Theme.of(context).colorScheme.primary,
+                //           onTap: () {
+                //             // callback
+                //           }),
+                //       CircularMenuItem(
+                //         color: Theme.of(context).colorScheme.primaryContainer,
+                //         icon: Icons.map_outlined,
+                //         onTap: () {
+                //           //callback
+                //         },
+                //         iconColor: Theme.of(context).colorScheme.primary,
+                //       ),
+                //       CircularMenuItem(
+                //           color: Theme.of(context).colorScheme.primaryContainer,
+                //           icon: Icons.people_alt,
+                //           iconColor: Theme.of(context).colorScheme.primary,
+                //           onTap: () {
+                //             //callback
+                //           }),
+                //     ]))
+              ]),
           );
         },
       ),

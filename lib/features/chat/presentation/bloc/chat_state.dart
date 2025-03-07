@@ -9,7 +9,13 @@ final class ChatLoading extends ChatState {}
 
 final class ChatCreateTripItineraryLoading extends ChatState {}
 
-final class ChatCreateTripItinerarySuccess extends ChatState {}
+final class ChatCreateTripItinerarySuccess extends ChatState {
+  final ChatSummarize chatSummarize;
+
+  ChatCreateTripItinerarySuccess({
+    required this.chatSummarize,
+  });
+}
 
 final class ChatsLoadedSuccess extends ChatState {
   final List<Chat> chatHeads;
@@ -27,10 +33,7 @@ final class ChatInsertSuccess extends ChatState {
   });
 }
 
-
-final class ChatInsertMembersSuccess extends ChatState {
-
-}
+final class ChatInsertMembersSuccess extends ChatState {}
 
 final class ChatDeleteSuccess extends ChatState {
   final int id;
@@ -39,7 +42,6 @@ final class ChatDeleteSuccess extends ChatState {
     required this.id,
   });
 }
-
 
 final class ChatFailure extends ChatState {
   final String message;
@@ -57,7 +59,6 @@ final class SummarizeItinerariesSuccess extends ChatState {
   });
 }
 
-
 final class SeenUpdatedSuccess extends ChatState {
   final List<Map<int, User>> seenUser;
 
@@ -70,7 +71,6 @@ final class ChatSummarizedSuccess extends ChatState {
   final ChatSummarize? chatSummarize;
 
   ChatSummarizedSuccess({
-     this.chatSummarize,
+    this.chatSummarize,
   });
-
 }

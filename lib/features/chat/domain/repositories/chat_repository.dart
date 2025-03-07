@@ -40,7 +40,7 @@ abstract interface class ChatRepository {
   Future<Either<Failure, List<Map<int, my_user.User>>>> getSeenUser({
     required int chatId,
   });
- 
+
   void unSubcribeToChatMembersChannel({
     required String channelName,
   });
@@ -48,7 +48,7 @@ abstract interface class ChatRepository {
   Future<Either<Failure, ChatSummarize?>> getCurrentChatSummary({
     required int chatId,
   });
-  Future<Either<Failure, Unit>> createItineraryFromSummary({
+  Future<Either<Failure, ChatSummarize>> createItineraryFromSummary({
     required int chatId,
   });
 }

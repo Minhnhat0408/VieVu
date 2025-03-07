@@ -373,7 +373,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
           "X-Requested-With": "XMLHttpRequest",
           "Content-Type": "application/x-www-form-urlencoded",
           "Cookie":
-              "PHPSESSID=mjvtcc5q341hpcugqe0uen7rl2; Path=/; Secure; HttpOnly;",
+              "PHPSESSID=ebtvjmgsumbg62gvt0u8eshgs1; Path=/; Secure; HttpOnly;",
         },
         body: body.entries
             .map((e) =>

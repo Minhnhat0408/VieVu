@@ -80,11 +80,33 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
           }
 
           if (state is ChatCreateTripItinerarySuccess) {
-            Navigator.of(context).pop();
+            // Navigator.of(context).pop();
+            setState(() {
+              chatSummarize = state.chatSummarize;
+            });
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
                 SnackBar(
+                  action: SnackBarAction(
+                    label: 'Xem ngay',
+                    onPressed: () {
+                      if (state.chatSummarize?.tripId != null) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TripDetailPage(
+                                      tripId: state.chatSummarize!.tripId!,
+                                      initialIndex: 2,
+                                    )));
+                      } else {
+                        showSnackbar(
+                            context,
+                            'Lỗi: Không tìm thấy ID chuyến đi.',
+                            SnackBarState.error);
+                      }
+                    },
+                  ),
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -101,25 +123,6 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
                             ),
                           ),
                         ],
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TripDetailPage(
-                                        tripId: widget.chat.tripId!,
-                                        initialIndex: 2,
-                                      )));
-                        },
-                        child: Text('Xem ngay',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              decorationColor:
-                                  Theme.of(context).colorScheme.onSurface,
-                            )),
                       ),
                     ],
                   ),
