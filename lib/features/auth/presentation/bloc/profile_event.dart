@@ -10,10 +10,23 @@ final class GetProfile extends ProfileEvent {
 }
 
 final class UpdateProfile extends ProfileEvent {
-  final String id;
-  final String email;
-  final String firstName;
-  final String lastName;
 
-  UpdateProfile(this.id, this.email, this.firstName, this.lastName);
+  final String? firstName;
+  final String? lastName;
+  final String? phone;
+  final String? gender;
+  final String? bio;
+  final String? city;
+  final File? avatar;
+
+  UpdateProfile({
+
+    this.firstName,
+    this.lastName,
+    this.phone,
+    this.avatar,
+    this.bio,
+    this.city,
+    this.gender,
+  });
 }

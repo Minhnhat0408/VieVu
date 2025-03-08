@@ -6,8 +6,12 @@ class UserModel extends User {
       required super.email,
       required super.firstName,
       required super.lastName,
+      required super.tripCount,
+      required super.ratingCount,
+      required super.avgRating,
       super.avatarUrl,
       super.city,
+      super.bio,
       super.gender,
       super.phoneNumber});
 
@@ -18,9 +22,13 @@ class UserModel extends User {
       firstName: json['first_name'] ?? '',
       lastName: json['last_name'] ?? '',
       avatarUrl: json['avatar_url'],
-      city: json['city'] ?? '',
-      gender: json['gender'] ?? '',
-      phoneNumber: json['phone'] ?? '',
+      tripCount: json['trip_count'] ?? 0,
+      ratingCount: json['rating_count'] ?? 0,
+      avgRating: json['avg_rating'] ?? 0.0,
+      bio: json['bio'],
+      city: json['city'],
+      gender: json['gender'],
+      phoneNumber: json['phone'],
     );
   }
 
@@ -31,11 +39,18 @@ class UserModel extends User {
     String? lastName,
     String? avatarUrl,
     String? city,
+    int? tripCount,
+    int? ratingCount,
+    double? avgRating,
     String? gender,
     String? phoneNumber,
+    String? bio,
   }) {
     return UserModel(
       id: id ?? this.id,
+      tripCount: tripCount ?? this.tripCount,
+      ratingCount: ratingCount ?? this.ratingCount,
+      avgRating: avgRating ?? this.avgRating,
       email: email ?? this.email,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
@@ -43,6 +58,7 @@ class UserModel extends User {
       city: city ?? this.city,
       gender: gender ?? this.gender,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      bio: bio ?? this.bio,
     );
   }
 }

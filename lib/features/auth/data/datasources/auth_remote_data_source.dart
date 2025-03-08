@@ -1,3 +1,4 @@
+import 'dart:developer';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -103,10 +104,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       final response = await supabaseClient
           .from('profiles')
-          .select()
-          .eq('id', currentUserSession!.user.id);
-      return UserModel.fromJson(response.first);
+          .select(
+              '*, trips(count), user_ratings!user_ratings_ratee_id_fkey(rating)')
+          .eq('id', currentUserSession!.user.id)
+          .single();
+
+      log(response.toString());
+      return UserModel.fromJson(response).copyWith(
+        tripCount: response['trips'].first['count'] as int,
+        ratingCount: response['user_ratings'].length as int,
+        avgRating: response['user_ratings'].length > 0
+            ? response['user_ratings'].fold(
+                    0.0,
+                    (previousValue, element) =>
+                        previousValue + element['rating'] as double) /
+                response['user_ratings'].length as double
+            : 0.0,
+      );
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

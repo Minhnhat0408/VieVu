@@ -29,10 +29,8 @@ class TripEditModal extends StatefulWidget {
 }
 
 class _TripEditModalState extends State<TripEditModal> {
-  final emailController = TextEditingController();
   final descriptionController = TextEditingController();
   final maxMemberController = TextEditingController();
-  final passwordController = TextEditingController();
   final nameController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   DateTimeRange? selectedDateRange;
@@ -103,9 +101,10 @@ class _TripEditModalState extends State<TripEditModal> {
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
     nameController.dispose();
+    descriptionController.dispose();
+    maxMemberController.dispose();
+
     super.dispose();
   }
 

@@ -13,6 +13,7 @@ import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/core/utils/text_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:vn_travel_companion/features/auth/presentation/bloc/profile_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
@@ -50,6 +51,7 @@ void main() async {
       BlocProvider(create: (_) => serviceLocator<TripItineraryBloc>()),
       BlocProvider(create: (_) => serviceLocator<ChatBloc>()),
       BlocProvider(create: (_) => serviceLocator<MessageBloc>()),
+      BlocProvider(create: (_) => serviceLocator<ProfileBloc>()),
     ],
     child: const MyApp(),
   ));

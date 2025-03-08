@@ -1,4 +1,5 @@
-
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
@@ -9,7 +10,7 @@ import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:vn_travel_companion/features/auth/domain/repository/profile_repository.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
-  final ProfileRemoteDataSource   remoteDataSource;
+  final ProfileRemoteDataSource remoteDataSource;
   final ConnectionChecker connectionChecker;
   const ProfileRepositoryImpl(this.remoteDataSource, this.connectionChecker);
 
@@ -33,20 +34,34 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<Either<Failure, User>> updateProfile({
-    required String name,
-    required String phone,
-    required String address,
-    required String avatar,
+    String? firstName,
+    String? lastName,
+    String? bio,
+    String? phone,
+    String? gender,
+    String? city,
+    File? avatar,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
+
+      String? imageUrl;
+      if (avatar != null) {
+        imageUrl = await remoteDataSource.uploadAvatar(
+          file: avatar,
+        );
+      }
+      log('imageUrl: $imageUrl');
       final user = await remoteDataSource.updateProfile(
-        name: name,
+        firstName: firstName,
+        gender: gender,
+        lastName: lastName,
+        bio: bio,
         phone: phone,
-        address: address,
-        avatar: avatar,
+        city: city,
+        avatar: imageUrl,
       );
 
       return right(user);

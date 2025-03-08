@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
@@ -8,12 +11,17 @@ abstract interface class ProfileRemoteDataSource {
   });
 
   Future<UserModel> updateProfile({
-    required String name,
-    required String phone,
-    required String address,
-    required String avatar,
+    String? firstName,
+    String? lastName,
+    String? gender,
+    String? bio,
+    String? phone,
+    String? city,
+    String? avatar,
   });
-
+  Future<String> uploadAvatar({
+    required File file,
+  });
   // Future<void> updatePassword({
   //   required String password,
   // });
@@ -25,6 +33,43 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   ProfileRemoteDataSourceImpl(
     this.supabaseClient,
   );
+  @override
+  Future<String> uploadAvatar({
+    required File file,
+  }) async {
+    final user = supabaseClient.auth.currentUser;
+    if (user == null) {
+      throw const ServerException("Không tìm thấy người dùng");
+    }
+    try {
+      await supabaseClient.storage.from('profile_avatars').upload(
+            "${user.id}.jpg",
+            file,
+          );
+
+      return supabaseClient.storage.from('profile_avatars').getPublicUrl(
+            "${user.id}.jpg",
+          );
+    } on StorageException catch (e) {
+      log(e.toString());
+      if (e.message == "The resource already exists") {
+        await supabaseClient.storage.from('profile_avatars').update(
+              "${user.id}.jpg",
+              file,
+            );
+
+        log('updated');
+        return supabaseClient.storage.from('profile_avatars').getPublicUrl(
+              "${user.id}.jpg",
+            );
+      } else {
+        throw ServerException(e.toString());
+      }
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
 
   @override
   Future<UserModel> getProfile({
@@ -41,38 +86,40 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
   @override
   Future<UserModel> updateProfile({
-    required String name,
-    required String phone,
-    required String address,
-    required String avatar,
+    String? firstName,
+    String? lastName,
+    String? phone,
+    String? city,
+    String? gender,
+    String? bio,
+    String? avatar,
   }) async {
     try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+
+      final buildUpdateObject = {
+        if (firstName != null) 'first_name': firstName,
+        if (lastName != null) 'last_name': lastName,
+        if (phone != null) 'phone': phone,
+        if (city != null) 'city': city,
+        if (avatar != null) 'avatar_url': avatar,
+        if (gender != null) 'gender': gender,
+        if (bio != null) 'bio': bio,
+      };
+      log(buildUpdateObject.toString());
       final response = await supabaseClient
           .from('profiles')
-          .upsert({
-            'name': name,
-            'phone': phone,
-            'address': address,
-            'avatar': avatar,
-          })
+          .update(buildUpdateObject)
+          .eq('id', user.id)
           .select()
           .single();
       return UserModel.fromJson(response);
     } catch (e) {
-      throw const ServerException();
+      log(e.toString());
+      throw ServerException(e.toString());
     }
   }
-
-  // @override
-  // Future<void> updatePassword({
-  //   required String password,
-  // }) async {
-  //   try {
-  //     await supabaseClient.auth.updateUser(UserAttributes(
-  //       password: password,
-  //     ));
-  //   } catch (e) {
-  //     throw const ServerException();
-  //   }
-  // }
 }

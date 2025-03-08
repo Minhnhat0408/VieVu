@@ -2,8 +2,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:vn_travel_companion/features/auth/data/datasources/profile_remote_datasource.dart';
 import 'package:vn_travel_companion/features/auth/data/repositories/auth_repository_implementation.dart';
+import 'package:vn_travel_companion/features/auth/data/repositories/profile_repository_implementation.dart';
 import 'package:vn_travel_companion/features/auth/domain/repository/auth_repository.dart';
+import 'package:vn_travel_companion/features/auth/domain/repository/profile_repository.dart';
 import 'package:vn_travel_companion/features/auth/domain/usecases/current_user.dart';
 import 'package:vn_travel_companion/features/auth/domain/usecases/listen_auth_change.dart';
 import 'package:vn_travel_companion/features/auth/domain/usecases/send_reset_password_email.dart';
@@ -15,6 +18,7 @@ import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.da
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vn_travel_companion/features/auth/presentation/bloc/profile_bloc.dart';
 import 'package:vn_travel_companion/features/chat/data/datasources/chat_remote_datasource.dart';
 import 'package:vn_travel_companion/features/chat/data/datasources/message_remote_datasource.dart';
 import 'package:vn_travel_companion/features/chat/data/repositories/chat_repository_implementation.dart';
@@ -84,6 +88,7 @@ Future<void> initDependencies() async {
   _initTrip();
   _initChat();
   _initMessage();
+  _initProfile();
 
   _initSavedService();
   _initTripItinerary();
@@ -435,6 +440,26 @@ void _initMessage() {
     ..registerLazySingleton(
       () => MessageBloc(
         messageRepository: serviceLocator(),
+      ),
+    );
+}
+
+void _initProfile() {
+  serviceLocator
+    ..registerFactory<ProfileRemoteDataSource>(
+      () => ProfileRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<ProfileRepository>(
+      () => ProfileRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => ProfileBloc(
+        profileRepository: serviceLocator(),
       ),
     );
 }

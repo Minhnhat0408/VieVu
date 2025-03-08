@@ -67,7 +67,10 @@ class AuthRepositoryImpl implements AuthRepository {
             id: session.user.id,
             email: session.user.email ?? ' ',
             firstName: '',
-            lastName: ''));
+            lastName: '',
+            tripCount: 0,
+            ratingCount: 0,
+            avgRating: 0.0));
       }
 
       final user = await remoteDataSource.getCurrentUserData();
