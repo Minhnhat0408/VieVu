@@ -77,6 +77,7 @@ class _AddTripModalState extends State<AddTripModal> {
                                 tripName.text,
                                 userId,
                               ));
+                          
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,

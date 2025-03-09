@@ -96,7 +96,7 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                                     imageUrl: trip.cover ?? '',
                                     errorWidget: (context, url, error) =>
                                         Image.asset(
-                                            'assets/images/trip_placeholder.png'),
+                                            'assets/images/trip_placeholder.avif'),
                                     width: 60,
                                     height: 60,
                                     fit: BoxFit.cover,

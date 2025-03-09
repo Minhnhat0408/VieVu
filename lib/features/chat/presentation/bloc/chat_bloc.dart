@@ -23,6 +23,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<UnSubcribeToChatMembersChannel>(_onUnSubcribeToChatMembersChannel);
     on<GetChatSummary>(_onGetChatSummary);
     on<CreateItineraryFromSummary>(_onCreateItineraryFromSummary);
+    on<GetSingleChat>(_onGetSingleChat);
   }
 
   void _onUnSubcribeToChatMembersChannel(
@@ -32,12 +33,30 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     );
   }
 
+  void _onGetSingleChat(GetSingleChat event, Emitter<ChatState> emit) async {
+    emit(ChatLoading());
+    final res = await _chatRepository.getSingleChat(
+      userId: event.userId,
+      tripId: event.tripId,
+    );
+    res.fold((l) => emit(ChatFailure(message: l.message)), (r) {
+      if (r != null) {
+        emit(ChatLoadedSuccess(chat: r));
+      } else {
+        add(InsertChat(
+          userId: event.userId,
+        ));
+      }
+    });
+  }
+
   void _onInsertChat(InsertChat event, Emitter<ChatState> emit) async {
     emit(ChatLoading());
     final res = await _chatRepository.insertChat(
       name: event.name,
       imageUrl: event.imageUrl,
       tripId: event.tripId,
+      userId: event.userId,
     );
     res.fold(
       (l) => emit(ChatFailure(message: l.message)),

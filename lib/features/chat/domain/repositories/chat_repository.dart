@@ -10,7 +10,13 @@ abstract interface class ChatRepository {
   Future<Either<Failure, Chat>> insertChat({
     String? name,
     String? tripId,
+    String? userId,
     String? imageUrl,
+  });
+
+    Future<Either<Failure, Chat?>> getSingleChat({
+    String? userId,
+    String? tripId,
   });
 
   Future<Either<Failure, Unit>> insertChatMembers({

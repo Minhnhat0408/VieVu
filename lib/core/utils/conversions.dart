@@ -94,3 +94,16 @@ Icon convertTypeIdToIcons(int? typeId, double size) {
       );
   }
 }
+
+String convertRoleToString(String? role) {
+  switch (role) {
+    case 'owner':
+      return 'Chủ chuyến đi';
+    case 'member':
+      return 'Thành viên';
+    case 'moderator':
+      return 'Người quản lý';
+    default:
+      return 'Khách';
+  }
+}

@@ -9,9 +9,11 @@ import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_custom_place_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_itinerary_options_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/edit_trip_itinerary_modal.dart';
@@ -31,6 +33,7 @@ class TripItineraryPage extends StatefulWidget {
 class _TripItineraryPageState extends State<TripItineraryPage> {
   List<TripItinerary>? _tripItineraries;
   List<bool> _expanded = [];
+  late TripMember? currentUser;
 
   final List<DateTime> _panels = [];
   final List<DateTime> _selectedDates = [];
@@ -46,7 +49,9 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
         _expanded.add(false);
       }
     }
-
+    currentUser = (context.read<CurrentTripMemberInfoCubit>().state
+            as CurrentTripMemberInfoLoaded)
+        .tripMember;
     if (context.read<TripItineraryBloc>().state is TripItineraryLoadedSuccess) {
       final state =
           context.read<TripItineraryBloc>().state as TripItineraryLoadedSuccess;
@@ -176,16 +181,19 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                 actions: [
                   _panels.isNotEmpty
                       ? IconButton(
-                          onPressed: () {
-                            displayModal(
-                                context,
-                                EditTripItineraryModal(
-                                  panels: _panels,
-                                  tripItinerary: _tripItineraries!,
-                                ),
-                                null,
-                                true);
-                          },
+                          onPressed: currentUser != null &&
+                                  currentUser!.role != 'member'
+                              ? () {
+                                  displayModal(
+                                      context,
+                                      EditTripItineraryModal(
+                                        panels: _panels,
+                                        tripItinerary: _tripItineraries!,
+                                      ),
+                                      null,
+                                      true);
+                                }
+                              : null,
                           style: IconButton.styleFrom(
                             side: BorderSide(
                                 width: 2,
@@ -193,20 +201,23 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                           ),
                           icon: const Icon(Icons.edit, size: 20))
                       : ElevatedButton(
-                          onPressed: () async {
-                            final DateTimeRange? picked =
-                                await showDateRangePicker(
-                              context: context,
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime(2100),
-                              initialDateRange: null,
-                              locale: const Locale('vi', 'VN'),
-                            );
-                            context.read<TripBloc>().add(UpdateTrip(
-                                tripId: widget.trip.id,
-                                startDate: picked!.start,
-                                endDate: picked.end));
-                          },
+                          onPressed: currentUser != null &&
+                                  currentUser!.role != 'member'
+                              ? () async {
+                                  final DateTimeRange? picked =
+                                      await showDateRangePicker(
+                                    context: context,
+                                    firstDate: DateTime.now(),
+                                    lastDate: DateTime(2100),
+                                    initialDateRange: null,
+                                    locale: const Locale('vi', 'VN'),
+                                  );
+                                  context.read<TripBloc>().add(UpdateTrip(
+                                      tripId: widget.trip.id,
+                                      startDate: picked!.start,
+                                      endDate: picked.end));
+                                }
+                              : null,
                           child: const Row(
                             children: [
                               Icon(Icons.add),
@@ -222,22 +233,25 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
               BlocConsumer<TripItineraryBloc, TripItineraryState>(
                 listener: (context, state) {
                   if (state is TripItineraryLoadedSuccess) {
-                    log(state.tripItineraries.toString());
-                    setState(() {
-                      _tripItineraries = state.tripItineraries;
-                      for (var i = 0; i < _panels.length; i++) {
-                        final panel = _panels[i];
-                        final itineraries = _tripItineraries!.where((element) {
-                          return element.time.toIso8601String().split('T')[0] ==
-                              panel.toIso8601String().split('T')[0];
-                        }).toList();
-                        if (itineraries.isNotEmpty) {
-                          _expanded[i] = true;
+                    if (mounted) {
+                      setState(() {
+                        _tripItineraries = state.tripItineraries;
+                        for (var i = 0; i < _panels.length; i++) {
+                          final panel = _panels[i];
+                          final itineraries =
+                              _tripItineraries!.where((element) {
+                            return element.time
+                                    .toIso8601String()
+                                    .split('T')[0] ==
+                                panel.toIso8601String().split('T')[0];
+                          }).toList();
+                          if (itineraries.isNotEmpty) {
+                            _expanded[i] = true;
+                          }
                         }
-                      }
-                    });
+                      });
+                    }
                   }
-
                   if (state is TripItineraryAddedSuccess) {
                     log(state.tripItinerary.toString());
 
@@ -450,35 +464,37 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.fromLTRB(14, 10, 20, 10),
                 ),
-                onPressed: () async {
-                  // Your action here
-                  final opt = await displayModal(
-                      context, const AddItineraryOptionsModal(), null, false);
+                onPressed: currentUser != null && currentUser!.role != 'member'
+                    ? () async {
+                        // Your action here
+                        final opt = await displayModal(context,
+                            const AddItineraryOptionsModal(), null, false);
 
-                  if (opt == 'select_saved') {
-                    context.read<SavedServiceBloc>().add(GetSavedServices(
-                          tripId: widget.trip.id,
-                        ));
+                        if (opt == 'select_saved') {
+                          context.read<SavedServiceBloc>().add(GetSavedServices(
+                                tripId: widget.trip.id,
+                              ));
 
-                    displayModal(
-                        context,
-                        SelectSavedServiceToItineraryModal(
-                            tripId: widget.trip.id, time: panel),
-                        null,
-                        true);
-                  } else {
-                    displayFullScreenModal(
-                        context,
-                        BlocProvider(
-                          create: (context) =>
-                              serviceLocator<LocationInfoCubit>(),
-                          child: AddCustomPlaceModal(
-                            tripId: widget.trip.id,
-                            date: panel,
-                          ),
-                        ));
-                  }
-                },
+                          displayModal(
+                              context,
+                              SelectSavedServiceToItineraryModal(
+                                  tripId: widget.trip.id, time: panel),
+                              null,
+                              true);
+                        } else {
+                          displayFullScreenModal(
+                              context,
+                              BlocProvider(
+                                create: (context) =>
+                                    serviceLocator<LocationInfoCubit>(),
+                                child: AddCustomPlaceModal(
+                                  tripId: widget.trip.id,
+                                  date: panel,
+                                ),
+                              ));
+                        }
+                      }
+                    : null,
                 child: const IntrinsicWidth(
                   child: Row(
                     children: [
@@ -546,34 +562,37 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.fromLTRB(14, 10, 20, 10),
           ),
-          onPressed: () async {
-            // Your action here
-            final opt = await displayModal(
-                context, const AddItineraryOptionsModal(), null, false);
+          onPressed: currentUser != null && currentUser!.role != 'member'
+              ? () async {
+                  // Your action here
+                  final opt = await displayModal(
+                      context, const AddItineraryOptionsModal(), null, false);
 
-            if (opt == 'select_saved') {
-              context.read<SavedServiceBloc>().add(GetSavedServices(
-                    tripId: widget.trip.id,
-                  ));
+                  if (opt == 'select_saved') {
+                    context.read<SavedServiceBloc>().add(GetSavedServices(
+                          tripId: widget.trip.id,
+                        ));
 
-              displayModal(
-                  context,
-                  SelectSavedServiceToItineraryModal(
-                      tripId: widget.trip.id, time: panel),
-                  null,
-                  true);
-            } else {
-              displayFullScreenModal(
-                  context,
-                  BlocProvider(
-                    create: (context) => serviceLocator<LocationInfoCubit>(),
-                    child: AddCustomPlaceModal(
-                      tripId: widget.trip.id,
-                      date: panel,
-                    ),
-                  ));
-            }
-          },
+                    displayModal(
+                        context,
+                        SelectSavedServiceToItineraryModal(
+                            tripId: widget.trip.id, time: panel),
+                        null,
+                        true);
+                  } else {
+                    displayFullScreenModal(
+                        context,
+                        BlocProvider(
+                          create: (context) =>
+                              serviceLocator<LocationInfoCubit>(),
+                          child: AddCustomPlaceModal(
+                            tripId: widget.trip.id,
+                            date: panel,
+                          ),
+                        ));
+                  }
+                }
+              : null,
           child: const IntrinsicWidth(
             child: Row(
               children: [

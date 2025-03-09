@@ -16,7 +16,7 @@ class ChatModel extends Chat {
 
   factory ChatModel.fromJson(Map<String, dynamic> json) {
     return ChatModel(
-      id: json['chat_id'],
+      id: json['chat_id'] ?? json['id'],
       tripId: json['trip_id'],
       name: json['chat_name'],
       lastSeenUserAvatar: json['last_seen_user_avatar'],

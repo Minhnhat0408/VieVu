@@ -202,8 +202,9 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
     try {
       final res2 = await supabaseClient
           .from('trips')
-          .select('saved_services!inner(link_id)')
-          .eq('owner_id', userId)
+          .select(
+              'trip_participants!inner(user_id), saved_services!inner(link_id)')
+          .eq('trip_participants.user_id', userId)
           .inFilter('saved_services.link_id', serviceIds);
       final linkIds = res2
           .expand(

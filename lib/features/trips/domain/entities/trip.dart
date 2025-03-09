@@ -35,3 +35,5 @@ class Trip {
     this.transports,
   });
 }
+
+

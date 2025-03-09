@@ -9,7 +9,9 @@ import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_note_to_itinerary_modal.dart';
 
 class TripItineraryDetailPage extends StatefulWidget {
@@ -30,9 +32,14 @@ class TripItineraryDetailPage extends StatefulWidget {
 class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
   int index = 0;
   List<TripItinerary> itineraries = [];
+  late TripMember? currentUser;
+
   @override
   void initState() {
     index = widget.index;
+    currentUser = (context.read<CurrentTripMemberInfoCubit>().state
+            as CurrentTripMemberInfoLoaded)
+        .tripMember;
     itineraries = widget.itineraries;
     super.initState();
   }
@@ -56,7 +63,7 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
       ],
       body: BlocListener<TripItineraryBloc, TripItineraryState>(
         listener: (context, state) {
-          // 
+          //
           if (state is TripItineraryUpdatedSuccess) {
             // change the updated itinerary in the list
 
@@ -240,35 +247,37 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
                             const SizedBox(
                               width: 10,
                             ),
-                            GestureDetector(
-                              onTap: () async {
-                                await showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                ).then((value) {
-                                  if (value != null) {
-                                    final newTime = DateTime(
-                                      itineraries[index].time.year,
-                                      itineraries[index].time.month,
-                                      itineraries[index].time.day,
-                                      value.hour,
-                                      value.minute,
-                                    );
+                            if (currentUser != null &&
+                                currentUser!.role != 'member')
+                              GestureDetector(
+                                onTap: () async {
+                                  await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                  ).then((value) {
+                                    if (value != null) {
+                                      final newTime = DateTime(
+                                        itineraries[index].time.year,
+                                        itineraries[index].time.month,
+                                        itineraries[index].time.day,
+                                        value.hour,
+                                        value.minute,
+                                      );
 
-                                    context
-                                        .read<TripItineraryBloc>()
-                                        .add(UpdateTripItinerary(
-                                          id: itineraries[index].id,
-                                          time: newTime,
-                                        ));
-                                  }
-                                });
-                              },
-                              child: const Icon(
-                                Icons.edit,
-                                size: 15,
-                              ),
-                            )
+                                      context
+                                          .read<TripItineraryBloc>()
+                                          .add(UpdateTripItinerary(
+                                            id: itineraries[index].id,
+                                            time: newTime,
+                                          ));
+                                    }
+                                  });
+                                },
+                                child: const Icon(
+                                  Icons.edit,
+                                  size: 15,
+                                ),
+                              )
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -282,24 +291,26 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
                                 style: Theme.of(context).textTheme.bodyLarge,
                               ),
                               const WidgetSpan(child: SizedBox(width: 6)),
-                              WidgetSpan(
-                                alignment: PlaceholderAlignment.middle,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    displayModal(
-                                        context,
-                                        AddNoteToItineraryModal(
-                                          tripItinerary: itineraries[index],
-                                        ),
-                                        null,
-                                        false);
-                                  },
-                                  child: const Icon(
-                                    Icons.edit,
-                                    size: 15,
+                              if (currentUser != null &&
+                                  currentUser!.role != 'member')
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      displayModal(
+                                          context,
+                                          AddNoteToItineraryModal(
+                                            tripItinerary: itineraries[index],
+                                          ),
+                                          null,
+                                          false);
+                                    },
+                                    child: const Icon(
+                                      Icons.edit,
+                                      size: 15,
+                                    ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                         ),

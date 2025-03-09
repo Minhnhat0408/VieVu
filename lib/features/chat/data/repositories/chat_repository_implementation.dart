@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
@@ -32,9 +34,39 @@ class ChatRepositoryImpl implements ChatRepository {
   });
 
   @override
+  Future<Either<Failure, Chat?>> getSingleChat({
+    String? userId,
+    String? tripId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+
+      final res = await chatRemoteDatasource.getSingleChat(
+        userId: userId,
+        tripId: tripId,
+      );
+      // if(res == null) {
+      //   final chat = await chatRemoteDatasource.insertChat(
+
+      //     tripId: tripId,
+      //     userId: userId,
+      //   );
+      //   return right(chat);
+      // }
+
+      return right(res);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, Chat>> insertChat({
     String? name,
     String? tripId,
+    String? userId,
     String? imageUrl,
   }) async {
     try {
@@ -45,6 +77,7 @@ class ChatRepositoryImpl implements ChatRepository {
         name: name,
         tripId: tripId,
         imageUrl: imageUrl,
+        userId: userId,
       );
       return right(res);
     } on ServerException catch (e) {
@@ -330,7 +363,7 @@ class ChatRepositoryImpl implements ChatRepository {
           }
         }
       }
-     final summarize = await chatRemoteDatasource.updateSummarize(
+      final summarize = await chatRemoteDatasource.updateSummarize(
         isConverted: true,
         chatId: chatId,
         metaData: summary,

@@ -3,7 +3,9 @@ import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 
 class TripPrivacyModal extends StatefulWidget {
   final Trip trip;
@@ -18,11 +20,14 @@ class TripPrivacyModal extends StatefulWidget {
 
 class _TripPrivacyModalState extends State<TripPrivacyModal> {
   bool _published = false;
-
+  late TripMember? currentUser;
   @override
   void initState() {
     super.initState();
     _published = widget.trip.isPublished;
+    currentUser = (context.read<CurrentTripMemberInfoCubit>().state
+            as CurrentTripMemberInfoLoaded)
+        .tripMember;
   }
 
   @override
@@ -94,24 +99,26 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
               },
               builder: (context, state) {
                 return ElevatedButton(
-                  onPressed: () {
-                    // widget.onStatusChanged(_status);
-                    if (_published != widget.trip.isPublished) {
-                      if (_published) {
-                        context.read<ChatBloc>().add(InsertChat(
-                              tripId: widget.trip.id,
-                              imageUrl: widget.trip.cover,
-                              name: widget.trip.name,
-                            ));
-                      }
-                      context.read<TripBloc>().add(UpdateTrip(
-                            isPublished: _published,
-                            tripId: widget.trip.id,
-                          ));
-                      // Update trip
-                    }
-                    // Navigator.of(context).pop();
-                  },
+                  onPressed: currentUser?.role == 'owner'
+                      ? () {
+                          // widget.onStatusChanged(_status);
+                          if (_published != widget.trip.isPublished) {
+                            if (_published) {
+                              context.read<ChatBloc>().add(InsertChat(
+                                    tripId: widget.trip.id,
+                                    imageUrl: widget.trip.cover,
+                                    name: widget.trip.name,
+                                  ));
+                            }
+                            context.read<TripBloc>().add(UpdateTrip(
+                                  isPublished: _published,
+                                  tripId: widget.trip.id,
+                                ));
+                            // Update trip
+                          }
+                          // Navigator.of(context).pop();
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,

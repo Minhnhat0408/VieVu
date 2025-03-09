@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -224,9 +225,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           backgroundColor: Colors.transparent,
           titleSpacing: 0,
           title: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(widget.chat.imageUrl),
-              radius: 20,
+            leading: CachedNetworkImage(
+              imageUrl:
+                  widget.chat.imageUrl ?? 'https://via.placeholder.com/150',
+              imageBuilder: (context, imageProvider) => CircleAvatar(
+                backgroundImage: imageProvider,
+              ),
+              width: 60,
+              height: 60,
+              placeholder: (context, url) => const CircularProgressIndicator(),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
             visualDensity: VisualDensity.compact,
             contentPadding:
@@ -317,7 +325,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   listener: (context, state) {
                     if (state is MessagesLoadedSuccess) {
                       if (widget.chat.isSeen == false &&
-                          totalRecordCount == 0) {
+                          totalRecordCount == 0 &&
+                          state.messages.isNotEmpty) {
                         _messageBloc.add(UpdateSeenMessage(
                           chatId: widget.chat.id,
                           messageId: state.messages.first.id,
@@ -328,7 +337,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                         _messageKeys[message.id] =
                             GlobalKey(); // Tạo key cho mỗi message
                       }
-                      if (state.messages.last.id == _scrollToMessageId) {
+                      if (state.messages.isNotEmpty &&
+                          state.messages.last.id == _scrollToMessageId) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           log('Post frame callback');
                           _scrollController.animateTo(
@@ -342,7 +352,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                       totalRecordCount += state.messages.length;
 
                       final next = totalRecordCount;
-                      final isLastPage = state.messages.length < _pageSize;
+                      final isLastPage = state.messages.isEmpty;
                       if (isLastPage) {
                         _pagingController.appendLastPage(state.messages);
                       } else {

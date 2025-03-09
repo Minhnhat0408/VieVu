@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vn_travel_companion/features/chat/presentation/pages/chat_details_page.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_edit_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
 
 final Map<String, String> optionLists = {
-  'Chỉnh sửa': 'Thay đổi các thông tin hiển thị của chuyến đi',
+  // 'Chỉnh sửa': 'Thay đổi các thông tin hiển thị của chuyến đi',
   // 'Người tham gia': 'Quản lý thành viên trong chuyến đi',
   'Nhóm chat': 'Chat với mọi người trong chuyến đi',
   'Quyền riêng tư': 'Công khai hoặc ẩn chuyến đi',
@@ -20,10 +26,10 @@ final Map<String, String> optionLists = {
 final List<TripSettingOptions> tripSettingOptions = [
   TripSettingOptions('Chia sẻ chuyến đi', const Icon(Icons.share)),
   // TripSettingOptions('Tạo bản sao chuyến đi', const Icon(Icons.copy)),
-  TripSettingOptions(
-    'Xóa chuyến đi',
-    const Icon(Icons.delete, color: Colors.red),
-  ),
+  // TripSettingOptions(
+  //   'Xóa chuyến đi',
+  //   const Icon(Icons.delete, color: Colors.red),
+  // ),
 ];
 
 class TripSettingOptions {
@@ -44,25 +50,92 @@ class TripSettingsPage extends StatefulWidget {
 }
 
 class _TripSettingsPageState extends State<TripSettingsPage> {
+  late TripMember? currentUser;
+  @override
+  void initState() {
+    super.initState();
+    currentUser = (context.read<CurrentTripMemberInfoCubit>().state
+            as CurrentTripMemberInfoLoaded)
+        .tripMember;
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomAppbar(
       appBarTitle: 'Cài đặt chuyến đi',
       centerTitle: true,
-      body: BlocListener<TripBloc, TripState>(
-        listener: (context, state) {
-          if (state is TripActionSuccess) {
-            Navigator.of(context).pop();
-          }
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<TripBloc, TripState>(
+            listener: (context, state) {
+              if (state is TripActionSuccess) {
+                Navigator.of(context).pop();
+              }
 
-          if (state is TripDeletedSuccess) {
-            Navigator.of(context)
-              ..pop()
-              ..pop();
-          }
-        },
+              if (state is TripDeletedSuccess) {
+                Navigator.of(context)
+                  ..pop()
+                  ..pop();
+              }
+            },
+          ),
+          BlocListener<ChatBloc, ChatState>(
+            listener: (context, state) {
+              if (state is ChatLoadedSuccess) {
+                displayFullScreenModal(
+                    context, ChatDetailsPage(chat: state.chat));
+              }
+            },
+          ),
+          BlocListener<TripMemberBloc, TripMemberState>(
+            listener: (context, state) {
+              if (state is TripMemberDeletedSuccess) {
+                Navigator.of(context)
+                  ..pop()
+                  ..pop();
+              }
+            },
+          ),
+        ],
         child: ListView(
           children: [
+            if (currentUser?.role == 'owner')
+              Column(
+                children: [
+                  ListTile(
+                    title: const Text("Chỉnh sửa",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        )),
+                    minVerticalPadding: 16,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                    subtitle: const Text(
+                        'Thay đổi các thông tin hiển thị của chuyến đi'),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () {
+                      // Navigator.of(context).pushNamed('/my-trips');
+
+                      displayFullScreenModal(
+                        context,
+                        TripEditModal(
+                          trip: widget.trip!,
+                        ),
+                      );
+
+                      // Change privacy
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                    child: Divider(
+                      thickness: 2,
+                      height: 2,
+                      color: Colors.grey[300],
+                    ),
+                  ),
+                ],
+              ),
             ...optionLists.entries.map((entry) {
               return Column(
                 children: [
@@ -78,13 +151,17 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       // Navigator.of(context).pushNamed('/my-trips');
-                      if (entry.key == 'Chỉnh sửa') {
-                        displayFullScreenModal(
-                          context,
-                          TripEditModal(
-                            trip: widget.trip!,
-                          ),
-                        );
+                      if (entry.key == 'Nhóm chat') {
+                        if (widget.trip != null && widget.trip!.isPublished) {
+                          context
+                              .read<ChatBloc>()
+                              .add(GetSingleChat(tripId: widget.trip!.id));
+                        } else {
+                          showSnackbar(
+                              context,
+                              'Công khai chuyến đi để bắt đầu chat với mọi người',
+                              'error');
+                        }
                       } else if (entry.key == 'Quyền riêng tư') {
                         // Change privacy
 
@@ -113,51 +190,99 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
               return Column(
                 children: [
                   ListTile(
-                      title: Text(option.title,
-                          style: TextStyle(
-                              color: option.title == 'Xóa chuyến đi'
-                                  ? Colors.red
-                                  : null)),
+                      title: Text(
+                        option.title,
+                      ),
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 20),
                       leading: option.icon,
                       onTap: () {
                         // Handle each option's action
-                        if (option.title == 'Xóa chuyến đi') {
-                          showDialog<String>(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Bạn có muốn xóa?'),
-                              content:
-                                  const Text('Chuyến đi sẽ bị xóa vĩnh viễn'),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, 'Hủy bỏ'),
-                                  child: const Text('Hủy bỏ'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context, 'Xóa');
-                                    final tripId = (context
-                                            .read<TripDetailsCubit>()
-                                            .state as TripDetailsLoadedSuccess)
-                                        .trip
-                                        .id;
-                                    context
-                                        .read<TripBloc>()
-                                        .add(DeleteTrip(id: tripId));
-                                  },
-                                  child: const Text('Xóa'),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
                       }),
                 ],
               );
             }),
+            Column(
+              children: [
+                if (currentUser != null)
+                  ListTile(
+                    title: Text(
+                        currentUser?.role == 'owner'
+                            ? 'Xóa chuyến đi'
+                            : 'Rời chuyến đi',
+                        style: const TextStyle(color: Colors.red)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                    leading: const Icon(Icons.delete, color: Colors.red),
+                    onTap: () {
+                      // Handle each option's action
+                      if (currentUser?.role == 'owner') {
+                        showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Bạn có muốn xóa?'),
+                            content:
+                                const Text('Chuyến đi sẽ bị xóa vĩnh viễn'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, 'Hủy bỏ'),
+                                child: const Text('Hủy bỏ'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, 'Xóa');
+                                  final tripId = (context
+                                          .read<TripDetailsCubit>()
+                                          .state as TripDetailsLoadedSuccess)
+                                      .trip
+                                      .id;
+                                  context
+                                      .read<TripBloc>()
+                                      .add(DeleteTrip(id: tripId));
+                                },
+                                child: const Text('Xóa'),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Rời chuyến đi?'),
+                            content: const Text(
+                                'Bạn có chắc chắn muốn rời chuyến đi?'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, 'Hủy bỏ'),
+                                child: const Text('Hủy bỏ'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, 'Rời chuyến đi');
+                                  final tripId = (context
+                                          .read<TripDetailsCubit>()
+                                          .state as TripDetailsLoadedSuccess)
+                                      .trip
+                                      .id;
+                                  context
+                                      .read<TripMemberBloc>()
+                                      .add(DeleteTripMember(
+                                        tripId: tripId,
+                                        userId: currentUser!.user.id,
+                                      ));
+                                },
+                                child: const Text('Rời chuyến đi'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                  ),
+              ],
+            )
           ],
         ),
       ),

@@ -5,15 +5,18 @@ import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
+import 'package:vn_travel_companion/features/trips/data/datasources/trip_member_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_repository.dart';
 
 class TripRepositoryImpl implements TripRepository {
   final TripRemoteDatasource tripRemoteDatasource;
+  final TripMemberRemoteDatasource tripMemberRemoteDatasource;
   final ConnectionChecker connectionChecker;
 
-  TripRepositoryImpl(this.tripRemoteDatasource, this.connectionChecker);
+  TripRepositoryImpl(this.tripRemoteDatasource, this.connectionChecker,
+      this.tripMemberRemoteDatasource);
 
   @override
   Future<Either<Failure, Unit>> deleteTrip({
@@ -85,6 +88,12 @@ class TripRepositoryImpl implements TripRepository {
       }
       final trip =
           await tripRemoteDatasource.insertTrip(name: name, userId: userId);
+
+      await tripMemberRemoteDatasource.insertTripMember(
+        tripId: trip.id,
+        userId: userId,
+        role: 'owner',
+      );
       return right(trip);
     } on ServerException catch (e) {
       return left(Failure(e.message));
@@ -164,7 +173,6 @@ class TripRepositoryImpl implements TripRepository {
     String? status,
     bool? isPublished,
     required int id,
-
   }) async {
     try {
       final trips = await tripRemoteDatasource.getCurrentUserTripsForSave(
@@ -172,7 +180,6 @@ class TripRepositoryImpl implements TripRepository {
         status: status,
         isPublished: isPublished,
         id: id,
-       
       );
       return right(trips);
     } on ServerException catch (e) {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
@@ -39,7 +41,6 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         title: const Text('Liên hệ'),
         actions: [
           Switch(
@@ -49,7 +50,6 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
               return const Icon(Icons.notifications_active_outlined);
             }),
             onChanged: (value) {
-
               setState(() {
                 _listentoNotification = value;
               });
@@ -84,6 +84,7 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
           ),
           BlocConsumer<ChatBloc, ChatState>(
             listener: (context, state) {
+              log(state.toString());
               if (state is ChatsLoadedSuccess) {
                 setState(() {
                   chats = state.chatHeads;
@@ -92,6 +93,15 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
               }
               if (state is ChatFailure) {
                 showSnackbar(context, state.message, SnackBarState.error);
+              }
+              if (state is ChatInsertSuccess) {
+                setState(() {
+                  // add if not exist
+                  if (!chats.contains(state.chat)) {
+                    chats.add(state.chat);
+                  }
+                  filteredChats = chats;
+                });
               }
             },
             builder: (context, state) {

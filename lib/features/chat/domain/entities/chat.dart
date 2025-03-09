@@ -1,7 +1,7 @@
 class Chat {
   final int id;
   final String name;
-  final String imageUrl;
+  final String  imageUrl;
 
   final String? tripId;
   final String? lastMessage;

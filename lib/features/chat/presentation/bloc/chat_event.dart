@@ -6,10 +6,12 @@ sealed class ChatEvent {}
 final class InsertChat extends ChatEvent {
   final String? name;
   final String? imageUrl;
+  final String? userId;
   final String? tripId;
 
   InsertChat({
     this.name,
+    this.userId,
     this.imageUrl,
     this.tripId,
   });
@@ -22,6 +24,16 @@ final class InsertChatMembers extends ChatEvent {
   InsertChatMembers({
     required this.id,
     required this.userId,
+  });
+}
+
+final class GetSingleChat extends ChatEvent {
+  final String? userId;
+  final String? tripId;
+
+  GetSingleChat({
+    this.userId,
+    this.tripId,
   });
 }
 

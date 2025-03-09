@@ -63,7 +63,7 @@ class AuthRepositoryImpl implements AuthRepository {
         if (session == null) {
           return left(Failure("User not logged in"));
         }
-        return right(UserModel(
+        return right(User(
             id: session.user.id,
             email: session.user.email ?? ' ',
             firstName: '',

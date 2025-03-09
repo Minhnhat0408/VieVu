@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 abstract class ChatRemoteDatasource {
   Future<ChatModel> insertChat({
     String? name,
+    String? userId,
     String? tripId,
     String? imageUrl,
   });
@@ -22,6 +23,11 @@ abstract class ChatRemoteDatasource {
 
   Future deleteChat({
     required int id,
+  });
+
+  Future<ChatModel?> getSingleChat({
+    String? userId,
+    String? tripId,
   });
 
   Future<List<ChatModel>> getChatHeads();
@@ -62,24 +68,77 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   );
 
   @override
+  Future<ChatModel?> getSingleChat({
+    String? userId,
+    String? tripId,
+  }) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+      var res = [];
+      if (userId != null) {
+        res = await supabaseClient.rpc(
+          'get_single_dm_chat_head',
+          params: {'user_id_param': user.id, 'receiver_id_param': userId},
+        );
+      }
+      if (tripId != null) {
+        res = await supabaseClient.rpc(
+          'get_single_trip_chat_head',
+          params: {'user_id_param': user.id, 'trip_id_param': tripId},
+        );
+      }
+
+      if (res.isEmpty) {
+        return null;
+      }
+
+      return ChatModel.fromJson(res.first);
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
   Future<ChatModel> insertChat({
     String? name,
     String? tripId,
+    String? userId,
     String? imageUrl,
   }) async {
     try {
-      final res = await supabaseClient
-          .from('chats')
-          .insert({
-            'name': name,
-            'avatar': imageUrl,
-            'trip_id': tripId,
-          })
-          .select("*")
-          .single();
+      log(userId.toString());
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+      if (tripId != null) {
+        final res = await supabaseClient.from('chats').insert({
+          'name': name,
+          'avatar': imageUrl,
+          'trip_id': tripId,
+        });
+        final chatId = res['id'];
+        await insertChatMembers(id: chatId, userId: user.id);
+        final chat = await getSingleChat(userId: userId, tripId: tripId);
+        return chat!;
+      }
 
-      return ChatModel.fromJson(res);
+      final res =
+          await supabaseClient.from('chats').insert({}).select("id").single();
+      final chatId = res['id'];
+      // insert chat members
+      await insertChatMembers(id: chatId, userId: user.id);
+      await insertChatMembers(id: chatId, userId: userId!);
+
+      final chat = await getSingleChat(userId: userId, tripId: tripId);
+
+      return chat!;
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

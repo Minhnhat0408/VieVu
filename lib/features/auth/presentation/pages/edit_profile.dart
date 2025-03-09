@@ -382,8 +382,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                             ),
                                           ],
                                         )),
-                                    DropdownMenuItem(
-                                        value: 'Khác', child: Text('Khác')),
                                   ],
                                   validator: (value) => value == null
                                       ? 'Vui lòng chọn giới tính'

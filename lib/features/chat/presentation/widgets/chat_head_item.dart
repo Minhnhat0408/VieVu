@@ -32,9 +32,15 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
         });
       },
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(widget.chat.imageUrl),
-          radius: 30,
+        leading: CachedNetworkImage(
+          imageUrl: widget.chat.imageUrl ?? 'https://via.placeholder.com/150',
+          imageBuilder: (context, imageProvider) => CircleAvatar(
+            backgroundImage: imageProvider,
+          ),
+          width: 60,
+          height: 60,
+          placeholder: (context, url) => const CircularProgressIndicator(),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
@@ -75,7 +81,7 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
                 : const SizedBox()
             : Container(
                 height: 16,
-                width: 16   ,
+                width: 16,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(10),

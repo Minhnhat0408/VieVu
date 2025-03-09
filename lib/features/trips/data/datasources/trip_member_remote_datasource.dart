@@ -1,0 +1,147 @@
+import 'dart:developer';
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vn_travel_companion/core/error/exceptions.dart';
+import 'package:vn_travel_companion/features/trips/data/models/trip_member_model.dart';
+
+abstract interface class TripMemberRemoteDatasource {
+  Future<List<TripMemberModel>> getTripMembers({
+    required String tripId,
+  });
+
+  Future<TripMemberModel> insertTripMember({
+    required String tripId,
+    required String userId,
+    required String role,
+  });
+
+  Future<TripMemberModel> updateTripMember({
+    required String tripId,
+    required String userId,
+    String? role,
+    bool? isBanned,
+  });
+
+  Future<TripMemberModel?> getMyTripMemberToTrip({
+    required String tripId,
+  });
+
+  Future<void> deleteTripMember({
+    required String tripId,
+    required String userId,
+  });
+}
+
+class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
+  final SupabaseClient supabaseClient;
+
+  TripMemberRemoteDatasourceImpl(
+    this.supabaseClient,
+  );
+
+  @override
+  Future<TripMemberModel?> getMyTripMemberToTrip({
+    required String tripId,
+  }) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+      final response = await supabaseClient
+          .from('trip_participants')
+          .select('*, profiles(*)')
+          .eq('trip_id', tripId)
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+      return response != null ? TripMemberModel.fromJson(response) : null;
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<TripMemberModel>> getTripMembers({
+    required String tripId,
+  }) async {
+    try {
+      final response = await supabaseClient
+          .from('trip_participants')
+          .select('*, profiles(*)')
+          .eq('trip_id', tripId)
+          .order('created_at', ascending: true);
+
+      return response.map((e) => TripMemberModel.fromJson(e)).toList();
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<TripMemberModel> insertTripMember({
+    required String tripId,
+    required String userId,
+    required String role,
+  }) async {
+    try {
+      final response = await supabaseClient
+          .from('trip_participants')
+          .insert({
+            'trip_id': tripId,
+            'user_id': userId,
+            'role': role,
+          })
+          .select('*, profiles(*)')
+          .single();
+
+      return TripMemberModel.fromJson(response);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<TripMemberModel> updateTripMember({
+    required String tripId,
+    required String userId,
+    String? role,
+    bool? isBanned,
+  }) async {
+    try {
+      final buildUpdateObject = {
+        if (role != null) 'role': role,
+        if (isBanned != null) 'is_banned': isBanned,
+      };
+      final response = await supabaseClient
+          .from('trip_participants')
+          .update(buildUpdateObject)
+          .eq('trip_id', tripId)
+          .eq('user_id', userId)
+          .select('*, profiles(*)')
+          .single();
+
+      return TripMemberModel.fromJson(response);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> deleteTripMember({
+    required String tripId,
+    required String userId,
+  }) async {
+    try {
+      await supabaseClient
+          .from('trip_participants')
+          .delete()
+          .eq('trip_id', tripId)
+          .eq('user_id', userId);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+}

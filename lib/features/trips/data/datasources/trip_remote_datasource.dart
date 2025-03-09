@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
+import 'package:vn_travel_companion/features/trips/data/models/trip_member_model.dart';
 import 'package:vn_travel_companion/features/trips/data/models/trip_model.dart';
 
 abstract interface class TripRemoteDatasource {
@@ -183,8 +184,8 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       var query = supabaseClient
           .from('trips')
           .select(
-              '*, saved_services(name,external_link, link_id, location_name)')
-          .eq('owner_id', userId);
+              '*, trip_participants!inner(user_id), saved_services(name,external_link, link_id, location_name)')
+          .eq('trip_participants.user_id', userId);
 
       if (status != null) {
         query = query.eq('status', status);
@@ -231,8 +232,9 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       log('hellooo');
       var query = supabaseClient
           .from('trips')
-          .select('*, saved_services(location_name)')
-          .eq('owner_id', userId);
+          .select(
+              '*, trip_participants!inner(user_id), saved_services(location_name)')
+          .eq('trip_participants.user_id', userId);
       // .eq('saved_services.type_id', 2);
 
       if (status != null) {

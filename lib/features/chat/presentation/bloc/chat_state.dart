@@ -17,6 +17,14 @@ final class ChatCreateTripItinerarySuccess extends ChatState {
   });
 }
 
+final class ChatLoadedSuccess extends ChatState {
+  final Chat chat;
+
+  ChatLoadedSuccess({
+    required this.chat,
+  });
+}
+
 final class ChatsLoadedSuccess extends ChatState {
   final List<Chat> chatHeads;
 

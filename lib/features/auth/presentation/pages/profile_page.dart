@@ -47,23 +47,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return BlocListener<ChatBloc, ChatState>(
       listener: (context, state) {
+        if (state is ChatLoadedSuccess) {
+          displayFullScreenModal(context, ChatDetailsPage(chat: state.chat));
+        }
         if (state is ChatInsertSuccess) {
-          final currentUser =
-              (context.read<AppUserCubit>().state as AppUserLoggedIn).user;
-          context
-              .read<ChatBloc>()
-              .add(InsertChatMembers(id: state.chat.id, userId: user!.id));
-          context.read<ChatBloc>().add(
-              InsertChatMembers(id: state.chat.id, userId: currentUser.id));
-          displayFullScreenModal(
-              context,
-              ChatDetailsPage(
-                  chat: Chat(
-                id: state.chat.id,
-                name: '${user?.lastName} ${user?.firstName}',
-                imageUrl: user?.avatarUrl ?? "",
-                isSeen: false,
-              )));
+          displayFullScreenModal(context, ChatDetailsPage(chat: state.chat));
         }
       },
       child: BlocConsumer<ProfileBloc, ProfileState>(
@@ -78,7 +66,9 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         builder: (context, state) {
           return CustomAppbar(
-            appBarTitle: "${user?.lastName} ${user?.firstName}",
+            appBarTitle: user != null
+                ? "${user?.lastName} ${user?.firstName} ${user?.gender != null ? user!.gender == "Nam" ? "♂️" : "♀️" : ""}"
+                : 'Hồ sơ',
             centerTitle: true,
             actions: [
               if (_isMe)
@@ -93,242 +83,271 @@ class _ProfilePageState extends State<ProfilePage> {
                   icon: const Icon(Icons.edit),
                 ),
             ],
-            body: Column(
-              children: [
-                const SizedBox(height: 20),
-                CachedNetworkImage(
-                  imageUrl: user?.avatarUrl ?? '',
-                  imageBuilder: (context, imageProvider) => CircleAvatar(
-                    radius: 70,
-                    backgroundImage: imageProvider,
-                  ),
-                  fit: BoxFit.cover,
-                  width: 140,
-                  height: 140,
-                ),
-                const SizedBox(height: 20),
-                // if (user?.city != null)
-                //   Padding(
-                //     padding: const EdgeInsets.only(bottom: 10.0),
-                //     child: Row(
-                //       mainAxisAlignment: MainAxisAlignment.center,
-                //       children: [
-                //         const Icon(
-                //           Icons.location_on,
-                //           size: 20,
-                //         ),
-                //         const SizedBox(width: 5),
-                //         Text(
-                //           user?.city ?? '',
-                //           style: const TextStyle(
-                //             fontWeight: FontWeight.bold,
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // Text(
-                //   user?.email ?? '',
-                //   style: const TextStyle(
-                //     color: Colors.grey,
-                //   ),
-                // ),
-                const SizedBox(height: 20),
-                IntrinsicHeight(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '${user?.tripCount} ',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+            body: state is ProfileLoading
+                ? const Center(child: CircularProgressIndicator())
+                : user == null
+                    ? const Center(child: Text('Không tìm thấy người dùng'))
+                    : Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          CachedNetworkImage(
+                            imageUrl: user?.avatarUrl ?? '',
+                            imageBuilder: (context, imageProvider) => Container(
+                              width: 140,
+                              height: 140,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary, // Change this to your desired border color
+                                  width: 2, // Adjust the border thickness
                                 ),
-                                Icon(
-                                  Icons.card_travel,
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              ],
-                            ),
-                            const Text('Chuyến đi'),
-                          ],
-                        ),
-                      ),
-                      const VerticalDivider(
-                        thickness: 2,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "${user!.avgRating}/5 ",
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.star,
-                                  color: Colors.yellow,
-                                )
-                              ],
-                            ),
-                            Text('(${user?.ratingCount}) đánh giá'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (!_isMe)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          context.read<ChatBloc>().add(InsertChat());
-
-                          // displayFullScreenModal(
-                          //     context,
-                          //     ChatDetailsPage(
-                          //         chat: Chat(
-                          //       id: 0,
-                          //       name: '${user?.lastName} ${user?.firstName}',
-                          //       imageUrl: user?.avatarUrl ?? "",
-                          //       isSeen: false,
-                          //     )));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.secondaryContainer,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          'Nhắn tin',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      IconButton(
-
-                          // padding: const EdgeInsets.symmetric(
-                          //     horizontal: 20, vertical: 10),
-                          onPressed: () async {
-                            if (user?.phoneNumber == null) {
-                              return;
-                            }
-                            final Uri callUri =
-                                Uri.parse('tel:${user!.phoneNumber}');
-                            if (await canLaunchUrl(callUri)) {
-                              await launchUrl(callUri);
-                            } else {
-                              throw 'Could not launch $callUri';
-                            }
-                          },
-                          style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .secondaryContainer,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          icon: Icon(
-                            Icons.phone,
-                            size: 20,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          )),
-                    ],
-                  ),
-                Card.outlined(
-                  borderOnForeground: true,
-                  // shadowColor: Theme.of(context).colorScheme.surface,
-
-                  // color: Theme.of(context).colorScheme.secondaryContainer,
-                  margin: const EdgeInsets.all(20),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      children: [
-                        const Row(
-                          children: [
-                            Text(
-                              'Thông tin cá nhân',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                              ),
+                              padding: const EdgeInsets.all(3),
+                              child: CircleAvatar(
+                                radius: 70,
+                                backgroundImage: imageProvider,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        const Divider(),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              user?.city ?? 'Chưa có thông tin',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.alternate_email,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              user?.email ?? 'Chưa có thông tin',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          user?.bio != null
-                              ? "\"${user?.bio} \""
-                              : "Chưa có thông tin",
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
+                            fit: BoxFit.cover,
+                            width: 140,
+                            height: 140,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
+                          const SizedBox(height: 20),
+                          // if (user?.city != null)
+                          //   Padding(
+                          //     padding: const EdgeInsets.only(bottom: 10.0),
+                          //     child: Row(
+                          //       mainAxisAlignment: MainAxisAlignment.center,
+                          //       children: [
+                          //         const Icon(
+                          //           Icons.location_on,
+                          //           size: 20,
+                          //         ),
+                          //         const SizedBox(width: 5),
+                          //         Text(
+                          //           user?.city ?? '',
+                          //           style: const TextStyle(
+                          //             fontWeight: FontWeight.bold,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // Text(
+                          //   user?.email ?? '',
+                          //   style: const TextStyle(
+                          //     color: Colors.grey,
+                          //   ),
+                          // ),
+                          const SizedBox(height: 20),
+                          IntrinsicHeight(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '${user?.tripCount} ',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.card_travel,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          )
+                                        ],
+                                      ),
+                                      const Text('Chuyến đi'),
+                                    ],
+                                  ),
+                                ),
+                                const VerticalDivider(
+                                  thickness: 2,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${user!.avgRating}/5 ",
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const Icon(
+                                            Icons.star,
+                                            color: Colors.yellow,
+                                          )
+                                        ],
+                                      ),
+                                      Text('(${user?.ratingCount}) đánh giá'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          if (!_isMe)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    context.read<ChatBloc>().add(GetSingleChat(
+                                          userId: user!.id,
+                                        ));
+
+                                    // displayFullScreenModal(
+                                    //     context,
+                                    //     ChatDetailsPage(
+                                    //         chat: Chat(
+                                    //       id: 0,
+                                    //       name: '${user?.lastName} ${user?.firstName}',
+                                    //       imageUrl: user?.avatarUrl ?? "",
+                                    //       isSeen: false,
+                                    //     )));
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Nhắn tin',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                IconButton(
+
+                                    // padding: const EdgeInsets.symmetric(
+                                    //     horizontal: 20, vertical: 10),
+                                    onPressed: () async {
+                                      if (user?.phoneNumber == null) {
+                                        return;
+                                      }
+                                      final Uri callUri =
+                                          Uri.parse('tel:${user!.phoneNumber}');
+                                      if (await canLaunchUrl(callUri)) {
+                                        await launchUrl(callUri);
+                                      } else {
+                                        throw 'Could not launch $callUri';
+                                      }
+                                    },
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .primaryContainer,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    icon: Icon(
+                                      Icons.phone,
+                                      size: 20,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    )),
+                              ],
+                            ),
+                          Card.outlined(
+                            borderOnForeground: true,
+                            // shadowColor: Theme.of(context).colorScheme.surface,
+
+                            // color: Theme.of(context).colorScheme.primaryContainer,
+                            margin: const EdgeInsets.all(20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                children: [
+                                  const Row(
+                                    children: [
+                                      Text(
+                                        'Thông tin cá nhân',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  const Divider(),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.location_on,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        user?.city ?? 'Chưa có thông tin',
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.alternate_email,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        user?.email ?? 'Chưa có thông tin',
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text(
+                                    user?.bio != null
+                                        ? "\"${user?.bio} \""
+                                        : "Chưa có thông tin",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
           );
         },
       ),
