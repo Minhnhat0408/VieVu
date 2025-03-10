@@ -31,12 +31,16 @@ class TripItineraryPage extends StatefulWidget {
   State<TripItineraryPage> createState() => _TripItineraryPageState();
 }
 
-class _TripItineraryPageState extends State<TripItineraryPage> {
+class _TripItineraryPageState extends State<TripItineraryPage>
+    with AutomaticKeepAliveClientMixin {
   List<TripItinerary>? _tripItineraries;
   List<bool> _expanded = [];
 
   final List<DateTime> _panels = [];
   final List<DateTime> _selectedDates = [];
+
+  @override
+  bool get wantKeepAlive => true;
   @override
   void initState() {
     super.initState();
@@ -73,6 +77,7 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocConsumer<TripBloc, TripState>(
       listener: (context, state) {
         if (state is TripActionSuccess) {

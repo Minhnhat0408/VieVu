@@ -126,9 +126,7 @@ class _TripDetailPageState extends State<TripDetailPage>
                       });
                     }
                   }
-                  if (state is SavedServiceDeleteSuccess) {
-                    // trip!.locations.remove(state.locationName);
-                  }
+                  
                 },
               ),
               BlocListener<TripItineraryBloc, TripItineraryState>(

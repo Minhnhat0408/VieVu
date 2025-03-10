@@ -5,18 +5,43 @@ import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/search/data/datasources/search_remote_datasource.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
 import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
 
-class ExploreSearchRepositoryImpl implements ExploreSearchRepository {
+class SearchRepositoryImpl implements SearchRepository {
   final SearchRemoteDataSource searchRemoteDataSource;
   final SavedServiceRemoteDatasource savedServiceRemoteDatasource;
   final ConnectionChecker connectionChecker;
-  ExploreSearchRepositoryImpl({
+  SearchRepositoryImpl({
     required this.searchRemoteDataSource,
     required this.savedServiceRemoteDatasource,
     required this.connectionChecker,
   });
+
+  @override
+  Future<Either<Failure, List<HomeSearchResult>>> homeSearch({
+    required String searchText,
+    required int limit,
+    required int offset,
+    String? searchType,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final searchResults = await searchRemoteDataSource.searchHome(
+        searchText: searchText,
+        limit: limit,
+        offset: offset,
+        searchType: searchType,
+      );
+
+      return right(searchResults);
+    } catch (e) {
+      throw left(Failure(e.toString()));
+    }
+  }
   @override
   Future<Either<Failure, List<ExploreSearchResult>>> searchAll({
     required String searchText,

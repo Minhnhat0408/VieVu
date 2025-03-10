@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
 import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
 
 part 'search_event.dart';
 part 'search_state.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
-  final ExploreSearchRepository _exploreSearchRepository;
+  final SearchRepository _exploreSearchRepository;
   SearchBloc({
-    required ExploreSearchRepository repository,
+    required SearchRepository repository,
   })  : _exploreSearchRepository = repository,
         super(SearchInitial()) {
     on<SearchEvent>((event, emit) {
@@ -20,6 +21,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<SearchHistory>(_onSearchHistory);
     on<EventsSearch>(_onEventsSearch);
     on<SearchExternalApi>(_onSearchExternalApi);
+    on<SearchHome>(_onSearchHome);
   }
 
   void _onExploreSearch(ExploreSearch event, Emitter<SearchState> emit) async {
@@ -33,6 +35,19 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     res.fold(
       (l) => emit(SearchError(message: l.message)),
       (r) => emit(SearchSuccess(results: r)),
+    );
+  }
+
+  void _onSearchHome(SearchHome event, Emitter<SearchState> emit) async {
+    final res = await _exploreSearchRepository.homeSearch(
+      searchText: event.searchText,
+      limit: event.limit,
+      offset: event.offset,
+      searchType: event.searchType,
+    );
+    res.fold(
+      (l) => emit(SearchError(message: l.message)),
+      (r) => emit(SearchHomeSuccess(results: r)),
     );
   }
 

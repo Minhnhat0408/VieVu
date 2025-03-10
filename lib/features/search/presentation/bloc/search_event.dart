@@ -82,3 +82,18 @@ class SearchHistory extends SearchEvent {
     this.externalLink,
   });
 }
+
+
+class SearchHome extends SearchEvent {
+  final String searchText;
+  final int limit;
+  final int offset;
+  final String? searchType;
+
+  SearchHome({
+    required this.searchText,
+    required this.limit,
+    required this.offset,
+    this.searchType,
+  });
+}

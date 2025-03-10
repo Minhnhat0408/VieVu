@@ -98,13 +98,23 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
       if (res == null) {
         throw const ServerException('Failed to insert saved service');
       }
-      await supabaseClient
+
+      final trip = await supabaseClient
           .from('trips')
-          .update({
-            'cover': res['cover'],
-          })
+          .select('cover, locations')
           .eq('id', tripId)
-          .isFilter('cover', null);
+          .single();
+
+      final newLocs = trip['locations'].contains(locationName)
+          ? trip['locations']
+          : [...trip['locations'], locationName];
+      final builObject = {
+        if (trip['cover'] == null) 'cover': res['cover'],
+        'locations': newLocs,
+      };
+      if (trip['cover'] == null || !trip['locations'].contains(locationName)) {
+        await supabaseClient.from('trips').update(builObject).eq('id', tripId);
+      }
 
       return SavedServiceModel.fromJson(res);
     } catch (e) {
@@ -116,13 +126,27 @@ class SavedServiceRemoteDatasourceImpl implements SavedServiceRemoteDatasource {
   @override
   Future deleteSavedTrips({required int linkId, required String tripId}) async {
     try {
-      final query = supabaseClient
+      await supabaseClient
           .from('saved_services')
           .delete()
           .eq('link_id', linkId)
           .eq('trip_id', tripId);
 
-      await query;
+      // remove location from trip if no saved service in that location
+      final trip = await supabaseClient
+          .from('trips')
+          .select('saved_services(location_name)')
+          .eq('id', tripId)
+          .single();
+
+      final locations = (trip['saved_services'] as List)
+          .map((e) => e['location_name'])
+          .toSet()
+          .toList();
+
+      await supabaseClient.from('trips').update({
+        'locations': locations,
+      }).eq('id', tripId);
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());

@@ -6,9 +6,9 @@ import 'package:vn_travel_companion/features/search/domain/repositories/explore_
 part 'search_history_state.dart';
 
 class SearchHistoryCubit extends Cubit<SearchHistoryState> {
-  final ExploreSearchRepository _exploreSearchRepository;
+  final SearchRepository _exploreSearchRepository;
   SearchHistoryCubit({
-    required ExploreSearchRepository repository,
+    required SearchRepository repository,
   })  : _exploreSearchRepository = repository,
         super(SearchHistoryInitial());
 

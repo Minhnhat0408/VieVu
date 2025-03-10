@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/features/search/data/models/explore_search_result_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:vn_travel_companion/features/search/data/models/home_search_result_model.dart';
 
 abstract interface class SearchRemoteDataSource {
   Future<List<ExploreSearchResultModel>> exploreSearch({
@@ -23,6 +24,13 @@ abstract interface class SearchRemoteDataSource {
     required String searchText,
     required int limit,
     required int page,
+  });
+
+  Future<List<HomeSearchResultModel>> searchHome({
+    required String searchText,
+    required int limit,
+    required int offset,
+    String? searchType,
   });
 
   Future<List<ExploreSearchResultModel>> searchExternalApi({
@@ -54,6 +62,30 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
     this.supabaseClient,
     this.client,
   );
+
+  @override
+  Future<List<HomeSearchResultModel>> searchHome({
+    required String searchText,
+    required int limit,
+    required int offset,
+    String? searchType,
+  }) async {
+    try {
+      final response =
+          await supabaseClient.rpc('search_profiles_and_trips', params: {
+        'keyword': searchText,
+        'result_limit': limit,
+        'result_offset': offset,
+        'search_type': searchType,
+      });
+      final List<Map<String, dynamic>> data =
+          List<Map<String, dynamic>>.from(response);
+      return data.map((e) => HomeSearchResultModel.fromJson(e)).toList();
+    } catch (e) {
+      log(e.toString());
+      throw Exception(e.toString());
+    }
+  }
 
   @override
   Future<List<ExploreSearchResultModel>> searchAll({

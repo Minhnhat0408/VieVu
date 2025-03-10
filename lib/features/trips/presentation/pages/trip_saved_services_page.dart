@@ -7,22 +7,21 @@ import 'package:vn_travel_companion/features/trips/domain/entities/saved_service
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/add_saved_services_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_big_card.dart';
 
 class TripSavedServicesPage extends StatefulWidget {
   final Trip trip;
   final TripMember? currentUser;
-  const TripSavedServicesPage({super.key, required this.trip,
-    this.currentUser});
+  const TripSavedServicesPage(
+      {super.key, required this.trip, this.currentUser});
 
   @override
   State<TripSavedServicesPage> createState() => _TripSavedServicesPageState();
 }
 
 class _TripSavedServicesPageState extends State<TripSavedServicesPage>
-    with AutomaticKeepAliveClientMixin<TripSavedServicesPage> {
+    with AutomaticKeepAliveClientMixin {
   final Map<String, int> _panels = {
     "Địa điểm tham quan": 2,
     "Đồ ăn & đồ uống": 1,
@@ -31,38 +30,35 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage>
     "Điểm đến du lịch": 0,
   };
 
-
   @override
   bool get wantKeepAlive => true;
+
   final List<bool> _expanded = List.generate(6, (index) => false);
   List<SavedService>? _savedServices;
 
   @override
   void initState() {
     super.initState();
+    log("TripSavedServicesPage initState");
     if (context.read<SavedServiceBloc>().state is SavedServicesLoadedSuccess) {
-      loadSavedServices(
-          context.read<SavedServiceBloc>().state as SavedServicesLoadedSuccess);
-    }
-
-  }
-
-  void loadSavedServices(SavedServicesLoadedSuccess state) {
-    for (int i in [0, 1, 2, 4, 5]) {
-      if (state.savedServices.any((item) => item.typeId == i)) {
-        _expanded[i] = true;
+      final state =
+          context.read<SavedServiceBloc>().state as SavedServicesLoadedSuccess;
+      for (int i in [0, 1, 2, 4, 5]) {
+        if (state.savedServices.any((item) => item.typeId == i)) {
+          _expanded[i] = true;
+        }
       }
+      setState(() {
+        _savedServices = state.savedServices;
+      });
     }
-    setState(() {
-      _savedServices = state.savedServices;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return CustomScrollView(
-      key: const PageStorageKey('trip-saved-services-page'),
+      // key: const PageStorageKey('trip-saved-services-page'),
       slivers: [
         SliverOverlapInjector(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
@@ -87,6 +83,19 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage>
         ),
         BlocConsumer<SavedServiceBloc, SavedServiceState>(
           listener: (context, state) {
+            log("SavedServiceBloc state: ${state.toString()}");
+            if (state is SavedServicesLoadedSuccess) {
+              if (mounted) {
+                setState(() {
+                  for (int i in [0, 1, 2, 4, 5]) {
+                    if (state.savedServices.any((item) => item.typeId == i)) {
+                      _expanded[i] = true;
+                    }
+                  }
+                  _savedServices = state.savedServices;
+                });
+              }
+            }
             if (state is SavedServiceActionSucess &&
                 state.tripId == widget.trip.id) {
               setState(() {

@@ -31,3 +31,10 @@ final class SearchOverAllSuccess extends SearchState {
   });
 }
 
+final class SearchHomeSuccess extends SearchState {
+  final List<HomeSearchResult> results;
+
+  SearchHomeSuccess({
+    required this.results,
+  });
+}

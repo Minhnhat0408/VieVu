@@ -321,8 +321,8 @@ void _initSearch() {
         serviceLocator(),
       ),
     )
-    ..registerFactory<ExploreSearchRepository>(
-      () => ExploreSearchRepositoryImpl(
+    ..registerFactory<SearchRepository>(
+      () => SearchRepositoryImpl(
         searchRemoteDataSource: serviceLocator(),
         savedServiceRemoteDatasource: serviceLocator(),
         connectionChecker: serviceLocator(),

@@ -108,7 +108,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     try {
       var query = supabaseClient
           .from('trips')
-          .select("*, saved_services(location_name), profiles(*)")
+          .select("*, saved_services(count), profiles(*)")
           .eq('is_published', true);
 
       if (status != null) {
@@ -137,16 +137,13 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
 
       return response.map((e) {
         final tripItem = e;
-        tripItem['service_count'] = e['saved_services'].length;
-        tripItem['locations'] = <String>[];
-        final locations = (e['saved_services'] as List)
-            .map((e) => e['location_name'] as String);
+        tripItem['service_count'] = e['saved_services'][0]['count'];
 
-        tripItem['locations'] = locations.toSet().toList();
-
+  
         return TripModel.fromJson(tripItem);
       }).toList();
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }
@@ -214,10 +211,6 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         final services = e['saved_services'] as List;
 
         tripItem['service_count'] = e['saved_services'].length;
-        tripItem['locations'] = <String>[];
-        final locations = services.map((e) => e['location_name'] as String);
-
-        tripItem['locations'] = locations.toSet().toList();
         final serviceIndex = services.indexWhere((element) {
           return element['link_id'] == id;
         });
@@ -245,8 +238,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       log('hellooo');
       var query = supabaseClient
           .from('trips')
-          .select(
-              '*, trip_participants!inner(user_id), saved_services(location_name)')
+          .select('*, trip_participants!inner(user_id), saved_services(count)')
           .eq('trip_participants.user_id', userId);
       // .eq('saved_services.type_id', 2);
 
@@ -264,13 +256,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
 
       return response.map((e) {
         final tripItem = e;
-        tripItem['service_count'] = e['saved_services'].length;
-
-        tripItem['locations'] = <String>[];
-        final locations = (e['saved_services'] as List)
-            .map((e) => e['location_name'] as String);
-
-        tripItem['locations'] = locations.toSet().toList();
+        tripItem['service_count'] = e['saved_services'][0]['count'];
 
         return TripModel.fromJson(tripItem);
       }).toList();
@@ -288,17 +274,12 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     try {
       final res = await supabaseClient
           .from('trips')
-          .select('*,  saved_services(location_name)')
+          .select('*,  saved_services(count)')
           .eq('id', tripId)
           .single();
 
       final tripItem = res;
-      tripItem['service_count'] = res['saved_services'].length;
-      tripItem['locations'] = <String>[];
-      final locations = (res['saved_services'] as List)
-          .map((e) => e['location_name'] as String);
-
-      tripItem['locations'] = locations.toSet().toList();
+      tripItem['service_count'] = res['saved_services'][0]['count'];
 
       return TripModel.fromJson(tripItem);
     } catch (e) {
@@ -391,7 +372,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
             .from('trips')
             .update(updateData)
             .eq('id', tripId)
-            .select('*, saved_services(location_name)')
+            .select('*, saved_services(count)')
             .maybeSingle(); // Prevents crash if no row is found
 
         if (res == null) {
@@ -399,12 +380,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         }
 
         final tripItem = res;
-        tripItem['service_count'] = res['saved_services'].length;
-        tripItem['locations'] = <String>[];
-        final locations = (res['saved_services'] as List)
-            .map((e) => e['location_name'] as String);
-
-        tripItem['locations'] = locations.toSet().toList();
+        tripItem['service_count'] = res['saved_services'][0]['count'];
 
         return TripModel.fromJson(tripItem);
       } else {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -10,8 +11,11 @@ import 'package:vn_travel_companion/core/constants/transport_options.dart';
 import 'package:vn_travel_companion/core/constants/trip_filters.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
+import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
+import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/home_search_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_status_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_transports_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_post_item.dart';
@@ -58,6 +62,7 @@ class _TripPostsPageState extends State<TripPostsPage> {
 
   DateTimeRange? selectedDateRange;
   TripStatus? _status;
+  List<HomeSearchResult> searchResult = [];
   final pageSize = 10;
   int totalRecordCount = 0;
   @override
@@ -100,36 +105,38 @@ class _TripPostsPageState extends State<TripPostsPage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          SearchAnchor(
-            builder: (context, controller) => IconButton(
-              onPressed: () {
-                controller.openView();
-              },
-              icon: const Icon(Icons.search),
-              iconSize: 24,
-              constraints: const BoxConstraints(
-                minWidth: 46, // Set the minimum width of the button
-                minHeight: 46, // Set the minimum height of the button
-              ),
-              style: IconButton.styleFrom(
-                backgroundColor:
-                    Theme.of(context).colorScheme.surfaceContainerHigh,
-              ),
-            ),
-            suggestionsBuilder: (context, controller) => [
-              ListTile(
-                title: const Text('Suggestion 1'),
-                onTap: () {
-                  controller.text = 'Suggestion 1';
-                },
-              ),
-              ListTile(
-                title: const Text('Suggestion 2'),
-                onTap: () {
-                  controller.text = 'Suggestion 2';
-                },
-              ),
-            ],
+          BlocConsumer<SearchBloc, SearchState>(
+            listener: (context, state) {
+              if (state is SearchHomeSuccess) {
+                setState(() {
+                  searchResult = state.results;
+                });
+              }
+            },
+            builder: (context, state) {
+              return Hero(
+                tag: 'homeSearch',
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const HomeSearchPage(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.search),
+                  iconSize: 24,
+                  constraints: const BoxConstraints(
+                    minWidth: 46, // Set the minimum width of the button
+                    minHeight: 46, // Set the minimum height of the button
+                  ),
+                  style: IconButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainerHigh,
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(width: 10),
           IconButton(

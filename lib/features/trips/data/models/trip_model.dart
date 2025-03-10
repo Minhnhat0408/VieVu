@@ -50,7 +50,7 @@ class TripModel extends Trip {
           : null,
       status: json['status'],
       isPublished: json['is_published'],
-      locations: json['locations'] ?? [],
+      locations: List<String>.from(json['locations']),
     );
   }
 }

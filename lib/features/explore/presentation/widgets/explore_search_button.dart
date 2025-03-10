@@ -9,7 +9,11 @@ class ExploreSearchButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.of(context).push(ExploreSearchPage.route());
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const ExploreSearchPage(),
+          ),
+        );
       },
       style: ElevatedButton.styleFrom(
         elevation: 4,

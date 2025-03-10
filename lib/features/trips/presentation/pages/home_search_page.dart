@@ -1,60 +1,40 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
 import 'package:vn_travel_companion/features/search/presentation/widgets/explore_search_item.dart';
 
-class ExploreSearchPage extends StatefulWidget {
-  // static route() {
-  //   return PageRouteBuilder(
-  //     pageBuilder: (context, animation, secondaryAnimation) =>
-  //         const ExploreSearchPage(),
-  //     fullscreenDialog: true,
-
-  //     reverseTransitionDuration: const Duration(milliseconds: 500),
-  //     transitionDuration: const Duration(milliseconds: 500),
-  //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-  //       // Return a FadeTransition for the page content change
-  //       return FadeTransition(
-  //         opacity: animation,
-  //         child: child,
-  //       );
-  //     }, // Set duration
-  //   );
-  // }
-
+class HomeSearchPage extends StatefulWidget {
   final String? initialKeyword;
-  const ExploreSearchPage({super.key, this.initialKeyword});
+  const HomeSearchPage({super.key, this.initialKeyword});
 
   @override
-  State<ExploreSearchPage> createState() => _ExploreSearchState();
+  State<HomeSearchPage> createState() => _HomeSearchState();
 }
 
-class _ExploreSearchState extends State<ExploreSearchPage> {
+class _HomeSearchState extends State<HomeSearchPage> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   String _keyword = '';
-  final PagingController<int, ExploreSearchResult> _pagingController =
+  final PagingController<int, HomeSearchResult> _pagingController =
       PagingController(firstPageKey: 0);
   final List<String> _filterOptions = [
-    'Sự kiện',
-    'Địa điểm du lịch', // Attractions
-    'Điểm đến', // Locations
-    'Khách sạn', // Hotels
-    'Nhà hàng', // Restaurants
-    'Cửa hàng', // Shops
-    'Loại hình du lịch', // Travel Types
+    'Tất cả',
+    'Người dùng',
+    'Chuyến đi',
   ];
   int totalRecordCount = 0;
   final int pageSize = 10;
-  String _selectedFilter = ''; // Default filter is 'All'
+  String _selectedFilter = 'Tất cả'; // Default filter is 'All'
 
   // Handle text changes with debounce
   void _onSearchChanged(String keyword) {
@@ -73,8 +53,7 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
   @override
   void initState() {
     super.initState();
-    context.read<SearchHistoryCubit>().getSearchHistory(
-        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id);
+
     if (widget.initialKeyword != null) {
       _searchController.text = widget.initialKeyword!;
     }
@@ -82,39 +61,12 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
       _onSearchChanged(_searchController.text);
     });
     _pagingController.addPageRequestListener((pageKey) {
-      if (_selectedFilter == 'Sự kiện') {
-        context.read<SearchBloc>().add(EventsSearch(
-              searchText: _keyword,
-              limit: pageSize,
-              page: (pageKey ~/ pageSize) + 1,
-            ));
-      } else if (_selectedFilter == 'Khách sạn' ||
-          _selectedFilter == 'Nhà hàng' ||
-          _selectedFilter == 'Cửa hàng') {
-        log('calling external api');
-        context.read<SearchBloc>().add(SearchExternalApi(
-              searchText: _keyword,
-              limit: pageSize,
-              page: (pageKey ~/ pageSize) + 1,
-              searchType: _mapFilterToSearchType(_selectedFilter),
-            ));
-      } else {
-        final searchType = _mapFilterToSearchType(_selectedFilter);
-        if (searchType == 'all') {
-          context.read<SearchBloc>().add(SearchAll(
-                searchText: _keyword,
-                limit: pageSize,
-                offset: pageKey,
-              ));
-        } else {
-          context.read<SearchBloc>().add(ExploreSearch(
-                searchText: _keyword,
-                limit: pageSize - 1,
-                offset: pageKey,
-                searchType: searchType,
-              ));
-        }
-      }
+      context.read<SearchBloc>().add(SearchHome(
+            searchText: _keyword,
+            searchType: _mapFilterToSearchType(_selectedFilter),
+            offset: pageKey,
+            limit: pageSize,
+          ));
     });
   }
 
@@ -126,22 +78,15 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
     super.dispose();
   }
 
-  String _mapFilterToSearchType(String filter) {
+  String? _mapFilterToSearchType(String filter) {
     switch (filter) {
-      case 'Địa điểm du lịch':
-        return 'attractions';
-      case 'Điểm đến':
-        return 'locations';
-      case 'Sự kiện':
-        return 'events';
-      case 'Khách sạn':
-        return 'hotel';
-      case 'Nhà hàng':
-        return 'restaurant';
-      case 'Cửa hàng':
-        return 'shop';
+      case 'Người dùng':
+        return 'profile';
+      case 'Chuyến đi':
+        return 'trip';
+
       default:
-        return 'all';
+        return null;
     }
   }
 
@@ -185,7 +130,7 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
         centerTitle: true,
         toolbarHeight: 90,
         title: Hero(
-          tag: 'exploreSearch',
+          tag: 'homeSearch',
           child: SearchBar(
             controller: _searchController,
             autoFocus: true,
@@ -224,7 +169,7 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
       ),
       body: BlocConsumer<SearchBloc, SearchState>(
         listener: (context, state) {
-          if (state is SearchSuccess) {
+          if (state is SearchHomeSuccess) {
             totalRecordCount += state.results.length;
             final next = totalRecordCount;
 
@@ -249,12 +194,8 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
                         key: _keyword.isEmpty
                             ? const Key('searchHistory')
                             : const Key('searchResults'),
-                        options: _keyword.isEmpty
-                            ? ["Tìm kiếm gần đây"]
-                            : _filterOptions,
-                        selectedOption: _keyword.isEmpty
-                            ? "Tìm kiếm gần đây"
-                            : _selectedFilter,
+                        options: _filterOptions,
+                        selectedOption: _selectedFilter,
                         onOptionSelected: _onFilterChanged,
                         isFiltering: state is SearchLoading)),
               ),
@@ -265,51 +206,57 @@ class _ExploreSearchState extends State<ExploreSearchPage> {
                   color: Theme.of(context).colorScheme.primaryContainer,
                 ),
               ),
-              if (_keyword.isEmpty)
-                SliverToBoxAdapter(
-                  child: BlocBuilder<SearchHistoryCubit, SearchHistoryState>(
-                    builder: (context, state) {
-                      if (state is SearchHistoryLoading) {
-                        return const SizedBox(
-                          height: 600,
-                          child: Center(
-                              child: CircularProgressIndicator.adaptive()),
-                        );
-                      }
-
-                      if (state is SearchHistorySuccess) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 60.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ExploreSearchItem(
-                                changeSearchText: changeSearchText,
-                              ),
-                              ...state.searchHistory.map((e) =>
-                                  ExploreSearchItem(
-                                      result: e,
-                                      changeSearchText: changeSearchText)),
-                            ],
-                          ),
-                        );
-                      }
-                      return const SizedBox();
-                    },
-                  ),
-                ),
               if (_keyword.isNotEmpty)
                 SliverPadding(
                   padding: const EdgeInsets.only(bottom: 70.0),
-                  sliver: PagedSliverList<int, ExploreSearchResult>(
+                  sliver: PagedSliverList<int, HomeSearchResult>(
                     pagingController: _pagingController,
                     builderDelegate:
-                        PagedChildBuilderDelegate<ExploreSearchResult>(
+                        PagedChildBuilderDelegate<HomeSearchResult>(
                       itemBuilder: (context, item, index) {
-                        return ExploreSearchItem(
-                            result: item,
-                            isDetailed: true,
-                            changeSearchText: changeSearchText);
+                        return ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          leading: CachedNetworkImage(
+                            imageUrl: item.cover,
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                            imageBuilder: (context, imageProvider) => Container(
+                              width: 60,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                shape: item.type == 'trip'
+                                    ? BoxShape.rectangle
+                                    : BoxShape.circle,
+                                // borderRadius: BorderRadius.circular(8),
+                                image: DecorationImage(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                          minLeadingWidth: 60,
+                          title: Text(item.name),
+                          subtitle: item.locations != null
+                              ? Text(item.locations ?? "",
+                                  maxLines: 1, overflow: TextOverflow.ellipsis)
+                              : null,
+                          trailing: item.type == 'trip'
+                              ? const Icon(Icons.card_travel)
+                              : const Icon(Icons.person),
+                          onTap: () {
+                            // context.read<SearchBloc>().add(SearchHistory(
+                            //       searchText: item.title,
+                            //       userId: (context.read<AppUserCubit>().state
+                            //               as AppUserLoggedIn)
+                            //           .user
+                            //           .id,
+                            //     ));
+                          },
+                        );
                       },
                       firstPageProgressIndicatorBuilder: (_) =>
                           const Center(child: CircularProgressIndicator()),

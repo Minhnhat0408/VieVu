@@ -1,15 +1,24 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
 
-abstract interface class ExploreSearchRepository {
-    Future<Either<Failure,List<ExploreSearchResult>>> searchAll({
+abstract interface class SearchRepository {
+  Future<Either<Failure, List<ExploreSearchResult>>> searchAll({
     required String searchText,
     required int limit,
     required int offset,
     String? tripId,
   });
-  Future<Either<Failure,List<ExploreSearchResult>>> exploreSearch({
+
+  Future<Either<Failure, List<HomeSearchResult>>> homeSearch({
+    required String searchText,
+    required int limit,
+    required int offset,
+    String? searchType,
+  });
+
+  Future<Either<Failure, List<ExploreSearchResult>>> exploreSearch({
     required String searchText,
     required int limit,
     required int offset,
@@ -17,16 +26,14 @@ abstract interface class ExploreSearchRepository {
     String searchType = 'all',
   });
 
-  Future<Either<Failure,List<ExploreSearchResult>>> searchEvents({
+  Future<Either<Failure, List<ExploreSearchResult>>> searchEvents({
     required String searchText,
     required int limit,
     String? tripId,
     required int page,
   });
 
-
-
-  Future<Either<Failure,List<ExploreSearchResult>>> searchExternalApi({
+  Future<Either<Failure, List<ExploreSearchResult>>> searchExternalApi({
     required String searchText,
     required int limit,
     String? tripId,
@@ -34,7 +41,7 @@ abstract interface class ExploreSearchRepository {
     required String searchType,
   });
 
-  Future<Either<Failure,bool>> upsertSearchHistory({
+  Future<Either<Failure, bool>> upsertSearchHistory({
     String? searchText,
     String? cover,
     required String userId,
@@ -44,8 +51,7 @@ abstract interface class ExploreSearchRepository {
     String? externalLink,
   });
 
-  Future<Either<Failure,List<ExploreSearchResult>>> getSearchHistory({
+  Future<Either<Failure, List<ExploreSearchResult>>> getSearchHistory({
     required String userId,
   });
-
 }
