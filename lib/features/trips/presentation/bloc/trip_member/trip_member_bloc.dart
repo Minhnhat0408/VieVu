@@ -2,25 +2,29 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_member_repository.dart';
+import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 
 part 'trip_member_event.dart';
 part 'trip_member_state.dart';
 
 class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
   final TripMemberRepository _tripMemberRepository;
+  final CurrentTripMemberInfoCubit _currentTripMemberInfoCubit;
   TripMemberBloc({
     required TripMemberRepository tripMemberRepository,
+    required CurrentTripMemberInfoCubit currentTripMemberInfoCubit,
   })  : _tripMemberRepository = tripMemberRepository,
+        _currentTripMemberInfoCubit = currentTripMemberInfoCubit,
         super(TripMemberInitial()) {
     on<TripMemberEvent>((event, emit) {});
     on<GetTripMembers>(_onGetTripMembers);
     on<InsertTripMember>(_onInsertTripMember);
     on<UpdateTripMember>(_onUpdateTripMember);
     on<DeleteTripMember>(_onDeleteTripMember);
-
   }
 
-  void _onInsertTripMember(InsertTripMember event, Emitter<TripMemberState> emit) async {
+  void _onInsertTripMember(
+      InsertTripMember event, Emitter<TripMemberState> emit) async {
     emit(TripMemberActionLoading());
     final res = await _tripMemberRepository.insertTripMember(
       tripId: event.tripId,
@@ -29,11 +33,14 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
     );
     res.fold(
       (l) => emit(TripMemberFailure(message: l.message)),
-      (r) => emit(TripMemberInsertedSuccess(tripMember: r)),
+      (r) {
+        _currentTripMemberInfoCubit.loadTripMemberToTrip(tripId: event.tripId);
+      },
     );
   }
 
-  void _onUpdateTripMember(UpdateTripMember event, Emitter<TripMemberState> emit) async {
+  void _onUpdateTripMember(
+      UpdateTripMember event, Emitter<TripMemberState> emit) async {
     emit(TripMemberActionLoading());
     final res = await _tripMemberRepository.updateTripMember(
       tripId: event.tripId,
@@ -43,12 +50,13 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
     );
     res.fold(
       (l) => emit(TripMemberFailure(message: l.message)),
-      (r) => emit(TripMemberUpdatedSuccess(tripMember: r)),
+      (r) => _currentTripMemberInfoCubit.loadTripMemberToTrip(
+          tripId: event.tripId),
     );
   }
 
-
-  void _onDeleteTripMember(DeleteTripMember event, Emitter<TripMemberState> emit) async {
+  void _onDeleteTripMember(
+      DeleteTripMember event, Emitter<TripMemberState> emit) async {
     emit(TripMemberActionLoading());
     final res = await _tripMemberRepository.deleteTripMember(
       tripId: event.tripId,
@@ -56,11 +64,13 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
     );
     res.fold(
       (l) => emit(TripMemberFailure(message: l.message)),
-      (r) => emit(TripMemberDeletedSuccess(tripMemberId: event.userId)),
+      (r) => _currentTripMemberInfoCubit.loadTripMemberToTrip(
+          tripId: event.tripId),
     );
   }
 
-  void _onGetTripMembers(GetTripMembers event, Emitter<TripMemberState> emit) async {
+  void _onGetTripMembers(
+      GetTripMembers event, Emitter<TripMemberState> emit) async {
     emit(TripMemberLoading());
     final res = await _tripMemberRepository.getTripMembers(
       tripId: event.tripId,
@@ -70,6 +80,4 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
       (r) => emit(TripMemberLoadedSuccess(tripMembers: r)),
     );
   }
-
-
 }

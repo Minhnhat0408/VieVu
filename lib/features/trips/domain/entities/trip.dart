@@ -1,3 +1,5 @@
+import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
+
 class Trip {
   final String id;
   final String name;
@@ -7,7 +9,7 @@ class Trip {
   final DateTime? endDate;
   final DateTime createdAt;
   final int? maxMember;
-  final String userId;
+  final User? user;
   final String status;
   final bool isPublished;
   final List<String> locations;
@@ -29,11 +31,9 @@ class Trip {
     this.maxMember,
     required this.locations,
     required this.serviceCount,
-    required this.userId,
+     this.user,
     required this.status,
     required this.isPublished,
     this.transports,
   });
 }
-
-

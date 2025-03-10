@@ -13,7 +13,9 @@ import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_se
 
 class TripSavedServicesPage extends StatefulWidget {
   final Trip trip;
-  const TripSavedServicesPage({super.key, required this.trip});
+  final TripMember? currentUser;
+  const TripSavedServicesPage({super.key, required this.trip,
+    this.currentUser});
 
   @override
   State<TripSavedServicesPage> createState() => _TripSavedServicesPageState();
@@ -29,6 +31,7 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage>
     "Điểm đến du lịch": 0,
   };
 
+
   @override
   bool get wantKeepAlive => true;
   final List<bool> _expanded = List.generate(6, (index) => false);
@@ -38,11 +41,13 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage>
   void initState() {
     super.initState();
     if (context.read<SavedServiceBloc>().state is SavedServicesLoadedSuccess) {
-      loadSavedServices(context.read<SavedServiceBloc>().state);
+      loadSavedServices(
+          context.read<SavedServiceBloc>().state as SavedServicesLoadedSuccess);
     }
+
   }
 
-  void loadSavedServices(state) {
+  void loadSavedServices(SavedServicesLoadedSuccess state) {
     for (int i in [0, 1, 2, 4, 5]) {
       if (state.savedServices.any((item) => item.typeId == i)) {
         _expanded[i] = true;
@@ -68,12 +73,13 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage>
               "${_savedServices != null ? _savedServices!.length : widget.trip.serviceCount} mục đã lưu",
               style: const TextStyle(fontSize: 16)),
           actions: [
-            ElevatedButton(
-                onPressed: () {
-                  displayFullScreenModal(
-                      context, AddSavedServicesPage(trip: widget.trip));
-                },
-                child: const Text('Thêm')),
+            if (widget.currentUser != null)
+              ElevatedButton(
+                  onPressed: () {
+                    displayFullScreenModal(
+                        context, AddSavedServicesPage(trip: widget.trip));
+                  },
+                  child: const Text('Thêm')),
             const SizedBox(width: 20),
           ],
           pinned: true,

@@ -9,13 +9,13 @@ abstract interface class TripMemberRemoteDatasource {
     required String tripId,
   });
 
-  Future<TripMemberModel> insertTripMember({
+  Future insertTripMember({
     required String tripId,
     required String userId,
     required String role,
   });
 
-  Future<TripMemberModel> updateTripMember({
+  Future updateTripMember({
     required String tripId,
     required String userId,
     String? role,
@@ -81,30 +81,24 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
   }
 
   @override
-  Future<TripMemberModel> insertTripMember({
+  Future insertTripMember({
     required String tripId,
     required String userId,
     required String role,
   }) async {
     try {
-      final response = await supabaseClient
-          .from('trip_participants')
-          .insert({
-            'trip_id': tripId,
-            'user_id': userId,
-            'role': role,
-          })
-          .select('*, profiles(*)')
-          .single();
-
-      return TripMemberModel.fromJson(response);
+      await supabaseClient.from('trip_participants').insert({
+        'trip_id': tripId,
+        'user_id': userId,
+        'role': role,
+      });
     } catch (e) {
       throw ServerException(e.toString());
     }
   }
 
   @override
-  Future<TripMemberModel> updateTripMember({
+  Future updateTripMember({
     required String tripId,
     required String userId,
     String? role,
@@ -115,15 +109,11 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
         if (role != null) 'role': role,
         if (isBanned != null) 'is_banned': isBanned,
       };
-      final response = await supabaseClient
+      await supabaseClient
           .from('trip_participants')
           .update(buildUpdateObject)
           .eq('trip_id', tripId)
-          .eq('user_id', userId)
-          .select('*, profiles(*)')
-          .single();
-
-      return TripMemberModel.fromJson(response);
+          .eq('user_id', userId);
     } catch (e) {
       throw ServerException(e.toString());
     }

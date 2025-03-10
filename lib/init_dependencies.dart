@@ -491,6 +491,7 @@ void _initTripMember() {
     ..registerLazySingleton(
       () => TripMemberBloc(
         tripMemberRepository: serviceLocator(),
+        currentTripMemberInfoCubit: serviceLocator(),
       ),
     );
 }

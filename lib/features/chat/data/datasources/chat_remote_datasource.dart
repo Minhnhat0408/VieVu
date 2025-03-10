@@ -116,11 +116,15 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         throw const ServerException("Không tìm thấy người dùng");
       }
       if (tripId != null) {
-        final res = await supabaseClient.from('chats').insert({
-          'name': name,
-          'avatar': imageUrl,
-          'trip_id': tripId,
-        });
+        final res = await supabaseClient
+            .from('chats')
+            .insert({
+              'name': name,
+              'avatar': imageUrl,
+              'trip_id': tripId,
+            })
+            .select("id")
+            .single();
         final chatId = res['id'];
         await insertChatMembers(id: chatId, userId: user.id);
         final chat = await getSingleChat(userId: userId, tripId: tripId);
@@ -138,8 +142,14 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
 
       return chat!;
     } catch (e) {
-      log(e.toString());
-      throw ServerException(e.toString());
+      final a = e as PostgrestException;
+
+      if (a.code == '23505') {
+        // log('Chat already exists');
+        throw "Chat already exists";
+      } else {
+        throw ServerException(e.toString());
+      }
     }
   }
 

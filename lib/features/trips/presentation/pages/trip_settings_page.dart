@@ -90,9 +90,7 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
           BlocListener<TripMemberBloc, TripMemberState>(
             listener: (context, state) {
               if (state is TripMemberDeletedSuccess) {
-                Navigator.of(context)
-                  ..pop()
-                  ..pop();
+                Navigator.of(context).pop();
               }
             },
           ),

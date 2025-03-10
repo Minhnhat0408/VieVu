@@ -20,8 +20,8 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      final tripMember =
-          await tripMemberRemoteDatasource.getMyTripMemberToTrip(tripId: tripId);
+      final tripMember = await tripMemberRemoteDatasource.getMyTripMemberToTrip(
+          tripId: tripId);
       return right(tripMember);
     } on ServerException catch (e) {
       return left(Failure(e.message));
@@ -62,7 +62,7 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
   }
 
   @override
-  Future<Either<Failure, TripMember>> insertTripMember({
+  Future<Either<Failure, Unit>> insertTripMember({
     required String tripId,
     required String userId,
     required String role,
@@ -71,16 +71,16 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      final tripMember = await tripMemberRemoteDatasource.insertTripMember(
+      await tripMemberRemoteDatasource.insertTripMember(
           tripId: tripId, userId: userId, role: role);
-      return right(tripMember);
+      return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
   }
 
   @override
-  Future<Either<Failure, TripMember>> updateTripMember({
+  Future<Either<Failure, Unit>> updateTripMember({
     required String tripId,
     required String userId,
     String? role,
@@ -90,9 +90,9 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      final tripMember = await tripMemberRemoteDatasource.updateTripMember(
+      await tripMemberRemoteDatasource.updateTripMember(
           tripId: tripId, userId: userId, role: role, isBanned: isBanned);
-      return right(tripMember);
+      return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

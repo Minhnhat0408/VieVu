@@ -1,3 +1,4 @@
+import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 
 class TripModel extends Trip {
@@ -9,7 +10,7 @@ class TripModel extends Trip {
     super.endDate,
     required super.createdAt,
     super.maxMember,
-    required super.userId,
+    super.user,
     required super.status,
     required super.isPublished,
     required super.locations,
@@ -44,7 +45,9 @@ class TripModel extends Trip {
           json['end_date'] == null ? null : DateTime.parse(json['end_date']),
       createdAt: DateTime.parse(json['created_at']),
       maxMember: json['max_member'],
-      userId: json['owner_id'],
+      user: json['profiles'] != null
+          ? UserModel.fromJson(json['profiles'])
+          : null,
       status: json['status'],
       isPublished: json['is_published'],
       locations: json['locations'] ?? [],

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 
 abstract interface class TripRepository {
   Future<Either<Failure, List<Trip>>> getTrips({
@@ -56,5 +55,4 @@ abstract interface class TripRepository {
     bool? isPublished,
     required int id,
   });
-
 }

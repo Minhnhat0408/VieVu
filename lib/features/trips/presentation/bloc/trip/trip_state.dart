@@ -39,3 +39,9 @@ final class TripLoadedFailure extends TripState {
 
   TripLoadedFailure(this.message);
 }
+
+final class TripPostsLoadedSuccess extends TripState {
+  final List<Trip> trips;
+
+  TripPostsLoadedSuccess(this.trips);
+}

@@ -38,9 +38,9 @@ class _TripManagePageState extends State<TripManagePage> {
     _scrollController = ScrollController();
     final userId =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
-    context
-        .read<TripBloc>()
-        .add(GetCurrentUserTrips(userId: userId, limit: pageSize, offset: 0));
+    // context
+    //     .read<TripBloc>()
+    //     .add(GetCurrentUserTrips(userId: userId, limit: pageSize, offset: 0));
     _pagingController.addPageRequestListener((pageKey) {
       context.read<TripBloc>().add(GetCurrentUserTrips(
           userId: userId,
@@ -64,7 +64,6 @@ class _TripManagePageState extends State<TripManagePage> {
   List<String> options = [
     'Trạng thái',
     'Phạm vi hiển thị',
-    
   ];
 
   String _convertFilterString(int index) {

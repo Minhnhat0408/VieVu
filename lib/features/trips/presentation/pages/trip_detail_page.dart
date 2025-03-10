@@ -5,6 +5,7 @@ import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.d
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
@@ -45,7 +46,7 @@ class _TripDetailPageState extends State<TripDetailPage>
           cancelPreviousAnimations: true);
   CarouselSliderController buttonCarouselController =
       CarouselSliderController();
-
+  TripMember? currentUser;
   @override
   void initState() {
     super.initState();
@@ -142,25 +143,16 @@ class _TripDetailPageState extends State<TripDetailPage>
                   }
                 },
               ),
-              // BlocListener<TripMemberBloc, TripMemberState>(
-              //   listener: (context, state) {
-              //     if (state is TripMemberLoadedSuccess) {
-              //       // get the user role in the trip
-              //       final userId =
-              //           (context.read<AppUserCubit>().state as AppUserLoggedIn)
-              //               .user
-              //               .id;
-              //       final member = state.tripMembers.where(
-              //         (element) => element.user.id == userId,
-              //       );
-              //       if (member.isNotEmpty) {
-              //         setState(() {
-              //           _userRole = member.first.role;
-              //         });
-              //       }
-              //     }
-              //   },
-              // ),
+              BlocListener<CurrentTripMemberInfoCubit,
+                  CurrentTripMemberInfoState>(
+                listener: (context, state) {
+                  if (state is CurrentTripMemberInfoLoaded) {
+                    setState(() {
+                      currentUser = state.tripMember;
+                    });
+                  }
+                },
+              ),
             ],
             child: Stack(children: [
               NestedScrollView(
@@ -183,10 +175,13 @@ class _TripDetailPageState extends State<TripDetailPage>
                           BlocProvider(
                             create: (context) =>
                                 serviceLocator<LocationInfoCubit>(),
-                            child: TripSavedServicesPage(trip: trip!),
+                            child: TripSavedServicesPage(trip: trip!,
+                            currentUser: currentUser,),
                           ),
-                          TripItineraryPage(trip: trip!),
-                          TripMembersPage(trip: trip!),
+                          TripItineraryPage(trip: trip!,
+                          currentUser: currentUser,),
+                          TripMembersPage(trip: trip!,
+                          ),
                         ])
                       : const Center(child: CircularProgressIndicator())),
 

@@ -82,7 +82,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         'status': 'planning',
         'created_at': DateTime.now().toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
-      }).select();
+      }).select("*, profiles(*)");
       if (res.isEmpty) {
         throw const ServerException('Failed to insert trip');
       }
@@ -106,7 +106,10 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     List<String>? locationIds,
   }) async {
     try {
-      var query = supabaseClient.from('trips').select();
+      var query = supabaseClient
+          .from('trips')
+          .select("*, saved_services(location_name), profiles(*)")
+          .eq('is_published', true);
 
       if (status != null) {
         query = query.eq('status', status);
@@ -119,9 +122,9 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       if (endDate != null) {
         query = query.lte('end_date', endDate);
       }
-
+      log(transports.toString());
       if (transports != null) {
-        query = query.contains('transports', transports);
+        query = query.overlaps('transports', transports);
       }
 
       if (locationIds != null) {
@@ -129,10 +132,20 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       }
 
       final response = await query
-          .order('created_at', ascending: false)
+          .order('published_time', ascending: false)
           .range(offset, offset + limit);
 
-      return response.map((e) => TripModel.fromJson(e)).toList();
+      return response.map((e) {
+        final tripItem = e;
+        tripItem['service_count'] = e['saved_services'].length;
+        tripItem['locations'] = <String>[];
+        final locations = (e['saved_services'] as List)
+            .map((e) => e['location_name'] as String);
+
+        tripItem['locations'] = locations.toSet().toList();
+
+        return TripModel.fromJson(tripItem);
+      }).toList();
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -455,6 +468,9 @@ Map<String, dynamic> _buildUpdateObject({
   }
   if (isPublished != null) {
     updateObject['is_published'] = isPublished;
+    if (isPublished) {
+      updateObject['published_time'] = DateTime.now().toIso8601String();
+    }
   }
   if (transports != null) {
     updateObject['transports'] = transports;

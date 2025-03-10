@@ -10,6 +10,26 @@ final class AddTrip extends TripEvent {
   AddTrip(this.name, this.userId);
 }
 
+final class GetTrips extends TripEvent {
+  final int limit;
+  final int offset;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final List<String>? transports;
+  final String? status;
+  final List<String>? locationIds;
+
+  GetTrips({
+    required this.limit,
+    required this.offset,
+    this.startDate,
+    this.endDate,
+    this.locationIds,
+    this.status,
+    this.transports,
+  });
+}
+
 final class UpdateTrip extends TripEvent {
   final String tripId;
   final File? cover;

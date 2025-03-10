@@ -10,13 +10,13 @@ abstract interface class TripMemberRepository {
   Future<Either<Failure, TripMember?>> getMyTripMemberToTrip({
     required String tripId,
   });
-  Future<Either<Failure, TripMember>> insertTripMember({
+  Future<Either<Failure, Unit>> insertTripMember({
     required String tripId,
     required String userId,
     required String role,
   });
 
-  Future<Either<Failure, TripMember>> updateTripMember({
+  Future<Either<Failure, Unit>> updateTripMember({
     required String tripId,
     required String userId,
     String? role,

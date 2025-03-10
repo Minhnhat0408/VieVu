@@ -3,10 +3,12 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_settings_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
@@ -41,10 +43,6 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
               as CurrentTripMemberInfoLoaded)
           .tripMember;
     }
-
-    // context.read<CurrentTripMemberInfoCubit>().loadTripMemberToTrip(
-    //       tripId: widget.tripId,
-    //     );
   }
 
   @override
@@ -100,17 +98,47 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                           : const Color.fromARGB(255, 255, 138, 130)),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.settings),
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(
-                      Theme.of(context).colorScheme.surface),
+              const SizedBox(width: 10),
+              if (currentUser != null)
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(
+                        Theme.of(context).colorScheme.surface),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => TripSettingsPage(
+                          trip: widget.trip,
+                        ),
+                      ),
+                    ); // Navigate to settings page
+                  },
                 ),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(TripSettingsPage.routeName,
-                      arguments: widget.trip!); // Navigate to settings page
-                },
-              ),
+              if (currentUser == null && state is! CurrentTripMemberInfoLoading)
+                FilledButton(
+                  onPressed: () {
+                    final userId =
+                        (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                            .user
+                            .id;
+                    context.read<TripMemberBloc>().add(
+                          InsertTripMember(
+                              tripId: widget.tripId,
+                              userId: userId,
+                              role: 'member'),
+                        );
+                    showSnackbar(context, 'Tham gia chuyến đi thành công!',
+                        SnackBarState.success);
+                  },
+                  child: const Text(
+                    'Tham gia',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               const SizedBox(width: 10),
             ],
             toolbarHeight: 50,
@@ -119,15 +147,9 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
             collapsedHeight: 72,
             flexibleSpace: LayoutBuilder(
               builder: (context, constraints) {
-                bool isCollapsed = constraints.biggest.height <= 170;
                 // log(constraints.biggest.height.toString());
                 return FlexibleSpaceBar(
                   titlePadding: const EdgeInsets.only(bottom: 84, left: 60),
-                  title: isCollapsed
-                      ? const Text(
-                          'Thông tin chuyến đi', // Show title when collapsed
-                        )
-                      : null, // Hide title when expanded
                   background: Padding(
                     padding: const EdgeInsets.only(bottom: 72.0),
                     child: Stack(

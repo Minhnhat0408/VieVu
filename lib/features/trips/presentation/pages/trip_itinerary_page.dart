@@ -24,7 +24,8 @@ import 'package:vn_travel_companion/init_dependencies.dart';
 
 class TripItineraryPage extends StatefulWidget {
   final Trip trip;
-  const TripItineraryPage({super.key, required this.trip});
+  final TripMember? currentUser;
+  const TripItineraryPage({super.key, required this.trip, this.currentUser});
 
   @override
   State<TripItineraryPage> createState() => _TripItineraryPageState();
@@ -33,7 +34,6 @@ class TripItineraryPage extends StatefulWidget {
 class _TripItineraryPageState extends State<TripItineraryPage> {
   List<TripItinerary>? _tripItineraries;
   List<bool> _expanded = [];
-  late TripMember? currentUser;
 
   final List<DateTime> _panels = [];
   final List<DateTime> _selectedDates = [];
@@ -49,9 +49,7 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
         _expanded.add(false);
       }
     }
-    currentUser = (context.read<CurrentTripMemberInfoCubit>().state
-            as CurrentTripMemberInfoLoaded)
-        .tripMember;
+
     if (context.read<TripItineraryBloc>().state is TripItineraryLoadedSuccess) {
       final state =
           context.read<TripItineraryBloc>().state as TripItineraryLoadedSuccess;
@@ -180,51 +178,56 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
                 ),
                 actions: [
                   _panels.isNotEmpty
-                      ? IconButton(
-                          onPressed: currentUser != null &&
-                                  currentUser!.role != 'member'
-                              ? () {
-                                  displayModal(
-                                      context,
-                                      EditTripItineraryModal(
-                                        panels: _panels,
-                                        tripItinerary: _tripItineraries!,
-                                      ),
-                                      null,
-                                      true);
-                                }
-                              : null,
-                          style: IconButton.styleFrom(
-                            side: BorderSide(
-                                width: 2,
-                                color: Theme.of(context).colorScheme.outline),
-                          ),
-                          icon: const Icon(Icons.edit, size: 20))
-                      : ElevatedButton(
-                          onPressed: currentUser != null &&
-                                  currentUser!.role != 'member'
-                              ? () async {
-                                  final DateTimeRange? picked =
-                                      await showDateRangePicker(
-                                    context: context,
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime(2100),
-                                    initialDateRange: null,
-                                    locale: const Locale('vi', 'VN'),
-                                  );
-                                  context.read<TripBloc>().add(UpdateTrip(
-                                      tripId: widget.trip.id,
-                                      startDate: picked!.start,
-                                      endDate: picked.end));
-                                }
-                              : null,
-                          child: const Row(
-                            children: [
-                              Icon(Icons.add),
-                              SizedBox(width: 5),
-                              Text('Thêm ngày'),
-                            ],
-                          )),
+                      ? widget.currentUser != null
+                          ? IconButton(
+                              onPressed: widget.currentUser != null &&
+                                      widget.currentUser!.role != 'member'
+                                  ? () {
+                                      displayModal(
+                                          context,
+                                          EditTripItineraryModal(
+                                            panels: _panels,
+                                            tripItinerary: _tripItineraries!,
+                                          ),
+                                          null,
+                                          true);
+                                    }
+                                  : null,
+                              style: IconButton.styleFrom(
+                                side: BorderSide(
+                                    width: 2,
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
+                              ),
+                              icon: const Icon(Icons.edit, size: 20))
+                          : const SizedBox.shrink()
+                      : widget.currentUser != null
+                          ? ElevatedButton(
+                              onPressed: widget.currentUser?.role != 'member'
+                                  ? () async {
+                                      final DateTimeRange? picked =
+                                          await showDateRangePicker(
+                                        context: context,
+                                        firstDate: DateTime.now(),
+                                        lastDate: DateTime(2100),
+                                        initialDateRange: null,
+                                        locale: const Locale('vi', 'VN'),
+                                      );
+                                      context.read<TripBloc>().add(UpdateTrip(
+                                          tripId: widget.trip.id,
+                                          startDate: picked!.start,
+                                          endDate: picked.end));
+                                    }
+                                  : null,
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.add),
+                                  SizedBox(width: 5),
+                                  Text('Thêm ngày'),
+                                ],
+                              ),
+                            )
+                          : const SizedBox.shrink(),
                   const SizedBox(width: 20),
                 ],
                 pinned: true,
@@ -454,62 +457,68 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
           padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 28),
           child: Column(
             children: [
-              const Text(
-                "Thêm các mục đã lưu cho ngày này để hoàn thiện lịch trình",
+              Text(
+                widget.currentUser != null
+                    ? "Thêm các mục đã lưu cho ngày này để hoàn thiện lịch trình"
+                    : "Không có mục nào được thêm vào lịch trình",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                style:
+                    const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.fromLTRB(14, 10, 20, 10),
-                ),
-                onPressed: currentUser != null && currentUser!.role != 'member'
-                    ? () async {
-                        // Your action here
-                        final opt = await displayModal(context,
-                            const AddItineraryOptionsModal(), null, false);
+              if (widget.currentUser != null)
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.fromLTRB(14, 10, 20, 10),
+                  ),
+                  onPressed: widget.currentUser!.role != 'member'
+                      ? () async {
+                          // Your action here
+                          final opt = await displayModal(context,
+                              const AddItineraryOptionsModal(), null, false);
 
-                        if (opt == 'select_saved') {
-                          context.read<SavedServiceBloc>().add(GetSavedServices(
-                                tripId: widget.trip.id,
-                              ));
-
-                          displayModal(
-                              context,
-                              SelectSavedServiceToItineraryModal(
-                                  tripId: widget.trip.id, time: panel),
-                              null,
-                              true);
-                        } else {
-                          displayFullScreenModal(
-                              context,
-                              BlocProvider(
-                                create: (context) =>
-                                    serviceLocator<LocationInfoCubit>(),
-                                child: AddCustomPlaceModal(
+                          if (opt == 'select_saved') {
+                            context
+                                .read<SavedServiceBloc>()
+                                .add(GetSavedServices(
                                   tripId: widget.trip.id,
-                                  date: panel,
-                                ),
-                              ));
+                                ));
+
+                            displayModal(
+                                context,
+                                SelectSavedServiceToItineraryModal(
+                                    tripId: widget.trip.id, time: panel),
+                                null,
+                                true);
+                          } else {
+                            displayFullScreenModal(
+                                context,
+                                BlocProvider(
+                                  create: (context) =>
+                                      serviceLocator<LocationInfoCubit>(),
+                                  child: AddCustomPlaceModal(
+                                    tripId: widget.trip.id,
+                                    date: panel,
+                                  ),
+                                ));
+                          }
                         }
-                      }
-                    : null,
-                child: const IntrinsicWidth(
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.add,
-                        size: 20,
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Text('Thêm'),
-                    ],
+                      : null,
+                  child: const IntrinsicWidth(
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.add,
+                          size: 20,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Text('Thêm'),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           )),
     );
@@ -562,7 +571,8 @@ class _TripItineraryPageState extends State<TripItineraryPage> {
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.fromLTRB(14, 10, 20, 10),
           ),
-          onPressed: currentUser != null && currentUser!.role != 'member'
+          onPressed: widget.currentUser != null &&
+                  widget.currentUser!.role != 'member'
               ? () async {
                   // Your action here
                   final opt = await displayModal(
