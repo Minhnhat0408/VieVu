@@ -39,6 +39,7 @@ class ChatSummarizeModel extends ChatSummarize {
     required super.createdAt,
     required super.tripId,
     required super.summary,
+    required super.readings,
     required super.lastMessageId,
     required super.isConverted,
   });
@@ -48,6 +49,7 @@ class ChatSummarizeModel extends ChatSummarize {
       isConverted: json['is_converted'] ?? false,
       tripId: json['trip_id'] ?? json['chats']['trip_id'],
       chatId: json['chat_id'],
+      readings: json['readings'],
       createdAt: DateTime.parse(json['updated_at']),
       summary: json['summary'] != null
           ? List<Map<String, dynamic>>.from(json['summary'])

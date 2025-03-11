@@ -25,6 +25,7 @@ class ChatSummarize {
   final int chatId;
   final String tripId;
   final bool isConverted;
+  final String readings;
   final DateTime createdAt;
   final List<Map<String, dynamic>> summary;
   final int lastMessageId;
@@ -32,6 +33,7 @@ class ChatSummarize {
   ChatSummarize({
     required this.isConverted,
     required this.chatId,
+    required this.readings,
     required this.tripId,
     required this.createdAt,
     required this.summary,

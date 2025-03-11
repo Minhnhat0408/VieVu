@@ -49,7 +49,12 @@ abstract class ChatRemoteDatasource {
     required Function callback,
   });
 
-  void unSubcribeToChatMembersChannel({
+  RealtimeChannel listenToChatSummariesChannel({
+    required int chatId,
+    required Function(ChatSummarizeModel) callback,
+  });
+
+  void unSubcribeToChannel({
     required String channelName,
   });
 
@@ -360,6 +365,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           .upsert({
             'chat_id': chatId,
             'summary': data,
+            'readings': jsonResponse['readings'],
             'updated_at': DateTime.now().toIso8601String(),
             'last_message_id': message.last['id'],
             'is_converted': false,
@@ -398,7 +404,36 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   }
 
   @override
-  void unSubcribeToChatMembersChannel({
+  RealtimeChannel listenToChatSummariesChannel({
+    required int chatId,
+    required Function(ChatSummarizeModel) callback,
+  }) {
+    return supabaseClient
+        .channel('chat_summaries:$chatId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'chat_summaries',
+          filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'chat_id',
+              value: chatId),
+          callback: (payload) async {
+            final event = payload.eventType;
+
+            if (event == PostgresChangeEvent.insert ||
+                event == PostgresChangeEvent.update) {
+              final data = payload.newRecord;
+
+              callback(ChatSummarizeModel.fromJson(data));
+            }
+          },
+        )
+        .subscribe();
+  }
+
+  @override
+  void unSubcribeToChannel({
     required String channelName,
   }) {
     supabaseClient.channel(channelName).unsubscribe();

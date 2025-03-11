@@ -43,11 +43,16 @@ abstract interface class ChatRepository {
     required Function callback,
   });
 
+    RealtimeChannel listenToChatSummariesChannel({
+    required int chatId,
+    required Function(ChatSummarize) callback,
+  });
+
   Future<Either<Failure, List<Map<int, my_user.User>>>> getSeenUser({
     required int chatId,
   });
 
-  void unSubcribeToChatMembersChannel({
+  void unSubcribeToChannel({
     required String channelName,
   });
 

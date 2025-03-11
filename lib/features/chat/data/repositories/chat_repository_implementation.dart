@@ -34,6 +34,17 @@ class ChatRepositoryImpl implements ChatRepository {
   });
 
   @override
+  RealtimeChannel listenToChatSummariesChannel({
+    required int chatId,
+    required Function(ChatSummarize) callback,
+  }) {
+    return chatRemoteDatasource.listenToChatSummariesChannel(
+      chatId: chatId,
+      callback: callback,
+    );
+  }
+
+  @override
   Future<Either<Failure, Chat?>> getSingleChat({
     String? userId,
     String? tripId,
@@ -47,14 +58,6 @@ class ChatRepositoryImpl implements ChatRepository {
         userId: userId,
         tripId: tripId,
       );
-      // if(res == null) {
-      //   final chat = await chatRemoteDatasource.insertChat(
-
-      //     tripId: tripId,
-      //     userId: userId,
-      //   );
-      //   return right(chat);
-      // }
 
       return right(res);
     } on ServerException catch (e) {
@@ -189,10 +192,10 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  void unSubcribeToChatMembersChannel({
+  void unSubcribeToChannel({
     required String channelName,
   }) {
-    chatRemoteDatasource.unSubcribeToChatMembersChannel(
+    chatRemoteDatasource.unSubcribeToChannel(
       channelName: channelName,
     );
   }

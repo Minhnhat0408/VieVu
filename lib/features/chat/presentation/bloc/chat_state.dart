@@ -76,9 +76,25 @@ final class SeenUpdatedSuccess extends ChatState {
 }
 
 final class ChatSummarizedSuccess extends ChatState {
-  final ChatSummarize? chatSummarize;
+  final ChatSummarize chatSummarize;
 
   ChatSummarizedSuccess({
+    required this.chatSummarize,
+  });
+}
+
+final class ChatSummarizeReceivedSuccess extends ChatState {
+  final ChatSummarize chatSummarize;
+
+  ChatSummarizeReceivedSuccess({
+    required this.chatSummarize,
+  });
+}
+
+final class ChatSummaryLoadedSuccess extends ChatState {
+  final ChatSummarize? chatSummarize;
+
+  ChatSummaryLoadedSuccess({
     this.chatSummarize,
   });
 }

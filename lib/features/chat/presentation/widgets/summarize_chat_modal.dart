@@ -79,6 +79,15 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
             }
           }
 
+          if (state is ChatSummaryLoadedSuccess) {
+            chatSummarize = state.chatSummarize;
+            if (chatSummarize != null) {
+              _expanded = List.generate(chatSummarize!.summary.length, (index) {
+                return false;
+              });
+            }
+          }
+
           if (state is ChatCreateTripItinerarySuccess) {
             // Navigator.of(context).pop();
             setState(() {

@@ -65,6 +65,14 @@ final class ListenToChatMembersChannel extends ChatEvent {
   });
 }
 
+final class ListenToChatSummariesChannel extends ChatEvent {
+  final int chatId;
+
+  ListenToChatSummariesChannel({
+    required this.chatId,
+  });
+}
+
 final class GetSeenUser extends ChatEvent {
   final int chatId;
 
@@ -73,10 +81,10 @@ final class GetSeenUser extends ChatEvent {
   });
 }
 
-final class UnSubcribeToChatMembersChannel extends ChatEvent {
+final class UnSubcribeToChannel extends ChatEvent {
   final String channelName;
 
-  UnSubcribeToChatMembersChannel({
+  UnSubcribeToChannel({
     required this.channelName,
   });
 }
@@ -94,5 +102,14 @@ final class CreateItineraryFromSummary extends ChatEvent {
 
   CreateItineraryFromSummary({
     required this.chatId,
+  });
+}
+
+
+final class ChatSummarizeReceived extends ChatEvent {
+  final ChatSummarize chatSummarize;
+
+  ChatSummarizeReceived({
+    required this.chatSummarize,
   });
 }
