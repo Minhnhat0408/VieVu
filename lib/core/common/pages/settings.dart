@@ -6,6 +6,7 @@ import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/theme/theme_provider.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -98,8 +99,13 @@ class SettingsPage extends StatelessWidget {
                                     .user
                                     .id;
 
-                                Navigator.of(context)
-                                    .pushNamed('/profile', arguments: userId);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfilePage(
+                                      id: userId,
+                                    ),
+                                  ),
+                                );
                               } else if (entry.key == 'Thông báo') {
                                 // Navigator.of(context)
                                 //     .pushNamed('/notification');

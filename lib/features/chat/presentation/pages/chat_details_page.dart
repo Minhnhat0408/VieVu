@@ -300,6 +300,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   color: Theme.of(context).colorScheme.primary,
                 )),
             PopupMenuButton(
+              
               onSelected: (item) async {
                 if (item == "itinerary") {
                   Navigator.push(
@@ -509,7 +510,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                               // Đánh dấu là đã xem hướng dẫn
                               OnboardingHelper.setSeenChatGuide();
-                              
+
                             }
                           });
                         }

@@ -313,21 +313,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ),
                               hintText: 'Hãy viết mô tả về bản thân bạn',
                             ),
+                            maxLength: 1000,
                             validator: Validators.check1000Characters,
-                          ),
-                          const SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "${descriptionController.text.length}/1000", // Label always on top
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.primary),
-                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 14),
                       Row(
                         children: [
                           Expanded(

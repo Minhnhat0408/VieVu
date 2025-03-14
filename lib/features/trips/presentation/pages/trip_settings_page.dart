@@ -82,8 +82,12 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
           BlocListener<ChatBloc, ChatState>(
             listener: (context, state) {
               if (state is ChatLoadedSuccess) {
-                displayFullScreenModal(
-                    context, ChatDetailsPage(chat: state.chat));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatDetailsPage(chat: state.chat),
+                  ),
+                );
               }
             },
           ),
@@ -121,10 +125,12 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                             'error');
                         return;
                       }
-                      displayFullScreenModal(
+                      Navigator.push(
                         context,
-                        TripEditModal(
-                          trip: widget.trip!,
+                        MaterialPageRoute(
+                          builder: (context) => TripEditModal(
+                            trip: widget.trip!,
+                          ),
                         ),
                       );
 
@@ -214,6 +220,58 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                 ],
               );
             }),
+            if (currentUser?.role == 'owner' &&
+                widget.trip!.isPublished &&
+                widget.trip!.status == 'ongoing')
+              Column(
+                children: [
+                  if (currentUser != null)
+                    ListTile(
+                      title: Text('Hoàn thành chuyến đi',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary)),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 20),
+                      leading: Icon(Icons.done_all_outlined,
+                          color: Theme.of(context).colorScheme.primary),
+                      onTap: () {
+                        // Handle each option's action
+                        if (currentUser?.role == 'owner') {
+                          showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Hoàn thành chuyến đi sớm ?'),
+                              content: const Text(
+                                  'Chuyến đi sẽ tự động hoàn thành sau ngày kết thúc lịch trình. Bạn có muốn hoàn thành chuyến đi ngay bây giờ?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Hủy bỏ'),
+                                  child: const Text('Hủy bỏ'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(
+                                      context,
+                                    );
+                                    final tripId = (context
+                                            .read<TripDetailsCubit>()
+                                            .state as TripDetailsLoadedSuccess)
+                                        .trip
+                                        .id;
+                                    context.read<TripBloc>().add(UpdateTrip(
+                                        tripId: tripId, status: 'completed'));
+                                  },
+                                  child: const Text('Hoàn thành chuyến đi'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                ],
+              ),
             if (currentUser?.role == 'owner' &&
                 widget.trip!.isPublished &&
                 widget.trip!.status != 'cancelled' &&

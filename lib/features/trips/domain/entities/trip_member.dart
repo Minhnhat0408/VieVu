@@ -1,17 +1,21 @@
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 
 class TripMember {
+  final int id;
   final User user;
   final String role;
   final bool isBanned;
   final String tripId;
-
+  final bool reviewed;
+  int rating;
 
   TripMember({
+    required this.id,
     required this.user,
     required this.role,
     required this.isBanned,
-
+    required this.reviewed,
+    required this.rating,
     required this.tripId,
   });
 
@@ -33,7 +37,6 @@ class TripMember {
       'role': role,
       'is_banned': isBanned,
       'trip_id': tripId,
-    
     };
   }
 }

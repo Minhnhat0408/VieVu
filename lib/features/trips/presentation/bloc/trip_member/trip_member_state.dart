@@ -46,3 +46,5 @@ final class TripMemberUpdatedSuccess extends TripMemberState {
     required this.tripMember,
   });
 }
+
+final class TripMemberRatedSuccess extends TripMemberState {}

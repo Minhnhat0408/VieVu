@@ -85,11 +85,34 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     required String id,
   }) async {
     try {
-      final response =
-          await supabaseClient.from('profiles').select().eq('id', id).single();
-      return UserModel.fromJson(response);
+      final response = await supabaseClient
+          .from('profiles')
+          .select('*, trip_participants(count)')
+          .eq('id', id)
+          .single();
+      final data = await supabaseClient
+          .from('trip_participants')
+          .select(' user_ratings(rating)')
+          .eq('user_id', id);
+      List<int> ratings = data
+          .expand((entry) => entry["user_ratings"])
+          .map((ratingEntry) => ratingEntry["rating"] as int)
+          .toList();
+
+      // Calculate count & average
+      int ratingCount = ratings.length;
+      double avgRating =
+          ratingCount > 0 ? ratings.reduce((a, b) => a + b) / ratingCount : 0.0;
+      return UserModel.fromJson(response).copyWith(
+        tripCount: response['trip_participants'].first['count'] as int,
+        ratingCount: ratingCount,
+        avgRating: avgRating,
+      );
     } catch (e) {
-      throw const ServerException();
+      log(e.toString());
+      throw ServerException(
+        e.toString(),
+      );
     }
   }
 

@@ -56,18 +56,22 @@ import 'package:vn_travel_companion/features/trips/data/datasources/saved_servic
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_itinerary_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_member_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/trip_remote_datasource.dart';
+import 'package:vn_travel_companion/features/trips/data/datasources/trip_review_remote_datasource.dart';
 import 'package:vn_travel_companion/features/trips/data/repositories/saved_service_repository_implementation.dart';
 import 'package:vn_travel_companion/features/trips/data/repositories/trip_itinerary_repository_implement.dart';
 import 'package:vn_travel_companion/features/trips/data/repositories/trip_member_repository_implementation.dart';
 import 'package:vn_travel_companion/features/trips/data/repositories/trip_repository_implementation.dart';
+import 'package:vn_travel_companion/features/trips/data/repositories/trip_review_repository_implementation.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/saved_service_repository.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_itinerary_repository.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_member_repository.dart';
 import 'package:vn_travel_companion/features/trips/domain/repositories/trip_repository.dart';
+import 'package:vn_travel_companion/features/trips/domain/repositories/trip_review_repository.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_review_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
@@ -97,6 +101,7 @@ Future<void> initDependencies() async {
   _initTripItinerary();
   _initTripMember();
   _initProfile();
+  _initTripReview();
 
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
@@ -492,6 +497,26 @@ void _initTripMember() {
       () => TripMemberBloc(
         tripMemberRepository: serviceLocator(),
         currentTripMemberInfoCubit: serviceLocator(),
+      ),
+    );
+}
+
+void _initTripReview() {
+  serviceLocator
+    ..registerFactory<TripReviewRemoteDataSource>(
+      () => TripReviewRemoteDatasourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<TripReviewRepository>(
+      () => TripReviewRepositoryImplementation(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => TripReviewBloc(
+        tripReviewRepository: serviceLocator(),
       ),
     );
 }

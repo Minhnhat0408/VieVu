@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/conversions.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
@@ -131,6 +132,10 @@ class _TripMembersPageState extends State<TripMembersPage> {
                         element.user.id == state.tripMember.user.id)] =
                     state.tripMember;
               });
+            }
+
+            if (state is TripMemberRatedSuccess) {
+              showSnackbar(context, 'Đánh giá thành công');
             }
           },
           builder: (context, state) {
@@ -370,21 +375,61 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                                 .colorScheme
                                                 .onSurfaceVariant,
                                             fontSize: 12)),
-                                    trailing: IconButton(
-                                      icon: const Icon(
-                                        Icons.chevron_right,
-                                        size: 30,
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) => ProfilePage(
-                                              id: tripMember.user.id,
+                                    trailing: widget.trip.status ==
+                                                'completed' &&
+                                            tripMember.user.id !=
+                                                (context
+                                                            .read<AppUserCubit>()
+                                                            .state
+                                                        as AppUserLoggedIn)
+                                                    .user
+                                                    .id
+                                        ? RatingBarIndicator(
+                                            rating:
+                                                tripMember.rating.toDouble(),
+                                            itemSize: 24,
+                                            direction: Axis.horizontal,
+                                            itemCount: 5,
+                                            itemBuilder: (context, _) =>
+                                                GestureDetector(
+                                              onTap: () {
+                                                context
+                                                    .read<TripMemberBloc>()
+                                                    .add(RateTripMember(
+                                                        memberId: tripMember.id,
+                                                        rating: _ + 1));
+                                                setState(() {
+                                                  tripMembers[tripMembers
+                                                          .indexWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  tripMember
+                                                                      .id)]
+                                                      .rating = _ + 1;
+                                                });
+                                              },
+                                              child: const Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
+                                              ),
                                             ),
+                                          )
+                                        : IconButton(
+                                            icon: const Icon(
+                                              Icons.chevron_right,
+                                              size: 30,
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProfilePage(
+                                                    id: tripMember.user.id,
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                           ),
-                                        );
-                                      },
-                                    ),
                                   ),
                                 );
                               },
@@ -410,41 +455,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                       padding: const EdgeInsets.fromLTRB(
                                           14, 10, 20, 10),
                                     ),
-                                    onPressed: () async {
-                                      // // Your action here
-                                      // final opt = await displayModal(
-                                      //     context,
-                                      //     const AddItineraryOptionsModal(),
-                                      //     null,
-                                      //     false);
-
-                                      // if (opt == 'select_saved') {
-                                      //   context
-                                      //       .read<SavedServiceBloc>()
-                                      //       .add(GetSavedServices(
-                                      //         tripId: widget.trip.id,
-                                      //       ));
-
-                                      //   displayModal(
-                                      //       context,
-                                      //       SelectSavedServiceToItineraryModal(
-                                      //           tripId: widget.trip.id,
-                                      //           time: panel),
-                                      //       null,
-                                      //       true);
-                                      // } else {
-                                      //   displayFullScreenModal(
-                                      //       context,
-                                      //       BlocProvider(
-                                      //         create: (context) => serviceLocator<
-                                      //             LocationInfoCubit>(),
-                                      //         child: AddCustomPlaceModal(
-                                      //           tripId: widget.trip.id,
-                                      //           date: panel,
-                                      //         ),
-                                      //       ));
-                                      // }
-                                    },
+                                    onPressed: () async {},
                                     child: const IntrinsicWidth(
                                       child: Row(
                                         children: [
@@ -483,10 +494,12 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                   const EdgeInsets.fromLTRB(14, 10, 20, 10),
                             ),
                             onPressed: () {
-                              displayFullScreenModal(
+                              Navigator.push(
                                 context,
-                                TripEditModal(
-                                  trip: widget.trip,
+                                MaterialPageRoute(
+                                  builder: (context) => TripEditModal(
+                                    trip: widget.trip,
+                                  ),
                                 ),
                               );
                             },

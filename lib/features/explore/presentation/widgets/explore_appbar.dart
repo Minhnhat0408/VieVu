@@ -84,26 +84,12 @@ class _ExploreAppbarState extends State<ExploreAppbar> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Khám phá',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineLarge!
-                                  .copyWith(color: const Color(0xFFE8E9DE))),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.notifications_none),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerHigh,
-                            ),
-                          ),
-                        ],
-                      ),
+                      Text('Khám phá',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineLarge!
+                              .copyWith(color: const Color(0xFFE8E9DE))),
                       const SizedBox(height: 90),
                       Expanded(
                         child: AnimatedTextKit(

@@ -104,22 +104,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       final response = await supabaseClient
           .from('profiles')
-          .select(
-              '*, trips(count), user_ratings!user_ratings_ratee_id_fkey(rating)')
+          .select('*, trips(count)')
           .eq('id', currentUserSession!.user.id)
           .single();
 
       log(response.toString());
       return UserModel.fromJson(response).copyWith(
         tripCount: response['trips'].first['count'] as int,
-        ratingCount: response['user_ratings'].length as int,
-        avgRating: response['user_ratings'].length > 0
-            ? response['user_ratings'].fold(
-                    0.0,
-                    (previousValue, element) =>
-                        previousValue + element['rating'] as double) /
-                response['user_ratings'].length as double
-            : 0.0,
+        // ratingCount: response['user_ratings'].length as int,
+        // avgRating: response['user_ratings'].length > 0
+        //     ? response['user_ratings'].fold(
+        //             0.0,
+        //             (previousValue, element) =>
+        //                 previousValue + element['rating'] as double) /
+        //         response['user_ratings'].length as double
+        //     : 0.0,
       );
     } catch (e) {
       log(e.toString());

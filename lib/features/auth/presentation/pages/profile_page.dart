@@ -35,12 +35,9 @@ class _ProfilePageState extends State<ProfilePage> {
     final currentUser =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user;
     if (currentUser.id == widget.id) {
-      user = currentUser;
       _isMe = true;
-    } else {
-      context.read<ProfileBloc>().add(GetProfile(widget.id));
-      // user = context.read<AppUserCubit>().getUserById(widget.id);
     }
+    context.read<ProfileBloc>().add(GetProfile(widget.id));
   }
 
   @override
@@ -48,10 +45,14 @@ class _ProfilePageState extends State<ProfilePage> {
     return BlocListener<ChatBloc, ChatState>(
       listener: (context, state) {
         if (state is ChatLoadedSuccess) {
-          displayFullScreenModal(context, ChatDetailsPage(chat: state.chat));
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return ChatDetailsPage(chat: state.chat);
+          }));
         }
         if (state is ChatInsertSuccess) {
-          displayFullScreenModal(context, ChatDetailsPage(chat: state.chat));
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return ChatDetailsPage(chat: state.chat);
+          }));
         }
       },
       child: BlocConsumer<ProfileBloc, ProfileState>(
@@ -74,11 +75,10 @@ class _ProfilePageState extends State<ProfilePage> {
               if (_isMe)
                 IconButton(
                   onPressed: () {
-                    displayFullScreenModal(
-                        context,
-                        EditProfilePage(
-                          user: user!,
-                        ));
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => EditProfilePage(
+                              user: user!,
+                            )));
                   },
                   icon: const Icon(Icons.edit),
                 ),
@@ -195,7 +195,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           )
                                         ],
                                       ),
-                                      Text('(${user?.ratingCount}) đánh giá'),
+                                      Text('${user?.ratingCount} đánh giá'),
                                     ],
                                   ),
                                 ),
@@ -212,16 +212,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                     context.read<ChatBloc>().add(GetSingleChat(
                                           userId: user!.id,
                                         ));
-
-                                    // displayFullScreenModal(
-                                    //     context,
-                                    //     ChatDetailsPage(
-                                    //         chat: Chat(
-                                    //       id: 0,
-                                    //       name: '${user?.lastName} ${user?.firstName}',
-                                    //       imageUrl: user?.avatarUrl ?? "",
-                                    //       isSeen: false,
-                                    //     )));
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Theme.of(context)

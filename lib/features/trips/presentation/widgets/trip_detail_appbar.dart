@@ -45,6 +45,11 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
     }
   }
 
+  bool isCompleted() {
+    return widget.trip?.status == 'completed' &&
+        widget.tabController.length == 5;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SliverSafeArea(
@@ -132,7 +137,6 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                               userId: userId,
                               role: 'member'),
                         );
-                  
                   },
                   child: const Text(
                     'Tham gia',
@@ -256,26 +260,37 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                     Theme.of(context).colorScheme.surface, // TabBar background
                 child: TabBar(
                   controller: widget.tabController,
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  tabs: const [
-                    Tab(
+                  isScrollable: isCompleted() ? true : false,
+                  tabAlignment: isCompleted() ? TabAlignment.start : null,
+                  labelPadding: isCompleted()
+                      ? null
+                      : const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  tabs: [
+                    const Tab(
                       text: 'Chi tiết',
                       icon: Icon(
                         Icons.info_outline,
                       ),
                     ),
-                    Tab(
+                    if (isCompleted())
+                      const Tab(
+                        text: 'Đánh giá',
+                        icon: Icon(
+                          Icons.insert_comment_outlined,
+                        ),
+                      ),
+                    const Tab(
                       text: 'Mục lưu',
                       icon: Icon(
                         Icons.favorite_border_outlined,
                       ),
                     ),
-                    Tab(
+                    const Tab(
                         text: 'Lộ trình',
                         icon: Icon(
                           Icons.map_outlined,
                         )),
-                    Tab(
+                    const Tab(
                         text: 'Thành viên',
                         icon: Icon(
                           Icons.group_outlined,

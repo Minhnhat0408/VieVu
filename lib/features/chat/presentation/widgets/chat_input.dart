@@ -123,6 +123,8 @@ class _ChatInputState extends State<ChatInput> {
                       );
                     }
                   });
+
+                  OnboardingHelper.setSeenTagGuide();
                 },
                 icon: const Icon(Icons.add_location_sharp),
               ),

@@ -366,18 +366,19 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                                                             FontWeight.bold),
                                                   ),
                                                   trailing: FilledButton(
-                                                    onPressed: itineraries
-                                                            .isNotEmpty
-                                                        ? () {
-                                                            displayFullScreenModal(
-                                                                context,
-                                                                MapViewModal(
-                                                                  tripItineraries:
-                                                                      itineraries,
-                                                                  panel: panel,
-                                                                ));
-                                                          }
-                                                        : null,
+                                                    onPressed:
+                                                        itineraries.isNotEmpty
+                                                            ? () {
+                                                                Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder: (context) =>
+                                                                            MapViewModal(
+                                                                              tripItineraries: itineraries,
+                                                                              panel: panel,
+                                                                            )));
+                                                              }
+                                                            : null,
                                                     child: const Row(
                                                       mainAxisSize:
                                                           MainAxisSize.min,
@@ -504,16 +505,18 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                                 null,
                                 true);
                           } else {
-                            displayFullScreenModal(
-                                context,
-                                BlocProvider(
-                                  create: (context) =>
-                                      serviceLocator<LocationInfoCubit>(),
-                                  child: AddCustomPlaceModal(
-                                    tripId: widget.trip.id,
-                                    date: panel,
-                                  ),
-                                ));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BlocProvider(
+                                        create: (context) =>
+                                            serviceLocator<LocationInfoCubit>(),
+                                        child: AddCustomPlaceModal(
+                                          tripId: widget.trip.id,
+                                          date: panel,
+                                        ),
+                                      )),
+                            );
                           }
                         }
                       : null,
@@ -604,16 +607,18 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                         null,
                         true);
                   } else {
-                    displayFullScreenModal(
-                        context,
-                        BlocProvider(
-                          create: (context) =>
-                              serviceLocator<LocationInfoCubit>(),
-                          child: AddCustomPlaceModal(
-                            tripId: widget.trip.id,
-                            date: panel,
-                          ),
-                        ));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                                create: (context) =>
+                                    serviceLocator<LocationInfoCubit>(),
+                                child: AddCustomPlaceModal(
+                                  tripId: widget.trip.id,
+                                  date: panel,
+                                ),
+                              )),
+                    );
                   }
                 }
               : null,

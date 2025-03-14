@@ -7,6 +7,9 @@ class TripMemberModel extends TripMember {
     required super.role,
     required super.isBanned,
     required super.tripId,
+    required super.id,
+    required super.reviewed,
+    required super.rating,
   });
 
   factory TripMemberModel.fromJson(Map<String, dynamic> json) {
@@ -15,6 +18,9 @@ class TripMemberModel extends TripMember {
       role: json['role'],
       isBanned: json['is_banned'] ?? false,
       tripId: json['trip_id'],
+      reviewed: json['reviewed'] ?? false,
+      id: json['id'],
+      rating: json['rating'] ?? 0,
     );
   }
 
@@ -25,8 +31,14 @@ class TripMemberModel extends TripMember {
     String? tripId,
     double? longitude,
     double? latitude,
+    bool? reviewed,
+    int? id,
+    int? rating,
   }) {
     return TripMemberModel(
+      id: id ?? this.id,
+      rating: rating ?? this.rating,
+      reviewed: reviewed ?? this.reviewed,
       user: user ?? this.user,
       role: role ?? this.role,
       isBanned: isBanned ?? this.isBanned,

@@ -4,6 +4,7 @@ class OnboardingHelper {
   static const String hasSeenReactionGuideKey = "hasSeenReactionGuide";
   static const String hasSeenTagGuideKey = "hasSeenTagGuide";
   static const String hasSeenChatGuideKey = "hasSeenChatGuide";
+  static const String hasSeenTripReviewGuideKey = "hasSeenTripReviewGuide";
 
   static Future<bool> hasSeenReactionGuide() async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,5 +49,20 @@ class OnboardingHelper {
   static Future<void> resetSeenChatGuide() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(hasSeenChatGuideKey, false);
+  }
+
+  static Future<bool> hasSeenTripReviewGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(hasSeenTripReviewGuideKey) ?? false;
+  }
+
+  static Future<void> setSeenTripReviewGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(hasSeenTripReviewGuideKey, true);
+  }
+
+  static Future<void> resetSeenTripReviewGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(hasSeenTripReviewGuideKey, false);
   }
 }

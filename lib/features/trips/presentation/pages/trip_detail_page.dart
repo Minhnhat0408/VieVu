@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vn_travel_companion/core/utils/onboarding_help.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
@@ -13,14 +17,17 @@ import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_servi
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_review_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/location_shared_map.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_info_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_page.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_review_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_saved_services_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_members_page.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/post_review_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_detail_appbar.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
@@ -40,7 +47,6 @@ class _TripDetailPageState extends State<TripDetailPage>
     with TickerProviderStateMixin {
   late TabController tabController;
   Trip? trip;
-  bool isFavorite = false;
   late final AnimatedMapController _animatedMapController =
       AnimatedMapController(
           vsync: this,
@@ -61,20 +67,8 @@ class _TripDetailPageState extends State<TripDetailPage>
       length: 4,
       vsync: this,
     );
-    
-    tabController.addListener(() {
-      if (tabController.indexIsChanging) {
-        if (tabController.index == 1) {
-          setState(() {
-            isFavorite = true;
-          });
-        } else {
-          setState(() {
-            isFavorite = false;
-          });
-        }
-      }
-    });
+    context.read<TripReviewBloc>().add(GetTripReviews(tripId: widget.tripId));
+
     context.read<TripDetailsCubit>().getTripDetails(tripId: widget.tripId);
     context
         .read<SavedServiceBloc>()
@@ -104,6 +98,16 @@ class _TripDetailPageState extends State<TripDetailPage>
             setState(() {
               trip = state.trip;
             });
+            log(trip?.status ?? 'null');
+            if (trip!.status == 'completed') {
+              log(trip?.status ?? 'null');
+              // tabController.dispose();
+              tabController = TabController(
+                initialIndex: widget.initialIndex ?? 0,
+                length: 5,
+                vsync: this,
+              );
+            }
           }
           if (state is TripDetailsLoadedFailure) {
             showSnackbar(context, state.message, 'error');
@@ -155,6 +159,79 @@ class _TripDetailPageState extends State<TripDetailPage>
                     setState(() {
                       currentUser = state.tripMember;
                     });
+                    log('mounted');
+                    if (currentUser?.reviewed == false &&
+                        trip?.status == 'completed') {
+                      OnboardingHelper.hasSeenTripReviewGuide().then((value) {
+                        if (!value) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text(
+                                "Chuyến đi hoàn tất",
+                                textAlign: TextAlign.center,
+                              ),
+                              actionsPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/celeb1.png',
+                                    // width: 200,
+                                    height: 300,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  const Text("Đánh giá trải nghiệm"),
+                                  RatingBarIndicator(
+                                    rating: 0,
+                                    itemSize: 50,
+                                    direction: Axis.horizontal,
+                                    itemCount: 5,
+                                    itemBuilder: (context, index) =>
+                                        GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).pop();
+                                        displayFullScreenModal(
+                                          context,
+                                          PostReviewModal(
+                                            trip: trip!,
+                                            currentUser: currentUser!,
+                                            initialRating: index + 1,
+                                          ),
+                                        );
+                                      },
+                                      child: Icon(
+                                        Icons.star_border,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text("Để sau"),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      });
+                    }
                   }
                 },
               ),
@@ -193,6 +270,12 @@ class _TripDetailPageState extends State<TripDetailPage>
                   body: trip != null
                       ? TabBarView(controller: tabController, children: [
                           TripInfoPage(trip: trip!),
+                          if (tabController.length == 5 &&
+                              trip!.status == 'completed')
+                            TripReviewPage(
+                              trip: trip!,
+                              currentUser: currentUser,
+                            ),
                           BlocProvider(
                             create: (context) =>
                                 serviceLocator<LocationInfoCubit>(),
@@ -224,25 +307,26 @@ class _TripDetailPageState extends State<TripDetailPage>
                                 'Vui lòng bật dịch vụ định vị để sử dụng');
                             return;
                           } else {
-                            displayFullScreenModal(
-                              context,
-                              LocationSharedMap(
-                                tripId: widget.tripId,
-                                tripItineraries:
-                                    tripItineraries.where((element) {
-                                  // check the time == today not time
-                                  //get the date tiem of today but 00h 00
-                                  // get the date time of tomorrow but 00h 00
-                                  final now = DateTime.now();
-                                  final today = DateTime(
-                                      now.year, now.month, now.day, 0, 0, 0);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LocationSharedMap(
+                                    tripId: widget.tripId,
+                                    tripItineraries:
+                                        tripItineraries.where((element) {
+                                      // check the time == today not time
+                                      //get the date tiem of today but 00h 00
+                                      // get the date time of tomorrow but 00h 00
+                                      final now = DateTime.now();
+                                      final today = DateTime(now.year,
+                                          now.month, now.day, 0, 0, 0);
 
-                                  return element.time.isAfter(today) &&
-                                      element.time.isBefore(
-                                          today.add(const Duration(days: 1)));
-                                }).toList(),
-                              ),
-                            );
+                                      return element.time.isAfter(today) &&
+                                          element.time.isBefore(today
+                                              .add(const Duration(days: 1)));
+                                    }).toList(),
+                                  ),
+                                ));
                           }
                         },
                         icon: const Icon(Icons.map_outlined),

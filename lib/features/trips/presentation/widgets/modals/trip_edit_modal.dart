@@ -186,7 +186,6 @@ class _TripEditModalState extends State<TripEditModal> {
                             height: 8), // Space between label and input box
                         TextFormField(
                           controller: nameController,
-                          onChanged: (value) => setState(() {}),
                           onTapOutside: (event) =>
                               FocusScope.of(context).unfocus(),
                           decoration: const InputDecoration(
@@ -196,21 +195,12 @@ class _TripEditModalState extends State<TripEditModal> {
                             ),
                             hintText: 'Hãy đặt tên cho chuyến đi của bạn',
                           ),
+                          maxLength: 80,
                           validator: Validators.combineValidators(
                             [
                               Validators.checkEmpty,
                               Validators.check80Characters,
                             ],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "${nameController.text.length}/80", // Label always on top
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary),
                           ),
                         ),
                       ],
@@ -312,7 +302,6 @@ class _TripEditModalState extends State<TripEditModal> {
                         const SizedBox(
                             height: 8), // Space between label and input box
                         TextFormField(
-                          onChanged: (value) => setState(() {}),
                           maxLines: 5,
                           onTapOutside: (event) =>
                               FocusScope.of(context).unfocus(),
@@ -325,16 +314,7 @@ class _TripEditModalState extends State<TripEditModal> {
                             hintText: 'Hãy viết mô tả chuyến đi của bạn',
                           ),
                           validator: Validators.check1000Characters,
-                        ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "${descriptionController.text.length}/1000", // Label always on top
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary),
-                          ),
+                          maxLength: 1000,
                         ),
                       ],
                     ),

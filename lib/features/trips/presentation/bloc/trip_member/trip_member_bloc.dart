@@ -21,6 +21,7 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
     on<InsertTripMember>(_onInsertTripMember);
     on<UpdateTripMember>(_onUpdateTripMember);
     on<DeleteTripMember>(_onDeleteTripMember);
+    on<RateTripMember>(_onRateTripMember);
   }
 
   void _onInsertTripMember(
@@ -78,6 +79,19 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
     res.fold(
       (l) => emit(TripMemberFailure(message: l.message)),
       (r) => emit(TripMemberLoadedSuccess(tripMembers: r)),
+    );
+  }
+
+  void _onRateTripMember(
+      RateTripMember event, Emitter<TripMemberState> emit) async {
+    emit(TripMemberActionLoading());
+    final res = await _tripMemberRepository.rateTripMember(
+      memberId: event.memberId,
+      rating: event.rating,
+    );
+    res.fold(
+      (l) => emit(TripMemberFailure(message: l.message)),
+      (r) => emit(TripMemberRatedSuccess()),
     );
   }
 }

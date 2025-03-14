@@ -64,7 +64,7 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           subtitle: const Text(
-              "Cho phép mọi người đều có thể xem chuyến đi của bạn và tham gia"),
+              "Cho phép mọi người đều có thể xem chuyến đi của bạn và tham gia. Công khai chuyến đi, hệ thống sẽ tự động cập nhật trạng thái chuyến đi phù hợp với ngày lịch trình."),
           trailing: Switch(
             value: _published,
             onChanged: (value) {

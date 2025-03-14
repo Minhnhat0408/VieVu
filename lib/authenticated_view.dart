@@ -1,10 +1,15 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
+import 'package:vn_travel_companion/core/common/pages/settings.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/profile_nested_routes.dart';
+import 'package:vn_travel_companion/features/chat/presentation/pages/all_chats_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore_nested_routes.dart';
 import 'package:vn_travel_companion/features/chat/presentation/pages/chats_nested_routes.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/home_nested_routes.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_nested_routes.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
 
 class AuthenticatedView extends StatefulWidget {
   const AuthenticatedView({super.key});
@@ -29,11 +34,11 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
   }
 
   final screens = [
-    const HomeNestedRoutes(),
-    const TripManageNestedRoutes(),
+    const TripPostsPage(),
+    const TripManagePage(),
     const ExploreNestedRoutes(),
-    const ChatsNestedRoutes(),
-    const ProfileNestedRoutes(),
+    const AllMessagesPage(),
+    const SettingsPage(),
   ];
 
   @override
@@ -63,8 +68,10 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
 
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(
+      body: LazyLoadIndexedStack(
         index: _selectedIndex,
+        preloadIndexes: const [1, 2],
+        autoDisposeIndexes: const [4],
         children: screens,
       ),
       // ),

@@ -27,4 +27,9 @@ abstract interface class TripMemberRepository {
     required String tripId,
     required String userId,
   });
+
+  Future<Either<Failure, Unit>> rateTripMember({
+    required int memberId,
+    required int rating,
+  });
 }

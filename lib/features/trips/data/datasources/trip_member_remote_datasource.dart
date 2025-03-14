@@ -30,6 +30,11 @@ abstract interface class TripMemberRemoteDatasource {
     required String tripId,
     required String userId,
   });
+
+  Future<void> rateTripMember({
+    required int memberId,
+    required int rating,
+  });
 }
 
 class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
@@ -67,13 +72,25 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
     required String tripId,
   }) async {
     try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
       final response = await supabaseClient
           .from('trip_participants')
-          .select('*, profiles(*)')
+          .select('*, profiles(*), user_ratings(rating)')
           .eq('trip_id', tripId)
+          .eq('user_ratings.rater_id', user.id)
           .order('created_at', ascending: true);
 
-      return response.map((e) => TripMemberModel.fromJson(e)).toList();
+      log(response.toString());
+      return response
+          .map((e) => TripMemberModel.fromJson(e).copyWith(
+                rating: e['user_ratings'].isNotEmpty
+                    ? e['user_ratings'][0]['rating']
+                    : 0,
+              ))
+          .toList();
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());
@@ -139,6 +156,27 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
           .eq('trip_id', tripId)
           .eq('user_id', userId);
     } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> rateTripMember({
+    required int memberId,
+    required int rating,
+  }) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+      await supabaseClient.from('user_ratings').upsert({
+        'rater_id': user.id,
+        'ratee_id': memberId,
+        'rating': rating,
+      }, onConflict: "rater_id, ratee_id");
+    } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

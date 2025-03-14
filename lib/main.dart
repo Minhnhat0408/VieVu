@@ -30,6 +30,7 @@ import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_servi
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_review_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
@@ -71,6 +72,7 @@ void main() async {
       BlocProvider(create: (_) => serviceLocator<ProfileBloc>()),
       BlocProvider(create: (_) => serviceLocator<TripMemberBloc>()),
       BlocProvider(create: (_) => serviceLocator<CurrentTripMemberInfoCubit>()),
+      BlocProvider(create: (_) => serviceLocator<TripReviewBloc>()),
     ],
     child: const MyApp(),
   ));

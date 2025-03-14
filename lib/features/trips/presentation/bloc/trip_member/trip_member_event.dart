@@ -46,3 +46,13 @@ class DeleteTripMember extends TripMemberEvent {
     required this.userId,
   });
 }
+
+class RateTripMember extends TripMemberEvent {
+  final int memberId;
+  final int rating;
+
+  RateTripMember({
+    required this.memberId,
+    required this.rating,
+  });
+}

@@ -23,13 +23,14 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        displayFullScreenModal(
-            context,
-            ChatDetailsPage(
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChatDetailsPage(
               chat: widget.chat,
-            )).then((value) {
-          widget.onMessageSeen();
-        });
+            ),
+          ),
+        );
+        widget.onMessageSeen();
       },
       child: ListTile(
         leading: CachedNetworkImage(
