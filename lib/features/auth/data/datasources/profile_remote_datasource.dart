@@ -25,6 +25,15 @@ abstract interface class ProfileRemoteDataSource {
   // Future<void> updatePassword({
   //   required String password,
   // });
+
+  RealtimeChannel listenToUserLocations({
+    required String userId,
+    required String tripId,
+    required Function({
+      required UserPositionModel userPosition,
+      required String eventType,
+    }) callback,
+  });
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -82,6 +91,33 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     } catch (e) {
       throw const ServerException();
     }
+  }
+
+  @override
+  RealtimeChannel listenToUserLocations({
+    required String userId,
+    required String tripId,
+    required Function({
+      required UserPositionModel userPosition,
+      required String eventType,
+    }) callback,
+  }) {
+    return supabaseClient
+        .channel('user_location:$tripId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'user_locations',
+          filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'trip_id',
+              value: tripId),
+          callback: (payload) async {
+            // callback();
+            final newRecord = payload.newRecord;
+          },
+        )
+        .subscribe();
   }
 
   @override

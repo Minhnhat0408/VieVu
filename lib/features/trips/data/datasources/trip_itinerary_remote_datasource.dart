@@ -19,6 +19,7 @@ abstract interface class TripItineraryRemoteDatasource {
     required int id,
     String? note,
     DateTime? time,
+    bool? isDone,
   });
 
   Future deleteTripItinerary({
@@ -75,6 +76,7 @@ class TripItineraryRemoteDatasourceImpl
     required int id,
     String? note,
     DateTime? time,
+    bool? isDone,
   }) async {
     try {
       Map<String, dynamic> updateObject = {};
@@ -84,6 +86,9 @@ class TripItineraryRemoteDatasourceImpl
       }
       if (time != null) {
         updateObject['time'] = time.toIso8601String();
+      }
+      if (isDone != null) {
+        updateObject['is_done'] = isDone;
       }
 
       log(time.toString());

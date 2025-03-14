@@ -113,7 +113,14 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       // Navigator.of(context).pushNamed('/my-trips');
-
+                      if (widget.trip!.status == 'cancelled' ||
+                          widget.trip!.status == 'completed') {
+                        showSnackbar(
+                            context,
+                            'Chuyến đi đã vào trạng thái lưu, không thể chỉnh sửa',
+                            'error');
+                        return;
+                      }
                       displayFullScreenModal(
                         context,
                         TripEditModal(
@@ -161,7 +168,14 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                               'error');
                         }
                       } else if (entry.key == 'Quyền riêng tư') {
-                        // Change privacy
+                        if (widget.trip!.status == 'cancelled' ||
+                            widget.trip!.status == 'completed') {
+                          showSnackbar(
+                              context,
+                              'Chuyến đi đã vào trạng thái lưu, không thể chỉnh sửa',
+                              'error');
+                          return;
+                        }
 
                         displayModal(context,
                             TripPrivacyModal(trip: widget.trip!), null, false);
@@ -200,87 +214,147 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                 ],
               );
             }),
-            Column(
-              children: [
-                if (currentUser != null)
-                  ListTile(
-                    title: Text(
-                        currentUser?.role == 'owner'
-                            ? 'Xóa chuyến đi'
-                            : 'Rời chuyến đi',
-                        style: const TextStyle(color: Colors.red)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                    leading: const Icon(Icons.delete, color: Colors.red),
-                    onTap: () {
-                      // Handle each option's action
-                      if (currentUser?.role == 'owner') {
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text('Bạn có muốn xóa?'),
-                            content:
-                                const Text('Chuyến đi sẽ bị xóa vĩnh viễn'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, 'Hủy bỏ'),
-                                child: const Text('Hủy bỏ'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context, 'Xóa');
-                                  final tripId = (context
-                                          .read<TripDetailsCubit>()
-                                          .state as TripDetailsLoadedSuccess)
-                                      .trip
-                                      .id;
-                                  context
-                                      .read<TripBloc>()
-                                      .add(DeleteTrip(id: tripId));
-                                },
-                                child: const Text('Xóa'),
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text('Rời chuyến đi?'),
-                            content: const Text(
-                                'Bạn có chắc chắn muốn rời chuyến đi?'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, 'Hủy bỏ'),
-                                child: const Text('Hủy bỏ'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context, 'Rời chuyến đi');
-                                  final tripId = (context
-                                          .read<TripDetailsCubit>()
-                                          .state as TripDetailsLoadedSuccess)
-                                      .trip
-                                      .id;
-                                  context
-                                      .read<TripMemberBloc>()
-                                      .add(DeleteTripMember(
-                                        tripId: tripId,
-                                        userId: currentUser!.user.id,
-                                      ));
-                                },
-                                child: const Text('Rời chuyến đi'),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                    },
-                  ),
-              ],
-            )
+            if (currentUser?.role == 'owner' &&
+                widget.trip!.isPublished &&
+                widget.trip!.status != 'cancelled' &&
+                widget.trip!.status != 'completed')
+              Column(
+                children: [
+                  if (currentUser != null)
+                    ListTile(
+                      title: const Text('Hủy chuyến đi',
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 209, 131, 15))),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 20),
+                      leading: const Icon(Icons.cancel_outlined,
+                          color: Color.fromARGB(255, 209, 131, 15)),
+                      onTap: () {
+                        // Handle each option's action
+                        if (currentUser?.role == 'owner') {
+                          showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Bạn có muốn hủy chuyến đi?'),
+                              content: const Text(
+                                  'Sau khi hủy chuyến đi sẽ không thể sử dụng và ở trạng thái lưu trữ.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Hủy bỏ'),
+                                  child: const Text('Hủy bỏ'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(
+                                      context,
+                                    );
+                                    final tripId = (context
+                                            .read<TripDetailsCubit>()
+                                            .state as TripDetailsLoadedSuccess)
+                                        .trip
+                                        .id;
+                                    context.read<TripBloc>().add(UpdateTrip(
+                                        tripId: tripId, status: 'cancelled'));
+                                  },
+                                  child: const Text('Hủy chuyến đi'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                ],
+              ),
+            if (currentUser?.role != 'owner' ||
+                (currentUser?.role == 'owner' &&
+                    (!widget.trip!.isPublished ||
+                        ((widget.trip!.status == 'cancelled' ||
+                                widget.trip!.status == "completed") &&
+                            widget.trip!.isPublished))))
+              Column(
+                children: [
+                  if (currentUser != null)
+                    ListTile(
+                      title: Text(
+                          currentUser?.role == 'owner'
+                              ? 'Xóa chuyến đi'
+                              : 'Rời chuyến đi',
+                          style: const TextStyle(color: Colors.red)),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 20),
+                      leading: const Icon(Icons.delete, color: Colors.red),
+                      onTap: () {
+                        // Handle each option's action
+                        if (currentUser?.role == 'owner') {
+                          showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Bạn có muốn xóa?'),
+                              content:
+                                  const Text('Chuyến đi sẽ bị xóa vĩnh viễn'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Hủy bỏ'),
+                                  child: const Text('Hủy bỏ'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, 'Xóa');
+                                    final tripId = (context
+                                            .read<TripDetailsCubit>()
+                                            .state as TripDetailsLoadedSuccess)
+                                        .trip
+                                        .id;
+                                    context
+                                        .read<TripBloc>()
+                                        .add(DeleteTrip(id: tripId));
+                                  },
+                                  child: const Text('Xóa'),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Rời chuyến đi?'),
+                              content: const Text(
+                                  'Bạn có chắc chắn muốn rời chuyến đi?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Hủy bỏ'),
+                                  child: const Text('Hủy bỏ'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, 'Rời chuyến đi');
+                                    final tripId = (context
+                                            .read<TripDetailsCubit>()
+                                            .state as TripDetailsLoadedSuccess)
+                                        .trip
+                                        .id;
+                                    context
+                                        .read<TripMemberBloc>()
+                                        .add(DeleteTripMember(
+                                          tripId: tripId,
+                                          userId: currentUser!.user.id,
+                                        ));
+                                  },
+                                  child: const Text('Rời chuyến đi'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                ],
+              )
           ],
         ),
       ),

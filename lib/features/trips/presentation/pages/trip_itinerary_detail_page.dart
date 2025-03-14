@@ -314,6 +314,40 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
                             ],
                           ),
                         ),
+                        if (widget.itineraries[widget.index].time
+                            .isBefore(DateTime.now()))
+                          // check box
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 10),
+                            child: InputChip(
+                              label: Text(
+                                "Hoàn thành",
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              selected: widget.itineraries[widget.index].isDone,
+                              onSelected: (bool value) {
+                                if (currentUser != null) {
+                                  context.read<TripItineraryBloc>().add(
+                                      UpdateTripItinerary(
+                                          id: widget
+                                              .itineraries[widget.index].id,
+                                          isDone: value,
+                                          time: widget
+                                              .itineraries[widget.index].time));
+                                  setState(() {
+                                    widget.itineraries[widget.index].isDone =
+                                        value;
+                                  });
+                                }
+                              },
+                              // selectedColor: Theme.of(context).colorScheme.primary,
+                              // checkmarkColor: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
                       ],
                     ),
                   ),

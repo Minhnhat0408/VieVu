@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:vn_travel_companion/core/constants/transport_options.dart';
+import 'package:vn_travel_companion/core/constants/trip_filters.dart';
 import 'package:vn_travel_companion/core/utils/calculate_distance.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 
@@ -155,18 +156,19 @@ class TripInfoPage extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: trip.status == 'planning'
-                      ? Theme.of(context).colorScheme.primary
-                      : trip.status == 'going'
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context).colorScheme.tertiary,
+                      ? const Color(0xFF90CAF9)
+                      : trip.status == 'ongoing'
+                          ? const Color(0xFF81C784)
+                          : trip.status == 'completed'
+                              ? const Color(0xFFFFD54F)
+                              : const Color(0xFFE57373),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
-                  trip.status == 'planning'
-                      ? 'Đang lên kế hoạch'
-                      : trip.status == 'going'
-                          ? 'Đang diễn ra'
-                          : 'Đã kết thúc',
+                  tripStatusList
+                      .where((element) => element.value == trip.status)
+                      .first
+                      .label,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimary,
                   ),

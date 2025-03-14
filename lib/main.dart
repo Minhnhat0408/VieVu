@@ -1,8 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:vn_travel_companion/authenticated_view.dart';
+import 'package:vn_travel_companion/background_services.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/common/pages/introduction.dart';
 import 'package:vn_travel_companion/core/common/pages/splash_screen.dart';
@@ -35,7 +40,17 @@ import 'package:vn_travel_companion/init_dependencies.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+
   await initDependencies();
+
+  await Permission.notification.isDenied.then(
+    (value) async {
+      if (value) {
+        await Permission.notification.request();
+      }
+    },
+  );
+  await initializeBackgroundService();
 
   runApp(MultiBlocProvider(
     providers: [
@@ -69,11 +84,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final service = FlutterBackgroundService();
   @override
   void initState() {
     context.read<AuthBloc>().add(AuthUserLoggedIn());
     // final accessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    log('dispose');
+    service.invoke('stopService');
   }
 
   @override

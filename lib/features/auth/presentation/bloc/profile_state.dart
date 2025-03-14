@@ -35,3 +35,10 @@ final class ProfileUpdateSuccess extends ProfileState {
     required this.user,ProfileFailure
   });
 }
+
+
+final class UserPositionReceivedSuccess extends ProfileState {
+  final UserPosition userPositionModel;
+
+  UserPositionReceivedSuccess(this.userPositionModel);
+}

@@ -183,7 +183,9 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                 ),
                 actions: [
                   _panels.isNotEmpty
-                      ? widget.currentUser != null
+                      ? widget.currentUser != null &&
+                              widget.trip.status != 'cancelled' &&
+                              widget.trip.status != 'completed'
                           ? IconButton(
                               onPressed: widget.currentUser != null &&
                                       widget.currentUser!.role != 'member'
@@ -206,7 +208,9 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                               ),
                               icon: const Icon(Icons.edit, size: 20))
                           : const SizedBox.shrink()
-                      : widget.currentUser != null
+                      : widget.currentUser != null &&
+                              widget.trip.status != 'cancelled' &&
+                              widget.trip.status != 'completed'
                           ? ElevatedButton(
                               onPressed: widget.currentUser?.role != 'member'
                                   ? () async {
@@ -354,7 +358,7 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                                                           horizontal: 20,
                                                           vertical: 10),
                                                   title: Text(
-                                                    DateFormat("EEE, MMM d, y")
+                                                    DateFormat("dd/MM/yyyy")
                                                         .format(panel),
                                                     style: const TextStyle(
                                                         fontSize: 18,
@@ -463,7 +467,9 @@ class _TripItineraryPageState extends State<TripItineraryPage>
           child: Column(
             children: [
               Text(
-                widget.currentUser != null
+                widget.currentUser != null &&
+                        widget.trip.status != 'cancelled' &&
+                        widget.trip.status != 'completed'
                     ? "Thêm các mục đã lưu cho ngày này để hoàn thiện lịch trình"
                     : "Không có mục nào được thêm vào lịch trình",
                 textAlign: TextAlign.center,
@@ -471,7 +477,9 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                     const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
               ),
               const SizedBox(height: 10),
-              if (widget.currentUser != null)
+              if (widget.currentUser != null &&
+                  widget.trip.status != 'cancelled' &&
+                  widget.trip.status != 'completed')
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.fromLTRB(14, 10, 20, 10),
@@ -549,6 +557,7 @@ class _TripItineraryPageState extends State<TripItineraryPage>
             connectionDirection: ConnectionDirection.before,
             contentsBuilder: (context, index) => TimelineItem(
               itineraries: itineraries,
+              // isOngoing:  ,
               index: index,
               panel: panel,
             ),

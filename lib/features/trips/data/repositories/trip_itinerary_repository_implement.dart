@@ -47,6 +47,7 @@ class TripItineraryRepositoryImpl implements TripItineraryRepository {
     required int id,
     String? note,
     DateTime? time,
+    bool? isDone,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -55,6 +56,7 @@ class TripItineraryRepositoryImpl implements TripItineraryRepository {
       final res = await tripItineraryRemoteDatasource.updateTripItinerary(
         id: id,
         note: note,
+        isDone: isDone,
         time: time,
       );
       return right(res);

@@ -17,6 +17,7 @@ abstract interface class TripItineraryRepository {
     required int id,
     String? note,
     DateTime? time,
+    bool? isDone,
   });
 
   Future<Either<Failure, Unit>> deleteTripItinerary({

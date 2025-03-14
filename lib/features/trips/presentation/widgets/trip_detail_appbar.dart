@@ -116,7 +116,10 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                     ); // Navigate to settings page
                   },
                 ),
-              if (currentUser == null && state is! CurrentTripMemberInfoLoading)
+              if (currentUser == null &&
+                  state is! CurrentTripMemberInfoLoading &&
+                  widget.trip?.status != 'completed' &&
+                  widget.trip?.status != 'cancelled')
                 FilledButton(
                   onPressed: () {
                     final userId =
@@ -129,8 +132,7 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                               userId: userId,
                               role: 'member'),
                         );
-                    showSnackbar(context, 'Tham gia chuyến đi thành công!',
-                        SnackBarState.success);
+                  
                   },
                   child: const Text(
                     'Tham gia',
@@ -291,7 +293,9 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
   SnackBar _tripStatusSnachBar(Trip? trip) {
     log('Current user: ${currentUser?.role}');
     return SnackBar(
-      padding: currentUser?.role == 'owner'
+      padding: currentUser?.role == 'owner' &&
+              trip!.status != 'completed' &&
+              trip.status != 'cancelled'
           ? const EdgeInsets.symmetric(horizontal: 10, vertical: 0)
           : const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       content: Row(
@@ -313,19 +317,19 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
               ),
             ),
           ),
-          if (currentUser?.role == 'owner')
+          if (currentUser?.role == 'owner' &&
+              trip!.status != 'completed' &&
+              trip.status != 'cancelled')
             TextButton(
               onPressed: () {
                 // check if trip contains any  null attributes
-                if (trip != null) {
-                  final a = missingInfoMessage(trip);
-                  if (a.isNotEmpty) {
-                    showSnackbar(context, a, SnackBarState.warning);
-                    return;
-                  } else {
-                    displayModal(
-                        context, TripPrivacyModal(trip: trip), null, false);
-                  }
+                final a = missingInfoMessage(trip);
+                if (a.isNotEmpty) {
+                  showSnackbar(context, a, SnackBarState.warning);
+                  return;
+                } else {
+                  displayModal(
+                      context, TripPrivacyModal(trip: trip), null, false);
                 }
               },
               style: TextButton.styleFrom(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:vn_travel_companion/core/constants/trip_filters.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 
@@ -33,7 +34,7 @@ class TripSmallItem extends StatelessWidget {
             Stack(
               children: [
                 Hero(
-                  tag: trip.id,
+                  tag: "${trip.id} small item",
                   child: CachedNetworkImage(
                     imageUrl: "${trip.cover}",
                     errorWidget: (context, url, error) => Image.asset(
@@ -55,16 +56,26 @@ class TripSmallItem extends StatelessWidget {
                   bottom: 14,
                   right: 14,
                   child: Container(
+                    margin: const EdgeInsets.only(top: 6),
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.red,
+                      color: trip.status == 'planning'
+                          ? const Color(0xFF90CAF9)
+                          : trip.status == 'ongoing'
+                              ? const Color(0xFF81C784)
+                              : trip.status == 'completed'
+                                  ? const Color(0xFFFFD54F)
+                                  : const Color(0xFFE57373),
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: const Text(
-                      'Lên kế hoạch',
+                    child: Text(
+                      tripStatusList
+                          .where((element) => element.value == trip.status)
+                          .first
+                          .label,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ),

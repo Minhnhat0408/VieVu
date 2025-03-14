@@ -509,6 +509,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                               // Đánh dấu là đã xem hướng dẫn
                               OnboardingHelper.setSeenChatGuide();
+                              
                             }
                           });
                         }

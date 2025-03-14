@@ -69,7 +69,9 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage>
               "${_savedServices != null ? _savedServices!.length : widget.trip.serviceCount} mục đã lưu",
               style: const TextStyle(fontSize: 16)),
           actions: [
-            if (widget.currentUser != null)
+            if (widget.currentUser != null &&
+                widget.trip.status != 'cancelled' &&
+                widget.trip.status != 'completed')
               ElevatedButton(
                   onPressed: () {
                     displayFullScreenModal(
@@ -131,11 +133,11 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage>
                     return ExpansionPanelList(
                       expansionCallback: (i, isExpanded) {
                         setState(() {
-                          _expanded[typeId] = !isExpanded;
+                          _expanded[typeId] = !_expanded[typeId];
                         });
                       },
                       expandedHeaderPadding: EdgeInsets.zero,
-                      animationDuration: const Duration(milliseconds: 300),
+                      animationDuration: const Duration(milliseconds: 1000),
                       children: [
                         ExpansionPanel(
                           headerBuilder: (context, isExpanded) => ListTile(

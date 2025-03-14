@@ -3,10 +3,15 @@ import 'package:intl/intl.dart' as intl;
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_detail_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TimelineItem extends StatelessWidget {
+class TimelineItem extends StatefulWidget {
   final List<TripItinerary> itineraries;
+  // final bool isOngoing;
   final int index;
 
   final DateTime panel;
@@ -15,7 +20,22 @@ class TimelineItem extends StatelessWidget {
     required this.panel,
     required this.itineraries,
     required this.index,
+    // required this.isOngoing,
   });
+
+  @override
+  State<TimelineItem> createState() => _TimelineItemState();
+}
+
+class _TimelineItemState extends State<TimelineItem> {
+  late TripMember? currentUser;
+  @override
+  void initState() {
+    currentUser = (context.read<CurrentTripMemberInfoCubit>().state
+            as CurrentTripMemberInfoLoaded)
+        .tripMember;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +45,7 @@ class TimelineItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            itineraries[index].title,
+            widget.itineraries[widget.index].title,
             softWrap: true,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -37,7 +57,7 @@ class TimelineItem extends StatelessWidget {
           GestureDetector(
             onTap: () {
               openDeepLink(
-                  "https://www.google.com/maps?q=${itineraries[index].latitude},${itineraries[index].longitude}");
+                  "https://www.google.com/maps?q=${widget.itineraries[widget.index].latitude},${widget.itineraries[widget.index].longitude}");
             },
             child: IntrinsicWidth(
               child: Row(
@@ -69,7 +89,8 @@ class TimelineItem extends StatelessWidget {
                 width: 10,
               ),
               Text(
-                intl.DateFormat('HH:mm').format(itineraries[index].time),
+                intl.DateFormat('HH:mm')
+                    .format(widget.itineraries[widget.index].time),
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(
@@ -93,10 +114,9 @@ class TimelineItem extends StatelessWidget {
               ),
               Flexible(
                   child: Text(
-                itineraries[index].note ?? "Chưa có ghi chú",
+                widget.itineraries[widget.index].note ?? "Chưa có ghi chú",
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 16),
               )),
             ],
           ),
@@ -108,8 +128,8 @@ class TimelineItem extends StatelessWidget {
               displayFullScreenModal(
                   context,
                   TripItineraryDetailPage(
-                    itineraries: itineraries,
-                    index: index,
+                    itineraries: widget.itineraries,
+                    index: widget.index,
                   ));
             },
             child: Row(
@@ -133,6 +153,33 @@ class TimelineItem extends StatelessWidget {
               ],
             ),
           ),
+          if (widget.itineraries[widget.index].time.isBefore(DateTime.now()))
+            // check box
+            Container(
+              margin: const EdgeInsets.only(top: 10),
+              child: InputChip(
+                label: Text(
+                  "Hoàn thành",
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.bold),
+                ),
+                selected: widget.itineraries[widget.index].isDone,
+                onSelected: (bool value) {
+                  if (currentUser != null) {
+                    context.read<TripItineraryBloc>().add(UpdateTripItinerary(
+                        id: widget.itineraries[widget.index].id,
+                        isDone: value,
+                        time: widget.itineraries[widget.index].time));
+                    setState(() {
+                      widget.itineraries[widget.index].isDone = value;
+                    });
+                  }
+                },
+                // selectedColor: Theme.of(context).colorScheme.primary,
+                // checkmarkColor: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
         ],
       ),
     );

@@ -87,6 +87,14 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
     required String role,
   }) async {
     try {
+      final res = await supabaseClient
+          .from('trips')
+          .select("max_member, trip_participants(count)")
+          .eq('id', tripId)
+          .single();
+      if (res['trip_participants'][0]['count'] >= res['max_member']) {
+        throw const ServerException("Số lượng thành viên đã đủ");
+      }
       await supabaseClient.from('trip_participants').insert({
         'trip_id': tripId,
         'user_id': userId,

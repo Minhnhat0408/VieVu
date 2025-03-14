@@ -9,6 +9,8 @@ class UserModel extends User {
       required super.tripCount,
       required super.ratingCount,
       required super.avgRating,
+      super.latitude,
+      super.longitude,
       super.avatarUrl,
       super.city,
       super.bio,
@@ -25,6 +27,8 @@ class UserModel extends User {
       tripCount: json['trip_count'] ?? 0,
       ratingCount: json['rating_count'] ?? 0,
       avgRating: json['avg_rating'] ?? 0.0,
+      latitude: json['latitude'],
+      longitude: json['longitude'],
       bio: json['bio'],
       city: json['city'],
       gender: json['gender'],
@@ -39,6 +43,8 @@ class UserModel extends User {
     String? lastName,
     String? avatarUrl,
     String? city,
+    double? latitude,
+    double? longitude,
     int? tripCount,
     int? ratingCount,
     double? avgRating,
@@ -59,6 +65,24 @@ class UserModel extends User {
       gender: gender ?? this.gender,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       bio: bio ?? this.bio,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+    );
+  }
+}
+
+class UserPositionModel extends UserPosition {
+  UserPositionModel({
+    required super.id,
+    required super.latitude,
+    required super.longitude,
+  });
+
+  factory UserPositionModel.fromJson(Map<String, dynamic> json) {
+    return UserPositionModel(
+      id: json['id'],
+      latitude: json['latitude'],
+      longitude: json['longitude'],
     );
   }
 }

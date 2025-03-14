@@ -360,6 +360,9 @@ class _AttractionListPageState extends State<AttractionListPage>
                         FlutterMap(
                           mapController: _animatedMapController.mapController,
                           options: MapOptions(
+                              interactionOptions: const InteractionOptions(
+                                enableMultiFingerGestureRace: true,
+                              ),
                               initialCenter: LatLng(
                                   widget.latitude!,
                                   widget
@@ -371,7 +374,8 @@ class _AttractionListPageState extends State<AttractionListPage>
                             TileLayer(
                               // Display map tiles from any source
                               urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+
                               userAgentPackageName:
                                   'com.example.vn_travel_companion',
                               // And many more recommended properties!
@@ -626,7 +630,6 @@ class _AttractionListPageState extends State<AttractionListPage>
                       ),
                       PagedSliverList<int, Attraction>(
                         pagingController: _pagingController,
-                        
                         builderDelegate: PagedChildBuilderDelegate<Attraction>(
                           itemBuilder: (context, item, index) {
                             return AttractionMedCard(

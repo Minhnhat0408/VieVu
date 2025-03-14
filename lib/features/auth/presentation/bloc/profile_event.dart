@@ -30,3 +30,19 @@ final class UpdateProfile extends ProfileEvent {
     this.gender,
   });
 }
+
+final class ListenToUserLocations extends ProfileEvent {
+  final String userId;
+  final String tripId;
+
+  ListenToUserLocations({
+    required this.userId,
+    required this.tripId,
+  });
+}
+
+final class UserPositionReceived extends ProfileEvent {
+  final UserPosition userPositionModel;
+
+  UserPositionReceived(this.userPositionModel);
+}

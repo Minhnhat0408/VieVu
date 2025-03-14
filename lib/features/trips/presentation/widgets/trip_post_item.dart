@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:vn_travel_companion/core/constants/transport_options.dart';
+import 'package:vn_travel_companion/core/constants/trip_filters.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 
@@ -150,18 +151,20 @@ class _TripPostItemState extends State<TripPostItem> {
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: widget.trip.status == 'planning'
-                          ? Theme.of(context).colorScheme.primary
-                          : widget.trip.status == 'going'
-                              ? Theme.of(context).colorScheme.secondary
-                              : Theme.of(context).colorScheme.tertiary,
+                          ? const Color(0xFF90CAF9)
+                          : widget.trip.status == 'ongoing'
+                              ? const Color(0xFF81C784)
+                              : widget.trip.status == 'completed'
+                                  ? const Color(0xFFFFD54F)
+                                  : const Color(0xFFE57373),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Text(
-                      widget.trip.status == 'planning'
-                          ? 'Đang lên kế hoạch'
-                          : widget.trip.status == 'going'
-                              ? 'Đang diễn ra'
-                              : 'Đã kết thúc',
+                      tripStatusList
+                          .where(
+                              (element) => element.value == widget.trip.status)
+                          .first
+                          .label,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),

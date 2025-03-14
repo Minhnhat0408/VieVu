@@ -12,7 +12,6 @@ class TripItineraryBloc extends Bloc<TripItineraryEvent, TripItineraryState> {
     required TripItineraryRepository tripItineraryRepository,
   })  : _tripItineraryRepository = tripItineraryRepository,
         super(TripItineraryInitial()) {
-
     on<InsertTripItinerary>(_onInsertTripItinerary);
     on<GetTripItineraries>(_onGetTripItineraries);
     on<UpdateTripItinerary>(_onUpdateTripItinerary);
@@ -66,6 +65,7 @@ class TripItineraryBloc extends Bloc<TripItineraryEvent, TripItineraryState> {
     final res = await _tripItineraryRepository.updateTripItinerary(
       id: event.id,
       note: event.note,
+      isDone: event.isDone,
       time: event.time,
     );
     res.fold(

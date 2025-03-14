@@ -65,6 +65,9 @@ class _MapViewModalState extends State<MapViewModal>
             options: MapOptions(
                 // initialCenter: LatLng(state.location.latitude,
                 //     state.location.longitude), // Center the map over London
+                interactionOptions: const InteractionOptions(
+                  enableMultiFingerGestureRace: true,
+                ),
                 initialCameraFit: CameraFit.coordinates(
                     coordinates: widget.tripItineraries
                         .map(
@@ -75,8 +78,7 @@ class _MapViewModalState extends State<MapViewModal>
                 minZoom: 5),
             children: [
               TileLayer(
-                urlTemplate:
-                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.vn_travel_companion',
               ),
               PolylineLayer(

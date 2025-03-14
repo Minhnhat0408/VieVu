@@ -92,6 +92,15 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
         userPos = [20.9907609, 105.8159886];
       });
 
+      // Geolocator.getPositionStream(
+      //   desiredAccuracy: LocationAccuracy.best,
+      //   distanceFilter: 10,
+      // ).listen((Position position) {
+      //   // log('Stream Position: ${position.latitude}, ${position.longitude}');
+      //   setState(() {
+      //     userPos = [20.9907609, 105.8159886];
+      //   });
+      // });
       // Save position to Hive
       final locationBox = Hive.box('locationBox');
       locationBox.put('latitude', position.latitude);
@@ -377,6 +386,9 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
                       FlutterMap(
                         mapController: _animatedMapController.mapController,
                         options: MapOptions(
+                            interactionOptions: const InteractionOptions(
+                              enableMultiFingerGestureRace: true,
+                            ),
                             initialCenter:
                                 LatLng(userPos![0] - 0.005, userPos![1]),
                             minZoom: 3),
@@ -384,7 +396,8 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
                           TileLayer(
                             // Display map tiles from any source
                             urlTemplate:
-                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+
                             userAgentPackageName:
                                 'com.example.vn_travel_companion',
                             // And many more recommended properties!

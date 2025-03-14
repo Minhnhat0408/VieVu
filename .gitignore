@@ -44,3 +44,5 @@ app.*.map.json
 
 # Exclude env
 .env
+
+/lib/core/secrets

@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/profile_nested_routes.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore_nested_routes.dart';
 import 'package:vn_travel_companion/features/chat/presentation/pages/chats_nested_routes.dart';
-import 'package:vn_travel_companion/core/common/pages/settings.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/home_nested_routes.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_nested_routes.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
 
 class AuthenticatedView extends StatefulWidget {
   const AuthenticatedView({super.key});

@@ -365,7 +365,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           .upsert({
             'chat_id': chatId,
             'summary': data,
-            'readings': jsonResponse['readings'],
+            'readings': jsonResponse['reading'],
             'updated_at': DateTime.now().toIso8601String(),
             'last_message_id': message.last['id'],
             'is_converted': false,

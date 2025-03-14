@@ -8,6 +8,7 @@ import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/auth/data/datasources/profile_remote_datasource.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:vn_travel_companion/features/auth/domain/repository/profile_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource remoteDataSource;
@@ -68,5 +69,21 @@ class ProfileRepositoryImpl implements ProfileRepository {
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
+  }
+
+  @override
+  supabase.RealtimeChannel listenToUserLocations({
+    required String userId,
+    required String tripId,
+    required Function({
+      required UserPosition userPosition,
+      required String eventType,
+    }) callback,
+  }) {
+    return remoteDataSource.listenToUserLocations(
+      userId: userId,
+      tripId: tripId,
+      callback: callback,
+    );
   }
 }

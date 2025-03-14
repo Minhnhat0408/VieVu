@@ -23,6 +23,8 @@ class TripMemberModel extends TripMember {
     String? role,
     bool? isBanned,
     String? tripId,
+    double? longitude,
+    double? latitude,
   }) {
     return TripMemberModel(
       user: user ?? this.user,

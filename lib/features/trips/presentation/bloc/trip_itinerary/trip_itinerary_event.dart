@@ -35,10 +35,12 @@ class UpdateTripItinerary extends TripItineraryEvent {
   final int id;
   final String? note;
   final DateTime? time;
+  final bool? isDone;
 
   UpdateTripItinerary({
     required this.id,
     this.note,
+    this.isDone,
     this.time,
   });
 }

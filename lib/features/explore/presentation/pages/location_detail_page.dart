@@ -435,6 +435,9 @@ class LocationDetailMainState extends State<LocationDetailMain>
         FlutterMap(
           mapController: _animatedMapController.mapController,
           options: MapOptions(
+              interactionOptions: const InteractionOptions(
+                enableMultiFingerGestureRace: true,
+              ),
               initialCenter: LatLng(state.location.latitude,
                   state.location.longitude), // Center the map over London
               initialCameraFit: CameraFit.coordinates(
@@ -448,8 +451,8 @@ class LocationDetailMainState extends State<LocationDetailMain>
           children: [
             TileLayer(
               // Display map tiles from any source
-              urlTemplate:
-                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+
               userAgentPackageName: 'com.example.vn_travel_companion',
               // And many more recommended properties!
             ),

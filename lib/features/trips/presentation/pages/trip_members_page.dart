@@ -90,46 +90,6 @@ class _TripMembersPageState extends State<TripMembersPage> {
               const SizedBox(
                 width: 10,
               ),
-              // _panels.isNotEmpty
-              //     ? IconButton(
-              //         onPressed: () {
-              //           displayModal(
-              //               context,
-              //               EditTripItineraryModal(
-              //                 panels: _panels,
-              //                 tripItinerary: _tripItineraries!,
-              //               ),
-              //               null,
-              //               true);
-              //         },
-              //         style: IconButton.styleFrom(
-              //           side: BorderSide(
-              //               width: 2,
-              //               color: Theme.of(context).colorScheme.outline),
-              //         ),
-              //         icon: const Icon(Icons.edit, size: 20))
-              //     : ElevatedButton(
-              //         onPressed: () async {
-              //           final DateTimeRange? picked = await showDateRangePicker(
-              //             context: context,
-              //             firstDate: DateTime.now(),
-              //             lastDate: DateTime(2100),
-              //             initialDateRange: null,
-              //             locale: const Locale('vi', 'VN'),
-              //           );
-              //           context.read<TripBloc>().add(UpdateTrip(
-              //               tripId: widget.trip.id,
-              //               startDate: picked!.start,
-              //               endDate: picked.end));
-              //         },
-              //         child: const Row(
-              //           children: [
-              //             Icon(Icons.add),
-              //             SizedBox(width: 5),
-              //             Text('Thêm ngày'),
-              //           ],
-              //         )),
-              // const SizedBox(width: 20),
             ],
             pinned: true,
             automaticallyImplyLeading: false,
@@ -196,7 +156,9 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                                   as AppUserLoggedIn)
                                               .user
                                               .id &&
-                                      tripMember.role != 'owner',
+                                      tripMember.role != 'owner' &&
+                                      widget.trip.status != 'cancelled' &&
+                                      widget.trip.status != 'completed',
 
                                   startActionPane: ActionPane(
                                     motion: const BehindMotion(),

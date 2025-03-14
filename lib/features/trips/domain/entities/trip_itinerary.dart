@@ -8,6 +8,7 @@ class TripItinerary {
   final double longitude;
   final String title;
   final String? note;
+  bool isDone;
   DateTime time;
   final DateTime createdAt;
 
@@ -16,6 +17,7 @@ class TripItinerary {
     required this.tripId,
     this.service,
     required this.latitude,
+    required this.isDone,
     required this.longitude,
     required this.title,
     this.note,
@@ -32,10 +34,12 @@ class TripItinerary {
     String? title,
     String? note,
     DateTime? time,
+    bool? isDone,
     DateTime? createdAt,
   }) {
     return TripItinerary(
       id: id ?? this.id,
+      isDone: isDone ?? this.isDone,
       tripId: tripId ?? this.tripId,
       service: service ?? this.service,
       latitude: latitude ?? this.latitude,

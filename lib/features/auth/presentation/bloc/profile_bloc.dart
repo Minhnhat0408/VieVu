@@ -17,6 +17,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<ProfileEvent>((event, emit) {});
     on<GetProfile>(_onGetProfile);
     on<UpdateProfile>(_onUpdateProfile);
+    on<ListenToUserLocations>(_onListenToUserLocations);
   }
 
   void _onUpdateProfile(UpdateProfile event, Emitter<ProfileState> emit) async {
@@ -33,6 +34,20 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     res.fold(
       (l) => emit(ProfileFailure(message: l.message)),
       (r) => emit(ProfileUpdateSuccess(user: r)),
+    );
+  }
+
+  void _onListenToUserLocations(
+      ListenToUserLocations event, Emitter<ProfileState> emit) {
+    _profileRepository.listenToUserLocations(
+      userId: event.userId,
+      tripId: event.tripId,
+      callback: ({
+        required UserPosition userPosition,
+        required String eventType,
+      }) {
+
+      },
     );
   }
 

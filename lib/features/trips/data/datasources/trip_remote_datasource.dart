@@ -139,7 +139,6 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         final tripItem = e;
         tripItem['service_count'] = e['saved_services'][0]['count'];
 
-  
         return TripModel.fromJson(tripItem);
       }).toList();
     } catch (e) {
@@ -195,7 +194,9 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
           .from('trips')
           .select(
               '*, trip_participants!inner(user_id), saved_services(name,external_link, link_id, location_name)')
-          .eq('trip_participants.user_id', userId);
+          .eq('trip_participants.user_id', userId)
+          .neq('status', 'cancelled')
+          .neq('status', 'completed');
 
       if (status != null) {
         query = query.eq('status', status);
@@ -335,6 +336,9 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         if (res == null) {
           throw const ServerException('Không có quyền cập nhật chuyến đi');
         }
+        if (res['published_time'] == null) {
+          updateData['published_time'] = DateTime.now().toIso8601String();
+        }
         if (res['saved_services'][0]['count'] == 0) {
           throw const ServerException(
               'Vui lòng thêm địa điểm cho chuyến đi trước khi công khai');
@@ -444,9 +448,6 @@ Map<String, dynamic> _buildUpdateObject({
   }
   if (isPublished != null) {
     updateObject['is_published'] = isPublished;
-    if (isPublished) {
-      updateObject['published_time'] = DateTime.now().toIso8601String();
-    }
   }
   if (transports != null) {
     updateObject['transports'] = transports;
