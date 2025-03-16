@@ -266,7 +266,7 @@ class ChatRepositoryImpl implements ChatRepository {
               );
             } else if (itinerary['metaData']['type'] == 'name') {
               final loc =
-                  await locationRemoteDatasource.convertAddressToGeoLocation(
+                  await locationRemoteDatasource.convertAddressToLatLng(
                       address: itinerary['metaData']['title']);
               await tripItineraryRemoteDatasource.insertTripItinerary(
                 tripId: chat.tripId,
@@ -311,6 +311,7 @@ class ChatRepositoryImpl implements ChatRepository {
                 name: itinerary['metaData']['title'],
                 linkId: itinerary['metaData']['id'],
                 locationName: loc.cityName,
+                
                 cover: itinerary['metaData']['cover'],
                 rating: itinerary['metaData']['avgRating'] ?? 0,
                 ratingCount: itinerary['metaData']['ratingCount'] ?? 0,

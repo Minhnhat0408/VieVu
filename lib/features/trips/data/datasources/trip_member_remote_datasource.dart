@@ -35,6 +35,11 @@ abstract interface class TripMemberRemoteDatasource {
     required int memberId,
     required int rating,
   });
+
+  Future<void> inviteTripMember({
+    required String tripId,
+    required String userId,
+  });
 }
 
 class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
@@ -83,7 +88,6 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
           .eq('user_ratings.rater_id', user.id)
           .order('created_at', ascending: true);
 
-      log(response.toString());
       return response
           .map((e) => TripMemberModel.fromJson(e).copyWith(
                 rating: e['user_ratings'].isNotEmpty
@@ -177,6 +181,60 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
       }, onConflict: "rater_id, ratee_id");
     } catch (e) {
       log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> inviteTripMember({
+    required String tripId,
+    required String userId,
+  }) async {
+    try {
+      final res = await supabaseClient
+          .from('trip_participants')
+          .select("id")
+          .eq('trip_id', tripId)
+          .eq('user_id', userId)
+          .maybeSingle();
+      if (res != null) {
+        throw const ServerException("Người dùng đã tham gia chuyến đi");
+      }
+
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+      final data = await supabaseClient
+          .from('notifications')
+          .select('id, is_accepted')
+          .eq('receiver_id', userId)
+          .eq('trip_id', tripId)
+          .eq('sender_id', user.id)
+          .eq('type', 'trip_invite')
+          .maybeSingle();
+
+      if (data != null) {
+        if (data['is_accepted'] == null) {
+          throw const ServerException("Đã mời người dùng này rồi");
+        } else if (data['is_accepted'] == false) {
+          throw const ServerException("Người dùng đã từ chối mời");
+        } else {
+          await supabaseClient.from('notifications').update({
+            'is_accepted': null,
+            'created_at': DateTime.now().toIso8601String(),
+          }).eq('id', data['id']);
+        }
+      } else {
+        await supabaseClient.from('notifications').insert({
+          'content': 'đã mời bạn tham gia chuyến đi',
+          'sender_id': user.id,
+          'receiver_id': userId,
+          'trip_id': tripId,
+          'type': 'trip_invite',
+        });
+      }
+    } catch (e) {
       throw ServerException(e.toString());
     }
   }

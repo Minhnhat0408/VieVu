@@ -2,10 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:vn_travel_companion/core/utils/conversions.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_review.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_review_bloc.dart';
 
 class PostReviewModal extends StatefulWidget {
@@ -52,21 +52,35 @@ class _PostReviewModalState extends State<PostReviewModal> {
               )),
           subtitle: const Text('Đánh giá chuyến đi này'),
         ),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(
+            height: 1,
+            thickness: 1,
+          ),
+        ),
+        toolbarHeight: 80,
         leadingWidth: 30,
         actions: [
           TextButton(
             onPressed: () {
-              context.read<TripReviewBloc>().add(
-                    UpsertTripReview(
-                      tripId: widget.trip.id,
-                      rating: rating.toDouble(),
-                      review: descriptionController.text.isEmpty
-                          ? null
-                          : descriptionController.text,
-                      memberId: widget.currentUser.id,
-                    ),
-                  );
-              Navigator.of(context).pop();
+              // check if rating is 0
+              if (rating != 0) {
+                context.read<TripReviewBloc>().add(
+                      UpsertTripReview(
+                        tripId: widget.trip.id,
+                        rating: rating.toDouble(),
+                        review: descriptionController.text.isEmpty
+                            ? null
+                            : descriptionController.text,
+                        memberId: widget.currentUser.id,
+                      ),
+                    );
+                Navigator.of(context).pop('Đã đánh giá');
+              } else {
+                showSnackbar(context, 'Vui lòng dánh giá mưc độ hài lòng',
+                    SnackBarState.warning);
+              }
             },
             child: const Text('Đăng'),
           )

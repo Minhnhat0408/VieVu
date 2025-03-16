@@ -5,12 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/profile_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/edit_profile.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/pages/chat_details_page.dart';
 
@@ -74,7 +72,8 @@ class _ProfilePageState extends State<ProfilePage> {
             actions: [
               if (_isMe)
                 IconButton(
-                  onPressed: () {
+                  onPressed: () async {
+
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => EditProfilePage(
                               user: user!,

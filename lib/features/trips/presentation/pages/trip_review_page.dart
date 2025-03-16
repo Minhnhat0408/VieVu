@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews/review_item.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_review.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_review_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/post_review_modal.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_review_item.dart';
 
 class TripReviewPage extends StatefulWidget {
@@ -66,7 +68,19 @@ class _TripReviewPageState extends State<TripReviewPage> {
                   child: Row(
                     children: [
                       FilledButton(
-                          onPressed: () {}, child: const Text('Thêm đánh giá')),
+                          onPressed: () {
+                            displayModal(
+                              context,
+                              PostReviewModal(
+                                trip: widget.trip,
+                                currentUser: widget.currentUser!,
+                                initialRating: 0,
+                              ),
+                              null,
+                              true,
+                            );
+                          },
+                          child: const Text('Thêm đánh giá')),
                     ],
                   ),
                 )
@@ -101,6 +115,7 @@ class _TripReviewPageState extends State<TripReviewPage> {
             }
 
             if (state is TripReviewUpsertedSuccess) {
+              widget.currentUser!.reviewed = true;
               setState(() {
                 tripReviews.insert(0, state.review);
               });

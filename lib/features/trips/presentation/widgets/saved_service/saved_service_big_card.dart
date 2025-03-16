@@ -8,6 +8,8 @@ import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.d
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
@@ -29,21 +31,23 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
     return InkWell(
       onTap: () {
         if (widget.service.typeId == 2) {
-          Navigator.pushNamed(
+          Navigator.push(
             context,
-            '/attraction',
-            arguments: widget.service.id,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AttractionDetailPage(attractionId: widget.service.id),
+            ),
           );
         } else if (widget.service.typeId == 0) {
-          Navigator.pushNamed(
+          Navigator.push(
             context,
-            '/location',
-            arguments: {
-              'locationId': widget.service.id,
-              'locationName': widget.service.name,
-            },
+            MaterialPageRoute(
+              builder: (context) => LocationDetailPage(
+                locationId: widget.service.id,
+                locationName: widget.service.locationName,
+              ),
+            ),
           );
-
         } else {
           if (widget.service.externalLink != null &&
               (widget.service.externalLink!.contains('http') ||

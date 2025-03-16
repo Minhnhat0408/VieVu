@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/core/constants/notification_types.dart';
 import 'package:vn_travel_companion/core/utils/conversions.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
+import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/invite_user_search.dart';
 import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_edit_modal.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -82,7 +85,15 @@ class _TripMembersPageState extends State<TripMembersPage> {
                 : null,
             actions: [
               FilledButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => InviteUserSearch(
+                        trip: widget.trip,
+                      ),
+                    ),
+                  );
+                },
                 child: const Text(
                   'Mời',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -136,6 +147,10 @@ class _TripMembersPageState extends State<TripMembersPage> {
 
             if (state is TripMemberRatedSuccess) {
               showSnackbar(context, 'Đánh giá thành công');
+            }
+
+            if (state is TripMemberInvitedSuccess) {
+              showSnackbar(context, 'Đã mời thành viên tham gia chuyến đi');
             }
           },
           builder: (context, state) {
@@ -393,11 +408,26 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                             itemBuilder: (context, _) =>
                                                 GestureDetector(
                                               onTap: () {
+                                                if (tripMember.rating != 0 ||
+                                                    tripMember.rating == _ + 1)
+                                                  return;
                                                 context
                                                     .read<TripMemberBloc>()
                                                     .add(RateTripMember(
                                                         memberId: tripMember.id,
                                                         rating: _ + 1));
+                                                context
+                                                    .read<NotificationBloc>()
+                                                    .add(SendNotification(
+                                                      userId:
+                                                          tripMember.user.id,
+                                                      type: NotificationType
+                                                          .rating.type,
+                                                      tripId: widget.trip.id,
+                                                      content:
+                                                          "${NotificationType.rating.message} ${_ + 1} sao từ chuyến đi",
+                                                    ));
+
                                                 setState(() {
                                                   tripMembers[tripMembers
                                                           .indexWhere(

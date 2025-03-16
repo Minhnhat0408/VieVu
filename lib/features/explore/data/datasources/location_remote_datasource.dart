@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -266,20 +267,18 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
     required double latitude,
     required double longitude,
   }) async {
-    final url = Uri.parse(
-        'https://api.geoapify.com/v1/geocode/reverse?lat=$latitude&lon=$longitude&format=json&apiKey=${dotenv.env['GEOCONVERT_API_KEY']!}');
     try {
-      final response = await http.get(url);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
 
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+      if (placemarks.isNotEmpty) {
+        final jsonResponse = placemarks.first;
         // return jsonResponse['results'][0]['address_line2'];
-        log(jsonResponse.toString());
         final res = await supabaseClient
             .from('locations')
             .select('id, name')
             .or(
-              'name.eq.${jsonResponse['results'][0]['city']}, ename.eq.${jsonResponse['results'][0]['city']}',
+              'name.eq.${jsonResponse.administrativeArea}, ename.eq.${jsonResponse.administrativeArea}',
             )
             .limit(1)
             .maybeSingle();
@@ -287,21 +286,23 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
 
         if (res != null) {
           return GeoApiLocationModel(
-              address: jsonResponse['results'][0]['formatted'],
-              cityName: res['name'],
+              address:
+                  "${jsonResponse.street}, ${jsonResponse.subAdministrativeArea}, ${jsonResponse.administrativeArea}, ${jsonResponse.country}",
+              cityName: jsonResponse.administrativeArea ?? "",
               latitude: latitude,
               id: res['id'],
               longitude: longitude);
         } else {
           return GeoApiLocationModel(
-              address: jsonResponse['results'][0]['formatted'],
-              cityName: jsonResponse['results'][0]['state'],
+              address:
+                  "${jsonResponse.street}, ${jsonResponse.subAdministrativeArea}, ${jsonResponse.administrativeArea}, ${jsonResponse.country}",
+              cityName: jsonResponse.administrativeArea ?? "",
               latitude: latitude,
               id: 0,
               longitude: longitude);
         }
       } else {
-        throw ServerException(response.body);
+        throw const ServerException("No location found");
       }
     } catch (e) {
       log(e.toString());
@@ -322,6 +323,33 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
     final convertAddressLongLat = Uri.parse(url);
 
     try {
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        final data = locations.first;
+        List<Placemark> placemarks =
+            await placemarkFromCoordinates(data.latitude, data.longitude);
+        final place = placemarks.first;
+        final res = await supabaseClient
+            .from('locations')
+            .select('id, name')
+            .or(
+              'name.eq.${place.administrativeArea}, ename.eq.${place.administrativeArea}',
+            )
+            .limit(1)
+            .maybeSingle();
+
+        return GeoApiLocationModel(
+            address:
+                "${place.street}, ${place.subAdministrativeArea}, ${place.administrativeArea}, ${place.country}",
+            cityName: place.administrativeArea ?? "",
+            latitude: locations.first.latitude,
+            id: res != null ? res['id'] : 0,
+            longitude: locations.first.longitude);
+      } else {
+        throw const ServerException("No location found");
+      }
+    } catch (e) {
+      log(e.toString());
       final response = await http.get(convertAddressLongLat);
 
       if (response.statusCode == 200) {
@@ -346,9 +374,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
       } else {
         throw ServerException(response.body);
       }
-    } catch (e) {
-      log(e.toString());
-      throw ServerException(e.toString());
+      // throw ServerException(e.toString());
     }
   }
 
@@ -366,41 +392,47 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
     };
 
     try {
-      final response = await http.post(
-        convertAddressLongLat,
-        headers: {
-          "sec-ch-ua-platform": "Windows",
-          "X-Requested-With": "XMLHttpRequest",
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Cookie":
-              "PHPSESSID=ebtvjmgsumbg62gvt0u8eshgs1; Path=/; Secure; HttpOnly;",
-        },
-        body: body.entries
-            .map((e) =>
-                '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-            .join('&'),
-      );
+      // final response = await http.post(
+      //   convertAddressLongLat,
+      //   headers: {
+      //     "sec-ch-ua-platform": "Windows",
+      //     "X-Requested-With": "XMLHttpRequest",
+      //     "Content-Type": "application/x-www-form-urlencoded",
+      //     "Cookie":
+      //         "PHPSESSID=ebtvjmgsumbg62gvt0u8eshgs1; Path=/; Secure; HttpOnly;",
+      //   },
+      //   body: body.entries
+      //       .map((e) =>
+      //           '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+      //       .join('&'),
+      // );
 
-      log("Response Status: ${response.statusCode}");
-      log("Response Body: ${response.body}");
+      // log("Response Status: ${response.statusCode}");
+      // log("Response Body: ${response.body}");
 
-      if (response.statusCode == 200) {
-        if (response.body.isEmpty) {
-          throw const FormatException("Empty response body");
-        }
+      // if (response.statusCode == 200) {
+      //   if (response.body.isEmpty) {
+      //     throw const FormatException("Empty response body");
+      //   }
 
-        // ✅ Split response and convert to double
-        final parts = response.body.split(',');
-        if (parts.length != 2) {
-          throw FormatException("Unexpected response format: ${response.body}");
-        }
+      //   // ✅ Split response and convert to double
+      //   final parts = response.body.split(',');
+      //   if (parts.length != 2) {
+      //     throw FormatException("Unexpected response format: ${response.body}");
+      //   }
 
-        final double latitude = double.parse(parts[0].trim());
-        final double longitude = double.parse(parts[1].trim());
+      //   final double latitude = double.parse(parts[0].trim());
+      //   final double longitude = double.parse(parts[1].trim());
 
-        return LatLng(latitude, longitude);
+      //   return LatLng(latitude, longitude);
+      // } else {
+      //   throw ServerException(response.body);
+      // }
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        return LatLng(locations.first.latitude, locations.first.longitude);
       } else {
-        throw ServerException(response.body);
+        throw const ServerException("No location found");
       }
     } catch (e) {
       log("Error: $e");

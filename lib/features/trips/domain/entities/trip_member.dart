@@ -6,7 +6,7 @@ class TripMember {
   final String role;
   final bool isBanned;
   final String tripId;
-  final bool reviewed;
+   bool reviewed;
   int rating;
 
   TripMember({

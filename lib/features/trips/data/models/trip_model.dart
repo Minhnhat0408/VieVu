@@ -26,9 +26,9 @@ class TripModel extends Trip {
     // convert json['start_date'] from string to DateTime
     // convert json['end_date'] from string to DateTime
     return TripModel(
-      id: json['id'],
+      id: json['id'] ?? "",
       isSaved: json['is_saved'] ?? false,
-      name: json['name'],
+      name: json['name'] ?? "",
       hasTripItineraries: json['has_trip_itineraries'] ?? false,
       cover: json['cover'],
       serviceCount: json['service_count'] ?? 0,
@@ -49,8 +49,8 @@ class TripModel extends Trip {
           ? UserModel.fromJson(json['profiles'])
           : null,
       status: json['status'],
-      isPublished: json['is_published'],
-      locations: List<String>.from(json['locations']),
+      isPublished: json['is_published']?? false,
+      locations: json['locations'] != null ? List<String>.from(json['locations']) : [],
     );
   }
 }

@@ -9,21 +9,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/background_services.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart'
     as auth;
-import 'package:vn_travel_companion/features/trips/data/models/trip_member_model.dart';
 import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_detail_page.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 

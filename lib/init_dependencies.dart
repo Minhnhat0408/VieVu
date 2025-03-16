@@ -47,6 +47,10 @@ import 'package:vn_travel_companion/features/explore/presentation/cubit/location
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews/reviews_cubit.dart';
+import 'package:vn_travel_companion/features/notifications/data/datasources/notification_remote_datasource.dart';
+import 'package:vn_travel_companion/features/notifications/data/repositories/notification_repository_implementation.dart';
+import 'package:vn_travel_companion/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:vn_travel_companion/features/search/data/datasources/search_remote_datasource.dart';
 import 'package:vn_travel_companion/features/search/data/repositories/explore_search_repository_implementation.dart';
 import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
@@ -102,6 +106,7 @@ Future<void> initDependencies() async {
   _initTripMember();
   _initProfile();
   _initTripReview();
+  _initNotification();
 
   final supabase = await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
@@ -517,6 +522,26 @@ void _initTripReview() {
     ..registerLazySingleton(
       () => TripReviewBloc(
         tripReviewRepository: serviceLocator(),
+      ),
+    );
+}
+
+void _initNotification() {
+  serviceLocator
+    ..registerFactory<NotificationRemoteDataSource>(
+      () => NotificationRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory<NotificationRepository>(
+      () => NotificationRepositoryImpl(
+        remoteDataSource: serviceLocator(),
+        connectionChecker: serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => NotificationBloc(
+        notificationRepository: serviceLocator(),
       ),
     );
 }

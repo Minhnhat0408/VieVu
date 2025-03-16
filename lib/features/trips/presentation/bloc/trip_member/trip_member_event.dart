@@ -56,3 +56,13 @@ class RateTripMember extends TripMemberEvent {
     required this.rating,
   });
 }
+
+class InviteTripMember extends TripMemberEvent {
+  final String tripId;
+  final String userId;
+
+  InviteTripMember({
+    required this.tripId,
+    required this.userId,
+  });
+}

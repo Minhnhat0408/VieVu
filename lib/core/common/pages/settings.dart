@@ -7,14 +7,13 @@ import 'package:vn_travel_companion/core/theme/theme_provider.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
+import 'package:vn_travel_companion/features/notifications/presentation/pages/notification_page.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class SettingsPage extends StatelessWidget {
-  static route() {
-    return MaterialPageRoute(builder: (context) => const SettingsPage());
-  }
+  final int unreadCount;
 
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, required this.unreadCount});
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +85,29 @@ class SettingsPage extends StatelessWidget {
                                   fontSize: 18,
                                 )),
                             minVerticalPadding: 16,
-                            leading: entry.value,
+                            leading: entry.key == "Thông báo"
+                                ? Stack(
+                                    children: [
+                                      entry.value,
+                                      if (unreadCount > 0)
+                                        Positioned(
+                                          right: 0,
+                                          top: 0,
+                                          child: CircleAvatar(
+                                            backgroundColor: Colors.red,
+                                            radius: 10,
+                                            child: Text(
+                                              '$unreadCount',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  )
+                                : entry.value,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 20,
                             ),
@@ -109,6 +130,12 @@ class SettingsPage extends StatelessWidget {
                               } else if (entry.key == 'Thông báo') {
                                 // Navigator.of(context)
                                 //     .pushNamed('/notification');
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const NotificationPage(),
+                                  ),
+                                );
                               } else if (entry.key == 'Phiên bản') {
                                 showAboutDialog(
                                     context: context,
@@ -163,21 +190,6 @@ class SettingsPage extends StatelessWidget {
                                   .onSecondaryContainer),
                         )),
                   ),
-                  // OpenContainer(
-                  //   closedBuilder: (context, VoidCallback openContainer) {
-                  //     return ElevatedButton(
-                  //         onPressed: openContainer,
-                  //         style: ElevatedButton.styleFrom(
-                  //           elevation: 0,
-                  //         ),
-                  //         child: const Text('Test Animation'));
-                  //   },
-                  //   closedElevation: 0,
-                  //   transitionDuration: const Duration(milliseconds: 2000),
-                  //   closedShape: RoundedRectangleBorder(
-                  //       borderRadius: BorderRadius.circular(50)),
-                  //   openBuilder: (context, _) => const SettingsPage(),
-                  // )
                 ],
               );
             },

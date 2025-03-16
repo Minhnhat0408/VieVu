@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -288,19 +287,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ),
           ),
           actions: [
-            IconButton(
-                onPressed: () async {
-                  setState(() {
-                    _showFloatingBox = true;
-                  });
-                  _controller.forward();
-                },
-                icon: Icon(
-                  Icons.document_scanner,
-                  color: Theme.of(context).colorScheme.primary,
-                )),
+            if (widget.chat.tripId != null)
+              IconButton(
+                  onPressed: () async {
+                    setState(() {
+                      _showFloatingBox = true;
+                    });
+                    _controller.forward();
+                  },
+                  icon: Icon(
+                    Icons.document_scanner,
+                    color: Theme.of(context).colorScheme.primary,
+                  )),
             PopupMenuButton(
-              
               onSelected: (item) async {
                 if (item == "itinerary") {
                   Navigator.push(
@@ -326,33 +325,35 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                PopupMenuItem(
-                    value: "summary",
-                    child: ListTile(
-                      leading: Icon(Icons.document_scanner,
-                          color: Theme.of(context).colorScheme.primary),
-                      title: const Text('Tổng hợp lịch trình'),
-                    )),
-                const PopupMenuItem(
+                if (widget.chat.tripId != null)
+                  PopupMenuItem(
+                      value: "summary",
+                      child: ListTile(
+                        leading: Icon(Icons.document_scanner,
+                            color: Theme.of(context).colorScheme.primary),
+                        title: const Text('Tổng hợp lịch trình'),
+                      )),
+                if (widget.chat.tripId != null)
+                  const PopupMenuItem(
                     value: "itinerary",
                     child: ListTile(
                       leading:
                           Icon(Icons.card_travel, color: Colors.blueAccent),
                       title: Text('Xem lịch trình'),
-                    )),
-                const PopupMenuItem(
-                    value: "h2",
-                    child: ListTile(
-                      leading: Icon(Icons.delete, color: Colors.red),
-                      title: Text('Thoát khỏi nhóm',
-                          style: TextStyle(color: Colors.red)),
-                    )),
-                // const PopupMenuItem(
-                //     value: "leave",
-                //     child: ListTile(
-                //       leading: Icon(Icons.output),
-                //       title: Text('Thoát khỏi nhóm'),
-                //     )),
+                    ),
+                  ),
+                PopupMenuItem(
+                  value: "h2",
+                  child: ListTile(
+                    leading: const Icon(Icons.delete, color: Colors.red),
+                    title: Text(
+                      widget.chat.tripId != null
+                          ? 'Thoát khỏi nhóm'
+                          : "Xóa cuộc trò chuyện",
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
@@ -510,7 +511,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                               // Đánh dấu là đã xem hướng dẫn
                               OnboardingHelper.setSeenChatGuide();
-
                             }
                           });
                         }

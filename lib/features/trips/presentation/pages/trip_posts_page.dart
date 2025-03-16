@@ -138,20 +138,6 @@ class _TripPostsPageState extends State<TripPostsPage> {
               );
             },
           ),
-          const SizedBox(width: 10),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none),
-            iconSize: 24,
-            constraints: const BoxConstraints(
-              minWidth: 46, // Set the minimum width of the button
-              minHeight: 46, // Set the minimum height of the button
-            ),
-            style: IconButton.styleFrom(
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHigh,
-            ),
-          ),
           const SizedBox(width: 14),
         ],
         titleSpacing: 14,

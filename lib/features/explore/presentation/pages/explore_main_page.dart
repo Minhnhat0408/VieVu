@@ -34,6 +34,9 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
                 (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
             BlocProvider.of<EventBloc>(context)
                 .add(GetHotEvents(userId: userId));
+
+            BlocProvider.of<AttractionBloc>(context)
+                .add(GetRecommendedAttraction(userId: userId, limit: 10));
             refresh = !refresh;
           });
         },
@@ -52,12 +55,14 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
               flexibleSpace: const ExploreAppbar(),
             ),
             SliverPadding(
-                padding: const EdgeInsets.only(bottom: 40.0, top: 10),
-                sliver: SliverToBoxAdapter(
-                    child: BlocProvider(
+              padding: const EdgeInsets.only(bottom: 40.0, top: 10),
+              sliver: SliverToBoxAdapter(
+                child: BlocProvider(
                   create: (context) => serviceLocator<AttractionBloc>(),
                   child: const HotAttractionsSection(),
-                ))),
+                ),
+              ),
+            ),
             SliverPadding(
                 padding: const EdgeInsets.only(bottom: 40.0),
                 sliver: SliverToBoxAdapter(

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import 'package:timelines/timelines.dart';
 import 'package:vn_travel_companion/core/utils/conversions.dart';
@@ -368,7 +369,8 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                                                   trailing: FilledButton(
                                                     onPressed:
                                                         itineraries.isNotEmpty
-                                                            ? () {
+                                                            ? ()  {
+
                                                                 Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(

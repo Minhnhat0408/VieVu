@@ -20,7 +20,9 @@ class ProfileNestedRoutes extends StatelessWidget {
               );
               break;
             default:
-              page = const SettingsPage();
+              page = const SettingsPage(
+                unreadCount: 0,
+              );
           }
 
           return MaterialPageRoute(builder: (_) => page);

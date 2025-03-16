@@ -116,7 +116,6 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                         'Thay đổi các thông tin hiển thị của chuyến đi'),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      // Navigator.of(context).pushNamed('/my-trips');
                       if (widget.trip!.status == 'cancelled' ||
                           widget.trip!.status == 'completed') {
                         showSnackbar(
@@ -161,7 +160,6 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                     subtitle: Text(entry.value),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      // Navigator.of(context).pushNamed('/my-trips');
                       if (entry.key == 'Nhóm chat') {
                         if (widget.trip != null && widget.trip!.isPublished) {
                           context

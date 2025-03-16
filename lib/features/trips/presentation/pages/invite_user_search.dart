@@ -1,41 +1,39 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
 import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
+import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
 
-class HomeSearchPage extends StatefulWidget {
-  final String? initialKeyword;
-  const HomeSearchPage({super.key, this.initialKeyword});
+class InviteUserSearch extends StatefulWidget {
+  final Trip trip;
+  const InviteUserSearch({super.key,
+    required this.trip});
 
   @override
-  State<HomeSearchPage> createState() => _HomeSearchState();
+  State<InviteUserSearch> createState() => _InviteUserSearchState();
 }
 
-class _HomeSearchState extends State<HomeSearchPage> {
+class _InviteUserSearchState extends State<InviteUserSearch> {
+  final PagingController<int, HomeSearchResult> _pagingController =
+      PagingController(firstPageKey: 0);
+
+  int totalRecordCount = 0;
+  final int pageSize = 10;
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   String _keyword = '';
-  final PagingController<int, HomeSearchResult> _pagingController =
-      PagingController(firstPageKey: 0);
-  final List<String> _filterOptions = [
-    'Tất cả',
-    'Người dùng',
-    'Chuyến đi',
-  ];
-  int totalRecordCount = 0;
-  final int pageSize = 10;
-  String _selectedFilter = 'Tất cả'; // Default filter is 'All'
+  void changeSearchText(String text) {
+    _searchController.text = text;
+    _onSearchChanged(text);
+  }
 
-  // Handle text changes with debounce
   void _onSearchChanged(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 1000), () async {
@@ -53,61 +51,17 @@ class _HomeSearchState extends State<HomeSearchPage> {
   void initState() {
     super.initState();
 
-    if (widget.initialKeyword != null) {
-      _searchController.text = widget.initialKeyword!;
-    }
     _searchController.addListener(() {
       _onSearchChanged(_searchController.text);
     });
     _pagingController.addPageRequestListener((pageKey) {
       context.read<SearchBloc>().add(SearchHome(
             searchText: _keyword,
-            searchType: _mapFilterToSearchType(_selectedFilter),
+            searchType: 'profile',
             offset: pageKey,
             limit: pageSize,
           ));
     });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _debounce?.cancel();
-    _pagingController.dispose();
-    super.dispose();
-  }
-
-  String? _mapFilterToSearchType(String filter) {
-    switch (filter) {
-      case 'Người dùng':
-        return 'profile';
-      case 'Chuyến đi':
-        return 'trip';
-
-      default:
-        return null;
-    }
-  }
-
-  void _onFilterChanged(String selectedFilter) {
-    setState(() {
-      if (_selectedFilter == selectedFilter) {
-        _selectedFilter =
-            ''; // Reset to '' if the same filter is selected again
-      } else {
-        _selectedFilter = selectedFilter;
-      }
-
-      totalRecordCount = 0; // Reset total record count for new search
-    });
-
-    // Reset paging controller to fetch new data based on selected filter
-    _pagingController.refresh();
-  }
-
-  void changeSearchText(String text) {
-    _searchController.text = text;
-    _onSearchChanged(text);
   }
 
   @override
@@ -119,7 +73,7 @@ class _HomeSearchState extends State<HomeSearchPage> {
         leadingWidth: 40,
         leading: Navigator.canPop(context)
             ? IconButton(
-                icon: const Icon(Icons.chevron_left),
+                icon: const Icon(Icons.close),
                 iconSize: 36,
                 padding: const EdgeInsets.all(0),
                 highlightColor: Colors.transparent,
@@ -136,9 +90,7 @@ class _HomeSearchState extends State<HomeSearchPage> {
             onTapOutside: (event) => FocusScope.of(context).unfocus(),
             elevation: const WidgetStatePropertyAll(0),
             leading: const Icon(Icons.search),
-            onSubmitted: (value) {
-        
-            },
+            onSubmitted: (value) {},
             onChanged: (value) {
               setState(() {});
             },
@@ -179,18 +131,6 @@ class _HomeSearchState extends State<HomeSearchPage> {
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
-                child: Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0),
-                    child: FilterOptionsBig(
-                        key: _keyword.isEmpty
-                            ? const Key('searchHistory')
-                            : const Key('searchResults'),
-                        options: _filterOptions,
-                        selectedOption: _selectedFilter,
-                        onOptionSelected: _onFilterChanged,
-                        isFiltering: state is SearchLoading)),
-              ),
-              SliverToBoxAdapter(
                 child: Divider(
                   height: 20,
                   thickness: 1,
@@ -218,9 +158,7 @@ class _HomeSearchState extends State<HomeSearchPage> {
                               width: 60,
                               height: 80,
                               decoration: BoxDecoration(
-                                shape: item.type == 'trip'
-                                    ? BoxShape.rectangle
-                                    : BoxShape.circle,
+                                shape: BoxShape.circle,
                                 // borderRadius: BorderRadius.circular(8),
                                 image: DecorationImage(
                                   image: imageProvider,
@@ -235,34 +173,14 @@ class _HomeSearchState extends State<HomeSearchPage> {
                               ? Text(item.locations ?? "",
                                   maxLines: 1, overflow: TextOverflow.ellipsis)
                               : null,
-                          trailing: item.type == 'trip'
-                              ? const Icon(Icons.card_travel)
-                              : const Icon(Icons.person),
+                          trailing: const Icon(Icons.person),
                           onTap: () {
-                            // context.read<SearchBloc>().add(SearchHistory(
-                            //       searchText: item.title,
-                            //       userId: (context.read<AppUserCubit>().state
-                            //               as AppUserLoggedIn)
-                            //           .user
-                            //           .id,
-                            //     ));
-                            if (item.type == 'trip') {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => TripDetailPage(
-                                    tripId: item.id,
+                            context.read<TripMemberBloc>().add(
+                                  InviteTripMember(
+                                    tripId: widget.trip.id,
+                                    userId: item.id,
                                   ),
-                                ),
-                              );
-                            } else {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ProfilePage(
-                                    id: item.id,
-                                  ),
-                                ),
-                              );
-                            }
+                                );
                           },
                         );
                       },

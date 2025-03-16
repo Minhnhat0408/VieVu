@@ -48,3 +48,5 @@ final class TripMemberUpdatedSuccess extends TripMemberState {
 }
 
 final class TripMemberRatedSuccess extends TripMemberState {}
+
+final class TripMemberInvitedSuccess extends TripMemberState {}

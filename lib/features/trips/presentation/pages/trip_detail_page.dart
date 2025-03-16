@@ -160,6 +160,7 @@ class _TripDetailPageState extends State<TripDetailPage>
                       currentUser = state.tripMember;
                     });
                     log('mounted');
+                    // log(currentUser!.reviewed.toString());
                     if (currentUser?.reviewed == false &&
                         trip?.status == 'completed') {
                       OnboardingHelper.hasSeenTripReviewGuide().then((value) {
@@ -198,16 +199,20 @@ class _TripDetailPageState extends State<TripDetailPage>
                                     itemCount: 5,
                                     itemBuilder: (context, index) =>
                                         GestureDetector(
-                                      onTap: () {
+                                      onTap: () async {
                                         Navigator.of(context).pop();
-                                        displayFullScreenModal(
+                                        displayModal(
                                           context,
                                           PostReviewModal(
                                             trip: trip!,
                                             currentUser: currentUser!,
                                             initialRating: index + 1,
                                           ),
-                                        );
+                                          null,
+                                          true,
+                                        ).then((value) {
+                                          tabController.animateTo(1);
+                                        });
                                       },
                                       child: Icon(
                                         Icons.star_border,

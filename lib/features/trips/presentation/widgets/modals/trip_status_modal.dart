@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:vn_travel_companion/core/constants/trip_filters.dart';
 
 class TripStatusModal extends StatefulWidget {

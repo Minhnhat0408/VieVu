@@ -114,4 +114,21 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, Unit>> inviteTripMember({
+    required String tripId,
+    required String userId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      await tripMemberRemoteDatasource.inviteTripMember(
+          tripId: tripId, userId: userId);
+      return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

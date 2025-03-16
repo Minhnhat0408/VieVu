@@ -7,7 +7,7 @@ import 'package:vn_travel_companion/features/auth/presentation/pages/sign_up.dar
 import 'package:vn_travel_companion/core/common/pages/settings.dart';
 
 Map<String, Widget Function(BuildContext)> routes = {
-  '/settings': (context) => const SettingsPage(),
+  // '/settings': (context) => const SettingsPage(),
   '/send-email-reset': (context) => const SendEmailResetPage(),
   '/login': (context) => const LogInPage(),
   '/sign-up': (context) => const SignUpPage(),

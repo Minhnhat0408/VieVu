@@ -24,6 +24,7 @@ import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.da
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
+import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
@@ -73,6 +74,7 @@ void main() async {
       BlocProvider(create: (_) => serviceLocator<TripMemberBloc>()),
       BlocProvider(create: (_) => serviceLocator<CurrentTripMemberInfoCubit>()),
       BlocProvider(create: (_) => serviceLocator<TripReviewBloc>()),
+      BlocProvider(create: (_) => serviceLocator<NotificationBloc>()),
     ],
     child: const MyApp(),
   ));

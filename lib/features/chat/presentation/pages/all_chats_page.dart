@@ -24,7 +24,7 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
     super.initState();
 
     context.read<ChatBloc>().add(GetChatHeads());
-    context.read<ChatBloc>().add(ListenToUpdateChannels());
+    // context.read<ChatBloc>().add(ListenToUpdateChannels());
 
     _searchController.addListener(() {
       setState(() {

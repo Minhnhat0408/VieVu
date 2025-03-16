@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_stepper/easy_stepper.dart';
+import 'package:vn_travel_companion/authenticated_view.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/common/widgets/loader.dart';
 import 'package:vn_travel_companion/core/utils/generate_pref_map.dart';
@@ -42,8 +43,10 @@ class _InitialPreferencesState extends State<InitialPreferences> {
             if (state is PreferencesFailure) {
               showSnackbar(context, state.message);
             } else if (state is PreferencesLoadedSuccess) {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/settings', (route) => false);
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AuthenticatedView()),
+                  (route) => false);
             }
           },
           builder: (context, state) {

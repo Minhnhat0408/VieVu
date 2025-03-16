@@ -304,7 +304,10 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
   }) async {
     try {
       // check if the user is the owner of the trip
-
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException('Không có quyền cập nhật chuyến đi');
+      }
       final updateData = _buildUpdateObject(
         description: description,
         cover: cover,
@@ -338,6 +341,21 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         }
         if (res['published_time'] == null) {
           updateData['published_time'] = DateTime.now().toIso8601String();
+          final users = await supabaseClient
+              .from('profiles')
+              .select('id')
+              .neq('id', user.id);
+          for (var e in users) {
+            await supabaseClient.from('notifications').insert(
+              {
+                'trip_id': tripId,
+                'sender_id': user.id,
+                'receiver_id': e['id'],
+                'type': 'trip_public',
+                'content': 'đã công khai chuyến đi',
+              },
+            );
+          }
         }
         if (res['saved_services'][0]['count'] == 0) {
           throw const ServerException(

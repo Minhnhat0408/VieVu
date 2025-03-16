@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
@@ -37,7 +38,8 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
   @override
   void initState() {
     super.initState();
-    _animatedMapController.mapController.mapEventStream.listen((event) {
+
+    _animatedMapController.mapController.mapEventStream.listen((event)  {
       if (event is MapEventTap) {
         log('Map tapped at: ${event.tapPosition}');
 
@@ -50,6 +52,7 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
         _addMarker(tappedLocation, 12);
         context.read<LocationInfoCubit>().convertGeoLocationToAddress(
             tappedLocation.latitude, tappedLocation.longitude);
+
       }
       if (event is MapEventDoubleTapZoom) {
         panelController.close();
@@ -69,6 +72,7 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
         point: position,
         width: 40,
         height: 40,
+        rotate: true,
         child: const Icon(Icons.location_pin, color: Colors.red, size: 40),
       );
     });
@@ -153,10 +157,11 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
                                   )
                                 : null,
                           ),
-                          onSubmitted: (value) {
+                          onSubmitted: (value)  {
                             context
                                 .read<LocationInfoCubit>()
                                 .convertAddressToLatLng(value);
+
                           },
                         ),
                         const SizedBox(height: 12),
@@ -195,6 +200,9 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
             FlutterMap(
               mapController: _animatedMapController.mapController,
               options: const MapOptions(
+                interactionOptions: InteractionOptions(
+                  enableMultiFingerGestureRace: true,
+                ),
                 initialCenter: LatLng(21.030735, 105.8524),
                 initialZoom: 9,
                 minZoom: 5,
