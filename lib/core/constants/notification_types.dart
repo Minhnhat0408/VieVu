@@ -77,7 +77,22 @@ class NotificationType {
     badge: const Badge(
       label: Icon(
         color: Colors.white,
-        Icons.remove_circle,
+        Icons.card_travel,
+        size: 16,
+      ),
+      alignment: Alignment.center,
+      backgroundColor: Colors.blue,
+      padding: EdgeInsets.all(3),
+    ),
+  );
+
+  static NotificationType tripStatus = NotificationType(
+    type: 'trip_update',
+    message: 'đã cập nhật trạng thái mới: ',
+    badge: const Badge(
+      label: Icon(
+        color: Colors.white,
+        Icons.card_travel,
         size: 16,
       ),
       alignment: Alignment.center,
@@ -108,5 +123,6 @@ class NotificationType {
     tripPublic,
     tripInviteAccept,
     tripInviteDecline,
+    tripStatus
   ];
 }

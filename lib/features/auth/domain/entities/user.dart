@@ -14,6 +14,7 @@ class User {
   final double avgRating;
   double? longitude;
   double? latitude;
+  
   User({
     required this.id,
     required this.email,

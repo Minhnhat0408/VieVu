@@ -175,6 +175,9 @@ class _ReviewItemState extends State<TripReviewItem> {
               ],
             ),
           ),
+        const SizedBox(
+          height: 50,
+        ),
         // const Divider(
         //   thickness: 1.5,
         //   height: 60,

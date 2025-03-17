@@ -15,6 +15,7 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class ServiceCard extends StatefulWidget {
   final Service service;
@@ -107,10 +108,8 @@ class _ServiceCardState extends State<ServiceCard> {
                                   .user
                                   .id;
 
-
                               String locationName;
                               if (!widget.slider) {
-
                                 locationName = (context
                                             .read<AttractionDetailsCubit>()
                                             .state
@@ -118,7 +117,6 @@ class _ServiceCardState extends State<ServiceCard> {
                                     .attraction
                                     .locationName;
                               } else {
-                        
                                 locationName = (context
                                         .read<LocationInfoCubit>()
                                         .state as LocationInfoAddressLoaded)
@@ -144,7 +142,20 @@ class _ServiceCardState extends State<ServiceCard> {
                                             selectedTrips.length -
                                             unselectedTrips.length;
                                   });
+                                  if (selectedTrips.isNotEmpty &&
+                                      widget.type == 'Địa điểm du lịch') {
+                                    final currentPref = (context
+                                            .read<PreferencesBloc>()
+                                            .state as PreferencesLoadedSuccess)
+                                        .preference;
 
+                                      context.read<PreferencesBloc>().add(
+                                          UpdatePreferenceDF(
+                                              attractionId: widget.service.id,
+                                              currentPref: currentPref,
+                                              action: 'save'));
+
+                                  }
                                   for (var item in selectedTrips) {
                                     context
                                         .read<SavedServiceBloc>()

@@ -19,6 +19,7 @@ class TripModel extends Trip {
     required super.hasTripItineraries,
     super.cover,
     required super.serviceCount,
+    required super.rating,
   });
 
   factory TripModel.fromJson(Map<String, dynamic> json) {
@@ -27,6 +28,7 @@ class TripModel extends Trip {
     // convert json['end_date'] from string to DateTime
     return TripModel(
       id: json['id'] ?? "",
+      rating: json['rating'] != null ? json['rating'].toDouble() : 0.0,
       isSaved: json['is_saved'] ?? false,
       name: json['name'] ?? "",
       hasTripItineraries: json['has_trip_itineraries'] ?? false,
@@ -49,8 +51,9 @@ class TripModel extends Trip {
           ? UserModel.fromJson(json['profiles'])
           : null,
       status: json['status'],
-      isPublished: json['is_published']?? false,
-      locations: json['locations'] != null ? List<String>.from(json['locations']) : [],
+      isPublished: json['is_published'] ?? false,
+      locations:
+          json['locations'] != null ? List<String>.from(json['locations']) : [],
     );
   }
 }

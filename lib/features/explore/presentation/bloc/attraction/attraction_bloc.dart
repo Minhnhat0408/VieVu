@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
+import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
 
 part 'attraction_event.dart';
 part 'attraction_state.dart';
@@ -56,7 +57,7 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
   void _onGetRecommendedAttraction(
       GetRecommendedAttraction event, Emitter<AttractionState> emit) async {
     final res = await _attractionRepository.getRecommendedAttractions(
-        limit: event.limit, userId: event.userId);
+        limit: event.limit, userPref: event.userPref);
     res.fold(
       (l) => emit(AttractionFailure(l.message)),
       (r) => emit(AttractionsLoadedSuccess(r)),
@@ -66,7 +67,9 @@ class AttractionBloc extends Bloc<AttractionEvent, AttractionState> {
   void _onGetRelatedAttractions(
       GetRelatedAttractions event, Emitter<AttractionState> emit) async {
     final res = await _attractionRepository.getRelatedAttractions(
-        attractionId: event.attractionId, limit: event.limit , userId: event.userId);
+        attractionId: event.attractionId,
+        limit: event.limit,
+        userId: event.userId);
     res.fold(
       (l) => emit(AttractionFailure(l.message)),
       (r) => emit(AttractionsLoadedSuccess(r)),

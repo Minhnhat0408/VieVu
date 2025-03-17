@@ -39,7 +39,6 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
 
   @override
   Widget build(BuildContext context) {
-    // log('result: ${result?.title}');
     return MultiBlocListener(
       listeners: [
         BlocListener<AttractionDetailsCubit, AttractionDetailsState>(

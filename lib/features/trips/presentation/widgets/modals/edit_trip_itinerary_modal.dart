@@ -97,8 +97,6 @@ class _EditTripItineraryModalState extends State<EditTripItineraryModal> {
                                             if (item.time.day > day.day &&
                                                 item.time.month >= day.month &&
                                                 item.time.year >= day.year) {
-                                              log('item time: ${item.title} - ${item.time}');
-                                              log('day: ${day.toString()}');
                                               item.time = item.time.subtract(
                                                   const Duration(days: 1));
                                               final tripIndex =
@@ -118,8 +116,6 @@ class _EditTripItineraryModalState extends State<EditTripItineraryModal> {
                                         } else {
                                           _panels.removeAt(index);
                                         }
-                                        log('delete trip itinerary: $_deleteTripItinerary');
-                                        log('update trip itinerary: $_updateTripItinerary');
                                         // make the time of all trip itinerary after this day to the previous day
                                       });
                                     },
@@ -190,7 +186,6 @@ class _EditTripItineraryModalState extends State<EditTripItineraryModal> {
                                             setState(() {
                                               _deleteTripItinerary.add(e);
                                               _tripItinerary.remove(e);
-                                              log('delete trip itinerary: $_deleteTripItinerary');
                                             });
                                           },
                                           icon: const Icon(

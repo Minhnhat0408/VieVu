@@ -108,7 +108,8 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     try {
       var query = supabaseClient
           .from('trips')
-          .select("*, saved_services(count), profiles(*)")
+          .select(
+              "*, saved_services(count), profiles(*),  trip_reviews(rating)")
           .eq('is_published', true);
 
       if (status != null) {
@@ -138,7 +139,12 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       return response.map((e) {
         final tripItem = e;
         tripItem['service_count'] = e['saved_services'][0]['count'];
-
+        List<int> ratings = (e["trip_reviews"] as List)
+            .map((ratingEntry) => ratingEntry["rating"] as int)
+            .toList();
+        tripItem['rating'] = ratings.isNotEmpty
+            ? ratings.reduce((a, b) => a + b) / ratings.length
+            : 0.0;
         return TripModel.fromJson(tripItem);
       }).toList();
     } catch (e) {
@@ -169,7 +175,6 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
               file,
             );
 
-        log('updated');
         return supabaseClient.storage.from('trip_cover_images').getPublicUrl(
               "$tripId.jpg",
             );
@@ -236,7 +241,6 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       required int limit,
       required int offset}) async {
     try {
-      log('hellooo');
       var query = supabaseClient
           .from('trips')
           .select('*, trip_participants!inner(user_id), saved_services(count)')

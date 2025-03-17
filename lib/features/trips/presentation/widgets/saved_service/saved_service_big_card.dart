@@ -15,6 +15,7 @@ import 'package:vn_travel_companion/features/trips/domain/entities/saved_service
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class SavedServiceBigCard extends StatefulWidget {
   final SavedService service;
@@ -112,6 +113,20 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
                             displayModal(context, SavedToTripModal(
                               onTripsChanged: (List<Trip> selectedTrips,
                                   List<Trip> unselectedTrips) {
+                                if (selectedTrips.isNotEmpty &&
+                                    widget.service.typeId == 2) {
+                                  final currentPref = (context
+                                          .read<PreferencesBloc>()
+                                          .state as PreferencesLoadedSuccess)
+                                      .preference;
+
+                                    context.read<PreferencesBloc>().add(
+                                        UpdatePreferenceDF(
+                                            attractionId: widget.service.id,
+                                            currentPref: currentPref,
+                                            action: 'save'));
+
+                                }
                                 for (var item in selectedTrips) {
                                   context
                                       .read<SavedServiceBloc>()
@@ -121,9 +136,7 @@ class _SavedServiceBigCardState extends State<SavedServiceBigCard> {
                                         cover: widget.service.cover,
                                         name: widget.service.name,
                                         locationName:
-                                            state is LocationInfoAddressLoaded
-                                                ? state.cityName
-                                                : '',
+                                            widget.service.locationName,
                                         rating: widget.service.rating,
                                         ratingCount: widget.service.ratingCount,
                                         typeId: widget.service.typeId,

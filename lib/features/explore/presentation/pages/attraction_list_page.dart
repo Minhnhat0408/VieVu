@@ -101,7 +101,6 @@ class _AttractionListPageState extends State<AttractionListPage>
                   topRanked: false),
             );
       } else {
-        log("Latitude: ${widget.latitude}, Longitude: ${widget.longitude}");
         context.read<AttractionBloc>().add(
               GetAttractionsWithFilter(
                   lat: widget.latitude,
@@ -339,7 +338,6 @@ class _AttractionListPageState extends State<AttractionListPage>
               }
               if (state is AttractionsLoadedSuccess) {
                 totalRecordCount += state.attractions.length;
-                log("Total record count: $totalRecordCount");
 
                 final next = totalRecordCount;
                 final isLastPage = state.attractions.length < pageSize;

@@ -306,7 +306,6 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
   }
 
   SnackBar _tripStatusSnachBar(Trip? trip) {
-    log('Current user: ${currentUser?.role}');
     return SnackBar(
       padding: currentUser?.role == 'owner' &&
               trip!.status != 'completed' &&

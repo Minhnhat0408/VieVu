@@ -41,3 +41,15 @@ class InsertPreference extends PreferencesEvent {
   });
 }
 
+
+class UpdatePreferenceDF extends PreferencesEvent {
+  final int attractionId;
+  final Preference currentPref;
+  final String action;
+
+  UpdatePreferenceDF({
+    required this.attractionId,
+    required this.currentPref,
+    required this.action,
+  });
+}

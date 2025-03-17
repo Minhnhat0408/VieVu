@@ -61,6 +61,7 @@ class _HotAttractionsSectionState extends State<HotAttractionsSection> {
                 height: 400, // Height for the horizontal list
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
+
                   itemCount: attractions!.length, // Number of items
                   itemBuilder: (context, index) {
                     return Padding(

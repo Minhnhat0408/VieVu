@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
@@ -39,6 +42,7 @@ class SettingsPage extends StatelessWidget {
     };
     return CustomAppbar(
       appBarTitle: 'Tài khoản',
+      
       actions: [
         Consumer<ThemeProvider>(builder: (context, notifier, child) {
           return IconButton(
@@ -190,6 +194,10 @@ class SettingsPage extends StatelessWidget {
                                   .onSecondaryContainer),
                         )),
                   ),
+                  // FloatingActionButton(
+                  //   onPressed: sendSimpleNoti,
+                  //   child: const Icon(Icons.notifications_active),
+                  // )
                 ],
               );
             },

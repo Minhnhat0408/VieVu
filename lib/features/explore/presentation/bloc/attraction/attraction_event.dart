@@ -26,9 +26,9 @@ class UpsertRecentViewedAttractions extends AttractionEvent {
 
 class GetRecommendedAttraction extends AttractionEvent {
   final int limit;
-  final String userId;
+  final Preference userPref;
 
-  GetRecommendedAttraction({required this.limit, required this.userId});
+  GetRecommendedAttraction({required this.limit, required this.userPref});
 }
 
 class GetRelatedAttractions extends AttractionEvent {

@@ -12,6 +12,7 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class AttractionMedCard extends StatefulWidget {
   final Attraction attraction;
@@ -118,7 +119,19 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                                             selectedTrips.length -
                                             unselectedTrips.length;
                                   });
+                                  if (selectedTrips.isNotEmpty) {
+                                    final currentPref = (context
+                                            .read<PreferencesBloc>()
+                                            .state as PreferencesLoadedSuccess)
+                                        .preference;
 
+                                      context.read<PreferencesBloc>().add(
+                                          UpdatePreferenceDF(
+                                              attractionId: widget.attraction.id,
+                                              currentPref: currentPref,
+                                              action: 'save'));
+
+                                  }
                                   for (var item in selectedTrips) {
                                     context
                                         .read<SavedServiceBloc>()
@@ -243,24 +256,38 @@ class _AttractionMedCardState extends State<AttractionMedCard> {
                           ),
                           const SizedBox(height: 4),
                           if (widget.attraction.travelTypes != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 2),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                border: Border.all(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                              child: Text(
-                                widget.attraction.travelTypes![0]
-                                        ['type_name'] ??
-                                    '',
-                                maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: widget.attraction.travelTypes!
+                                    .map<Widget>((type) => Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            type is String
+                                                ? type
+                                                : type['type_name'] as String,
+                                            maxLines: 1,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
                               ),
                             ),
                           const SizedBox(height: 4),

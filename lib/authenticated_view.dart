@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
@@ -12,6 +13,7 @@ import 'package:vn_travel_companion/features/chat/presentation/pages/all_chats_p
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore_nested_routes.dart';
 import 'package:vn_travel_companion/features/chat/presentation/pages/chats_nested_routes.dart';
 import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:vn_travel_companion/features/notifications/presentation/pages/notification_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/home_nested_routes.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_nested_routes.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
@@ -38,6 +40,8 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
     });
   }
 
+  final service = FlutterBackgroundService();
+
   @override
   void initState() {
     super.initState();
@@ -45,38 +49,38 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     context.read<NotificationBloc>().add(GetUnreadNotificationsCount());
 
-    client
-        .channel("notifcations_count:$userId")
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'notifications',
-          filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'receiver_id',
-              value: userId),
-          callback: (payload) {
-            // log('Payload: $payload');
-            final event = payload.eventType;
-            if (event == PostgresChangeEvent.update) {
-              final data = payload.newRecord;
-              if (data['is_read'] == false) {
-                setState(() {
-                  _unreadNotificationsCount++;
-                });
-              } else {
-                setState(() {
-                  _unreadNotificationsCount--;
-                });
-              }
-            } else if (event == PostgresChangeEvent.insert) {
-              setState(() {
-                _unreadNotificationsCount++;
-              });
-            }
-          },
-        )
-        .subscribe();
+    service.on('newNotification').listen((payload) {
+      log('New notification: $payload');
+
+      final event = payload!['eventType'];
+      if (event == 'update') {
+        final data = payload['newRecord'];
+        if (data['is_read'] == false) {
+          setState(() {
+            _unreadNotificationsCount++;
+          });
+        } else {
+          setState(() {
+            _unreadNotificationsCount--;
+          });
+        }
+      } else if (event == 'insert') {
+        setState(() {
+          _unreadNotificationsCount++;
+        });
+      }
+    });
+
+    service.on('redirecting').listen((data) {
+      log('Redirect: $data');
+      // setState(() {
+      //   _selectedIndex = 4;
+      // });
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return const NotificationPage();
+      }));
+    });
+   
 
     client
         .channel("chat_realtime:$userId")

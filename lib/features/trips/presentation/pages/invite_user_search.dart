@@ -37,7 +37,6 @@ class _InviteUserSearchState extends State<InviteUserSearch> {
   void _onSearchChanged(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 1000), () async {
-      log('searching for $keyword');
       setState(() {
         _keyword = keyword;
       });

@@ -317,7 +317,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       ),
                       null,
                       true);
-                  log("messageId: $messageId");
 
                   if (messageId != null) {
                     scrollToMessage(messageId);
@@ -406,7 +405,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           if (state.messages.isNotEmpty &&
                               state.messages.last.id == _scrollToMessageId) {
                             WidgetsBinding.instance.addPostFrameCallback((_) {
-                              log('Post frame callback');
                               _scrollController.animateTo(
                                 _scrollController.position.maxScrollExtent +
                                     230,
@@ -732,7 +730,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                     ),
                                                     null,
                                                     true);
-                                            log("messageId: $messageId");
 
                                             if (messageId != null) {
                                               scrollToMessage(messageId);

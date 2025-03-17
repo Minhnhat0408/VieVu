@@ -136,7 +136,6 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                                   _currentSelectedTrips.add(trip);
 
                                   if (!_initialSelectedTrips.contains(trip)) {
-                                    log('hello');
                                     _selectedTrips.add(trip);
                                   }
                                   _unselectedTrips.remove(trip);

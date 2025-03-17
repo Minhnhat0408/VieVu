@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
@@ -8,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/secrets/supabase_secret.dart';
+import 'package:http/http.dart' as http;
 
 // final SupabaseClient client = serviceLocator<SupabaseClient>();
 const notiChannelId = 'location_service';
@@ -19,6 +21,13 @@ Future<void> initializeBackgroundService() async {
     nottiChannelName, // title
     description:
         'This channel is used for sharing location between member of trip', // description
+    importance: Importance.max,
+  );
+  const AndroidNotificationChannel channelNoti = AndroidNotificationChannel(
+    'app_background_noti', // id
+    'App Background Notifications', // title
+    description:
+        'This channel is used for app background notifications', // description
     importance: Importance.max,
   );
 
@@ -36,11 +45,9 @@ Future<void> initializeBackgroundService() async {
         iOS: DarwinInitializationSettings(),
         android: AndroidInitializationSettings('ic_bg_service_small'),
       ),
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        log('notification tap background');
-        log(response.toString());
-      },
-      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+      onDidReceiveNotificationResponse: notificationTapBackground,
+      onDidReceiveBackgroundNotificationResponse:
+          notificationTapBackgroundAction,
     );
   }
 
@@ -48,6 +55,10 @@ Future<void> initializeBackgroundService() async {
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channelNoti);
 
   await service.configure(
     androidConfiguration: AndroidConfiguration(
@@ -56,6 +67,7 @@ Future<void> initializeBackgroundService() async {
       autoStart: true,
       isForegroundMode: false,
       notificationChannelId: notiChannelId,
+      autoStartOnBoot: true,
       initialNotificationTitle: 'Chia sẻ vị trí',
       initialNotificationContent: 'Khởi động dịch vụ chia sẻ vị trí',
       foregroundServiceNotificationId: 888,
@@ -71,6 +83,20 @@ Future<void> initializeBackgroundService() async {
 
 @pragma('vm:entry-point')
 void notificationTapBackground(
+    NotificationResponse notificationResponse) async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  DartPluginRegistrant.ensureInitialized();
+  log('notification tap type redirect${notificationResponse.payload}');
+
+  // FlutterBackgroundService().invoke('newNotification');
+  if (notificationResponse.payload == 'notification') {
+    FlutterBackgroundService().invoke('redirectNoti');
+  }
+}
+
+@pragma('vm:entry-point')
+void notificationTapBackgroundAction(
     NotificationResponse notificationResponse) async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
@@ -109,6 +135,81 @@ void onStart(ServiceInstance service) async {
 
   // Stream<Position>? positionStream;
   if (service is AndroidServiceInstance) {
+    final user = client.auth.currentUser;
+    if (user == null) {
+      log('User is null');
+      // return;
+    }
+    client
+        .channel('background_noti_receiver:${user?.id}')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'notifications',
+          filter: user != null
+              ? PostgresChangeFilter(
+                  type: PostgresChangeFilterType.eq,
+                  column: 'receiver_id',
+                  value: user.id,
+                )
+              : null,
+          callback: (payload) async {
+            log('new notification');
+            final event = payload.eventType;
+            final data = payload.newRecord;
+            final sender = data['sender_id'] != null
+                ? await client
+                    .from('profiles')
+                    .select('first_name,avatar_url')
+                    .eq('id', data['sender_id'])
+                    .maybeSingle()
+                : null;
+            final trip = data['trip_id'] != null
+                ? await client
+                    .from('trips')
+                    .select('name,cover')
+                    .eq('id', data['trip_id'])
+                    .maybeSingle()
+                : null;
+            service.invoke('newNotification', {
+              'eventType': payload.eventType == PostgresChangeEvent.update
+                  ? 'update'
+                  : 'insert',
+              'newRecord': data,
+            });
+            if (event == PostgresChangeEvent.insert) {
+              final http.Response response = await http.get(Uri.parse(
+                  sender != null ? sender['avatar_url'] : trip!['cover']));
+              flutterLocalNotificationsPlugin.show(
+                data['id'],
+                sender != null
+                    ? "Thông báo từ ${sender['first_name']}"
+                    : "Thông báo từ ${trip!['name']}",
+                data['type'] != "trip_update"
+                    ? "${sender != null ? "${sender['first_name']}" : ""} ${data['content']} ${trip != null ? "${trip['name']}" : ""}"
+                    : "${trip != null ? "${trip['name']}" : ""} ${data['content']}",
+                payload: 'notification',
+                NotificationDetails(
+                  android: AndroidNotificationDetails(
+                    'app_background_noti',
+                    'App Background Notifications',
+                    icon: 'ic_bg_service_small',
+                    importance: Importance.max,
+                    channelDescription: 'App Background Notifications',
+                    priority: Priority.high,
+                    ongoing: false,
+                    largeIcon: ByteArrayAndroidBitmap.fromBase64String(
+                      base64Encode(response.bodyBytes),
+                    ),
+                    autoCancel: false,
+                  ),
+                ),
+              );
+            }
+          },
+        )
+        .subscribe();
+
     if (await service.isForegroundService()) {
       log('foreground service');
     } else {
@@ -121,7 +222,6 @@ void onStart(ServiceInstance service) async {
       service.setAsBackgroundService();
     });
 
-  
     service.on('listenToLocation').listen((data) async {
       log('listen to location');
       log(data.toString());
@@ -157,11 +257,9 @@ void onStart(ServiceInstance service) async {
           ),
         ),
       );
-      // }
-      // }
+
       final currentUser = data['data'];
-      log("current channel name: $channelName");
-      log("new channel name: ${data['channel_name']}");
+
 
       if (channelName != data['channel_name']) {
         channelName = data['channel_name'] as String;
@@ -194,8 +292,17 @@ void onStart(ServiceInstance service) async {
           });
         });
       }
+    });
 
-      // log('initial position');
+    service.on('redirectNoti').listen((data) {
+      // log('Redirect: $data');
+      // setState(() {
+      //   _selectedIndex = 4;
+      // });
+      // Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      //   return const NotificationPage();
+      // }));
+      service.invoke('redirecting');
     });
     service.on('stopListen').listen((event) {
       // remove notificaiton id 888
@@ -206,7 +313,7 @@ void onStart(ServiceInstance service) async {
     });
     service.on('stopService').listen((event) {
       log('stop listening');
-
+      client.removeAllChannels();
       service.stopSelf();
     });
   }

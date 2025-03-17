@@ -21,3 +21,5 @@ final class PreferencesFailure extends PreferencesState {
   PreferencesFailure(this.message);
 }
 
+
+

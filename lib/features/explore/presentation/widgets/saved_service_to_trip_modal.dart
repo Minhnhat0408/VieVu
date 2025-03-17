@@ -146,14 +146,12 @@ class _SavedServiceToTripModalState extends State<SavedServiceToTripModal> {
                                   _currentSelectedTrips.add(trip);
 
                                   if (!_initialSelectedTrips.contains(trip)) {
-                                    log('hello');
                                     _selectedTrips.add(trip);
                                     _unselectedTrips.remove(trip);
                                   }
                                 } else {
                                   _currentSelectedTrips.remove(trip);
                                   if (_initialSelectedTrips.contains(trip)) {
-                                    log("hi");
                                     _unselectedTrips.add(trip);
                                     _selectedTrips.remove(trip);
                                   }

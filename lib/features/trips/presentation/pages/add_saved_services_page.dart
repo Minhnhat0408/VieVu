@@ -67,7 +67,6 @@ class _AddSavedServicesPageViewState extends State<AddSavedServicesPageView> {
   void _onSearchChanged(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 1000), () async {
-      log('searching for $keyword');
       setState(() {
         _keyword = keyword;
       });
@@ -98,7 +97,6 @@ class _AddSavedServicesPageViewState extends State<AddSavedServicesPageView> {
       } else if (_selectedFilter == 'Khách sạn' ||
           _selectedFilter == 'Nhà hàng' ||
           _selectedFilter == 'Cửa hàng') {
-        log('calling external api');
         context.read<SearchBloc>().add(SearchExternalApi(
               searchText: _keyword,
               limit: pageSize,

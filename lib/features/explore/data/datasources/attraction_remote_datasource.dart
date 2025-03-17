@@ -10,6 +10,8 @@ import 'package:vn_travel_companion/features/explore/data/models/hotel_model.dar
 import 'package:vn_travel_companion/features/explore/data/models/restaurant_model.dart';
 import 'package:vn_travel_companion/features/explore/data/models/service_model.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
+import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
 
 abstract interface class AttractionRemoteDatasource {
   Future<AttractionModel?> getAttraction({
@@ -59,7 +61,7 @@ abstract interface class AttractionRemoteDatasource {
 
   Future<List<AttractionModel>> getRecommendedAttractions({
     required int limit,
-    required String userId,
+    required PreferenceModel userPref,
   });
 
   Future<List<AttractionModel>> getRelatedAttractions({
@@ -445,25 +447,23 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
   @override
   Future<List<AttractionModel>> getRecommendedAttractions({
     required int limit,
-    required String userId,
+    required PreferenceModel userPref,
   }) async {
     final Uri url =
         Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/recommendations');
 
     try {
-      final response = await supabaseClient
-          .from('user_preferences')
-          .select()
-          .eq('user_id', userId)
-          .single();
-      // log(response.toString());
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException('Không thể xác thực người dùng');
+      }
       final body = {
         "user_preferences": {
           "user_id": 1,
-          "price": response['budget'],
-          "avg_rating": response['avg_rating'],
-          "rating_count": response['rating_count'],
-          ...response['prefs_df'],
+          "price": userPref.budget,
+          "avg_rating": userPref.avgRating,
+          "rating_count": userPref.ratingCount,
+          ...userPref.prefsDF,
         },
         "attraction_ids": [],
         "top_n": limit,
@@ -483,7 +483,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         final res2 = await supabaseClient
             .from('trips')
             .select('saved_services!inner(link_id)')
-            .eq('owner_id', userId)
+            .eq('owner_id', user.id)
             .inFilter(
                 'saved_services.link_id', data.map((e) => e['id']).toList());
         final linkIds = res2
@@ -593,7 +593,6 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
       }
 
       final response = await query.range(offset, offset + limit);
-      log('attraction');
 
       return (response as List).map((e) {
         return AttractionModel.fromJson(e);

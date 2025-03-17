@@ -9,6 +9,8 @@ import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
 import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
 import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
+import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
+import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
 
 class AttractionRepositoryImpl implements AttractionRepository {
   final AttractionRemoteDatasource attractionRemoteDatasource;
@@ -235,7 +237,7 @@ class AttractionRepositoryImpl implements AttractionRepository {
   @override
   Future<Either<Failure, List<Attraction>>> getRecommendedAttractions({
     required int limit,
-    required String userId,
+    required Preference userPref,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -244,7 +246,12 @@ class AttractionRepositoryImpl implements AttractionRepository {
       final attractions =
           await attractionRemoteDatasource.getRecommendedAttractions(
         limit: limit,
-        userId: userId,
+        userPref: PreferenceModel(
+          budget: userPref.budget,
+          avgRating: userPref.avgRating,
+          ratingCount: userPref.ratingCount,
+          prefsDF: userPref.prefsDF,
+        ),
       );
 
       return right(attractions);

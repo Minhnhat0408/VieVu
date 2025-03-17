@@ -16,6 +16,8 @@ class Trip {
   final int serviceCount;
   final List<String>? transports;
   final bool isSaved;
+  final double rating;
+
   bool hasTripItineraries;
 
   Trip({
@@ -23,6 +25,7 @@ class Trip {
     required this.name,
     required this.hasTripItineraries,
     this.description,
+    required this.rating,
     this.cover,
     required this.isSaved,
     this.startDate,

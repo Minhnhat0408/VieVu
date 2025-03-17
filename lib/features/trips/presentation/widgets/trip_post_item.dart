@@ -65,16 +65,33 @@ class _TripPostItemState extends State<TripPostItem> {
                     ),
                   ),
                 ),
-                // Positioned(
-                //     top: 14,
-                //     right: 14,
-                //     child: IconButton(
-                //         style: IconButton.styleFrom(
-                //           backgroundColor:
-                //               Theme.of(context).colorScheme.primaryContainer,
-                //         ),
-                //         onPressed: () {},
-                //         icon: const Icon(Icons.bookmark))),
+                if (widget.trip.status == 'completed' && widget.trip.rating > 0)
+                  Positioned(
+                    top: 14,
+                    right: 14,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.tertiaryContainer,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.yellow,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.trip.rating.toStringAsFixed(1),
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 Positioned(
                   bottom: 14,
                   left: 14,

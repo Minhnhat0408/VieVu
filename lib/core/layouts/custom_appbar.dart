@@ -32,6 +32,7 @@ class CustomAppbar extends StatelessWidget {
                 },
               )
             : null,
+        automaticallyImplyLeading: false,
         title: appBarTitle != null ? Text(appBarTitle!) : null,
         actions: actions,
         centerTitle: centerTitle,

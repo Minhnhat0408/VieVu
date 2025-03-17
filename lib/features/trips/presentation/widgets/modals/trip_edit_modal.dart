@@ -39,7 +39,6 @@ class _TripEditModalState extends State<TripEditModal> {
   String coverImage = "";
 
   void selectImage() async {
-    log("Select image");
     final pickedImage = await pickImage();
 
     if (pickedImage != null) {

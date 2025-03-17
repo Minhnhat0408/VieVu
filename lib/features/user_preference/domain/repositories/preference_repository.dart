@@ -22,4 +22,11 @@ abstract interface class PreferenceRepository {
     int? ratingCount,
     Map<String, dynamic>? prefsDF,
   });
+
+  Future<Either<Failure, Preference>> updateUserPreferenceDF({
+     required int attractionId,
+
+    required Preference currentPref,
+    required String action,
+  });
 }

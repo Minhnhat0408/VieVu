@@ -43,7 +43,6 @@ class _EventBigCardState extends State<EventBigCard> {
       listener: (context, state) {
         if (state is LocationInfoGeoLoaded) {
           setState(() {
-            log('Latitude and longitude are fetched');
             latitude = state.latitude;
             longitude = state.longitude;
             locationId = state.locationId;
@@ -152,7 +151,6 @@ class _EventBigCardState extends State<EventBigCard> {
                                     if (latitude == null ||
                                         longitude == null ||
                                         locationId == null) {
-                                      log('Latitude and longitude are null');
                                     } else {
                                       context
                                           .read<SavedServiceBloc>()

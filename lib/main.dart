@@ -97,13 +97,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    log('dispose');
-    service.invoke('stopService');
-  }
-
-  @override
   Widget build(BuildContext context) {
     // final brightness = View.of(context).platformDispatcher.platformBrightness;
     TextTheme textTheme =

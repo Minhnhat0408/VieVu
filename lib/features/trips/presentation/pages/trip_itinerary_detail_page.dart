@@ -68,7 +68,6 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
             // change the updated itinerary in the list
 
             setState(() {
-              log('Updated itinerary: ${state.tripItinerary.time.toString()}');
               final updatedItinerary = state.tripItinerary;
               itineraries[index] = updatedItinerary;
             });

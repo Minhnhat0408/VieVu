@@ -16,6 +16,7 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
     on<UpdatePreference>(_onUpdatePreference);
     on<InsertPreference>(_onInsertPreference);
     on<UserPreferenceSignOut>(_onSignOut);
+    on<UpdatePreferenceDF>(_onUpdatePreferenceDF);
   }
 
   void _onGetPreference(
@@ -63,6 +64,20 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
       avgRating: event.avgRating,
       ratingCount: event.ratingCount,
       prefsDF: event.prefsDF,
+    );
+    res.fold(
+      (l) => emit(PreferencesFailure(l.message)),
+      (r) => emit(PreferencesLoadedSuccess(r)),
+    );
+  }
+
+  void _onUpdatePreferenceDF(
+      UpdatePreferenceDF event, Emitter<PreferencesState> emit) async {
+    emit(PreferencesLoading());
+    final res = await _preferenceRepository.updateUserPreferenceDF(
+      attractionId: event.attractionId,
+      currentPref: event.currentPref,
+      action: event.action,
     );
     res.fold(
       (l) => emit(PreferencesFailure(l.message)),

@@ -205,7 +205,6 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
           'Content-Type': 'application/json',
         },
       );
-      log(locationId.toString());
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
         final data = jsonResponse['moduleList'] != null
@@ -217,32 +216,27 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
         }
         for (final item in data) {
           if (item['typeName'] == 'hotComment') {
-            log('hotComment');
             returnData['comments'] =
                 (item['hotCommentModule']['hotCommentList'] as List)
                     .map((e) => Comment.fromJson(e))
                     .toList();
           } else if (item['typeName'] == 'tripBestRank') {
-            log('tripBestRank');
             returnData['tripbestModule'] = (item['tripBestRankingInfoModule']
                     ['rankgingInfoTabList'] as List)
                 .map((e) => TripBest.fromJson(e))
                 .toList();
           } else if (item['typeName'] == 'classicRecommendSight') {
-            log('classicRecommendSight');
             returnData['attractions'] = (item['classicRecommendSightModule']
                     ['sightList'][0]['sightList'] as List)
                 .map((e) {
               return AttractionModel.fromGeneralLocationInfo(e);
             }).toList();
           } else if (item['typeName'] == 'classicRecommendHotel') {
-            log('classicRecommendHotel');
             returnData['hotels'] = (item['classicRecommendHotelModule']
                     ['hotelList'][0]['hotelList'] as List)
                 .map((e) => HotelModel.fromGeneralLocationInfo(e))
                 .toList();
           } else if (item['typeName'] == 'classicRecommendRestaurant') {
-            log('classicRecommendRestaurant');
 
             returnData['restaurants'] =
                 (item['classicRecommendRestaurantModule']['restaurantList'][0]

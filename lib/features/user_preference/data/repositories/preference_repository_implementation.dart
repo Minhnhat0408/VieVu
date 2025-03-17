@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
+import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
 import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
 import 'package:vn_travel_companion/features/user_preference/domain/repositories/preference_repository.dart';
 
@@ -77,6 +80,35 @@ class PreferenceRepositoryImpl implements PreferenceRepository {
 
       return right(preference);
     } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Preference>> updateUserPreferenceDF({
+      required int attractionId,
+
+    required Preference currentPref,
+    required String action,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final preference = await remoteDataSource.updateUserPreferenceDF(
+        attractionId: attractionId,
+        currentPref: PreferenceModel(
+          budget: currentPref.budget,
+          avgRating: currentPref.avgRating,
+          ratingCount: currentPref.ratingCount,
+          prefsDF: currentPref.prefsDF,
+        ),
+        action: action,
+      );
+
+      return right(preference);
+    } on ServerException catch (e) {
+      log(e.message);
       return left(Failure(e.message));
     }
   }

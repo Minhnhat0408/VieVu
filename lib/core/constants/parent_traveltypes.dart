@@ -14,3 +14,4 @@ List<TravelType> parentTravelTypes = [
   TravelType(id: '70-165', name: 'Phong Cách Sống'),
   TravelType(id: '70-166', name: 'Thể thao'),
 ];
+

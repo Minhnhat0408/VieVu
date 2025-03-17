@@ -134,7 +134,9 @@ class _NotificationPageState extends State<NotificationPage> {
                       title: RichText(
                         text: TextSpan(
                           children: highlightText(
-                              "${item.user?.firstName ?? ""} ${item.content} ${item.trip?.name ?? ""}",
+                              item.type != "trip_update"
+                                  ? "${item.user?.firstName ?? ""} ${item.content} ${item.trip?.name ?? ""}"
+                                  : "${item.trip?.name ?? ""} ${item.content}",
                               item.content),
                           style: DefaultTextStyle.of(context)
                               .style, // Đảm bảo phong cách văn bản mặc định

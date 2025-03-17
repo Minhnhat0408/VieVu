@@ -25,12 +25,15 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/slider
 import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class AttractionDetailPage extends StatelessWidget {
   final int attractionId;
+  final bool? isSearch;
 
-  const AttractionDetailPage({super.key, required this.attractionId});
+  const AttractionDetailPage(
+      {super.key, required this.attractionId, this.isSearch = false});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +46,10 @@ class AttractionDetailPage extends StatelessWidget {
         BlocProvider(create: (_) => serviceLocator<ReviewsCubit>()),
       ],
       child: Scaffold(
-        body: AttractionDetailView(attractionId: attractionId),
+        body: AttractionDetailView(
+          attractionId: attractionId,
+          isSearch: isSearch,
+        ),
       ),
     );
   }
@@ -51,10 +57,12 @@ class AttractionDetailPage extends StatelessWidget {
 
 class AttractionDetailView extends StatefulWidget {
   final int attractionId;
+  final bool? isSearch;
 
   const AttractionDetailView({
     super.key,
     required this.attractionId,
+    this.isSearch = false,
   });
 
   @override
@@ -67,14 +75,17 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
   final GlobalKey _reviewsSectionKey = GlobalKey();
   int changeSavedItemCount = 0;
   bool _showFullDescription = false;
+  bool _udpatePref = false;
   int currentSavedTripCount = 0;
   @override
   void initState() {
     super.initState();
+
     final userId =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
-    context.read<TripBloc>().add(GetSavedToTrips(
-        userId: userId, id: widget.attractionId));
+    context
+        .read<TripBloc>()
+        .add(GetSavedToTrips(userId: userId, id: widget.attractionId));
     context
         .read<AttractionDetailsCubit>()
         .fetchAttractionDetails(widget.attractionId);
@@ -101,7 +112,6 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
         BlocListener<TripBloc, TripState>(
           listener: (context, state) {
             if (state is SavedToTripLoadedSuccess) {
-              log('SavedToTripLoadedSuccess');
               currentSavedTripCount =
                   state.trips.where((trip) => trip.isSaved).length;
             }
@@ -119,54 +129,59 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
                             userId: userId,
                             id: state.attraction.id,
                           ));
-                      displayModal(
-                          context,
-                          SavedToTripModal(
 
-                            onTripsChanged: (List<Trip> selectedTrips,
-                                List<Trip> unselectedTrips) {
-                              setState(() {
-                                changeSavedItemCount = selectedTrips.length +
-                                    unselectedTrips.length;
+                      displayModal(context, SavedToTripModal(
+                        onTripsChanged: (List<Trip> selectedTrips,
+                            List<Trip> unselectedTrips) {
+                          setState(() {
+                            changeSavedItemCount =
+                                selectedTrips.length + unselectedTrips.length;
 
-                                currentSavedTripCount = currentSavedTripCount +
-                                    selectedTrips.length -
-                                    unselectedTrips.length;
-                              });
+                            currentSavedTripCount = currentSavedTripCount +
+                                selectedTrips.length -
+                                unselectedTrips.length;
+                          });
+                          if (selectedTrips.isNotEmpty) {
+                            final currentPref = (context
+                                    .read<PreferencesBloc>()
+                                    .state as PreferencesLoadedSuccess)
+                                .preference;
+                            context.read<PreferencesBloc>().add(
+                                UpdatePreferenceDF(
+                                    attractionId: state.attraction.id,
+                                    currentPref: currentPref,
+                                    action: 'save'));
+                          }
 
-                              for (var item in selectedTrips) {
-                                context
-                                    .read<SavedServiceBloc>()
-                                    .add(InsertSavedService(
-                                      tripId: item.id,
-                                      linkId: state.attraction.id,
-                                      cover: state.attraction.cover,
-                                      name: state.attraction.name,
-                                      locationName:
-                                          state.attraction.locationName,
-                                      rating: state.attraction.avgRating ?? 0,
-                                      ratingCount:
-                                          state.attraction.ratingCount ?? 0,
-                                      typeId: 2,
-                                      tagInfoList: state.attraction.travelTypes!
-                                          .map((e) => e['type_name'].toString())
-                                          .toList(),
-                                      latitude: state.attraction.latitude,
-                                      longitude: state.attraction.longitude,
-                                    ));
+                          for (var item in selectedTrips) {
+                            context
+                                .read<SavedServiceBloc>()
+                                .add(InsertSavedService(
+                                  tripId: item.id,
+                                  linkId: state.attraction.id,
+                                  cover: state.attraction.cover,
+                                  name: state.attraction.name,
+                                  locationName: state.attraction.locationName,
+                                  rating: state.attraction.avgRating ?? 0,
+                                  ratingCount:
+                                      state.attraction.ratingCount ?? 0,
+                                  typeId: 2,
+                                  tagInfoList: state.attraction.travelTypes!
+                                      .map((e) => e['type_name'].toString())
+                                      .toList(),
+                                  latitude: state.attraction.latitude,
+                                  longitude: state.attraction.longitude,
+                                ));
+                          }
 
-                              }
-
-                              for (var item in unselectedTrips) {
-                                context.read<SavedServiceBloc>().add(
-                                    DeleteSavedService(
-                                        linkId: state.attraction.id,
-                                        tripId: item.id));
-                              }
-                            },
-                          ),
-                          null,
-                          false);
+                          for (var item in unselectedTrips) {
+                            context.read<SavedServiceBloc>().add(
+                                DeleteSavedService(
+                                    linkId: state.attraction.id,
+                                    tripId: item.id));
+                          }
+                        },
+                      ), null, false);
                     }
                   },
                   icon: Icon(
@@ -184,6 +199,27 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
           if (state is AttractionDetailsFailure) {
             // Show error message
             showSnackbar(context, state.message, 'error');
+          }
+
+          if (state is AttractionDetailsLoadedSuccess) {
+            if (_udpatePref == false) {
+              final currentPref = (context.read<PreferencesBloc>().state
+                      as PreferencesLoadedSuccess)
+                  .preference;
+
+              context.read<PreferencesBloc>().add(UpdatePreferenceDF(
+                  attractionId: state.attraction.id,
+                  currentPref: currentPref,
+                  action: 'save'));
+
+              context.read<PreferencesBloc>().add(UpdatePreferenceDF(
+                  attractionId: state.attraction.id,
+                  currentPref: currentPref,
+                  action: 'search'));
+              setState(() {
+                _udpatePref = true;
+              });
+            }
           }
         },
         builder: (context, state) {

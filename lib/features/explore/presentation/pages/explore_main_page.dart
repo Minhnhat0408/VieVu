@@ -13,14 +13,17 @@ import 'package:vn_travel_companion/features/explore/presentation/widgets/attrac
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class ExploreMainPage extends StatefulWidget {
-  const ExploreMainPage({super.key});
+  const ExploreMainPage({
+    super.key,
+  });
 
   @override
   State<ExploreMainPage> createState() => _ExploreMainPageState();
 }
 
 class _ExploreMainPageState extends State<ExploreMainPage> {
-  bool refresh = false;
+  bool? refresh;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,9 +38,11 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
             BlocProvider.of<EventBloc>(context)
                 .add(GetHotEvents(userId: userId));
 
-            BlocProvider.of<AttractionBloc>(context)
-                .add(GetRecommendedAttraction(userId: userId, limit: 10));
-            refresh = !refresh;
+            if (refresh == null) {
+              refresh = true;
+            } else {
+              refresh = !refresh!;
+            }
           });
         },
         child: CustomScrollView(
@@ -68,7 +73,9 @@ class _ExploreMainPageState extends State<ExploreMainPage> {
                 sliver: SliverToBoxAdapter(
                     child: BlocProvider(
                   create: (context) => serviceLocator<AttractionBloc>(),
-                  child: const RecommendedAttractionSection(),
+                  child: RecommendedAttractionSection(
+                    refresh: refresh,
+                  ),
                 ))),
             const SliverPadding(
                 padding: EdgeInsets.only(bottom: 40.0),

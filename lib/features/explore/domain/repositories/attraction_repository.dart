@@ -4,6 +4,7 @@ import 'package:vn_travel_companion/features/explore/domain/entities/attraction.
 import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
+import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
 
 abstract interface class AttractionRepository {
   Future<Either<Failure, Attraction>> getAttraction({
@@ -55,7 +56,7 @@ abstract interface class AttractionRepository {
 
   Future<Either<Failure, List<Attraction>>> getRecommendedAttractions({
     required int limit,
-    required String userId,
+    required Preference userPref,
   });
 
   Future<Either<Failure, List<Attraction>>> getRelatedAttractions({

@@ -39,7 +39,6 @@ class _TripSavedServicesPageState extends State<TripSavedServicesPage>
   @override
   void initState() {
     super.initState();
-    log("TripSavedServicesPage initState");
     if (context.read<SavedServiceBloc>().state is SavedServicesLoadedSuccess) {
       final state =
           context.read<SavedServiceBloc>().state as SavedServicesLoadedSuccess;

@@ -9,12 +9,14 @@ import 'package:vn_travel_companion/core/utils/open_url.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/all_nearby_service_page.dart';
 
 import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/init_dependencies.dart';
 
 class ExploreSearchItem extends StatelessWidget {
@@ -102,6 +104,7 @@ class ExploreSearchItem extends StatelessWidget {
                 externalLink: result!.externalLink,
                 linkId: result!.id,
               ));
+
           openDeepLink(result!.externalLink!);
         } else if (result?.type == 'attractions') {
           context.read<SearchBloc>().add(SearchHistory(
@@ -111,7 +114,22 @@ class ExploreSearchItem extends StatelessWidget {
                 address: result!.address,
                 linkId: result!.id,
               ));
-          Navigator.pushNamed(context, '/attraction', arguments: result!.id);
+
+          //  final currentPref = (context.read<PreferencesBloc>().state
+          //             as PreferencesLoadedSuccess)
+          //         .preference;
+          //     for (var item in state.attraction.travelTypes ?? []) {
+          //       context.read<PreferencesBloc>().add(UpdatePreferenceDF(
+          //           travelType:
+          //               item is String ? item : item['type_name'] as String,
+          //           currentPref: currentPref,
+          //           action: 'view'));
+          //     }
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AttractionDetailPage(
+                attractionId: result!.id,
+                isSearch: true,
+              )));
         } else if (result?.type == 'hotel' ||
             result?.type == 'restaurant' ||
             result?.type == 'shop') {

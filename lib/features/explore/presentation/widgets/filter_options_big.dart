@@ -30,7 +30,6 @@ class _FilterOptionsBigState extends State<FilterOptionsBig> {
   @override
   void initState() {
     super.initState();
-    log('FilterOptionsBig init');
     options = List.from(widget.options);
     topItem = widget.selectedOption.isNotEmpty ? widget.selectedOption : null;
   }

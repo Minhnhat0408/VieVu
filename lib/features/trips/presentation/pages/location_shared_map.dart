@@ -145,7 +145,6 @@ class _LocationSharedMapState extends State<LocationSharedMap>
         currentUser.latitude = position.latitude;
         currentUser.longitude = position.longitude;
       });
-      log("realtime:trip_${widget.tripId}_location");
 
       service.invoke('listenToLocation', {
         'channel_name': "realtime:trip_${widget.tripId}_location",

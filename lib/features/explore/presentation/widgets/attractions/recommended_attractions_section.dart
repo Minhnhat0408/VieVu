@@ -4,11 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/all_recommendations_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
+import 'package:vn_travel_companion/init_dependencies.dart';
 
 class RecommendedAttractionSection extends StatefulWidget {
-  const RecommendedAttractionSection({super.key});
+  final bool? refresh;
+  const RecommendedAttractionSection({super.key, this.refresh});
 
   @override
   State<RecommendedAttractionSection> createState() =>
@@ -17,29 +22,62 @@ class RecommendedAttractionSection extends StatefulWidget {
 
 class _RecommendedAttractionSectionState
     extends State<RecommendedAttractionSection> {
+  final List<Attraction> attractions = [];
   @override
   void initState() {
     super.initState();
     final userId =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
-    context
-        .read<AttractionBloc>()
-        .add(GetRecommendedAttraction(limit: 10, userId: userId));
+    context.read<AttractionBloc>().add(GetRecommendedAttraction(
+        limit: 10,
+        userPref:
+            (context.read<PreferencesBloc>().state as PreferencesLoadedSuccess)
+                .preference));
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.refresh != null) {
+      final userId =
+          (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
+      context.read<AttractionBloc>().add(GetRecommendedAttraction(
+          limit: 10,
+          userPref: (context.read<PreferencesBloc>().state
+                  as PreferencesLoadedSuccess)
+              .preference));
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(20),
-          child: Text(
-            'Gợi ý cho bạn',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge!
-                .copyWith(fontWeight: FontWeight.bold),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Gợi ý cho bạn',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge!
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                        create: (context) => serviceLocator<AttractionBloc>(),
+                        child: const AllRecommendationsPage(),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Xem tất cả',
+                ),
+              ),
+            ],
           ),
         ),
         BlocConsumer<AttractionBloc, AttractionState>(
@@ -55,12 +93,11 @@ class _RecommendedAttractionSectionState
 
             if (state is AttractionsLoadedSuccess) {
               return SizedBox(
-                height: 400, // Height for the horizontal list
+                height: 415, // Height for the horizontal list
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: state.attractions.length, // Number of items
                   itemBuilder: (context, index) {
-                    log(state.attractions[index].name);
                     return Padding(
                       padding: EdgeInsets.only(
                         left: index == 0

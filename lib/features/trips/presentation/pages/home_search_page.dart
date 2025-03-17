@@ -39,7 +39,6 @@ class _HomeSearchState extends State<HomeSearchPage> {
   void _onSearchChanged(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 1000), () async {
-      log('searching for $keyword');
       setState(() {
         _keyword = keyword;
       });
@@ -137,7 +136,7 @@ class _HomeSearchState extends State<HomeSearchPage> {
             elevation: const WidgetStatePropertyAll(0),
             leading: const Icon(Icons.search),
             onSubmitted: (value) {
-        
+
             },
             onChanged: (value) {
               setState(() {});

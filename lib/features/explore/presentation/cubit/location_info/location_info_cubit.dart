@@ -46,7 +46,6 @@ class LocationInfoCubit extends Cubit<LocationInfoState> {
     final result = await _locationRepository.convertAddressToGeoLocation(
       address: address,
     );
-    log('result: $result');
     result.fold(
       (failure) => emit(LocationInfoFailure(message: failure.message)),
       (geo) => emit(LocationInfoGeoLoaded(

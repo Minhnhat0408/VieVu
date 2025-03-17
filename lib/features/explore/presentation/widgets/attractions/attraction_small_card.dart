@@ -11,6 +11,7 @@ import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class AttractionSmallCard extends StatefulWidget {
   final Attraction attraction;
@@ -104,7 +105,18 @@ class _AttractionSmallCardState extends State<AttractionSmallCard> {
                                           selectedTrips.length -
                                           unselectedTrips.length;
                                 });
+                                if (selectedTrips.isNotEmpty) {
+                                  final currentPref = (context
+                                          .read<PreferencesBloc>()
+                                          .state as PreferencesLoadedSuccess)
+                                      .preference;
 
+                                  context.read<PreferencesBloc>().add(
+                                      UpdatePreferenceDF(
+                                          attractionId: widget.attraction.id,
+                                          currentPref: currentPref,
+                                          action: 'save'));
+                                }
                                 for (var item in selectedTrips) {
                                   context
                                       .read<SavedServiceBloc>()
