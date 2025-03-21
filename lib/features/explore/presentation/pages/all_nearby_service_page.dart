@@ -89,19 +89,9 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
       // log('Current Position: ${position.latitude}, ${position.longitude}');
 
       setState(() {
-        userPos = [20.9907609, 105.8159886];
+        userPos = [position.latitude, position.longitude];
       });
 
-      // Geolocator.getPositionStream(
-      //   desiredAccuracy: LocationAccuracy.best,
-      //   distanceFilter: 10,
-      // ).listen((Position position) {
-      //   // log('Stream Position: ${position.latitude}, ${position.longitude}');
-      //   setState(() {
-      //     userPos = [20.9907609, 105.8159886];
-      //   });
-      // });
-      // Save position to Hive
       final locationBox = Hive.box('locationBox');
       locationBox.put('latitude', position.latitude);
       locationBox.put('longitude', position.longitude);
@@ -512,14 +502,16 @@ class _AllNearbyServicePageState extends State<AllNearbyServicePage>
                       itemCount: services.length,
                       carouselController: buttonCarouselController,
                       itemBuilder: (context, index, realIndex) {
-                        return ServiceCard(
-                            service: services[index],
-                            slider: true,
-                            type: services[index].typeId == 1
-                                ? "Nhà hàng"
-                                : services[index].typeId == 2
-                                    ? "Địa điểm du lịch"
-                                    : "Khách sạn");
+                        return RepaintBoundary(
+                          child: ServiceCard(
+                              service: services[index],
+                              slider: true,
+                              type: services[index].typeId == 1
+                                  ? "Nhà hàng"
+                                  : services[index].typeId == 2
+                                      ? "Địa điểm du lịch"
+                                      : "Khách sạn"),
+                        );
                       },
                       options: CarouselOptions(
                         height: 130,

@@ -295,19 +295,13 @@ void onStart(ServiceInstance service) async {
     });
 
     service.on('redirectNoti').listen((data) {
-      // log('Redirect: $data');
-      // setState(() {
-      //   _selectedIndex = 4;
-      // });
-      // Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      //   return const NotificationPage();
-      // }));
+    
       service.invoke('redirecting');
     });
     service.on('stopListen').listen((event) {
       // remove notificaiton id 888
       log('stop listening');
-
+      flutterLocalNotificationsPlugin.cancel(888);
       positionChannel.unsubscribe();
       channelName = null;
     });

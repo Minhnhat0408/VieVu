@@ -20,6 +20,7 @@ class TripModel extends Trip {
     super.cover,
     required super.serviceCount,
     required super.rating,
+    super.publishedTime,
   });
 
   factory TripModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +36,9 @@ class TripModel extends Trip {
       cover: json['cover'],
       serviceCount: json['service_count'] ?? 0,
       description: json['description'],
+      publishedTime: json['published_time'] != null
+          ? DateTime.parse(json['published_time'])
+          : null,
       transports: json['transports'] != null
           ? (json['transports'] as List<dynamic>)
               .map((v) => v.toString())

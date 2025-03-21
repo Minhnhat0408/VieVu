@@ -22,6 +22,8 @@ final class NotificationError extends NotificationState {
 final class NotificationDeleted extends NotificationState {}
 
 final class NotificationMarkedAsRead extends NotificationState {}
+final class AllNotificationsMarkedAsRead extends NotificationState {}
+
 
 final class NotificationSent extends NotificationState {}
 

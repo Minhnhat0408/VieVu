@@ -1,7 +1,7 @@
 class Chat {
   final int id;
   final String name;
-  final String  imageUrl;
+  final String?  imageUrl;
 
   final String? tripId;
   final String? lastMessage;
@@ -13,7 +13,7 @@ class Chat {
     required this.id,
     required this.name,
     this.tripId,
-    required this.imageUrl,
+     this.imageUrl,
     this.lastMessage,
     this.lastMessageTime,
     this.lastSeenUserAvatar,

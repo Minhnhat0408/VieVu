@@ -257,15 +257,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           titleSpacing: 0,
           title: ListTile(
             leading: CachedNetworkImage(
-              imageUrl:
-                  widget.chat.imageUrl ?? 'https://via.placeholder.com/150',
+              imageUrl: widget.chat.imageUrl ?? '',
               imageBuilder: (context, imageProvider) => CircleAvatar(
                 backgroundImage: imageProvider,
               ),
               width: 60,
               height: 60,
               placeholder: (context, url) => const CircularProgressIndicator(),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+              errorWidget: (context, url, error) => widget.chat.tripId != null
+                  ? const CircleAvatar(child: Icon(Icons.group))
+                  : const CircleAvatar(child: Icon(Icons.person)),
             ),
             visualDensity: VisualDensity.compact,
             contentPadding:
@@ -640,7 +641,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   ),
                                   const SizedBox(height: 20),
                                   Text(
-                                    'No messages',
+                                    'Chưa có tin nhắn nào',
                                     style: TextStyle(
                                       color:
                                           Theme.of(context).colorScheme.outline,

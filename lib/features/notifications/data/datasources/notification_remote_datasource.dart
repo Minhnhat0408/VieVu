@@ -90,9 +90,14 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   @override
   Future<void> markAllNotificationsAsRead() async {
     try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException(
+            "Không thể đánh dấu tất cả thông báo đã đọc");
+      }
       await supabaseClient.from('notifications').update({
         'is_read': true,
-      });
+      }).eq('receiver_id', user.id);
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());

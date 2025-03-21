@@ -62,7 +62,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     final res = await _notificationRepository.markAllNotificationsAsRead();
     res.fold(
       (l) => emit(NotificationError(message: l.message)),
-      (r) => emit(NotificationMarkedAsRead()),
+      (r) => emit(AllNotificationsMarkedAsRead()),
     );
   }
 

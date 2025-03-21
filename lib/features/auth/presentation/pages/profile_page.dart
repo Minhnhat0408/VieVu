@@ -73,7 +73,6 @@ class _ProfilePageState extends State<ProfilePage> {
               if (_isMe)
                 IconButton(
                   onPressed: () async {
-
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => EditProfilePage(
                               user: user!,
@@ -108,6 +107,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 radius: 70,
                                 backgroundImage: imageProvider,
                               ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const CircleAvatar(
+                              radius: 70,
+                              child: Icon(
+                                Icons.person,
+                                size: 70,
+                              ), // Change this to your desired border color
                             ),
                             fit: BoxFit.cover,
                             width: 140,

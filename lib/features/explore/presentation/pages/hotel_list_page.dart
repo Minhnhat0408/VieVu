@@ -10,6 +10,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
@@ -345,7 +346,7 @@ class _HotelListPageState extends State<HotelListPage>
               }
             },
             builder: (context, state) {
-              return IndexedStack(index: mapView ? 0 : 1, children: [
+              return LazyLoadIndexedStack(index: mapView ? 0 : 1, children: [
                 if (_pagingController.itemList != null)
                   Stack(
                     children: [
@@ -489,11 +490,13 @@ class _HotelListPageState extends State<HotelListPage>
                         itemCount: _pagingController.itemList!.length,
                         carouselController: buttonCarouselController,
                         itemBuilder: (context, index, realIndex) {
-                          return HotelSmallCard(
-                            hotel: _pagingController.itemList![index],
-                            slider: true,
-                            locationName: widget.locationName,
-                            locationId: widget.locationId,
+                          return RepaintBoundary(
+                            child: HotelSmallCard(
+                              hotel: _pagingController.itemList![index],
+                              slider: true,
+                              locationName: widget.locationName,
+                              locationId: widget.locationId,
+                            ),
                           );
                         },
                         options: CarouselOptions(

@@ -135,9 +135,7 @@ class _HomeSearchState extends State<HomeSearchPage> {
             onTapOutside: (event) => FocusScope.of(context).unfocus(),
             elevation: const WidgetStatePropertyAll(0),
             leading: const Icon(Icons.search),
-            onSubmitted: (value) {
-
-            },
+            onSubmitted: (value) {},
             onChanged: (value) {
               setState(() {});
             },
@@ -181,9 +179,7 @@ class _HomeSearchState extends State<HomeSearchPage> {
                 child: Padding(
                     padding: const EdgeInsets.only(bottom: 4.0),
                     child: FilterOptionsBig(
-                        key: _keyword.isEmpty
-                            ? const Key('searchHistory')
-                            : const Key('searchResults'),
+                        key: const Key('searchResults'),
                         options: _filterOptions,
                         selectedOption: _selectedFilter,
                         onOptionSelected: _onFilterChanged,
@@ -208,11 +204,12 @@ class _HomeSearchState extends State<HomeSearchPage> {
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           leading: CachedNetworkImage(
-                            imageUrl: item.cover,
+                            imageUrl: item.cover ?? '',
                             placeholder: (context, url) =>
                                 const CircularProgressIndicator(),
                             errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
+                                const CircleAvatar(
+                                    radius: 30, child: Icon(Icons.person)),
                             imageBuilder: (context, imageProvider) => Container(
                               width: 60,
                               height: 80,

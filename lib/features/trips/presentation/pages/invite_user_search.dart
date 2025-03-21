@@ -13,8 +13,7 @@ import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member
 
 class InviteUserSearch extends StatefulWidget {
   final Trip trip;
-  const InviteUserSearch({super.key,
-    required this.trip});
+  const InviteUserSearch({super.key, required this.trip});
 
   @override
   State<InviteUserSearch> createState() => _InviteUserSearchState();
@@ -148,11 +147,11 @@ class _InviteUserSearchState extends State<InviteUserSearch> {
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           leading: CachedNetworkImage(
-                            imageUrl: item.cover,
+                            imageUrl: item.cover ?? "",
                             placeholder: (context, url) =>
                                 const CircularProgressIndicator(),
                             errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
+                                const CircleAvatar(child: Icon(Icons.person)),
                             imageBuilder: (context, imageProvider) => Container(
                               width: 60,
                               height: 80,

@@ -1,7 +1,7 @@
 class HomeSearchResult {
   final String id;
   final String name;
-  final String cover;
+  final String? cover;
   final String type;
   final String? locations;
 

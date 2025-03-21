@@ -164,13 +164,23 @@ class _TripPostsPageState extends State<TripPostsPage> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: CachedNetworkImageProvider(
-                    (context.read<AppUserCubit>().state as AppUserLoggedIn)
-                            .user
-                            .avatarUrl ??
-                        '',
+                CachedNetworkImage(
+                  imageUrl:
+                      (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                              .user
+                              .avatarUrl ??
+                          '',
+                  imageBuilder: (context, imageProvider) => CircleAvatar(
+                    radius: 20,
+                    backgroundImage: imageProvider,
+                  ),
+                  height: 40,
+                  width: 40,
+                  placeholder: (context, url) => const CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+                  errorWidget: (context, url, error) => const CircleAvatar(
+                    child: Icon(Icons.person),
                   ),
                 ),
                 const SizedBox(width: 10),

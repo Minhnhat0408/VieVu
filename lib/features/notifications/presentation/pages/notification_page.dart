@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vn_travel_companion/core/constants/notification_types.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
 import 'package:vn_travel_companion/features/notifications/domain/entities/notification.dart'
     as app;
@@ -40,11 +41,14 @@ class _NotificationPageState extends State<NotificationPage> {
       centerTitle: true,
       actions: [
         IconButton(
-            onPressed: () {
-              context
-                  .read<NotificationBloc>()
-                  .add(MarkAllNotificationsAsRead());
-            },
+            onPressed: (_pagingController.itemList != null &&
+                    _pagingController.itemList!.isNotEmpty)
+                ? () {
+                    context
+                        .read<NotificationBloc>()
+                        .add(MarkAllNotificationsAsRead());
+                  }
+                : null,
             icon: const Icon(
               Icons.mark_email_read_outlined,
               size: 30,
@@ -62,6 +66,15 @@ class _NotificationPageState extends State<NotificationPage> {
             } else {
               _pagingController.appendPage(state.notifications, next);
             }
+            setState(() {});
+          }
+
+          if (state is AllNotificationsMarkedAsRead) {
+            for (var element in _pagingController.itemList!) {
+              element.isRead = true;
+            }
+            setState(() {});
+            showSnackbar(context, "Đã đánh dấu tất cả thông báo là đã đọc");
           }
         },
         builder: (context, state) {
@@ -69,139 +82,166 @@ class _NotificationPageState extends State<NotificationPage> {
               child: PagedListView<int, app.Notification>(
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<app.Notification>(
-                      itemBuilder: (context, item, index) {
-                    return ListTile(
-                      onTap: () {
-                        if (item.type == NotificationType.rating.type) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      ProfilePage(id: item.user!.id)));
-                        }
-                        if (item.type.contains('trip')) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TripDetailPage(
-                                        tripId: item.trip?.id ?? "",
-                                        tripCover: item.trip?.cover ?? "",
-                                      )));
-                        }
-                        if (!item.isRead) {
-                          context.read<NotificationBloc>().add(
-                              MarkNotificationAsRead(notificationId: item.id));
-                          // chnag ehte item.isRead to true
-                          setState(() {
-                            item.isRead = true;
-                          });
-                        }
-                      },
-                      leading: Stack(children: [
-                        CachedNetworkImage(
-                          imageUrl: (item.user != null
-                                  ? item.user?.avatarUrl
-                                  : item.trip?.cover) ??
-                              "",
-                          imageBuilder: (context, imageProvider) =>
-                              CircleAvatar(
-                            radius: 30,
-                            backgroundImage: imageProvider,
-                          ),
-                          height: 60,
-                          width: 60,
-                          placeholder: (context, url) => const CircleAvatar(
-                            child: Icon(Icons.person),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const CircleAvatar(
-                            child: Icon(Icons.person),
-                          ),
-                        ),
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: NotificationType.allNotificationType
-                              .where((element) {
-                                return element.type == item.type;
-                              })
-                              .first
-                              .badge,
-                        )
-                      ]),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      title: RichText(
-                        text: TextSpan(
-                          children: highlightText(
-                              item.type != "trip_update"
-                                  ? "${item.user?.firstName ?? ""} ${item.content} ${item.trip?.name ?? ""}"
-                                  : "${item.trip?.name ?? ""} ${item.content}",
-                              item.content),
-                          style: DefaultTextStyle.of(context)
-                              .style, // Đảm bảo phong cách văn bản mặc định
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(timeago.format(item.createdAt, locale: 'vi')),
-                          if (item.type == "trip_invite" &&
-                              item.isAccepted == null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                // 2 buttons here delcine and accept
-
-                                ElevatedButton(
-                                  onPressed: () {
-                                    context.read<NotificationBloc>().add(
-                                        RejectTripInvitation(
-                                            notificationId: item.id,
-                                            tripId: item.trip?.id ?? "",
-                                            userId: item.user?.id ?? ""));
-                                    setState(() {
-                                      item.isAccepted = false;
-                                    });
-                                  },
-                                  child: const Text('Từ chối'),
+                      firstPageProgressIndicatorBuilder: (context) =>
+                          const Center(child: CircularProgressIndicator()),
+                      animateTransitions: true,
+                      newPageProgressIndicatorBuilder: (context) =>
+                          const Center(child: CircularProgressIndicator()),
+                      noItemsFoundIndicatorBuilder: (context) => Column(
+                            children: [
+                              const SizedBox(height: 250),
+                              Icon(
+                                Icons.mark_email_unread_outlined,
+                                size: 100,
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                              const SizedBox(height: 20),
+                              Text(
+                                'Không có thông báo nào',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.outline,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
-
-                                FilledButton(
-                                  onPressed: () {
-                                    context.read<NotificationBloc>().add(
-                                        AcceptTripInvitation(
-                                            notificationId: item.id,
+                              ),
+                            ],
+                          ),
+                      itemBuilder: (context, item, index) {
+                        return ListTile(
+                          onTap: () {
+                            if (item.type == NotificationType.rating.type) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProfilePage(id: item.user!.id)));
+                            }
+                            if (item.type.contains('trip')) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TripDetailPage(
                                             tripId: item.trip?.id ?? "",
-                                            userId: item.user?.id ?? ""));
-                                    setState(() {
-                                      item.isAccepted = true;
-                                    });
-                                  },
-                                  child: const Text('Đồng ý'),
+                                            tripCover: item.trip?.cover ?? "",
+                                          )));
+                            }
+                            if (!item.isRead) {
+                              context.read<NotificationBloc>().add(
+                                  MarkNotificationAsRead(
+                                      notificationId: item.id));
+                              // chnag ehte item.isRead to true
+                              setState(() {
+                                item.isRead = true;
+                              });
+                            }
+                          },
+                          leading: Stack(children: [
+                            CachedNetworkImage(
+                              imageUrl: (item.user != null
+                                      ? item.user?.avatarUrl
+                                      : item.trip?.cover) ??
+                                  "",
+                              imageBuilder: (context, imageProvider) =>
+                                  CircleAvatar(
+                                radius: 30,
+                                backgroundImage: imageProvider,
+                              ),
+                              height: 60,
+                              width: 60,
+                              placeholder: (context, url) => const CircleAvatar(
+                                child: Icon(Icons.person),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const CircleAvatar(
+                                child: Icon(Icons.person),
+                              ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: NotificationType.allNotificationType
+                                  .where((element) {
+                                    return element.type == item.type;
+                                  })
+                                  .first
+                                  .badge,
+                            )
+                          ]),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          title: RichText(
+                            text: TextSpan(
+                              children: highlightText(
+                                  item.type != "trip_update"
+                                      ? "${item.user?.firstName ?? ""} ${item.content} ${item.trip?.name ?? ""}"
+                                      : "${item.trip?.name ?? ""} ${item.content}",
+                                  item.content),
+                              style: DefaultTextStyle.of(context)
+                                  .style, // Đảm bảo phong cách văn bản mặc định
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  timeago.format(item.createdAt, locale: 'vi')),
+                              if (item.type == "trip_invite" &&
+                                  item.isAccepted == null)
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    // 2 buttons here delcine and accept
+
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        context.read<NotificationBloc>().add(
+                                            RejectTripInvitation(
+                                                notificationId: item.id,
+                                                tripId: item.trip?.id ?? "",
+                                                userId: item.user?.id ?? ""));
+                                        setState(() {
+                                          item.isAccepted = false;
+                                        });
+                                      },
+                                      child: const Text('Từ chối'),
+                                    ),
+
+                                    FilledButton(
+                                      onPressed: () {
+                                        context.read<NotificationBloc>().add(
+                                            AcceptTripInvitation(
+                                                notificationId: item.id,
+                                                tripId: item.trip?.id ?? "",
+                                                userId: item.user?.id ?? ""));
+                                        setState(() {
+                                          item.isAccepted = true;
+                                        });
+                                      },
+                                      child: const Text('Đồng ý'),
+                                    )
+                                  ],
+                                ),
+                              if (item.isAccepted != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: Text(item.isAccepted == true
+                                      ? "Đã chấp nhận"
+                                      : "Đã từ chối"),
                                 )
-                              ],
-                            ),
-                          if (item.isAccepted != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
-                              child: Text(item.isAccepted == true
-                                  ? "Đã chấp nhận"
-                                  : "Đã từ chối"),
-                            )
-                        ],
-                      ),
-                      trailing: item.isRead
-                          ? const SizedBox(
-                              width: 16,
-                            )
-                          : Icon(
-                              Icons.circle,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 16,
-                            ),
-                    );
-                  })),
+                            ],
+                          ),
+                          trailing: item.isRead
+                              ? const SizedBox(
+                                  width: 16,
+                                )
+                              : Icon(
+                                  Icons.circle,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 16,
+                                ),
+                        );
+                      })),
               onRefresh: () async {
                 _pagingController.refresh();
               });

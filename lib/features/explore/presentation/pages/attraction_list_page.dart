@@ -8,6 +8,7 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
@@ -349,8 +350,9 @@ class _AttractionListPageState extends State<AttractionListPage>
               }
             },
             builder: (context, state) {
-              return IndexedStack(
+              return LazyLoadIndexedStack(
                 index: mapView ? 0 : 1,
+
                 children: [
                   if (_pagingController.itemList != null)
                     Stack(
@@ -497,9 +499,11 @@ class _AttractionListPageState extends State<AttractionListPage>
                           itemCount: _pagingController.itemList!.length,
                           carouselController: buttonCarouselController,
                           itemBuilder: (context, index, realIndex) {
-                            return AttractionMedCard(
-                              attraction: _pagingController.itemList![index],
-                              slider: true,
+                            return RepaintBoundary(
+                              child: AttractionMedCard(
+                                attraction: _pagingController.itemList![index],
+                                slider: true,
+                              ),
                             );
                           },
                           options: CarouselOptions(

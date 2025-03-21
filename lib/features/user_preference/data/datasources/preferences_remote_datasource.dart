@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
@@ -27,8 +26,7 @@ abstract interface class PreferencesRemoteDataSource {
   });
 
   Future<PreferenceModel> updateUserPreferenceDF({
-      required int attractionId,
-
+    required int attractionId,
     required PreferenceModel currentPref,
     required String action,
   });
@@ -128,15 +126,20 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
         throw const ServerException('User not authenticated');
       }
 
-      final att  = await supabaseClient
+      final att = await supabaseClient
           .from('attractions')
-          .select('travel_types(name)')
+          .select('attraction_types(type_name)')
           .eq('id', attractionId)
           .single();
 
-      final travelTypes = (att['travel_types'] as List).map((e) => e['name']).toList();
+      final travelTypes =
+          (att['attraction_types'] as List).map((e) => e['type_name']).toList();
 
-      double plusPoint = action == 'view' ? 1 : action == 'search' ? 1.5 : 2;
+      double plusPoint = action == 'view'
+          ? 1
+          : action == 'search'
+              ? 1.5
+              : 2;
       double minScore = 0;
       double maxScore = 5;
 
@@ -151,7 +154,9 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
             .maybeSingle();
 
         if (res != null) {
-          DateTime lastUpdated = DateTime.tryParse(res['updated_at'] ?? '')?.toUtc() ?? DateTime.now().toUtc();
+          DateTime lastUpdated =
+              DateTime.tryParse(res['updated_at'] ?? '')?.toUtc() ??
+                  DateTime.now().toUtc();
           DateTime now = DateTime.now().toUtc();
           int hoursInactive = now.difference(lastUpdated).inHours;
 
@@ -162,7 +167,8 @@ class PreferencesRemoteDataSourceImpl implements PreferencesRemoteDataSource {
         }
 
         // Increase score based on action
-        final newScore = ((newPref[travelType] ?? 0) + plusPoint).clamp(minScore, maxScore);
+        final newScore =
+            ((newPref[travelType] ?? 0) + plusPoint).clamp(minScore, maxScore);
 
         // Save to Supabase
         await supabaseClient.from('preference_history').upsert({

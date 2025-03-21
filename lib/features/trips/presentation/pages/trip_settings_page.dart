@@ -323,7 +323,8 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                     ),
                 ],
               ),
-            if (currentUser?.role != 'owner' ||
+            if ((currentUser?.role != 'owner' &&
+                    widget.trip!.status != "completed") ||
                 (currentUser?.role == 'owner' &&
                     (!widget.trip!.isPublished ||
                         ((widget.trip!.status == 'cancelled' ||

@@ -71,6 +71,10 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
     String? searchType,
   }) async {
     try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw Exception("User not found");
+      }
       final response =
           await supabaseClient.rpc('search_profiles_and_trips', params: {
         'keyword': searchText,

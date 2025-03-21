@@ -133,7 +133,6 @@ class _LocationSharedMapState extends State<LocationSharedMap>
     }).subscribe();
 
     _updateAndStoreCurrentLocation();
-    service.startService();
   }
 
   Future<void> _updateAndStoreCurrentLocation() async {

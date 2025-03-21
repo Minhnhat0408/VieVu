@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/calculate_distance.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
@@ -400,10 +401,13 @@ class LocationDetailMainState extends State<LocationDetailMain>
                           return distanceA.compareTo(
                               distanceB); // Sort by ascending distance
                         });
-                        return IndexedStack(index: mapView ? 0 : 1, children: [
-                          _buildMapView(location, state),
-                          _buildDetailsView(location, locationInfo, imgList),
-                        ]);
+                        return LazyLoadIndexedStack(
+                            index: mapView ? 0 : 1,
+                            children: [
+                              _buildMapView(location, state),
+                              _buildDetailsView(
+                                  location, locationInfo, imgList),
+                            ]);
                       },
                     );
                   }
@@ -559,25 +563,31 @@ class LocationDetailMainState extends State<LocationDetailMain>
           itemBuilder: (context, index, realIndex) {
             if (allServices[index] is Attraction) {
               final attraction = allServices[index] as Attraction;
-              return AttractionMedCard(
-                attraction: attraction,
-                slider: true,
+              return RepaintBoundary(
+                child: AttractionMedCard(
+                  attraction: attraction,
+                  slider: true,
+                ),
               );
             } else if (allServices[index] is Restaurant) {
               final restaurant = allServices[index] as Restaurant;
-              return RestaurantSmallCard(
-                restaurant: restaurant,
-                locationId: widget.locationId,
-                locationName: widget.locationName,
-                slider: true,
+              return RepaintBoundary(
+                child: RestaurantSmallCard(
+                  restaurant: restaurant,
+                  locationId: widget.locationId,
+                  locationName: widget.locationName,
+                  slider: true,
+                ),
               );
             } else {
               final hotel = allServices[index] as Hotel;
-              return HotelSmallCard(
-                hotel: hotel,
-                locationId: widget.locationId,
-                locationName: widget.locationName,
-                slider: true,
+              return RepaintBoundary(
+                child: HotelSmallCard(
+                  hotel: hotel,
+                  locationId: widget.locationId,
+                  locationName: widget.locationName,
+                  slider: true,
+                ),
               );
             }
           },

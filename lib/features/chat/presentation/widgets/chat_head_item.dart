@@ -34,14 +34,16 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
       },
       child: ListTile(
         leading: CachedNetworkImage(
-          imageUrl: widget.chat.imageUrl ?? 'https://via.placeholder.com/150',
+          imageUrl: widget.chat.imageUrl ?? '',
           imageBuilder: (context, imageProvider) => CircleAvatar(
             backgroundImage: imageProvider,
           ),
           width: 60,
           height: 60,
           placeholder: (context, url) => const CircularProgressIndicator(),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
+          errorWidget: (context, url, error) => widget.chat.tripId != null
+              ? const CircleAvatar(child: Icon(Icons.group))
+              : const CircleAvatar(child: Icon(Icons.person)),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),

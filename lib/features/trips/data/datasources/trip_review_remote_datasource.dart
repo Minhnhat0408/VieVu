@@ -57,6 +57,10 @@ class TripReviewRemoteDatasourceImpl implements TripReviewRemoteDataSource {
     required int memberId,
   }) async {
     try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
       final res = await supabaseClient
           .from('trip_reviews')
           .upsert({
@@ -71,7 +75,18 @@ class TripReviewRemoteDatasourceImpl implements TripReviewRemoteDataSource {
       await supabaseClient.from('trip_participants').update({
         'reviewed': true,
       }).eq('id', memberId);
-      log(res.toString());
+      final pref = await supabaseClient
+          .from('user_preferences')
+          .select()
+          .eq('user_id', user.id)
+          .single();
+      final newRatingCount = pref['rating_count'] + 1;
+      final newRating =
+          (pref['rating'] * pref['rating_count'] + rating) / newRatingCount;
+      await supabaseClient.from('user_preferences').update({
+        'avg_rating': newRating,
+        'rating_count': newRatingCount,
+      });
       return TripReviewModel.fromJson(res);
     } catch (e) {
       log(e.toString());

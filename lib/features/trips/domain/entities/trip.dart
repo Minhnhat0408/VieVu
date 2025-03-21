@@ -17,6 +17,7 @@ class Trip {
   final List<String>? transports;
   final bool isSaved;
   final double rating;
+  final DateTime? publishedTime;
 
   bool hasTripItineraries;
 
@@ -38,5 +39,6 @@ class Trip {
     required this.status,
     required this.isPublished,
     this.transports,
+    this.publishedTime,
   });
 }

@@ -41,7 +41,6 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
 
   void _onUpdatePreference(
       UpdatePreference event, Emitter<PreferencesState> emit) async {
-    emit(PreferencesLoading());
     final res = await _preferenceRepository.updateUserPreference(
       userId: event.userId,
       budget: event.budget,
@@ -50,7 +49,7 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
       prefsDF: event.prefsDF,
     );
     res.fold(
-      (l) => emit(PreferencesFailure(l.message)),
+      (l) => null,
       (r) => emit(PreferencesLoadedSuccess(r)),
     );
   }
@@ -73,14 +72,13 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
 
   void _onUpdatePreferenceDF(
       UpdatePreferenceDF event, Emitter<PreferencesState> emit) async {
-    emit(PreferencesLoading());
     final res = await _preferenceRepository.updateUserPreferenceDF(
       attractionId: event.attractionId,
       currentPref: event.currentPref,
       action: event.action,
     );
     res.fold(
-      (l) => emit(PreferencesFailure(l.message)),
+      (l) => null,
       (r) => emit(PreferencesLoadedSuccess(r)),
     );
   }

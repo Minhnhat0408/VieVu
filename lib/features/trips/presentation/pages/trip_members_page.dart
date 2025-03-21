@@ -367,7 +367,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                   child: ListTile(
                                     leading: CachedNetworkImage(
                                       imageUrl: tripMember.user.avatarUrl ??
-                                          'https://via.placeholder.com/150',
+                                          '',
                                       imageBuilder: (context, imageProvider) =>
                                           CircleAvatar(
                                         backgroundImage: imageProvider,

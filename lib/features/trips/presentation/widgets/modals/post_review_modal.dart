@@ -93,8 +93,7 @@ class _PostReviewModalState extends State<PostReviewModal> {
           ),
           ListTile(
             leading: CachedNetworkImage(
-              imageUrl: widget.currentUser.user.avatarUrl ??
-                  'https://via.placeholder.com/150',
+              imageUrl: widget.currentUser.user.avatarUrl ?? '  ',
               imageBuilder: (context, imageProvider) => CircleAvatar(
                 radius: 25,
                 backgroundImage: imageProvider,

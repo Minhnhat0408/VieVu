@@ -47,7 +47,7 @@ class _ReviewItemState extends State<TripReviewItem> {
                   children: [
                     CachedNetworkImage(
                       imageUrl: widget.review.user.avatarUrl ??
-                          'https://via.placeholder.com/150',
+                          '',
                       imageBuilder: (context, imageProvider) => CircleAvatar(
                         radius: 20,
                         backgroundImage: imageProvider,

@@ -30,6 +30,8 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
 
   @override
   Widget build(BuildContext context) {
+    log("${_selectedTrips.length} ${_unselectedTrips.length}");
+
     return BlocConsumer<TripBloc, TripState>(
       listener: (context, state) {
         if (state is SavedToTripLoadedSuccess) {
@@ -161,21 +163,23 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                 color: Theme.of(context).colorScheme.primary,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
-                      onPressed: () {
-                        setState(() {
-                          if (_currentSelectedTrips.isNotEmpty) {
-                            _currentSelectedTrips = [];
-                          }
-                          _currentSelectedTrips = [];
-                        });
-                      },
-                      child: Text(
-                          _currentSelectedTrips.isNotEmpty ? "Hủy" : "Tất cả",
-                          style: const TextStyle(
-                              decoration: TextDecoration.underline))),
+                  // TextButton(
+                  //     onPressed: () {
+                  //       setState(() {
+                  //         if (_currentSelectedTrips.isNotEmpty) {
+                  //           _currentSelectedTrips.clear();
+                  //         } else {
+                  //           _currentSelectedTrips = List.from(state.trips);
+
+                  //         }
+                  //       });
+                  //     },
+                  //     child: Text(
+                  //         _currentSelectedTrips.isNotEmpty ? "Hủy" : "Tất cả",
+                  //         style: const TextStyle(
+                  //             decoration: TextDecoration.underline))),
                   ElevatedButton(
                     onPressed: () {
                       widget.onTripsChanged(_selectedTrips, _unselectedTrips);
@@ -186,6 +190,10 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                       foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     ),
                     child: const Text("Áp dụng"),
+                  ),
+
+                  const SizedBox(
+                    width: 20,
                   ),
                 ],
               ),

@@ -147,7 +147,8 @@ class _TripPostItemState extends State<TripPostItem> {
                                   fontSize: 14),
                             ),
                             Text(
-                              timeago.format(DateTime.now(), locale: 'vi'),
+                              timeago.format(widget.trip.publishedTime!,
+                                  locale: 'vi'),
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Color.fromARGB(255, 215, 215, 215),
@@ -182,8 +183,8 @@ class _TripPostItemState extends State<TripPostItem> {
                               (element) => element.value == widget.trip.status)
                           .first
                           .label,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
+                      style: const TextStyle(
+                        color: Colors.black,
                       ),
                     ),
                   ),

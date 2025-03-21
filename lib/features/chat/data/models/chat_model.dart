@@ -4,7 +4,7 @@ class ChatModel extends Chat {
   ChatModel({
     required super.id,
     required super.name,
-    required super.imageUrl,
+     super.imageUrl,
     super.lastMessage,
     super.lastMessageTime,
     super.tripId,

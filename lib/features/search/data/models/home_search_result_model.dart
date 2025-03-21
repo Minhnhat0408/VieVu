@@ -4,7 +4,7 @@ class HomeSearchResultModel extends HomeSearchResult {
   HomeSearchResultModel({
     required super.id,
     required super.name,
-    required super.cover,
+     super.cover,
     required super.type,
     super.locations,
   });
