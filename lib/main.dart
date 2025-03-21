@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,6 +36,7 @@ import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member
 import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_review_bloc.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
+import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
 import 'package:vn_travel_companion/features/user_preference/presentation/pages/initial_preferences.dart';
@@ -89,11 +92,44 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final service = FlutterBackgroundService();
+  bool _isLoggedIn = false;
+  Uri? _pendingUri;
+  late final StreamSubscription<Uri?> _linkSub;
   @override
   void initState() {
     context.read<AuthBloc>().add(AuthUserLoggedIn());
-    // final accessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
     super.initState();
+    AppLinks().getInitialLink().then((uri) {
+      if (uri != null) {
+        setState(() {
+          _pendingUri = uri;
+        });
+      }
+    });
+    // wrap with mounted to avoid calling setState after dispose
+
+    _linkSub = AppLinks().uriLinkStream.listen((uri) {
+      log(uri.toString());
+      if (_isLoggedIn) {
+        log(uri.toString());
+        if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == 'trip') {
+          final tripId =
+              uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+
+          if (tripId != null) {
+            setState(() {
+              _pendingUri = uri;
+            });
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSub.cancel();
+    super.dispose();
   }
 
   @override
@@ -104,6 +140,7 @@ class _MyAppState extends State<MyApp> {
 
     MaterialTheme theme = MaterialTheme(textTheme);
     final brightness = MediaQuery.of(context).platformBrightness;
+
     return ChangeNotifierProvider(
       create: (BuildContext context) => ThemeProvider(),
       child: Consumer<ThemeProvider>(
@@ -139,6 +176,9 @@ class _MyAppState extends State<MyApp> {
                 }
 
                 if (state is AppUserLoggedIn) {
+                  setState(() {
+                    _isLoggedIn = true;
+                  });
                   context
                       .read<PreferencesBloc>()
                       .add(GetUserPreference(state.user.id));
@@ -169,6 +209,28 @@ class _MyAppState extends State<MyApp> {
                         return const InitialPreferences();
                       }
                       if (state is PreferencesLoadedSuccess) {
+                        if (_pendingUri != null) {
+                          final tripId = _pendingUri!.pathSegments.length > 1
+                              ? _pendingUri!.pathSegments[1]
+                              : null;
+
+                          log(tripId.toString());
+                          if (tripId != null) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (mounted) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => TripDetailPage(
+                                      tripId: tripId,
+                                    ),
+                                  ),
+                                );
+                                _pendingUri = null;
+                              }
+                            });
+                          }
+                          _pendingUri = null;
+                        }
                         return const AuthenticatedView();
                       }
                       return const SplashScreenPage();

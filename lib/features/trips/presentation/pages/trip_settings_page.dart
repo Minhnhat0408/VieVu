@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
@@ -213,7 +214,14 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                           const EdgeInsets.symmetric(horizontal: 20),
                       leading: option.icon,
                       onTap: () {
-                        // Handle each option's action
+                        if (option.title == 'Chia sẻ chuyến đi') {
+                          // copy the link to clipboard
+                          final link =
+                              'vntravelcompanion://app/trip/${widget.trip!.id}';
+                          Clipboard.setData(ClipboardData(text: link));
+                          showSnackbar(context,
+                              'Đã sao chép liên kết chuyến đi!', 'success');
+                        }
                       }),
                 ],
               );
