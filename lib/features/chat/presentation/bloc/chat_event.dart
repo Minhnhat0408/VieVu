@@ -18,7 +18,7 @@ final class InsertChat extends ChatEvent {
 }
 
 final class InsertChatMembers extends ChatEvent {
-  final int id;
+  final String id;
   final String userId;
 
   InsertChatMembers({

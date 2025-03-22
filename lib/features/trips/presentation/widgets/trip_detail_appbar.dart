@@ -123,8 +123,7 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                 ),
               if (currentUser == null &&
                   state is! CurrentTripMemberInfoLoading &&
-                  widget.trip?.status != 'completed' &&
-                  widget.trip?.status != 'cancelled')
+                  widget.trip?.status == 'planning')
                 FilledButton(
                   onPressed: () {
                     final userId =

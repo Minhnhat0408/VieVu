@@ -2,9 +2,11 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
+import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/profile_bloc.dart';
@@ -65,21 +67,31 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         builder: (context, state) {
           return CustomAppbar(
+            floatingActionButton: _isMe
+                ? FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return EditProfilePage(user: user!);
+                      }));
+                    },
+                    child: const Icon(Icons.edit),
+                  )
+                : null,
             appBarTitle: user != null
                 ? "${user?.lastName} ${user?.firstName} ${user?.gender != null ? user!.gender == "Nam" ? "♂️" : "♀️" : ""}"
                 : 'Hồ sơ',
             centerTitle: true,
             actions: [
-              if (_isMe)
-                IconButton(
-                  onPressed: () async {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => EditProfilePage(
-                              user: user!,
-                            )));
-                  },
-                  icon: const Icon(Icons.edit),
-                ),
+              IconButton(
+                onPressed: () {
+                  final link = 'vntravelcompanion://app/profile/${user?.id}';
+                  Clipboard.setData(ClipboardData(text: link));
+                  showSnackbar(
+                      context, 'Đã sao chép liên kết chuyến đi!', 'success');
+                },
+                icon: const Icon(Icons.share),
+              ),
             ],
             body: state is ProfileLoading
                 ? const Center(child: CircularProgressIndicator())

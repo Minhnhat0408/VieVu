@@ -66,7 +66,7 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           subtitle: const Text(
-              "Cho phép mọi người đều có thể xem chuyến đi của bạn và tham gia. Công khai chuyến đi, hệ thống sẽ tự động cập nhật trạng thái chuyến đi phù hợp với ngày lịch trình."),
+              "Cho phép mọi người đều có thể xem chuyến đi của bạn và tham gia. "),
           trailing: Switch(
             value: _published,
             onChanged: (value) {
@@ -76,6 +76,18 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
               });
             },
           ),
+        ),
+        ListTile(
+          horizontalTitleGap: 0,
+          subtitle: Text(
+              '(*) Công khai chuyến đi, hệ thống sẽ tự động cập nhật trạng thái chuyến đi phù hợp với ngày lịch trình.',
+              style: TextStyle(fontSize: 12, color: Colors.grey)),
+        ),
+        ListTile(
+          horizontalTitleGap: 0,
+          subtitle: Text(
+              '(*) Một khi đã công khai , chuyến đi không thể trở về trạng thái riêng tư.',
+              style: TextStyle(fontSize: 12, color: Colors.redAccent)),
         ),
         Divider(
           thickness: 1,
@@ -101,7 +113,8 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
               },
               builder: (context, state) {
                 return ElevatedButton(
-                  onPressed: currentUser?.role == 'owner'
+                  onPressed: currentUser?.role == 'owner' &&
+                          widget.trip.isPublished == false
                       ? () {
                           // widget.onStatusChanged(_status);
                           if (_published != widget.trip.isPublished) {
@@ -111,23 +124,16 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
                                     imageUrl: widget.trip.cover,
                                     name: widget.trip.name,
                                   ));
-                              // context
-                              //     .read<NotificationBloc>()
-                              //     .add(SendNotification(
-                              //       userId: currentUser!.user.id,
-                              //       type: NotificationType.tripPublic.type,
-                              //       tripId: widget.trip.id,
-                              //       content:
-                              //           NotificationType.tripPublic.message,
-                              //     ));
+
+
                             }
                             context.read<TripBloc>().add(UpdateTrip(
                                   isPublished: _published,
                                   tripId: widget.trip.id,
                                 ));
-                            // Update trip
+                
                           }
-                          // Navigator.of(context).pop();
+
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

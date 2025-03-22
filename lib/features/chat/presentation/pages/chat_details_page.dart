@@ -549,13 +549,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           }
                         }
 
-                        if (state is MessageFailure) {
-                          // Show snackbar
-                          showSnackbar(
-                              context, state.message, SnackBarState.error);
-                        }
+
                       },
                       builder: (context, state) {
+                        
                         return Expanded(
                           child: PagedListView<int, Message>(
                             scrollController: _scrollController,

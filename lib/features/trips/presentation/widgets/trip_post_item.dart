@@ -127,8 +127,8 @@ class _TripPostItemState extends State<TripPostItem> {
                           placeholder: (context, url) => const Center(
                             child: CircularProgressIndicator(),
                           ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                          errorWidget: (context, url, error) => CircleAvatar(
+                              radius: 20, child: const Icon(Icons.person)),
                           imageBuilder: (context, imageProvider) =>
                               CircleAvatar(
                             radius: 20,

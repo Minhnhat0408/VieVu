@@ -6,12 +6,14 @@ class CustomAppbar extends StatelessWidget {
   final List<Widget>? actions;
   final bool centerTitle;
   final bool extendBodyBehindAppBar;
+  final FloatingActionButton? floatingActionButton;
   const CustomAppbar({
     super.key,
     required this.body,
     this.appBarTitle,
     this.actions,
     this.centerTitle = false,
+    this.floatingActionButton,
     this.extendBodyBehindAppBar = false,
   });
 
@@ -19,6 +21,7 @@ class CustomAppbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: extendBodyBehindAppBar,
+      floatingActionButton: floatingActionButton,
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
         backgroundColor: Colors.transparent,

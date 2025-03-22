@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:vn_travel_companion/authenticated_view.dart';
@@ -21,12 +22,16 @@ import 'package:vn_travel_companion/core/utils/text_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/profile_bloc.dart';
+import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/reset_password.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
+import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
 import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:vn_travel_companion/features/notifications/presentation/pages/notification_page.dart';
 import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
 import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
 import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
@@ -124,12 +129,24 @@ class _MyAppState extends State<MyApp> {
         }
       }
     });
+
+    _checkDynamicLinks();
   }
 
   @override
   void dispose() {
     _linkSub.cancel();
     super.dispose();
+  }
+
+  Future<void> _checkDynamicLinks() async {
+    final plugin = FlutterLocalNotificationsPlugin();
+    final res = await plugin.getNotificationAppLaunchDetails();
+    if (res?.notificationResponse?.payload != null) {
+      setState(() {
+        _pendingUri = Uri.tryParse(res?.notificationResponse?.payload ?? '');
+      });
+    }
   }
 
   @override
@@ -198,7 +215,7 @@ class _MyAppState extends State<MyApp> {
                   return BlocConsumer<PreferencesBloc, PreferencesState>(
                     listener: (context, state) {
                       if (state is PreferencesFailure) {
-                        showSnackbar(context, state.message);
+                        // showSnackbar(context, state.message);
                       }
                     },
                     builder: (context, state) {
@@ -210,25 +227,103 @@ class _MyAppState extends State<MyApp> {
                       }
                       if (state is PreferencesLoadedSuccess) {
                         if (_pendingUri != null) {
-                          final tripId = _pendingUri!.pathSegments.length > 1
-                              ? _pendingUri!.pathSegments[1]
-                              : null;
-
-                          log(tripId.toString());
-                          if (tripId != null) {
+                          if (_pendingUri!.pathSegments[0] == 'trip') {
+                            final tripId = _pendingUri!.pathSegments.length > 1
+                                ? _pendingUri!.pathSegments[1]
+                                : null;
+                            if (tripId != null) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => TripDetailPage(
+                                        tripId: tripId,
+                                      ),
+                                    ),
+                                  );
+                                  _pendingUri = null;
+                                }
+                              });
+                            }
+                          } else if (_pendingUri!.pathSegments[0] ==
+                              'notifications') {
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               if (mounted) {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => TripDetailPage(
-                                      tripId: tripId,
-                                    ),
+                                    builder: (context) =>
+                                        const NotificationPage(),
                                   ),
                                 );
-                                _pendingUri = null;
                               }
                             });
+                          } else if (_pendingUri!.pathSegments[0] ==
+                              'attraction') {
+                            final attractionId =
+                                _pendingUri!.pathSegments.length > 1
+                                    ? _pendingUri!.pathSegments[1]
+                                    : null;
+                            if (attractionId != null) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AttractionDetailPage(
+                                        attractionId: int.tryParse(
+                                              attractionId ?? '0',
+                                            ) ??
+                                            0,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              });
+                            }
+                          } else if (_pendingUri!.pathSegments[0] ==
+                              'profile') {
+                            final profileId =
+                                _pendingUri!.pathSegments.length > 1
+                                    ? _pendingUri!.pathSegments[1]
+                                    : null;
+                            if (profileId != null) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ProfilePage(
+                                        id: profileId,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              });
+                            }
+                          } else if (_pendingUri!.pathSegments[0] ==
+                              'location') {
+                            // final locationId =
+                            //     _pendingUri!.pathSegments.length > 1
+                            //         ? _pendingUri!.pathSegments[1]
+                            //         : null;
+                            // if (locationId != null) {
+                            //   WidgetsBinding.instance.addPostFrameCallback((_) {
+                            //     if (mounted) {
+                            //       Navigator.of(context).push(
+                            //         MaterialPageRoute(
+                            //           builder: (context) => LocationDetailPage(
+                            //             locationId: int.tryParse(
+                            //                   locationId,
+                            //                 ) ??
+                            //                 0,
+                            //             // locationName: ,
+                            //           ),
+                            //         ),
+                            //       );
+                            //     }
+                            //   });
+                            // }
                           }
+
                           _pendingUri = null;
                         }
                         return const AuthenticatedView();

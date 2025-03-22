@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -106,7 +107,9 @@ class _AttractionDetailViewState extends State<AttractionDetailView> {
         IconButton(
           icon: const Icon(Icons.share),
           onPressed: () {
-            // Share the attraction
+            final link = 'vntravelcompanion://app/trip/${widget.attractionId}';
+            Clipboard.setData(ClipboardData(text: link));
+            showSnackbar(context, 'Đã sao chép liên kết chuyến đi!', 'success');
           },
         ),
         BlocListener<TripBloc, TripState>(

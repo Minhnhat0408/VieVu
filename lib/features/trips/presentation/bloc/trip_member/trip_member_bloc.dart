@@ -64,11 +64,12 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
       tripId: event.tripId,
       userId: event.userId,
     );
-    res.fold(
-      (l) => emit(TripMemberFailure(message: l.message)),
-      (r) => _currentTripMemberInfoCubit.loadTripMemberToTrip(
-          tripId: event.tripId),
-    );
+    res.fold((l) => emit(TripMemberFailure(message: l.message)), (r) {
+      _currentTripMemberInfoCubit.loadTripMemberToTrip(tripId: event.tripId);
+      emit(TripMemberDeletedSuccess(
+        tripMemberId: event.userId,
+      ));
+    });
   }
 
   void _onGetTripMembers(

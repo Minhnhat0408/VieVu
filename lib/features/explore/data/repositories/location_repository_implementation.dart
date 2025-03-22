@@ -126,13 +126,13 @@ class LocationRepositoryImpl implements LocationRepository {
 
       final att = await attractionRemoteDatasource.getAttractionsWithFilter(
           locationId: locationId,
-          limit: 9,
+          limit: 7,
           offset: 0,
           sortType: "hot_score",
           topRanked: false);
 
       final ress = await attractionRemoteDatasource.getRestaurantsWithFilter(
-        limit: 10,
+        limit: 8,
         offset: 1,
         locationId: locationId,
       );
@@ -143,7 +143,7 @@ class LocationRepositoryImpl implements LocationRepository {
         roomQuantity: 1,
         adultCount: 2,
         childCount: 0,
-        limit: 10,
+        limit: 8,
         offset: 1,
         locationName: locationName,
       );
@@ -237,7 +237,7 @@ class LocationRepositoryImpl implements LocationRepository {
   }
 
   @override
-    Future<Either<Failure, LatLng>> convertAddressToLatLng({
+  Future<Either<Failure, LatLng>> convertAddressToLatLng({
     required String address,
   }) async {
     try {

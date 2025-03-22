@@ -95,7 +95,9 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
           BlocListener<TripMemberBloc, TripMemberState>(
             listener: (context, state) {
               if (state is TripMemberDeletedSuccess) {
-                Navigator.of(context).pop();
+                Navigator.of(context)
+                  ..pop()
+                  ..pop();
               }
             },
           ),
@@ -414,7 +416,12 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                                 ),
                               ],
                             ),
-                          );
+                          ).then((value) {
+                            if (value == 'Rời chuyến đi') {
+                              showSnackbar(
+                                  context, 'Đã rời chuyến đi', 'success');
+                            }
+                          });
                         }
                       },
                     ),

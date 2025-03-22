@@ -275,11 +275,21 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     required String tripId,
   }) async {
     try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException('Không có quyền xem chi tiết chuyến đi');
+      }
+
+      // check if the user is the owner or of the trip
       final res = await supabaseClient
           .from('trips')
           .select('*,  saved_services(count)')
           .eq('id', tripId)
           .single();
+
+      if (res['is_published'] == false && res['owner_id'] != user.id) {
+        throw const ServerException('Chuyến đi chưa được công khai');
+      }
 
       final tripItem = res;
       tripItem['service_count'] = res['saved_services'][0]['count'];

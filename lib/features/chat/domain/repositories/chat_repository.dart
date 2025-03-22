@@ -20,7 +20,7 @@ abstract interface class ChatRepository {
   });
 
   Future<Either<Failure, Unit>> insertChatMembers({
-    required int id,
+    required String id,
     required String userId,
   });
 

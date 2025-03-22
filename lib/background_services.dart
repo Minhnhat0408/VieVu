@@ -178,8 +178,13 @@ void onStart(ServiceInstance service) async {
               'newRecord': data,
             });
             if (event == PostgresChangeEvent.insert) {
-              final http.Response response = await http.get(Uri.parse(
-                  sender != null ? sender['avatar_url'] : trip!['cover']));
+              // check avatar_url maybe null
+
+              final http.Response response = await http.get(Uri.parse(sender !=
+                      null
+                  ? sender['avatar_url'] ??
+                      "https://dovercourt.org/wp-content/uploads/2019/11/610-6104451_image-placeholder-png-user-profile-placeholder-image-png.jpg"
+                  : trip!['cover']));
               flutterLocalNotificationsPlugin.show(
                 data['id'],
                 sender != null
@@ -188,7 +193,7 @@ void onStart(ServiceInstance service) async {
                 data['type'] != "trip_update"
                     ? "${sender != null ? "${sender['first_name']}" : ""} ${data['content']} ${trip != null ? "${trip['name']}" : ""}"
                     : "${trip != null ? "${trip['name']}" : ""} ${data['content']}",
-                payload: 'notification',
+                payload: 'vntravelcompanion://app/notifications',
                 NotificationDetails(
                   android: AndroidNotificationDetails(
                     'app_background_noti',
@@ -201,7 +206,7 @@ void onStart(ServiceInstance service) async {
                     largeIcon: ByteArrayAndroidBitmap.fromBase64String(
                       base64Encode(response.bodyBytes),
                     ),
-                    autoCancel: false,
+                    // autoCancel: false,
                   ),
                 ),
               );
@@ -260,7 +265,6 @@ void onStart(ServiceInstance service) async {
 
       final currentUser = data['data'];
 
-
       if (channelName != data['channel_name']) {
         channelName = data['channel_name'] as String;
 
@@ -295,7 +299,6 @@ void onStart(ServiceInstance service) async {
     });
 
     service.on('redirectNoti').listen((data) {
-    
       service.invoke('redirecting');
     });
     service.on('stopListen').listen((event) {

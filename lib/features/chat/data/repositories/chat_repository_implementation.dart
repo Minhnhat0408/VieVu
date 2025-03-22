@@ -90,7 +90,7 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<Either<Failure, Unit>> insertChatMembers({
-    required int id,
+    required String id,
     required String userId,
   }) async {
     try {
@@ -311,7 +311,7 @@ class ChatRepositoryImpl implements ChatRepository {
                 name: itinerary['metaData']['title'],
                 linkId: itinerary['metaData']['id'],
                 locationName: loc.cityName,
-                
+
                 cover: itinerary['metaData']['cover'],
                 rating: itinerary['metaData']['avgRating'] ?? 0,
                 ratingCount: itinerary['metaData']['ratingCount'] ?? 0,

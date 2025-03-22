@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/onboarding_help.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
@@ -98,9 +97,8 @@ class _TripDetailPageState extends State<TripDetailPage>
             setState(() {
               trip = state.trip;
             });
-            log(trip?.status ?? 'null');
+
             if (trip!.status == 'completed') {
-              log(trip?.status ?? 'null');
               // tabController.dispose();
               tabController = TabController(
                 initialIndex: widget.initialIndex ?? 0,
@@ -109,11 +107,15 @@ class _TripDetailPageState extends State<TripDetailPage>
               );
             }
           }
-          if (state is TripDetailsLoadedFailure) {
-            showSnackbar(context, state.message, 'error');
-          }
+          // if (state is TripDetailsLoadedFailure) {
+          //   // showSnackbar(context, state.message, 'error');
+          // }
         },
         builder: (context, state) {
+          if (state is TripDetailsLoadedFailure) {
+            return const Center(child: Text('404 Có lỗi xảy ra'));
+          }
+
           return MultiBlocListener(
             listeners: [
               BlocListener<TripBloc, TripState>(

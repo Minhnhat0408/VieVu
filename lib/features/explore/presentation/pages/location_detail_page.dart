@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -164,7 +165,11 @@ class LocationDetailMainState extends State<LocationDetailMain>
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
-              // Scroll slightly down to make the bottom visible
+              final link =
+                  'vntravelcompanion://app/location/${widget.locationId}';
+              Clipboard.setData(ClipboardData(text: link));
+              showSnackbar(
+                  context, 'Đã sao chép liên kết chuyến đi!', 'success');
             },
           ),
           BlocListener<TripBloc, TripState>(

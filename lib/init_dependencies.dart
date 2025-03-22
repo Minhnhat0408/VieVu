@@ -494,8 +494,9 @@ void _initTripMember() {
     )
     ..registerFactory<TripMemberRepository>(
       () => TripMemberRepositoryImpl(
-        serviceLocator(),
-        serviceLocator(),
+        chatRemoteDatasource: serviceLocator(),
+        tripMemberRemoteDatasource: serviceLocator(),
+        connectionChecker: serviceLocator(),
       ),
     )
     ..registerLazySingleton(

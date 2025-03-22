@@ -4,7 +4,6 @@ import 'package:vn_travel_companion/core/error/exceptions.dart';
 import 'package:vn_travel_companion/core/error/failures.dart';
 import 'package:vn_travel_companion/core/network/connection_checker.dart';
 import 'package:vn_travel_companion/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:vn_travel_companion/features/auth/domain/repository/auth_repository.dart';
 

@@ -17,12 +17,17 @@ abstract class ChatRemoteDatasource {
   });
 
   Future insertChatMembers({
-    required int id,
+    required String id,
     required String userId,
   });
 
   Future deleteChat({
     required int id,
+  });
+
+  Future deleteChatMembers({
+    required String id,
+    required String userId,
   });
 
   Future<ChatModel?> getSingleChat({
@@ -103,6 +108,32 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
       return ChatModel.fromJson(res.first);
     } catch (e) {
       log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future deleteChatMembers({
+    required String id,
+    required String userId,
+  }) async {
+    try {
+      final res = await supabaseClient
+          .from('chats')
+          .select('id')
+          .eq('trip_id', id)
+          .maybeSingle();
+
+      if(res == null) {
+        return;
+      }
+
+      await supabaseClient
+          .from('chat_members')
+          .delete()
+          .eq('chat_id', res['id'])
+          .eq('user_id', userId);
+    } catch (e) {
       throw ServerException(e.toString());
     }
   }
@@ -202,12 +233,18 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
 
   @override
   Future insertChatMembers({
-    required int id,
+    required String id,
     required String userId,
   }) async {
     try {
+      final res = await supabaseClient
+          .from('chats')
+          .select('id')
+          .eq('trip_id', id)
+          .single();
+
       await supabaseClient.from('chat_members').insert({
-        'chat_id': id,
+        'chat_id': res['id'],
         'user_id': userId,
       });
     } catch (e) {
