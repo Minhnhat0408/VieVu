@@ -79,7 +79,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       InsertChatMembers event, Emitter<ChatState> emit) async {
     emit(ChatLoading());
     final res = await _chatRepository.insertChatMembers(
-      id: event.id,
+      chatId: event.chatId,
+      tripId: event.tripId,
       userId: event.userId,
     );
     res.fold(

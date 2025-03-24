@@ -366,8 +366,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                   ),
                                   child: ListTile(
                                     leading: CachedNetworkImage(
-                                      imageUrl: tripMember.user.avatarUrl ??
-                                          '',
+                                      imageUrl: tripMember.user.avatarUrl ?? '',
                                       imageBuilder: (context, imageProvider) =>
                                           CircleAvatar(
                                         backgroundImage: imageProvider,
@@ -390,6 +389,25 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                                 .colorScheme
                                                 .onSurfaceVariant,
                                             fontSize: 12)),
+                                    onTap: (widget.trip.status == "completed" &&
+                                            tripMember.user.id !=
+                                                (context
+                                                            .read<AppUserCubit>()
+                                                            .state
+                                                        as AppUserLoggedIn)
+                                                    .user
+                                                    .id)
+                                        ? () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfilePage(
+                                                  id: tripMember.user.id,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        : null,
                                     trailing: widget.trip.status ==
                                                 'completed' &&
                                             tripMember.user.id !=

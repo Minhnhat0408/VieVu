@@ -18,11 +18,13 @@ final class InsertChat extends ChatEvent {
 }
 
 final class InsertChatMembers extends ChatEvent {
-  final String id;
+  final int?  chatId;
+  final String? tripId;
   final String userId;
 
   InsertChatMembers({
-    required this.id,
+    required this.chatId,
+    required this.tripId,
     required this.userId,
   });
 }

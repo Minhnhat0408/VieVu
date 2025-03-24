@@ -60,10 +60,15 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
       }
       final response = await supabaseClient
           .from('trip_participants')
-          .select('*, profiles(*)')
+          .select('*, profiles(*), trip_reviews(*)')
           .eq('trip_id', tripId)
           .eq('user_id', user.id)
           .maybeSingle();
+
+      if (response != null) {
+        response['reviewed'] = response['trip_reviews'] != null ? true : false;
+      }
+      log(response.toString());
 
       return response != null ? TripMemberModel.fromJson(response) : null;
     } catch (e) {
@@ -108,20 +113,24 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
     required String role,
   }) async {
     try {
-      final res = await supabaseClient
-          .from('trips')
-          .select("max_member, trip_participants(count)")
-          .eq('id', tripId)
-          .single();
-      if (res['trip_participants'][0]['count'] >= res['max_member']) {
-        throw const ServerException("Số lượng thành viên đã đủ");
+      if (role != 'owner') {
+        final res = await supabaseClient
+            .from('trips')
+            .select("max_member, trip_participants(count)")
+            .eq('id', tripId)
+            .single();
+        if (res['trip_participants'][0]['count'] >= res['max_member']) {
+          throw const ServerException("Số lượng thành viên đã đủ");
+        }
       }
+
       await supabaseClient.from('trip_participants').insert({
         'trip_id': tripId,
         'user_id': userId,
         'role': role,
       });
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

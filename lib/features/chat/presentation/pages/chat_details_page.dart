@@ -548,11 +548,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             });
                           }
                         }
-
-
                       },
                       builder: (context, state) {
-                        
                         return Expanded(
                           child: PagedListView<int, Message>(
                             scrollController: _scrollController,

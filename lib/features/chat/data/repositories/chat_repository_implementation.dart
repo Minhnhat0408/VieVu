@@ -82,6 +82,7 @@ class ChatRepositoryImpl implements ChatRepository {
         imageUrl: imageUrl,
         userId: userId,
       );
+
       return right(res);
     } on ServerException catch (e) {
       return left(Failure(e.message));
@@ -90,7 +91,8 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<Either<Failure, Unit>> insertChatMembers({
-    required String id,
+    String? tripId,
+    int? chatId,
     required String userId,
   }) async {
     try {
@@ -98,7 +100,8 @@ class ChatRepositoryImpl implements ChatRepository {
         return left(Failure("Không có kết nối mạng"));
       }
       await chatRemoteDatasource.insertChatMembers(
-        id: id,
+        chatId: chatId,
+        tripId: tripId,
         userId: userId,
       );
       return right(unit);
@@ -265,9 +268,8 @@ class ChatRepositoryImpl implements ChatRepository {
                 longitude: res.longitude,
               );
             } else if (itinerary['metaData']['type'] == 'name') {
-              final loc =
-                  await locationRemoteDatasource.convertAddressToLatLng(
-                      address: itinerary['metaData']['title']);
+              final loc = await locationRemoteDatasource.convertAddressToLatLng(
+                  address: itinerary['metaData']['title']);
               await tripItineraryRemoteDatasource.insertTripItinerary(
                 tripId: chat.tripId,
                 note: itinerary['note'],
@@ -311,7 +313,6 @@ class ChatRepositoryImpl implements ChatRepository {
                 name: itinerary['metaData']['title'],
                 linkId: itinerary['metaData']['id'],
                 locationName: loc.cityName,
-
                 cover: itinerary['metaData']['cover'],
                 rating: itinerary['metaData']['avgRating'] ?? 0,
                 ratingCount: itinerary['metaData']['ratingCount'] ?? 0,

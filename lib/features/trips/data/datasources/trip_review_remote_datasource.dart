@@ -40,7 +40,6 @@ class TripReviewRemoteDatasourceImpl implements TripReviewRemoteDataSource {
           .select('*, trip_participants(profiles(*))')
           .eq('trip_id', tripId)
           .order('created_at', ascending: sortType == 'latest' ? false : true);
-      log(res.toString());
 
       return res.map((e) => TripReviewModel.fromJson(e)).toList();
     } catch (e) {
@@ -72,9 +71,9 @@ class TripReviewRemoteDatasourceImpl implements TripReviewRemoteDataSource {
           .select('*, trip_participants(profiles(*))')
           .single();
 
-      await supabaseClient.from('trip_participants').update({
-        'reviewed': true,
-      }).eq('id', memberId);
+      // await supabaseClient.from('trip_participants').update({
+      //   'reviewed': true,
+      // }).eq('id', memberId);
       final pref = await supabaseClient
           .from('user_preferences')
           .select()
@@ -82,11 +81,11 @@ class TripReviewRemoteDatasourceImpl implements TripReviewRemoteDataSource {
           .single();
       final newRatingCount = pref['rating_count'] + 1;
       final newRating =
-          (pref['rating'] * pref['rating_count'] + rating) / newRatingCount;
+          (pref['avg_rating'] * pref['rating_count'] + rating) / newRatingCount;
       await supabaseClient.from('user_preferences').update({
         'avg_rating': newRating,
         'rating_count': newRatingCount,
-      });
+      }).eq('user_id', user.id);
       return TripReviewModel.fromJson(res);
     } catch (e) {
       log(e.toString());

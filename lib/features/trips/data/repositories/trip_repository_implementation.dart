@@ -89,6 +89,7 @@ class TripRepositoryImpl implements TripRepository {
       final trip =
           await tripRemoteDatasource.insertTrip(name: name, userId: userId);
 
+      log('this the fucking repo');
       await tripMemberRemoteDatasource.insertTripMember(
         tripId: trip.id,
         userId: userId,

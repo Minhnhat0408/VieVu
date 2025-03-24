@@ -46,7 +46,7 @@ class _ChatHeadItemState extends State<ChatHeadItem> {
               : const CircleAvatar(child: Icon(Icons.person)),
         ),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
+            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
         title: Padding(
           padding: const EdgeInsets.only(bottom: 5.0),
           child: Text(

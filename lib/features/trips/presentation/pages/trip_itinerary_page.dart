@@ -369,8 +369,7 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                                                   trailing: FilledButton(
                                                     onPressed:
                                                         itineraries.isNotEmpty
-                                                            ? ()  {
-
+                                                            ? () {
                                                                 Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(

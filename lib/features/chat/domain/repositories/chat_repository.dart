@@ -14,13 +14,14 @@ abstract interface class ChatRepository {
     String? imageUrl,
   });
 
-    Future<Either<Failure, Chat?>> getSingleChat({
+  Future<Either<Failure, Chat?>> getSingleChat({
     String? userId,
     String? tripId,
   });
 
   Future<Either<Failure, Unit>> insertChatMembers({
-    required String id,
+    String? tripId,
+    int? chatId,
     required String userId,
   });
 
@@ -43,7 +44,7 @@ abstract interface class ChatRepository {
     required Function callback,
   });
 
-    RealtimeChannel listenToChatSummariesChannel({
+  RealtimeChannel listenToChatSummariesChannel({
     required int chatId,
     required Function(ChatSummarize) callback,
   });

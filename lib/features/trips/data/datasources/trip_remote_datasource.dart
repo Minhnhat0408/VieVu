@@ -80,12 +80,19 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         'status': 'planning',
         'created_at': DateTime.now().toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
-      }).select("*, profiles(*)");
+        'locations': [],
+      }).select("*, saved_services(count)");
       if (res.isEmpty) {
         throw const ServerException('Failed to insert trip');
       }
-      log(res.first.toString());
 
+      // await supabaseClient.from('trip_participants').insert({
+      //   'trip_id': res.first['id'],
+      //   'user_id': userId,
+      //   'role': 'owner',
+      // });
+      log(res.first.toString());
+      res.first['service_count'] = res.first['saved_services'][0]['count'];
       return TripModel.fromJson(res.first);
     } catch (e) {
       log(e.toString());
@@ -294,6 +301,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       final tripItem = res;
       tripItem['service_count'] = res['saved_services'][0]['count'];
 
+      
       return TripModel.fromJson(tripItem);
     } catch (e) {
       throw ServerException(e.toString());

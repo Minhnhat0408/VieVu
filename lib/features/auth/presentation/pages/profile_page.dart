@@ -201,7 +201,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Row(
                                         children: [
                                           Text(
-                                            "${user!.avgRating}/5 ",
+                                            // set precision to 1 decimal
+
+                                            "${user?.avgRating.toStringAsFixed(1) ?? 0} ",
                                             style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,

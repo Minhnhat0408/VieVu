@@ -7,15 +7,11 @@ import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/common/pages/settings.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/profile_nested_routes.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/pages/all_chats_page.dart';
 import 'package:vn_travel_companion/features/explore/presentation/pages/explore_nested_routes.dart';
-import 'package:vn_travel_companion/features/chat/presentation/pages/chats_nested_routes.dart';
 import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:vn_travel_companion/features/notifications/presentation/pages/notification_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/home_nested_routes.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_nested_routes.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
 import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,7 +76,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
         return const NotificationPage();
       }));
     });
-   
+
 
     client
         .channel("chat_realtime:$userId")

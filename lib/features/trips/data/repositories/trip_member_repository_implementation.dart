@@ -79,7 +79,7 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       await tripMemberRemoteDatasource.insertTripMember(
           tripId: tripId, userId: userId, role: role);
 
-      await chatRemoteDatasource.insertChatMembers(id: tripId, userId: userId);
+      await chatRemoteDatasource.insertChatMembers(tripId: tripId, userId: userId);
       return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));

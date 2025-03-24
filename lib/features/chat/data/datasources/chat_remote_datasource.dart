@@ -17,7 +17,8 @@ abstract class ChatRemoteDatasource {
   });
 
   Future insertChatMembers({
-    required String id,
+    String? tripId,
+    int? chatId,
     required String userId,
   });
 
@@ -100,6 +101,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           params: {'user_id_param': user.id, 'trip_id_param': tripId},
         );
       }
+      log(res.toString());
 
       if (res.isEmpty) {
         return null;
@@ -124,7 +126,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           .eq('trip_id', id)
           .maybeSingle();
 
-      if(res == null) {
+      if (res == null) {
         return;
       }
 
@@ -162,7 +164,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
             .select("id")
             .single();
         final chatId = res['id'];
-        await insertChatMembers(id: chatId, userId: user.id);
+        await insertChatMembers(chatId: chatId, userId: user.id);
         final chat = await getSingleChat(userId: userId, tripId: tripId);
         return chat!;
       }
@@ -171,21 +173,20 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           await supabaseClient.from('chats').insert({}).select("id").single();
       final chatId = res['id'];
       // insert chat members
-      await insertChatMembers(id: chatId, userId: user.id);
-      await insertChatMembers(id: chatId, userId: userId!);
+      await insertChatMembers(chatId: chatId, userId: user.id);
+      await insertChatMembers(chatId: chatId, userId: userId!);
 
       final chat = await getSingleChat(userId: userId, tripId: tripId);
 
       return chat!;
     } catch (e) {
-      final a = e as PostgrestException;
-
-      if (a.code == '23505') {
-        // log('Chat already exists');
-        throw "Chat already exists";
-      } else {
-        throw ServerException(e.toString());
+      if (e is PostgrestException) {
+        if (e.code == '23505') {
+          throw "Chat already exists";
+        }
+        throw ServerException(e.message);
       }
+      throw ServerException(e.toString());
     }
   }
 
@@ -233,20 +234,31 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
 
   @override
   Future insertChatMembers({
-    required String id,
+    String? tripId,
+    int? chatId,
     required String userId,
   }) async {
     try {
-      final res = await supabaseClient
-          .from('chats')
-          .select('id')
-          .eq('trip_id', id)
-          .single();
+      if (tripId == null && chatId == null) {
+        throw ServerException("tripId or chatId must be provided");
+      }
+      if (tripId != null) {
+        final res = await supabaseClient
+            .from('chats')
+            .select('id')
+            .eq('trip_id', tripId)
+            .single();
 
-      await supabaseClient.from('chat_members').insert({
-        'chat_id': res['id'],
-        'user_id': userId,
-      });
+        await supabaseClient.from('chat_members').insert({
+          'chat_id': res['id'],
+          'user_id': userId,
+        });
+      } else {
+        await supabaseClient.from('chat_members').insert({
+          'chat_id': chatId,
+          'user_id': userId,
+        });
+      }
     } catch (e) {
       throw ServerException(e.toString());
     }

@@ -36,6 +36,9 @@ class _FilterOptionsBigState extends State<FilterOptionsBig> {
 
   void toggleSelection(String item) {
     setState(() {
+      if (widget.selectedOption == "Tìm kiếm gần đây") {
+        return;
+      }
       if (topItem == item) {
         // If clicking again, unselect and restore order
         topItem = null;
