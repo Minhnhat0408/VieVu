@@ -40,3 +40,20 @@ class TripMember {
     };
   }
 }
+
+
+class TripMemberRating {
+  final User user;
+  final int rating;
+  final String tripName;
+  final String tripId;
+  final String tripCover;
+
+  TripMemberRating({
+    required this.user,
+    required this.rating,
+    required this.tripName,
+    required this.tripId,
+    required this.tripCover,
+  });
+}

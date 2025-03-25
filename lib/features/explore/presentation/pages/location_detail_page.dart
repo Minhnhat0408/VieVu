@@ -408,6 +408,12 @@ class LocationDetailMainState extends State<LocationDetailMain>
                         });
                         return LazyLoadIndexedStack(
                             index: mapView ? 0 : 1,
+                            preloadIndexes: [
+                              1
+                            ],
+                            autoDisposeIndexes: const [
+                              0
+                            ],
                             children: [
                               _buildMapView(location, state),
                               _buildDetailsView(

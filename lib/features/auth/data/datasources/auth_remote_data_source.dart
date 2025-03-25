@@ -108,7 +108,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .eq('id', currentUserSession!.user.id)
           .single();
 
-      log(response.toString());
+
       return UserModel.fromJson(response).copyWith(
         tripCount: response['trips'].first['count'] as int,
         // ratingCount: response['user_ratings'].length as int,

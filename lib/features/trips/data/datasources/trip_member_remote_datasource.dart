@@ -40,6 +40,8 @@ abstract interface class TripMemberRemoteDatasource {
     required String tripId,
     required String userId,
   });
+
+  Future<List<TripMemberRatingModel>> getRatedUsers({required String userId});
 }
 
 class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
@@ -68,8 +70,6 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
       if (response != null) {
         response['reviewed'] = response['trip_reviews'] != null ? true : false;
       }
-      log(response.toString());
-
       return response != null ? TripMemberModel.fromJson(response) : null;
     } catch (e) {
       log(e.toString());
@@ -100,6 +100,34 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
                     : 0,
               ))
           .toList();
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<TripMemberRatingModel>> getRatedUsers(
+      {required String userId}) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+      final data = await supabaseClient
+          .from('user_ratings')
+          .select(
+              'rating, trip_participants!inner(user_id, trip_id,trips(name, cover)), profiles(*)')
+          .eq('trip_participants.user_id', userId);
+
+      // log(ratings.toString());
+      return data.map((e) {
+        return TripMemberRatingModel.fromJson(e).copyWith(
+          tripName: e['trip_participants']['trips']['name'],
+          tripId: e['trip_participants']['trip_id'],
+          tripCover: e['trip_participants']['trips']['cover'],
+        );
+      }).toList();
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());

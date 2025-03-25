@@ -276,7 +276,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
           .eq('user_id', userId)
           .or('keyword.eq.$searchText,and( title.eq.$title, $compareLinkId)');
 
-      log(response.toString());
+
       if (response.isEmpty) {
         await supabaseClient.from('search_history').insert({
           'keyword': searchText,

@@ -376,9 +376,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           ],
                                         )),
                                   ],
-                                  validator: (value) => value == null
-                                      ? 'Vui lòng chọn giới tính'
-                                      : null,
                                 ),
                               ],
                             ),
@@ -420,10 +417,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         10), // Restrict to 10 digits
                                   ],
                                   validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Vui lòng nhập số điện thoại';
-                                    } else if (!RegExp(r'^(0\d{9})$')
-                                        .hasMatch(value)) {
+                                    if (value != null &&
+                                        value.isNotEmpty &&
+                                        !RegExp(r'^(0\d{9})$')
+                                            .hasMatch(value)) {
                                       return 'Số điện thoại không hợp lệ';
                                     }
                                     return null;
@@ -454,12 +451,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       state is! ProfileActionLoading) {
                     // check if anything changed
 
-                    if (firstNameController.text == widget.user.firstName &&
-                        lastNameController.text == widget.user.lastName &&
-                        descriptionController.text == widget.user.bio &&
-                        phoneController.text == widget.user.phoneNumber &&
+                    if ((normalize(firstNameController.text) ?? '') ==
+                            (widget.user.firstName ?? '') &&
+                        (normalize(lastNameController.text) ?? '') ==
+                            (widget.user.lastName ?? '') &&
+                        (normalize(descriptionController.text) ?? '') ==
+                            (widget.user.bio ?? '') &&
+                        (normalize(phoneController.text) ?? '') ==
+                            (widget.user.phoneNumber ?? '') &&
                         selectedGender == widget.user.gender &&
-                        _provinceController.text == widget.user.city &&
+                        (normalize(_provinceController.text) ?? '') ==
+                            (widget.user.city ?? '') &&
                         image == null) {
                       showSnackbar(
                           context,
@@ -470,13 +472,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                     context.read<ProfileBloc>().add(
                           UpdateProfile(
-                            firstName: firstNameController.text,
-                            lastName: lastNameController.text,
-                            bio: descriptionController.text,
-                            phone: phoneController.text,
+                            firstName: normalize(firstNameController.text),
+                            lastName: normalize(lastNameController.text),
+                            bio: normalize(descriptionController.text),
+                            phone: normalize(phoneController.text),
                             gender: selectedGender,
                             avatar: image,
-                            city: _provinceController.text,
+                            city: normalize(_provinceController.text),
                           ),
                         );
                   }
@@ -508,4 +510,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
   }
+}
+
+String? normalize(String text) {
+  return text.trim().isEmpty ? null : text.trim();
 }

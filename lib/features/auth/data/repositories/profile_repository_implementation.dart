@@ -71,19 +71,5 @@ class ProfileRepositoryImpl implements ProfileRepository {
     }
   }
 
-  @override
-  supabase.RealtimeChannel listenToUserLocations({
-    required String userId,
-    required String tripId,
-    required Function({
-      required UserPosition userPosition,
-      required String eventType,
-    }) callback,
-  }) {
-    return remoteDataSource.listenToUserLocations(
-      userId: userId,
-      tripId: tripId,
-      callback: callback,
-    );
-  }
+
 }

@@ -46,3 +46,40 @@ class TripMemberModel extends TripMember {
     );
   }
 }
+
+
+class TripMemberRatingModel extends TripMemberRating {
+  TripMemberRatingModel({
+    required super.user,
+    required super.rating,
+    required super.tripName,
+    required super.tripId,
+    required super.tripCover,
+  });
+
+  factory TripMemberRatingModel.fromJson(Map<String, dynamic> json) {
+    return TripMemberRatingModel(
+      user: UserModel.fromJson(json['profiles']),
+      rating: json['rating'],
+      tripId: json['trip_id'] ?? "",
+      tripName: json['trip_name'] ?? "",
+      tripCover: json['trip_cover'] ?? "",
+    );
+  }
+
+  TripMemberRatingModel copyWith({
+    UserModel? user,
+    int? rating,
+    String? tripName,
+    String? tripId,
+    String? tripCover,
+  }) {
+    return TripMemberRatingModel(
+      user: user ?? this.user,
+      rating: rating ?? this.rating,
+      tripName: tripName ?? this.tripName,
+      tripId: tripId ?? this.tripId,
+      tripCover: tripCover ?? this.tripCover,
+    );
+  }
+}

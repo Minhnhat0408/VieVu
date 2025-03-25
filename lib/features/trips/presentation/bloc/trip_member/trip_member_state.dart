@@ -50,3 +50,11 @@ final class TripMemberUpdatedSuccess extends TripMemberState {
 final class TripMemberRatedSuccess extends TripMemberState {}
 
 final class TripMemberInvitedSuccess extends TripMemberState {}
+
+final class UsersRatedLoadedSuccess extends TripMemberState {
+  final List<TripMemberRating> users;
+
+  UsersRatedLoadedSuccess({
+    required this.users,
+  });
+}

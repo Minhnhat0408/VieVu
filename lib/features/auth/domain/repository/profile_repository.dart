@@ -20,14 +20,6 @@ abstract interface class ProfileRepository {
     File? avatar,
   });
 
-  supabase.RealtimeChannel listenToUserLocations({
-    required String userId,
-    required String tripId,
-    required Function({
-      required UserPosition userPosition,
-      required String eventType,
-    }) callback,
-  });
 }
 
 

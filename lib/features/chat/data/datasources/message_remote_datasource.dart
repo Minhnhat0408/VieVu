@@ -128,7 +128,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .gte('id', messageId)
           .order('created_at', ascending: false);
 
-      log(res.map((e) => e['content']).toList().toString());
+  
       return res.map((e) => MessageModel.fromJson(e)).toList();
     } catch (e) {
       throw ServerException(e.toString());

@@ -79,7 +79,8 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       await tripMemberRemoteDatasource.insertTripMember(
           tripId: tripId, userId: userId, role: role);
 
-      await chatRemoteDatasource.insertChatMembers(tripId: tripId, userId: userId);
+      await chatRemoteDatasource.insertChatMembers(
+          tripId: tripId, userId: userId);
       return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));
@@ -134,6 +135,21 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       await tripMemberRemoteDatasource.inviteTripMember(
           tripId: tripId, userId: userId);
       return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<TripMemberRating>>> getRatedUsers(
+      {required String userId}) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final ratedUsers =
+          await tripMemberRemoteDatasource.getRatedUsers(userId: userId);
+      return right(ratedUsers);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

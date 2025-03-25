@@ -338,249 +338,271 @@ class _RestaurantListPageState extends State<RestaurantListPage>
               }
             },
             builder: (context, state) {
-              return LazyLoadIndexedStack(index: mapView ? 0 : 1, children: [
-                if (_pagingController.itemList != null)
-                  Stack(
-                    children: [
-                      FlutterMap(
-                        mapController: _animatedMapController.mapController,
-                        options: MapOptions(
-                            interactionOptions: const InteractionOptions(
-                              enableMultiFingerGestureRace: true,
-                            ),
-                            initialCenter: LatLng(
-                                widget.latitude!,
-                                widget
-                                    .longitude!), // Center the map over London
-                            initialCameraFit: CameraFit.coordinates(
-                                coordinates: _pagingController.itemList!
-                                    .map(
-                                      (attraction) => LatLng(
-                                          attraction.latitude,
-                                          attraction.longitude),
-                                    )
-                                    .toList()),
-                            initialZoom: 13,
-                            minZoom: 5),
+              return LazyLoadIndexedStack(
+                  index: mapView ? 0 : 1,
+                  preloadIndexes: [
+                    1
+                  ],
+                  autoDisposeIndexes: const [
+                    0
+                  ],
+                  children: [
+                    if (_pagingController.itemList != null)
+                      Stack(
                         children: [
-                          TileLayer(
-                            // Display map tiles from any source
-                            urlTemplate:
-                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          FlutterMap(
+                            mapController: _animatedMapController.mapController,
+                            options: MapOptions(
+                                interactionOptions: const InteractionOptions(
+                                  enableMultiFingerGestureRace: true,
+                                ),
+                                initialCenter: LatLng(
+                                    widget.latitude!,
+                                    widget
+                                        .longitude!), // Center the map over London
+                                initialCameraFit: CameraFit.coordinates(
+                                    coordinates: _pagingController.itemList!
+                                        .map(
+                                          (attraction) => LatLng(
+                                              attraction.latitude,
+                                              attraction.longitude),
+                                        )
+                                        .toList()),
+                                initialZoom: 13,
+                                minZoom: 5),
+                            children: [
+                              TileLayer(
+                                // Display map tiles from any source
+                                urlTemplate:
+                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 
-                            userAgentPackageName:
-                                'com.example.vn_travel_companion',
-                            // And many more recommended properties!
-                          ),
-                          MarkerLayer(markers: [
-                            Marker(
-                              width: 70,
-                              height: 70,
-                              point:
-                                  LatLng(widget.latitude!, widget.longitude!),
-                              //circle avatar with border
-                              child: Image.asset(
-                                'assets/icons/main2.png',
-                                width: 70,
-                                height: 70,
+                                userAgentPackageName:
+                                    'com.example.vn_travel_companion',
+                                // And many more recommended properties!
                               ),
-                            ),
-                          ]),
-                          MarkerClusterLayerWidget(
-                            options: MarkerClusterLayerOptions(
-                              maxClusterRadius: 45,
-                              size: const Size(60, 60),
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.all(50),
-                              maxZoom: 15,
-                              markers: [
-                                ..._pagingController.itemList!
-                                    .asMap()
-                                    .entries
-                                    .map((item) {
-                                  final attraction = item.value;
+                              MarkerLayer(markers: [
+                                Marker(
+                                  width: 70,
+                                  height: 70,
+                                  point: LatLng(
+                                      widget.latitude!, widget.longitude!),
+                                  //circle avatar with border
+                                  child: Image.asset(
+                                    'assets/icons/main2.png',
+                                    width: 70,
+                                    height: 70,
+                                  ),
+                                ),
+                              ]),
+                              MarkerClusterLayerWidget(
+                                options: MarkerClusterLayerOptions(
+                                  maxClusterRadius: 45,
+                                  size: const Size(60, 60),
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(50),
+                                  maxZoom: 15,
+                                  markers: [
+                                    ..._pagingController.itemList!
+                                        .asMap()
+                                        .entries
+                                        .map((item) {
+                                      final attraction = item.value;
 
-                                  return Marker(
-                                    width:
-                                        activeIndex == attraction.id ? 80 : 60,
-                                    height:
-                                        activeIndex == attraction.id ? 80 : 60,
-                                    point: LatLng(attraction.latitude,
-                                        attraction.longitude),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          buttonCarouselController
-                                              .animateToPage(item.key,
-                                                  duration: const Duration(
-                                                      milliseconds: 300),
-                                                  curve: Curves.easeInOut);
-                                          activeIndex = attraction.id;
-                                        });
-                                      },
-                                      child: Container(
+                                      return Marker(
                                         width: activeIndex == attraction.id
                                             ? 80
                                             : 60,
                                         height: activeIndex == attraction.id
                                             ? 80
                                             : 60,
-                                        decoration: BoxDecoration(
-                                          color: Colors.orange,
-                                          borderRadius: BorderRadius.circular(
-                                              activeIndex == attraction.id
-                                                  ? 10
-                                                  : 30),
-                                          image: DecorationImage(
-                                            image: CachedNetworkImageProvider(
-                                                attraction.cover),
-                                            fit: BoxFit.cover,
-                                          ),
-                                          border: Border.all(
-                                            color: Colors.orange,
+                                        point: LatLng(attraction.latitude,
+                                            attraction.longitude),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              buttonCarouselController
+                                                  .animateToPage(item.key,
+                                                      duration: const Duration(
+                                                          milliseconds: 300),
+                                                      curve: Curves.easeInOut);
+                                              activeIndex = attraction.id;
+                                            });
+                                          },
+                                          child: Container(
                                             width: activeIndex == attraction.id
-                                                ? 5
-                                                : 3,
+                                                ? 80
+                                                : 60,
+                                            height: activeIndex == attraction.id
+                                                ? 80
+                                                : 60,
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      activeIndex ==
+                                                              attraction.id
+                                                          ? 10
+                                                          : 30),
+                                              image: DecorationImage(
+                                                image:
+                                                    CachedNetworkImageProvider(
+                                                        attraction.cover),
+                                                fit: BoxFit.cover,
+                                              ),
+                                              border: Border.all(
+                                                color: Colors.orange,
+                                                width:
+                                                    activeIndex == attraction.id
+                                                        ? 5
+                                                        : 3,
+                                              ),
+                                            ),
                                           ),
                                         ),
+                                      );
+                                    }),
+                                  ],
+                                  builder: (context, markers) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: Colors.orange),
+                                      child: Center(
+                                        child: Text(
+                                          markers.length.toString(),
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                }),
-                              ],
-                              builder: (context, markers) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: Colors.orange),
-                                  child: Center(
-                                    child: Text(
-                                      markers.length.toString(),
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                );
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            bottom: 70,
+                            left: 16.0,
+                            child: FloatingActionButton(
+                              heroTag: 'rotate',
+                              onPressed: () {
+                                // Rotate the map by 45 degrees
+                                _animatedMapController.animatedRotateTo(0);
                               },
+                              child: const Icon(Icons.rotate_right),
+                            ),
+                          ),
+                          CarouselSlider.builder(
+                            itemCount: _pagingController.itemList!.length,
+                            carouselController: buttonCarouselController,
+                            itemBuilder: (context, index, realIndex) {
+                              return RepaintBoundary(
+                                child: RestaurantSmallCard(
+                                  restaurant:
+                                      _pagingController.itemList![index],
+                                  slider: true,
+                                  locationName: widget.locationName,
+                                  locationId: widget.locationId,
+                                ),
+                              );
+                            },
+                            options: CarouselOptions(
+                              height: 130,
+                              initialPage: 0,
+                              reverse: false,
+                              enableInfiniteScroll: false,
+                              onPageChanged: (index, reason) => setState(() {
+                                activeIndex =
+                                    _pagingController.itemList![index].id;
+
+                                if (index ==
+                                    _pagingController.itemList!.length - 1) {
+                                  if ((index + 1) % pageSize == 0) {
+                                    final nextPageKey =
+                                        (_pagingController.itemList!.length ~/
+                                                pageSize) +
+                                            1;
+                                    final userId = (context
+                                            .read<AppUserCubit>()
+                                            .state as AppUserLoggedIn)
+                                        .user
+                                        .id;
+                                    context
+                                        .read<NearbyServicesCubit>()
+                                        .getRestaurantsWithFilter(
+                                          userId: userId,
+                                          categoryId1: _selectedFilter != null
+                                              ? restaurantFilterOptions[
+                                                  _selectedFilter]
+                                              : null,
+                                          serviceIds: _selectedServices
+                                              .map((e) =>
+                                                  restaurantServicesMap[e]!)
+                                              .toList(),
+                                          openTime: _selectedOpenTime
+                                              .map((e) =>
+                                                  restaurantTimeSlotsMap[e]!)
+                                              .toList(),
+                                          limit: pageSize,
+                                          offset: nextPageKey,
+                                          minPrice: _minPrice,
+                                          maxPrice: _maxPrice,
+                                          lat: widget.latitude,
+                                          lon: widget.longitude,
+                                          locationId: widget.locationId,
+                                        );
+                                  }
+                                }
+                                _animateMapTo(LatLng(
+                                    _pagingController.itemList![index].latitude,
+                                    _pagingController
+                                        .itemList![index].longitude));
+                              }),
                             ),
                           ),
                         ],
                       ),
-                      Positioned(
-                        bottom: 70,
-                        left: 16.0,
-                        child: FloatingActionButton(
-                          heroTag: 'rotate',
-                          onPressed: () {
-                            // Rotate the map by 45 degrees
-                            _animatedMapController.animatedRotateTo(0);
-                          },
-                          child: const Icon(Icons.rotate_right),
-                        ),
+                    if (_pagingController.itemList == null)
+                      const Center(
+                        child: CircularProgressIndicator(),
                       ),
-                      CarouselSlider.builder(
-                        itemCount: _pagingController.itemList!.length,
-                        carouselController: buttonCarouselController,
-                        itemBuilder: (context, index, realIndex) {
-                          return RepaintBoundary(
-                            child: RestaurantSmallCard(
-                              restaurant: _pagingController.itemList![index],
-                              slider: true,
-                              locationName: widget.locationName,
-                              locationId: widget.locationId,
-                            ),
-                          );
-                        },
-                        options: CarouselOptions(
-                          height: 130,
-                          initialPage: 0,
-                          reverse: false,
-                          enableInfiniteScroll: false,
-                          onPageChanged: (index, reason) => setState(() {
-                            activeIndex = _pagingController.itemList![index].id;
-
-                            if (index ==
-                                _pagingController.itemList!.length - 1) {
-                              if ((index + 1) % pageSize == 0) {
-                                final nextPageKey =
-                                    (_pagingController.itemList!.length ~/
-                                            pageSize) +
-                                        1;
-                                final userId = (context
-                                        .read<AppUserCubit>()
-                                        .state as AppUserLoggedIn)
-                                    .user
-                                    .id;
-                                context
-                                    .read<NearbyServicesCubit>()
-                                    .getRestaurantsWithFilter(
-                                      userId: userId,
-                                      categoryId1: _selectedFilter != null
-                                          ? restaurantFilterOptions[
-                                              _selectedFilter]
-                                          : null,
-                                      serviceIds: _selectedServices
-                                          .map((e) => restaurantServicesMap[e]!)
-                                          .toList(),
-                                      openTime: _selectedOpenTime
-                                          .map(
-                                              (e) => restaurantTimeSlotsMap[e]!)
-                                          .toList(),
-                                      limit: pageSize,
-                                      offset: nextPageKey,
-                                      minPrice: _minPrice,
-                                      maxPrice: _maxPrice,
-                                      lat: widget.latitude,
-                                      lon: widget.longitude,
-                                      locationId: widget.locationId,
-                                    );
-                              }
-                            }
-                            _animateMapTo(LatLng(
-                                _pagingController.itemList![index].latitude,
-                                _pagingController.itemList![index].longitude));
-                          }),
-                        ),
-                      ),
-                    ],
-                  ),
-                if (_pagingController.itemList == null)
-                  const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.only(bottom: 70),
-                      sliver: PagedSliverList<int, Restaurant>(
-                        pagingController: _pagingController,
-                        builderDelegate: PagedChildBuilderDelegate<Restaurant>(
-                          itemBuilder: (context, item, index) {
-                            return RestaurantSmallCard(
-                              restaurant: item,
-                              locationName: widget.locationName,
-                              locationId: widget.locationId,
-                            );
-                          },
-                          firstPageProgressIndicatorBuilder: (_) =>
-                              const Center(child: CircularProgressIndicator()),
-                          newPageProgressIndicatorBuilder: (_) =>
-                              const Center(child: CircularProgressIndicator()),
-                          noItemsFoundIndicatorBuilder: (_) => const Center(
-                              child: Text('Không có điểm du lịch nào.')),
-                          newPageErrorIndicatorBuilder: (context) => Center(
-                            child: TextButton(
-                              onPressed: () =>
-                                  _pagingController.retryLastFailedRequest(),
-                              child: const Text('Thử lại'),
+                    CustomScrollView(
+                      slivers: [
+                        SliverPadding(
+                          padding: const EdgeInsets.only(bottom: 70),
+                          sliver: PagedSliverList<int, Restaurant>(
+                            pagingController: _pagingController,
+                            builderDelegate:
+                                PagedChildBuilderDelegate<Restaurant>(
+                              itemBuilder: (context, item, index) {
+                                return RestaurantSmallCard(
+                                  restaurant: item,
+                                  locationName: widget.locationName,
+                                  locationId: widget.locationId,
+                                );
+                              },
+                              firstPageProgressIndicatorBuilder: (_) =>
+                                  const Center(
+                                      child: CircularProgressIndicator()),
+                              newPageProgressIndicatorBuilder: (_) =>
+                                  const Center(
+                                      child: CircularProgressIndicator()),
+                              noItemsFoundIndicatorBuilder: (_) => const Center(
+                                  child: Text('Không có điểm du lịch nào.')),
+                              newPageErrorIndicatorBuilder: (context) => Center(
+                                child: TextButton(
+                                  onPressed: () => _pagingController
+                                      .retryLastFailedRequest(),
+                                  child: const Text('Thử lại'),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ]);
+                  ]);
             },
           ),
         ),

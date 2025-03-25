@@ -154,18 +154,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
           .select('*, attraction_types(id, type_name), locations(name)')
           .order('hot_score', ascending: false)
           .range(offset, offset + limit);
-      // log(response.first.toString());
-      // final res2 = await supabaseClient
-      //     .from('trips')
-      //     .select('saved_services!inner(link_id)')
-      //     .eq('owner_id', userId)
-      //     .inFilter(
-      //         'saved_services.link_id', response.map((e) => e['id']).toList());
-      // final linkIds = res2
-      //     .expand(
-      //         (item) => item['saved_services'] ?? []) // Flatten saved_services
-      //     .map((service) => service['link_id']) // Extract link_id
-      //     .toList();
+
       return response.map((e) {
         return AttractionModel.fromJson(e).copyWith(
           locationName: e['locations']['name'],

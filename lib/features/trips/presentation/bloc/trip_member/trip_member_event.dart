@@ -66,3 +66,11 @@ class InviteTripMember extends TripMemberEvent {
     required this.userId,
   });
 }
+
+class GetRatedUsers extends TripMemberEvent {
+  final String userId;
+
+  GetRatedUsers({
+    required this.userId,
+  });
+}

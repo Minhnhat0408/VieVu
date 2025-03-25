@@ -37,4 +37,8 @@ abstract interface class TripMemberRepository {
     required String tripId,
     required String userId,
   });
+
+  Future<Either<Failure, List<TripMemberRating>>> getRatedUsers({
+    required String userId,
+  });
 }

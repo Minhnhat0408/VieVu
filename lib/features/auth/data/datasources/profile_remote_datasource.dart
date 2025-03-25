@@ -22,18 +22,6 @@ abstract interface class ProfileRemoteDataSource {
   Future<String> uploadAvatar({
     required File file,
   });
-  // Future<void> updatePassword({
-  //   required String password,
-  // });
-
-  RealtimeChannel listenToUserLocations({
-    required String userId,
-    required String tripId,
-    required Function({
-      required UserPositionModel userPosition,
-      required String eventType,
-    }) callback,
-  });
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -91,13 +79,12 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
           .eq('id', id)
           .single();
       final data = await supabaseClient
-          .from('trip_participants')
-          .select(' user_ratings(rating)')
-          .eq('user_id', id);
-      List<int> ratings = data
-          .expand((entry) => entry["user_ratings"])
-          .map((ratingEntry) => ratingEntry["rating"] as int)
-          .toList();
+          .from('user_ratings')
+          .select('rating, trip_participants!inner(user_id)')
+          .eq('trip_participants.user_id', id);
+
+      List<int> ratings =
+          data.map((ratingEntry) => ratingEntry["rating"] as int).toList();
 
       // Calculate count & average
       int ratingCount = ratings.length;
@@ -114,33 +101,6 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         e.toString(),
       );
     }
-  }
-
-  @override
-  RealtimeChannel listenToUserLocations({
-    required String userId,
-    required String tripId,
-    required Function({
-      required UserPositionModel userPosition,
-      required String eventType,
-    }) callback,
-  }) {
-    return supabaseClient
-        .channel('user_location:$tripId')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'user_locations',
-          filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'trip_id',
-              value: tripId),
-          callback: (payload) async {
-            // callback();
-            final newRecord = payload.newRecord;
-          },
-        )
-        .subscribe();
   }
 
   @override

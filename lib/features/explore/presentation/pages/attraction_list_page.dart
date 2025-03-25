@@ -352,7 +352,8 @@ class _AttractionListPageState extends State<AttractionListPage>
             builder: (context, state) {
               return LazyLoadIndexedStack(
                 index: mapView ? 0 : 1,
-
+                preloadIndexes: [1],
+                autoDisposeIndexes: const [0],
                 children: [
                   if (_pagingController.itemList != null)
                     Stack(

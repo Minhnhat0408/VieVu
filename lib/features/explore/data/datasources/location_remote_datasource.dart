@@ -67,7 +67,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
           .eq('id', locationId)
           .maybeSingle();
 
-      log(response.toString());
+
       if (response == null) {
         return null;
       }
@@ -276,7 +276,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
             )
             .limit(1)
             .maybeSingle();
-        log(res.toString());
+
 
         if (res != null) {
           return GeoApiLocationModel(
@@ -356,7 +356,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
             )
             .limit(1)
             .maybeSingle();
-        log(res.toString());
+
 
         return GeoApiLocationModel(
             address: jsonResponse['results'][0]['formatted'],

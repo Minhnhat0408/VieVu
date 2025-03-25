@@ -6,11 +6,13 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
+import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/bloc/profile_bloc.dart';
 import 'package:vn_travel_companion/features/auth/presentation/pages/edit_profile.dart';
+import 'package:vn_travel_companion/features/auth/presentation/widget/user_rating_modal.dart';
 import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vn_travel_companion/features/chat/presentation/pages/chat_details_page.dart';
 
@@ -193,30 +195,41 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const VerticalDivider(
                                   thickness: 2,
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20.0),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            // set precision to 1 decimal
+                                GestureDetector(
+                                  onTap: () {
+                                    displayModal(
+                                        context,
+                                        UserRatingModal(
+                                          userId: user!.id,
+                                        ),
+                                        null,
+                                        false);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              // set precision to 1 decimal
 
-                                            "${user?.avgRating.toStringAsFixed(1) ?? 0} ",
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                              "${user?.avgRating.toStringAsFixed(1) ?? 0} ",
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                          const Icon(
-                                            Icons.star,
-                                            color: Colors.yellow,
-                                          )
-                                        ],
-                                      ),
-                                      Text('${user?.ratingCount} đánh giá'),
-                                    ],
+                                            const Icon(
+                                              Icons.star,
+                                              color: Colors.yellow,
+                                            )
+                                          ],
+                                        ),
+                                        Text('${user?.ratingCount} đánh giá'),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],

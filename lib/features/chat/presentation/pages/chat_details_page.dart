@@ -11,7 +11,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vn_travel_companion/core/utils/display_modal.dart';
 import 'package:vn_travel_companion/core/utils/onboarding_help.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
 import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
 import 'package:vn_travel_companion/features/chat/data/models/message_model.dart';
 import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';

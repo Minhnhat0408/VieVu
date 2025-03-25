@@ -77,7 +77,6 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
       }));
     });
 
-
     client
         .channel("chat_realtime:$userId")
         .onPostgresChanges(
@@ -136,7 +135,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
       extendBody: true,
       body: LazyLoadIndexedStack(
         index: _selectedIndex,
-        preloadIndexes: const [1, 2, 3],
+        preloadIndexes: const [1, 2],
         autoDisposeIndexes: const [4],
         children: screens,
       ),

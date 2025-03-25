@@ -33,7 +33,7 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
       // Fetch trending events
       final response = await client.get(url);
 
-      // log(response.body.toString());
+     
       if (response.statusCode == 200) {
         final decodedBody = utf8.decode(response.bodyBytes);
         final data = json.decode(
