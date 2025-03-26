@@ -799,16 +799,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   .add(RemoveMessage(messageId: message.id));
             }
           },
-          menuItems: const [
+          menuItems: [
             MenuItem(
               label: "Sao chép",
               icon: Icons.copy,
             ),
-            MenuItem(
-              label: "Gỡ tin nhắn",
-              icon: Icons.delete,
-              isDestuctive: true,
-            ),
+            if (message.user.id ==
+                (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id)
+              MenuItem(
+                label: "Gỡ tin nhắn",
+                icon: Icons.delete,
+                isDestuctive: true,
+              ),
           ],
           widgetAlignment: message.user.id ==
                   (context.read<AppUserCubit>().state as AppUserLoggedIn)

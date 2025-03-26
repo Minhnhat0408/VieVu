@@ -188,7 +188,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      if (tripMember.role == 'owner')
+                                      if  (tripMember.role == 'owner')
                                         IconButton(
                                           onPressed: () {
                                             showDialog(

@@ -121,7 +121,7 @@ class _AddSavedServicesPageViewState extends State<AddSavedServicesPageView> {
                 searchType: searchType,
                 tripId: widget.trip.id,
               ));
-      }
+        }
       }
     });
   }
@@ -253,7 +253,7 @@ class _AddSavedServicesPageViewState extends State<AddSavedServicesPageView> {
             totalRecordCount += state.results.length;
             final next = totalRecordCount;
 
-            final isLastPage = state.results.isEmpty;
+            final isLastPage = state.results.length < pageSize;
             if (isLastPage) {
               _pagingController.appendLastPage(state.results);
             } else {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_reactions/widgets/stacked_reactions.dart';
@@ -157,7 +159,14 @@ class _MessageItemState extends State<MessageItem> {
                 children: [
                   const SizedBox(height: 5),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    ...widget.message.seenUser!.map((user) {
+                    ...widget.message.seenUser!
+                        .where((e) =>
+                            e.id !=
+                            (context.read<AppUserCubit>().state
+                                    as AppUserLoggedIn)
+                                .user
+                                .id)
+                        .map((user) {
                       return Padding(
                         padding: const EdgeInsets.only(right: 2.0),
                         child: CircleAvatar(
@@ -178,22 +187,24 @@ class _MessageItemState extends State<MessageItem> {
   }
 
   TextSpan _buildHighlightedText(
-      String text,
-      List<Map<String, dynamic>> metaData,
-      Message mesage,
-      BuildContext context) {
+    String text,
+    List<Map<String, dynamic>> metaData,
+    Message message,
+    BuildContext context,
+  ) {
     List<InlineSpan> spans = [];
     int start = 0;
-    final highlights = metaData.map((item) => item['title'] as String).toList();
 
-    // Sắp xếp danh sách highlights theo độ dài giảm dần để xử lý các tiêu đề lồng nhau
+    final highlights = metaData.map((item) => item['title'] as String).toList();
     highlights.sort((a, b) => b.length.compareTo(a.length));
+
+    final urlRegex = RegExp(r'(https?:\/\/[^\s]+)', caseSensitive: false);
 
     while (start < text.length) {
       int? highlightStart;
       String? matchedHighlight;
 
-      // Tìm vị trí bắt đầu của highlight gần nhất
+      // Tìm highlight gần nhất
       for (var highlight in highlights) {
         final index = text.indexOf(highlight, start);
         if (index != -1 && (highlightStart == null || index < highlightStart)) {
@@ -202,68 +213,96 @@ class _MessageItemState extends State<MessageItem> {
         }
       }
 
-      if (highlightStart != null && matchedHighlight != null) {
-        // Thêm phần văn bản trước highlight
-        if (start < highlightStart) {
-          spans.add(TextSpan(
-              text: text.substring(start, highlightStart),
+      // Nếu có highlight và highlight gần nhất nằm sau vị trí start
+      if (highlightStart != null && highlightStart >= start) {
+        // Trước đoạn highlight kiểm tra có link không
+        final beforeHighlight = text.substring(start, highlightStart);
+        final linkMatches = urlRegex.allMatches(beforeHighlight);
+        int lastPos = 0;
+        for (final match in linkMatches) {
+          if (match.start > lastPos) {
+            spans.add(TextSpan(
+              text: beforeHighlight.substring(lastPos, match.start),
               style: TextStyle(
-                decoration:
-                    text.substring(start, highlightStart).contains("http")
-                        ? TextDecoration.underline
-                        : TextDecoration.none,
-              )));
+                fontSize: 16,
+                fontFamily: GoogleFonts.merriweather().fontFamily,
+              ),
+            ));
+          }
+          final linkText = match.group(0)!;
+          spans.add(WidgetSpan(
+            child: GestureDetector(
+              onTap: () => openDeepLink(linkText),
+              child: Text(
+                linkText,
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  color: Colors.blue,
+                  fontFamily: GoogleFonts.merriweather().fontFamily,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ));
+          lastPos = match.end;
+        }
+        // Thêm phần còn lại nếu sau link không còn gì
+        if (lastPos < beforeHighlight.length) {
+          spans.add(TextSpan(
+            text: beforeHighlight.substring(lastPos),
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: GoogleFonts.merriweather().fontFamily,
+            ),
+          ));
         }
 
-        // Thêm phần văn bản được highlight với GestureDetector
+        // Add highlight
+        final matchedItem =
+            metaData.firstWhere((e) => e['title'] == matchedHighlight);
         spans.add(WidgetSpan(
           child: GestureDetector(
             onTap: () {
-              final tmp = metaData.firstWhere(
-                  (element) => element['title'] == matchedHighlight);
-              if (tmp['type'] == 'address') {
+              if (matchedItem['type'] == 'address') {
                 String googleMapsUrl =
                     "https://www.google.com/maps/search/?api=1&query=$matchedHighlight";
                 openDeepLink(googleMapsUrl);
+              } else if (matchedItem['id'] != null) {
+                displayModal(
+                  context,
+                  HighlightLocationDetailsModal(locationDetails: matchedItem),
+                  null,
+                  false,
+                );
               } else {
-                if (tmp['id'] != null) {
-                  displayModal(
-                      context,
-                      HighlightLocationDetailsModal(
-                        locationDetails: tmp,
-                      ),
-                      null,
-                      false);
-                } else {
-                  final userId =
-                      (context.read<AppUserCubit>().state as AppUserLoggedIn)
-                          .user
-                          .id;
-                  if (userId != widget.message.user.id) {
-                    showSnackbar(
-                        context, "Chưa có thông tin chi tiết cho địa điểm này");
-                    return;
-                  }
-                  displayModal(
-                      context,
-                      AddPlaceByNameModal(
-                        searchKey: matchedHighlight!,
-                        message: mesage,
-                      ),
-                      null,
-                      true);
+                final userId =
+                    (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                        .user
+                        .id;
+                if (userId != message.user.id) {
+                  showSnackbar(
+                      context, "Chưa có thông tin chi tiết cho địa điểm này");
+                  return;
                 }
+                displayModal(
+                  context,
+                  AddPlaceByNameModal(
+                    searchKey: matchedHighlight!,
+                    message: message,
+                  ),
+                  null,
+                  true,
+                );
               }
             },
             child: Text(
-              matchedHighlight,
+              matchedHighlight!,
               style: TextStyle(
+                fontFamily: GoogleFonts.merriweather().fontFamily,
                 fontSize: 16,
+                height: 1.2,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
-                decoration: matchedHighlight.contains("http")
-                    ? TextDecoration.underline
-                    : TextDecoration.none,
               ),
             ),
           ),
@@ -271,17 +310,49 @@ class _MessageItemState extends State<MessageItem> {
 
         start = highlightStart + matchedHighlight.length;
       } else {
-        // Không còn highlight nào, thêm phần còn lại của văn bản
-        spans.add(TextSpan(
-            text: text.substring(start),
+        // Không còn highlight, chỉ check link
+        final remainingText = text.substring(start);
+        final linkMatches = urlRegex.allMatches(remainingText);
+        int lastPos = 0;
+        for (final match in linkMatches) {
+          if (match.start > lastPos) {
+            spans.add(TextSpan(
+              text: remainingText.substring(lastPos, match.start),
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: GoogleFonts.merriweather().fontFamily,
+              ),
+            ));
+          }
+          final linkText = match.group(0)!;
+          spans.add(WidgetSpan(
+            child: GestureDetector(
+              onTap: () => openDeepLink(linkText),
+              child: Text(
+                linkText,
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.blue,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.normal,
+                  height: 1.2,
+                  fontFamily: GoogleFonts.merriweather().fontFamily,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ));
+          lastPos = match.end;
+        }
+        if (lastPos < remainingText.length) {
+          spans.add(TextSpan(
+            text: remainingText.substring(lastPos),
             style: TextStyle(
-              fontStyle: text.substring(start) == "Tin nhắn đã bị gỡ"
-                  ? FontStyle.italic
-                  : FontStyle.normal,
-              color: text.substring(start) == "Tin nhắn đã bị gỡ"
-                  ? Theme.of(context).colorScheme.outline
-                  : Theme.of(context).colorScheme.onSurface,
-            )));
+              fontSize: 16,
+              fontFamily: GoogleFonts.merriweather().fontFamily,
+            ),
+          ));
+        }
         break;
       }
     }
