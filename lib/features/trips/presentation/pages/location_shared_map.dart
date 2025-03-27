@@ -103,6 +103,7 @@ class _LocationSharedMapState extends State<LocationSharedMap>
         .channel("realtime:trip_${widget.tripId}_location")
         .onPresenceLeave((payload) {
       log('someone left');
+      log(payload.leftPresences.toString());
       log('left id : ${payload.leftPresences.first.payload['data']['id']}');
       log('current id : ${currentUser.id}');
       final id = payload.leftPresences.first.payload['data']['id'];
@@ -122,7 +123,7 @@ class _LocationSharedMapState extends State<LocationSharedMap>
             sharedPosUsers.indexWhere((element) => element.id == user.id);
         if (index == -1) {
           setState(() {
-            sharedPosUsers.add(user);
+            sharedPosUsers.add(user); 
           });
         } else {
           setState(() {
@@ -160,6 +161,7 @@ class _LocationSharedMapState extends State<LocationSharedMap>
 
   @override
   void dispose() {
+    log("dispose");
     super.dispose();
     _animatedMapController.dispose();
 

@@ -116,17 +116,10 @@ class _MyAppState extends State<MyApp> {
     _linkSub = AppLinks().uriLinkStream.listen((uri) {
       log(uri.toString());
       if (_isLoggedIn) {
-        log(uri.toString());
-        if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == 'trip') {
-          final tripId =
-              uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-
-          if (tripId != null) {
-            setState(() {
-              _pendingUri = uri;
-            });
-          }
-        }
+        setState(() {
+          _pendingUri = uri;
+          // log(_pendingUri.toString());
+        });
       }
     });
 
@@ -286,6 +279,7 @@ class _MyAppState extends State<MyApp> {
                                 _pendingUri!.pathSegments.length > 1
                                     ? _pendingUri!.pathSegments[1]
                                     : null;
+                            log("profileId: $profileId");
                             if (profileId != null) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 if (mounted) {

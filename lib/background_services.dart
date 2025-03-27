@@ -193,7 +193,7 @@ void onStart(ServiceInstance service) async {
                 data['type'] != "trip_update"
                     ? "${sender != null ? "${sender['first_name']}" : ""} ${data['content']} ${trip != null ? "${trip['name']}" : ""}"
                     : "${trip != null ? "${trip['name']}" : ""} ${data['content']}",
-                payload: 'vntravelcompanion://app/notifications',
+                payload: 'notification',
                 NotificationDetails(
                   android: AndroidNotificationDetails(
                     'app_background_noti',
@@ -267,7 +267,7 @@ void onStart(ServiceInstance service) async {
 
       if (channelName != data['channel_name']) {
         channelName = data['channel_name'] as String;
-
+        log('channel name: $channelName');
         positionChannel = client.channel(channelName!);
         positionChannel.subscribe((status, error) {
           if (status == RealtimeSubscribeStatus.subscribed) {
@@ -299,6 +299,7 @@ void onStart(ServiceInstance service) async {
     });
 
     service.on('redirectNoti').listen((data) {
+      log('redirecting');
       service.invoke('redirecting');
     });
     service.on('stopListen').listen((event) {
@@ -309,7 +310,7 @@ void onStart(ServiceInstance service) async {
       channelName = null;
     });
     service.on('stopService').listen((event) {
-      log('stop listening');
+      log('stop sẻvice');
       client.removeAllChannels();
       service.stopSelf();
     });
