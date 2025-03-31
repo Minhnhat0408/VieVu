@@ -1,4 +1,4 @@
-# vn_travel_companion
+# VieVu
 
 A new Flutter project.
 
