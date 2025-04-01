@@ -4,9 +4,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_detail_page.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_itinerary_detail_page.dart';
 
 class MapViewModal extends StatefulWidget {
   final List<TripItinerary> tripItineraries;

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/theme/theme_provider.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
-import 'package:vn_travel_companion/features/notifications/presentation/pages/notification_page.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/theme/theme_provider.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:vievu/features/auth/presentation/pages/profile_page.dart';
+import 'package:vievu/features/notifications/presentation/pages/notification_page.dart';
+import 'package:vievu/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class SettingsPage extends StatelessWidget {
   final int unreadCount;

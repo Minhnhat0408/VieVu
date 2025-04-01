@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
 
 class UserRatingModal extends StatefulWidget {
   final String userId;

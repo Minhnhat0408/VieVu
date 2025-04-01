@@ -3,17 +3,17 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/constants/trip_filters.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/constants/trip_filters.dart';
+import 'package:vievu/core/utils/display_modal.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_trip_modal.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_small_item.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_status_modal.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/add_trip_modal.dart';
+import 'package:vievu/features/trips/presentation/widgets/trip_small_item.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/trip_status_modal.dart';
 
 class TripManagePage extends StatefulWidget {
   const TripManagePage({super.key});

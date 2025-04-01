@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
+import 'package:vievu/features/explore/domain/entities/restaurant.dart';
 
 class RestaurantModel extends Restaurant {
   RestaurantModel(

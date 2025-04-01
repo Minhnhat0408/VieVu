@@ -1,18 +1,17 @@
-import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
-import 'package:vn_travel_companion/features/notifications/domain/entities/notification.dart';
-import 'package:vn_travel_companion/features/trips/data/models/trip_model.dart';
+import 'package:vievu/features/auth/data/models/user_model.dart';
+import 'package:vievu/features/notifications/domain/entities/notification.dart';
+import 'package:vievu/features/trips/data/models/trip_model.dart';
 
 class NotificationModel extends Notification {
-  NotificationModel({
-    required super.id,
-    required super.content,
-     super.user,
-     super.trip,
-    required super.type,
-    required super.createdAt,
-    required super.isRead,
-    super.isAccepted
-  });
+  NotificationModel(
+      {required super.id,
+      required super.content,
+      super.user,
+      super.trip,
+      required super.type,
+      required super.createdAt,
+      required super.isRead,
+      super.isAccepted});
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(

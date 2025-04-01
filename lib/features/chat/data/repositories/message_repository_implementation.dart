@@ -1,11 +1,11 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/chat/data/datasources/message_remote_datasource.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
-import 'package:vn_travel_companion/features/chat/domain/repositories/message_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/chat/data/datasources/message_remote_datasource.dart';
+import 'package:vievu/features/chat/domain/entities/message.dart';
+import 'package:vievu/features/chat/domain/repositories/message_repository.dart';
 
 class MessageRepositoryImpl implements MessageRepository {
   final MessageRemoteDatasource messageRemoteDatasource;

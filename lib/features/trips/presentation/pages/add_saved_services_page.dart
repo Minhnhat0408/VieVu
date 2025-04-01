@@ -4,17 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
-import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
-import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_small_card.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/features/explore/presentation/bloc/location/location_bloc.dart';
+import 'package:vievu/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
+import 'package:vievu/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
+import 'package:vievu/features/explore/presentation/widgets/filter_options_big.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vievu/features/search/presentation/cubit/search_history_cubit.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/presentation/widgets/saved_service/saved_service_small_card.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class AddSavedServicesPage extends StatelessWidget {
   final Trip trip;

@@ -2,14 +2,14 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/all_recommendations_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/explore/domain/entities/attraction.dart';
+import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vievu/features/explore/presentation/pages/all_recommendations_page.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
+import 'package:vievu/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class RecommendedAttractionSection extends StatefulWidget {
   final bool? refresh;

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_small_card.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/attraction_small_card.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class NearbyAttractionSection extends StatefulWidget {
   const NearbyAttractionSection({super.key});

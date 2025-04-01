@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
-import 'package:vn_travel_companion/features/explore/domain/repositories/location_repository.dart';
+import 'package:vievu/features/explore/domain/entities/location.dart';
+import 'package:vievu/features/explore/domain/repositories/location_repository.dart';
 
 part 'location_info_state.dart';
 

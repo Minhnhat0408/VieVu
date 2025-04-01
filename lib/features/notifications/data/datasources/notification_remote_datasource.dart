@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/notifications/data/models/notification_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/notifications/data/models/notification_model.dart';
 
 abstract interface class NotificationRemoteDataSource {
   Future<List<NotificationModel>> getNotifications({

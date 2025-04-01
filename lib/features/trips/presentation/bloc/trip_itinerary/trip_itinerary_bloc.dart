@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
-import 'package:vn_travel_companion/features/trips/domain/repositories/trip_itinerary_repository.dart';
+import 'package:vievu/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vievu/features/trips/domain/repositories/trip_itinerary_repository.dart';
 
 part 'trip_itinerary_event.dart';
 part 'trip_itinerary_state.dart';

@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/user_preference/data/models/travel_type_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/user_preference/data/models/travel_type_model.dart';
 
 abstract interface class TravelTypeRemoteDatasource {
   Future<List<TravelTypeModel>> getParentTravelTypes();

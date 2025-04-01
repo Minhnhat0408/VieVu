@@ -1,8 +1,8 @@
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/comment.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/tripbest.dart';
+import 'package:vievu/features/explore/domain/entities/attraction.dart';
+import 'package:vievu/features/explore/domain/entities/comment.dart';
+import 'package:vievu/features/explore/domain/entities/hotel.dart';
+import 'package:vievu/features/explore/domain/entities/restaurant.dart';
+import 'package:vievu/features/explore/domain/entities/tripbest.dart';
 
 class Location {
   final int id;
@@ -30,15 +30,13 @@ class Location {
   });
 }
 
-
-
 class GenericLocationInfo {
-   List<Attraction> attractions;
-   List<Hotel> hotels;
-   List<Restaurant> restaurants;
-   List<TripBest>? tripbestModule;
-   List<Comment>? comments;
-   List<Location>? locations;
+  List<Attraction> attractions;
+  List<Hotel> hotels;
+  List<Restaurant> restaurants;
+  List<TripBest>? tripbestModule;
+  List<Comment>? comments;
+  List<Location>? locations;
 
   GenericLocationInfo({
     required this.attractions,
@@ -67,7 +65,6 @@ class GenericLocationInfo {
     );
   }
 }
-
 
 class GeoApiLocation {
   final double latitude;

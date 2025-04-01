@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/chat/domain/entities/message.dart';
 
 abstract interface class MessageRepository {
   Future<Either<Failure, Message>> insertMessage({

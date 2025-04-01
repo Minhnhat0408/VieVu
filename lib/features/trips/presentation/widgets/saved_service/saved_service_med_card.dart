@@ -2,7 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
+import 'package:vievu/features/trips/domain/entities/saved_services.dart';
 
 class SavedServiceMedCard extends StatelessWidget {
   final SavedService service;

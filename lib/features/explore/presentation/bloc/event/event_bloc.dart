@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/event.dart';
-import 'package:vn_travel_companion/features/explore/domain/repositories/event_repository.dart';
+import 'package:vievu/features/explore/domain/entities/event.dart';
+import 'package:vievu/features/explore/domain/repositories/event_repository.dart';
 
 part 'event_event.dart';
 part 'event_state.dart';

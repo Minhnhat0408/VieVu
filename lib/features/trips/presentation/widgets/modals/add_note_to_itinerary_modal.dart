@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
 
 class AddNoteToItineraryModal extends StatefulWidget {
   final TripItinerary tripItinerary;

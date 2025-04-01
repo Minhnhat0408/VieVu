@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
 
 abstract interface class TripMemberRepository {
   Future<Either<Failure, List<TripMember>>> getTripMembers({

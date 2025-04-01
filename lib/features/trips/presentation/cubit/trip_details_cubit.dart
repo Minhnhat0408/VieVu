@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/repositories/trip_repository.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/domain/repositories/trip_repository.dart';
 
 part 'trip_details_state.dart';
 
@@ -22,6 +22,4 @@ class TripDetailsCubit extends Cubit<TripDetailsState> {
       (trip) => emit(TripDetailsLoadedSuccess(trip)),
     );
   }
-
-
 }

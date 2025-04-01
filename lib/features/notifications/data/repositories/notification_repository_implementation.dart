@@ -1,10 +1,10 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/notifications/data/datasources/notification_remote_datasource.dart';
-import 'package:vn_travel_companion/features/notifications/domain/entities/notification.dart';
-import 'package:vn_travel_companion/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/notifications/data/datasources/notification_remote_datasource.dart';
+import 'package:vievu/features/notifications/domain/entities/notification.dart';
+import 'package:vievu/features/notifications/domain/repositories/notification_repository.dart';
 
 class NotificationRepositoryImpl implements NotificationRepository {
   final NotificationRemoteDataSource remoteDataSource;
@@ -155,5 +155,4 @@ class NotificationRepositoryImpl implements NotificationRepository {
       return left(Failure(e.message));
     }
   }
-  
 }

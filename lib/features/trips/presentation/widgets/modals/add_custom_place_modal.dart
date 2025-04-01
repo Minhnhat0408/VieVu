@@ -6,10 +6,10 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
+import 'package:vievu/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
 
 class AddCustomPlaceModal extends StatefulWidget {
   final String tripId;
@@ -39,7 +39,7 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
   void initState() {
     super.initState();
 
-    _animatedMapController.mapController.mapEventStream.listen((event)  {
+    _animatedMapController.mapController.mapEventStream.listen((event) {
       if (event is MapEventTap) {
         log('Map tapped at: ${event.tapPosition}');
 
@@ -52,7 +52,6 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
         _addMarker(tappedLocation, 12);
         context.read<LocationInfoCubit>().convertGeoLocationToAddress(
             tappedLocation.latitude, tappedLocation.longitude);
-
       }
       if (event is MapEventDoubleTapZoom) {
         panelController.close();
@@ -78,7 +77,7 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
     });
     _animatedMapController.animateTo(
       dest: position,
-      zoom: zoom ?? 12,
+      // zoom: zoom ?? 12,
       rotation: 0.0,
     );
   }
@@ -157,11 +156,10 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
                                   )
                                 : null,
                           ),
-                          onSubmitted: (value)  {
+                          onSubmitted: (value) {
                             context
                                 .read<LocationInfoCubit>()
                                 .convertAddressToLatLng(value);
-
                           },
                         ),
                         const SizedBox(height: 12),

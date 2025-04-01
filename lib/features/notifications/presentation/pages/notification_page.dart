@@ -1,16 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:vn_travel_companion/core/constants/notification_types.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
-import 'package:vn_travel_companion/features/notifications/domain/entities/notification.dart'
+import 'package:vievu/core/constants/notification_types.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/auth/presentation/pages/profile_page.dart';
+import 'package:vievu/features/notifications/domain/entities/notification.dart'
     as app;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:vievu/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_detail_page.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});

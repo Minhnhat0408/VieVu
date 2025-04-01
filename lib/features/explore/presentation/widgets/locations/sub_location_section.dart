@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
+import 'package:vievu/features/explore/domain/entities/location.dart';
+import 'package:vievu/features/explore/presentation/pages/location_detail_page.dart';
 
 class SubLocationSection extends StatelessWidget {
   final List<Location> locations;

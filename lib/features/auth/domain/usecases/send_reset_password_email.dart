@@ -1,8 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/usecases/usecase.dart';
-import 'package:vn_travel_companion/features/auth/domain/repository/auth_repository.dart';
-
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/usecases/usecase.dart';
+import 'package:vievu/features/auth/domain/repository/auth_repository.dart';
 
 class SendResetPasswordEmail implements UseCase<Unit, ResetEmailParams> {
   final AuthRepository authRepository;

@@ -1,5 +1,5 @@
-import 'package:vn_travel_companion/features/trips/data/models/saved_service_model.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vievu/features/trips/data/models/saved_service_model.dart';
+import 'package:vievu/features/trips/domain/entities/trip_itinerary.dart';
 
 class TripItineraryModel extends TripItinerary {
   TripItineraryModel({

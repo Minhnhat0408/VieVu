@@ -4,17 +4,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/auth/presentation/bloc/profile_bloc.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/edit_profile.dart';
-import 'package:vn_travel_companion/features/auth/presentation/widget/user_rating_modal.dart';
-import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:vn_travel_companion/features/chat/presentation/pages/chat_details_page.dart';
+import 'package:vievu/features/auth/presentation/bloc/profile_bloc.dart';
+import 'package:vievu/features/auth/presentation/pages/edit_profile.dart';
+import 'package:vievu/features/auth/presentation/widget/user_rating_modal.dart';
+import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vievu/features/chat/presentation/pages/chat_details_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String id;

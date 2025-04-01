@@ -5,12 +5,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
-import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/features/auth/presentation/pages/profile_page.dart';
+import 'package:vievu/features/explore/presentation/widgets/filter_options_big.dart';
+import 'package:vievu/features/search/domain/entities/home_search_result.dart';
+import 'package:vievu/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_detail_page.dart';
 
 class HomeSearchPage extends StatefulWidget {
   final String? initialKeyword;

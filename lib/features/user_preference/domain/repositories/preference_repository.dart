@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/user_preference/domain/entities/preference.dart';
 
 abstract interface class PreferenceRepository {
   Future<Either<Failure, Preference?>> getUserPreference({
@@ -24,8 +24,7 @@ abstract interface class PreferenceRepository {
   });
 
   Future<Either<Failure, Preference>> updateUserPreferenceDF({
-     required int attractionId,
-
+    required int attractionId,
     required Preference currentPref,
     required String action,
   });

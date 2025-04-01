@@ -3,14 +3,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/event/event_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/explore/presentation/bloc/event/event_bloc.dart';
+import 'package:vievu/features/explore/presentation/bloc/location/location_bloc.dart';
+import 'package:vievu/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
+import 'package:vievu/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
+import 'package:vievu/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
+import 'package:vievu/features/trips/presentation/cubit/trip_details_cubit.dart';
 
 class SavedServiceSmallCard extends StatefulWidget {
   final ExploreSearchResult result;
@@ -69,8 +69,6 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                       price: state.attraction.price,
                     ),
                   );
-
-
             }
           },
         ),
@@ -81,18 +79,18 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                     as TripDetailsLoadedSuccess)
                 .trip
                 .id;
-         context.read<SavedServiceBloc>().add(InsertSavedService(
-                tripId: tripId,
-                linkId: state.location.id,
-                cover: state.location.cover,
-                name: state.location.name,
-                locationName: state.location.name,
-                rating: 0,
-                ratingCount: 0,
-                typeId: 0,
-                latitude: state.location.latitude,
-                longitude: state.location.longitude,
-              ));
+            context.read<SavedServiceBloc>().add(InsertSavedService(
+                  tripId: tripId,
+                  linkId: state.location.id,
+                  cover: state.location.cover,
+                  name: state.location.name,
+                  locationName: state.location.name,
+                  rating: 0,
+                  ratingCount: 0,
+                  typeId: 0,
+                  latitude: state.location.latitude,
+                  longitude: state.location.longitude,
+                ));
           }
         }),
         BlocListener<LocationInfoCubit, LocationInfoState>(
@@ -121,7 +119,6 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                     price: widget.result.price,
                   ),
                 );
-
           }
         }),
         BlocListener<EventBloc, EventState>(listener: (context, state) {
@@ -149,8 +146,6 @@ class _SavedServiceSmallCardState extends State<SavedServiceSmallCard> {
                     price: state.event.price,
                   ),
                 );
-
-
           }
         }),
       ],

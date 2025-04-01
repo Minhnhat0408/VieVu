@@ -1,5 +1,5 @@
-import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/auth/data/models/user_model.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
 
 class TripMemberModel extends TripMember {
   TripMemberModel({
@@ -46,7 +46,6 @@ class TripMemberModel extends TripMember {
     );
   }
 }
-
 
 class TripMemberRatingModel extends TripMemberRating {
   TripMemberRatingModel({

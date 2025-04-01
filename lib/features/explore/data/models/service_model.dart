@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
+import 'package:vievu/features/explore/domain/entities/service.dart';
 
 class ServiceModel extends Service {
   ServiceModel({

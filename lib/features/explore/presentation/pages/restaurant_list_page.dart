@@ -9,16 +9,16 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_filter_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_open_time_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_price_range.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_service_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/restaurant/restaurant_small_card.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/constants/restaurant_filters.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/features/explore/domain/entities/restaurant.dart';
+import 'package:vievu/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vievu/features/explore/presentation/widgets/restaurant/restaurant_filter_modal.dart';
+import 'package:vievu/features/explore/presentation/widgets/restaurant/restaurant_open_time_modal.dart';
+import 'package:vievu/features/explore/presentation/widgets/restaurant/restaurant_price_range.dart';
+import 'package:vievu/features/explore/presentation/widgets/restaurant/restaurant_service_modal.dart';
+import 'package:vievu/features/explore/presentation/widgets/restaurant/restaurant_small_card.dart';
 
 class RestaurantListPage extends StatefulWidget {
   final String locationName;

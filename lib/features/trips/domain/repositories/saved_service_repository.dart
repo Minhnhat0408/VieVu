@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/trips/domain/entities/saved_services.dart';
 
 abstract interface class SavedServiceRepository {
   Future<Either<Failure, SavedService>> insertSavedService({

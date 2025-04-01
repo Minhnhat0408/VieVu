@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/explore/data/models/review_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/explore/data/models/review_model.dart';
 import 'package:http/http.dart' as http;
 
 abstract interface class ReviewRemoteDataSource {
@@ -58,7 +58,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
       final jsonResponse = jsonDecode(response.body);
 
       final reviews = jsonResponse['reviewList'] as List;
-    
+
       return reviews
           .map((item) => ReviewModel.fromJson(item as Map<String, dynamic>))
           .toList();
@@ -67,4 +67,3 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     }
   }
 }
-

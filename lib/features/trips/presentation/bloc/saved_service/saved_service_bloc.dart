@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
-import 'package:vn_travel_companion/features/trips/domain/repositories/saved_service_repository.dart';
+import 'package:vievu/features/trips/domain/entities/saved_services.dart';
+import 'package:vievu/features/trips/domain/repositories/saved_service_repository.dart';
 
 part 'saved_service_event.dart';
 part 'saved_service_state.dart';
@@ -12,8 +12,6 @@ class SavedServiceBloc extends Bloc<SavedServiceEvent, SavedServiceState> {
     required SavedServiceRepository savedServiceRepository,
   })  : _savedServiceRepository = savedServiceRepository,
         super(SavedServiceInitial()) {
-  
-
     on<InsertSavedService>(_onInsertSavedService);
     on<DeleteSavedService>(_onDeleteSavedService);
     on<GetSavedServices>(_onGetSavedServices);

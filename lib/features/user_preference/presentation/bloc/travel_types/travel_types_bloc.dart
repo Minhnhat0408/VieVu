@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/repositories/travel_type_repository.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/features/user_preference/domain/repositories/travel_type_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 part 'travel_types_event.dart';
 part 'travel_types_state.dart';

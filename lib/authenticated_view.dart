@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/common/pages/settings.dart';
-import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:vn_travel_companion/features/chat/presentation/pages/all_chats_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/explore_nested_routes.dart';
-import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
-import 'package:vn_travel_companion/features/notifications/presentation/pages/notification_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/common/pages/settings.dart';
+import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vievu/features/chat/presentation/pages/all_chats_page.dart';
+import 'package:vievu/features/explore/presentation/pages/explore_nested_routes.dart';
+import 'package:vievu/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:vievu/features/notifications/presentation/pages/notification_page.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_manage_page.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_posts_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class AuthenticatedView extends StatefulWidget {
   const AuthenticatedView({super.key});

@@ -2,12 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/review.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews/reviews_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews/review_item.dart';
+import 'package:vievu/features/explore/domain/entities/review.dart';
+import 'package:vievu/features/explore/presentation/cubit/reviews/reviews_cubit.dart';
+import 'package:vievu/features/explore/presentation/widgets/filter_options_big.dart';
+import 'package:vievu/features/explore/presentation/widgets/reviews/review_item.dart';
 
 class ReviewsPage extends StatefulWidget {
   final int attractionId;

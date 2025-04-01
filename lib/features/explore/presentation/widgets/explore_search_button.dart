@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/search/presentation/pages/explore_search_page.dart';
+import 'package:vievu/features/search/presentation/pages/explore_search_page.dart';
 
 class ExploreSearchButton extends StatelessWidget {
   final bool showNotification;

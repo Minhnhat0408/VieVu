@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
 
 class AddTripModal extends StatefulWidget {
   const AddTripModal({super.key});
@@ -77,7 +77,6 @@ class _AddTripModalState extends State<AddTripModal> {
                                 tripName.text,
                                 userId,
                               ));
-                          
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,

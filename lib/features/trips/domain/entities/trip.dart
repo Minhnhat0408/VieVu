@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
 
 class Trip {
   final String id;
@@ -35,7 +35,7 @@ class Trip {
     this.maxMember,
     required this.locations,
     required this.serviceCount,
-     this.user,
+    this.user,
     required this.status,
     required this.isPublished,
     this.transports,

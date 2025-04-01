@@ -2,13 +2,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter/material.dart';
 import 'package:timelines/timelines.dart';
-import 'package:vn_travel_companion/core/utils/conversions.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
+import 'package:vievu/core/utils/conversions.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/chat/domain/entities/chat.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:vn_travel_companion/features/chat/presentation/widgets/summary_timeline.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_detail_page.dart';
+import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vievu/features/chat/presentation/widgets/summary_timeline.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_detail_page.dart';
 
 class SummarizeChatModal extends StatefulWidget {
   final Chat chat;

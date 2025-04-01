@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/features/explore/data/models/event_model.dart';
+import 'package:vievu/features/explore/data/models/event_model.dart';
 
 abstract class EventRemoteDatasource {
   Future<List<EventModel>> getHotEvents({
@@ -33,7 +33,6 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
       // Fetch trending events
       final response = await client.get(url);
 
-     
       if (response.statusCode == 200) {
         final decodedBody = utf8.decode(response.bodyBytes);
         final data = json.decode(
@@ -92,7 +91,7 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
         Uri.parse('https://api-v2.ticketbox.vn/gin/api/v1/events/$eventId');
     try {
       final response = await client.get(
-          url,
+        url,
         headers: {'x-accept-language': 'vi'},
       );
 
@@ -104,11 +103,11 @@ class EventRemoteDatasourceImpl implements EventRemoteDatasource {
 
         return EventModel.fromEventDetails(data['data']['result']);
       } else {
-          throw Exception(
-              'Failed to load event details: ${response.statusCode} ${response.reasonPhrase}');
-        }
-      } catch (e) {
-        log('Error fetching event details: $e');
+        throw Exception(
+            'Failed to load event details: ${response.statusCode} ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      log('Error fetching event details: $e');
       throw Exception('Error fetching event details: $e');
     }
   }

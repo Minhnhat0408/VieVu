@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
-import 'package:vn_travel_companion/features/chat/domain/repositories/message_repository.dart';
+import 'package:vievu/features/chat/domain/entities/message.dart';
+import 'package:vievu/features/chat/domain/repositories/message_repository.dart';
 
 part 'message_event.dart';
 part 'message_state.dart';

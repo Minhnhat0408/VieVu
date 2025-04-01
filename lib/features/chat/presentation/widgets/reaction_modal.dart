@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
+import 'package:vievu/features/chat/domain/entities/message.dart';
 
 class ReactionsModal extends StatefulWidget {
   final Message message;

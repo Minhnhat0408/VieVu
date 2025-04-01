@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/domain/repositories/trip_member_repository.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/domain/repositories/trip_member_repository.dart';
 
 part 'current_trip_member_info_state.dart';
 

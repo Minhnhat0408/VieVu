@@ -1,10 +1,10 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/trip_review_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_review.dart';
-import 'package:vn_travel_companion/features/trips/domain/repositories/trip_review_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/trips/data/datasources/trip_review_remote_datasource.dart';
+import 'package:vievu/features/trips/domain/entities/trip_review.dart';
+import 'package:vievu/features/trips/domain/repositories/trip_review_repository.dart';
 
 class TripReviewRepositoryImplementation implements TripReviewRepository {
   final TripReviewRemoteDataSource tripReviewRemoteDataSource;
@@ -41,8 +41,7 @@ class TripReviewRepositoryImplementation implements TripReviewRepository {
         return left(Failure("Không có kết nối mạng"));
       }
       final tripReview = await tripReviewRemoteDataSource.upsertTripReview(
-          tripId: tripId, review: review, rating: rating,
-          memberId: memberId);
+          tripId: tripId, review: review, rating: rating, memberId: memberId);
       return right(tripReview);
     } on ServerException catch (e) {
       return left(Failure(e.message));

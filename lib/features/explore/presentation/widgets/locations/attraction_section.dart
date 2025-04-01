@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/features/explore/domain/entities/attraction.dart';
+import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vievu/features/explore/presentation/bloc/location/location_bloc.dart';
+import 'package:vievu/features/explore/presentation/pages/attraction_list_page.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/attraction_big_card.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class AttractionsSection extends StatelessWidget {
   final List<Attraction> attractions;

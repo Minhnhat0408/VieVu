@@ -3,15 +3,15 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_settings_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vievu/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_settings_page.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TripDetailAppbar extends StatefulWidget {
@@ -254,49 +254,52 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
             ),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(50.0),
-              child: Container(
-                color:
-                    Theme.of(context).colorScheme.surface, // TabBar background
-                child: TabBar(
-                  controller: widget.tabController,
-                  isScrollable: isCompleted() ? true : false,
-                  tabAlignment: isCompleted() ? TabAlignment.start : null,
-                  labelPadding: isCompleted()
-                      ? null
-                      : const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                  tabs: [
-                    const Tab(
-                      text: 'Chi tiết',
-                      icon: Icon(
-                        Icons.info_outline,
+              child: widget.trip != null
+                  ? Container(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surface, // TabBar background
+                      child: TabBar(
+                        controller: widget.tabController,
+                        isScrollable: isCompleted() ? true : false,
+                        tabAlignment: isCompleted() ? TabAlignment.start : null,
+                        labelPadding: isCompleted()
+                            ? null
+                            : const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                        tabs: [
+                          const Tab(
+                            text: 'Chi tiết',
+                            icon: Icon(
+                              Icons.info_outline,
+                            ),
+                          ),
+                          if (isCompleted())
+                            const Tab(
+                              text: 'Đánh giá',
+                              icon: Icon(
+                                Icons.insert_comment_outlined,
+                              ),
+                            ),
+                          const Tab(
+                            text: 'Mục lưu',
+                            icon: Icon(
+                              Icons.favorite_border_outlined,
+                            ),
+                          ),
+                          const Tab(
+                              text: 'Lộ trình',
+                              icon: Icon(
+                                Icons.map_outlined,
+                              )),
+                          const Tab(
+                              text: 'Thành viên',
+                              icon: Icon(
+                                Icons.group_outlined,
+                              )),
+                        ],
                       ),
-                    ),
-                    if (isCompleted())
-                      const Tab(
-                        text: 'Đánh giá',
-                        icon: Icon(
-                          Icons.insert_comment_outlined,
-                        ),
-                      ),
-                    const Tab(
-                      text: 'Mục lưu',
-                      icon: Icon(
-                        Icons.favorite_border_outlined,
-                      ),
-                    ),
-                    const Tab(
-                        text: 'Lộ trình',
-                        icon: Icon(
-                          Icons.map_outlined,
-                        )),
-                    const Tab(
-                        text: 'Thành viên',
-                        icon: Icon(
-                          Icons.group_outlined,
-                        )),
-                  ],
-                ),
-              ),
+                    )
+                  : const SizedBox(),
             ),
           );
         },

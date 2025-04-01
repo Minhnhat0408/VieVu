@@ -2,11 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/utils/conversions.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_med_card.dart';
+import 'package:vievu/core/utils/conversions.dart';
+import 'package:vievu/features/trips/domain/entities/saved_services.dart';
+import 'package:vievu/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
+import 'package:vievu/features/trips/presentation/widgets/saved_service/saved_service_med_card.dart';
 
 class SelectSavedServiceToItineraryModal extends StatefulWidget {
   final DateTime time;
@@ -57,7 +57,7 @@ class _SelectSavedServiceToItineraryModalState
           preferredSize: const Size.fromHeight(1.0),
           child: Divider(
             thickness: 1,
-            color:  Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         actions: [

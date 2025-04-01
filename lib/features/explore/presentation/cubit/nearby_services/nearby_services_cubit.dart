@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
-import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
+import 'package:vievu/features/explore/domain/entities/hotel.dart';
+import 'package:vievu/features/explore/domain/entities/restaurant.dart';
+import 'package:vievu/features/explore/domain/entities/service.dart';
+import 'package:vievu/features/explore/domain/repositories/attraction_repository.dart';
 
 part 'nearby_services_state.dart';
 
@@ -69,7 +69,6 @@ class NearbyServicesCubit extends Cubit<NearbyServicesState> {
     List<int> openTime = const [],
     required int limit,
     required String userId,
-
     required int offset,
     int? minPrice,
     int? maxPrice,

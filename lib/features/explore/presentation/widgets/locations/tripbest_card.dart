@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/utils/open_url.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/tripbest.dart';
+import 'package:vievu/core/utils/open_url.dart';
+import 'package:vievu/features/explore/domain/entities/tripbest.dart';
 
 class TripbestCard extends StatelessWidget {
   final TripBest tripBest;

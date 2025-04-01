@@ -1,20 +1,19 @@
 import 'dart:developer';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart'
-    as my_user;
-import 'package:vn_travel_companion/features/chat/data/datasources/chat_remote_datasource.dart';
-import 'package:vn_travel_companion/features/chat/data/datasources/message_remote_datasource.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
-import 'package:vn_travel_companion/features/chat/domain/repositories/chat_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart' as my_user;
+import 'package:vievu/features/chat/data/datasources/chat_remote_datasource.dart';
+import 'package:vievu/features/chat/data/datasources/message_remote_datasource.dart';
+import 'package:vievu/features/chat/domain/entities/chat.dart';
+import 'package:vievu/features/chat/domain/entities/message.dart';
+import 'package:vievu/features/chat/domain/repositories/chat_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/trip_itinerary_remote_datasource.dart';
+import 'package:vievu/features/explore/data/datasources/location_remote_datasource.dart';
+import 'package:vievu/features/trips/data/datasources/saved_service_remote_datasource.dart';
+import 'package:vievu/features/trips/data/datasources/trip_itinerary_remote_datasource.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
   final ChatRemoteDatasource chatRemoteDatasource;

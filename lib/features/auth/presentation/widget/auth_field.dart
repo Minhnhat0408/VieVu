@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/utils/validators.dart';
+import 'package:vievu/core/utils/validators.dart';
 
 class AuthField extends StatefulWidget {
   final String hintText;

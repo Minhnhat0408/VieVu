@@ -1,5 +1,4 @@
-
-import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
+import 'package:vievu/features/explore/domain/entities/hotel.dart';
 
 class HotelModel extends Hotel {
   HotelModel({

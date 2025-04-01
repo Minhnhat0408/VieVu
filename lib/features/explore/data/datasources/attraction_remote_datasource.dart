@@ -4,14 +4,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
-import 'package:vn_travel_companion/features/explore/data/models/hotel_model.dart';
-import 'package:vn_travel_companion/features/explore/data/models/restaurant_model.dart';
-import 'package:vn_travel_companion/features/explore/data/models/service_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/explore/data/models/attraction_model.dart';
+import 'package:vievu/features/explore/data/models/hotel_model.dart';
+import 'package:vievu/features/explore/data/models/restaurant_model.dart';
+import 'package:vievu/features/explore/data/models/service_model.dart';
 import 'package:html_unescape/html_unescape.dart';
-import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
+import 'package:vievu/features/user_preference/data/models/preference_model.dart';
+import 'package:vievu/features/user_preference/domain/entities/preference.dart';
 
 abstract interface class AttractionRemoteDatasource {
   Future<AttractionModel?> getAttraction({

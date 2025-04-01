@@ -2,12 +2,12 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/auth/data/datasources/profile_remote_datasource.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
-import 'package:vn_travel_companion/features/auth/domain/repository/profile_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/auth/data/datasources/profile_remote_datasource.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/auth/domain/repository/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -70,6 +70,4 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return left(Failure(e.message));
     }
   }
-
-
 }

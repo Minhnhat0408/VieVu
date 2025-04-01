@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/trips/domain/entities/trip_itinerary.dart';
 
 abstract interface class TripItineraryRepository {
   Future<Either<Failure, TripItinerary>> insertTripItinerary({

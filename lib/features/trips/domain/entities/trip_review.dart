@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
 
 class TripReview {
   final int id;

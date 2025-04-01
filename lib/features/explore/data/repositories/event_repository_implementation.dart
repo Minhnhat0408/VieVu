@@ -1,11 +1,11 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/explore/data/datasources/event_remote_datasource.dart';
-import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/event.dart';
-import 'package:vn_travel_companion/features/explore/domain/repositories/event_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/explore/data/datasources/event_remote_datasource.dart';
+import 'package:vievu/features/explore/data/datasources/location_remote_datasource.dart';
+import 'package:vievu/features/explore/domain/entities/event.dart';
+import 'package:vievu/features/explore/domain/repositories/event_repository.dart';
 
 class EventRepositoryImpl implements EventRepository {
   final EventRemoteDatasource eventRemoteDatasource;

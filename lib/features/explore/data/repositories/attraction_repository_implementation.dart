@@ -1,16 +1,16 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
-import 'package:vn_travel_companion/features/explore/domain/repositories/attraction_repository.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
-import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/explore/data/datasources/attraction_remote_datasource.dart';
+import 'package:vievu/features/explore/domain/entities/attraction.dart';
+import 'package:vievu/features/explore/domain/entities/hotel.dart';
+import 'package:vievu/features/explore/domain/entities/restaurant.dart';
+import 'package:vievu/features/explore/domain/entities/service.dart';
+import 'package:vievu/features/explore/domain/repositories/attraction_repository.dart';
+import 'package:vievu/features/trips/data/datasources/saved_service_remote_datasource.dart';
+import 'package:vievu/features/user_preference/data/models/preference_model.dart';
+import 'package:vievu/features/user_preference/domain/entities/preference.dart';
 
 class AttractionRepositoryImpl implements AttractionRepository {
   final AttractionRemoteDatasource attractionRemoteDatasource;

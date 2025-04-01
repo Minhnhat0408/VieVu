@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/constants/parent_traveltypes.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/core/constants/parent_traveltypes.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
 
 class ParentTravelTypeModal extends StatefulWidget {
   final TravelType? currentTravelType;

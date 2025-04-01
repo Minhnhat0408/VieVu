@@ -2,8 +2,8 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/auth/data/models/user_model.dart';
 
 abstract interface class ProfileRemoteDataSource {
   Future<UserModel> getProfile({

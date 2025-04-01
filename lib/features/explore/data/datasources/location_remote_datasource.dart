@@ -5,13 +5,13 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
-import 'package:vn_travel_companion/features/explore/data/models/hotel_model.dart';
-import 'package:vn_travel_companion/features/explore/data/models/location_model.dart';
-import 'package:vn_travel_companion/features/explore/data/models/restaurant_model.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/comment.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/tripbest.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/explore/data/models/attraction_model.dart';
+import 'package:vievu/features/explore/data/models/hotel_model.dart';
+import 'package:vievu/features/explore/data/models/location_model.dart';
+import 'package:vievu/features/explore/data/models/restaurant_model.dart';
+import 'package:vievu/features/explore/domain/entities/comment.dart';
+import 'package:vievu/features/explore/domain/entities/tripbest.dart';
 
 abstract interface class LocationRemoteDatasource {
   Future<LocationModel?> getLocation({
@@ -66,7 +66,6 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
           .select('*, parent:parent_id(name, id, parent_id)')
           .eq('id', locationId)
           .maybeSingle();
-
 
       if (response == null) {
         return null;
@@ -237,7 +236,6 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
                 .map((e) => HotelModel.fromGeneralLocationInfo(e))
                 .toList();
           } else if (item['typeName'] == 'classicRecommendRestaurant') {
-
             returnData['restaurants'] =
                 (item['classicRecommendRestaurantModule']['restaurantList'][0]
                         ['restaurantList'] as List)
@@ -276,7 +274,6 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
             )
             .limit(1)
             .maybeSingle();
-
 
         if (res != null) {
           return GeoApiLocationModel(
@@ -356,7 +353,6 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
             )
             .limit(1)
             .maybeSingle();
-
 
         return GeoApiLocationModel(
             address: jsonResponse['results'][0]['formatted'],

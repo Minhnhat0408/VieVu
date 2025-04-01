@@ -1,11 +1,11 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
-import 'package:vn_travel_companion/features/auth/domain/repository/auth_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/auth/domain/repository/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;

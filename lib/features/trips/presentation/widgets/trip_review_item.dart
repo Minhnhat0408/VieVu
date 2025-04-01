@@ -2,14 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_review.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/features/auth/presentation/pages/profile_page.dart';
+import 'package:vievu/features/trips/domain/entities/trip_review.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_review_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/post_review_modal.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_review_bloc.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/post_review_modal.dart';
 
 class TripReviewItem extends StatefulWidget {
   final TripReview review;
@@ -46,8 +46,7 @@ class _ReviewItemState extends State<TripReviewItem> {
                 child: Row(
                   children: [
                     CachedNetworkImage(
-                      imageUrl: widget.review.user.avatarUrl ??
-                          '',
+                      imageUrl: widget.review.user.avatarUrl ?? '',
                       imageBuilder: (context, imageProvider) => CircleAvatar(
                         radius: 20,
                         backgroundImage: imageProvider,

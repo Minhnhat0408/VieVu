@@ -2,11 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
-import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:vn_travel_companion/features/chat/presentation/widgets/chat_head_item.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/features/chat/domain/entities/chat.dart';
+import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vievu/features/chat/presentation/widgets/chat_head_item.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
 
 class AllMessagesPage extends StatefulWidget {
   const AllMessagesPage({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_posts_page.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_posts_page.dart';
 
 class HomeNestedRoutes extends StatelessWidget {
   const HomeNestedRoutes({super.key});

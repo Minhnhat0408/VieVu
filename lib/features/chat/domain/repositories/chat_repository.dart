@@ -1,10 +1,9 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart'
-    as my_user;
-import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart' as my_user;
+import 'package:vievu/features/chat/domain/entities/chat.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
+import 'package:vievu/features/chat/domain/entities/message.dart';
 
 abstract interface class ChatRepository {
   Future<Either<Failure, Chat>> insertChat({

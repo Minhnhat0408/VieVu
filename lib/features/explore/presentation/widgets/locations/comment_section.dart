@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/comment.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/comment_card.dart';
+import 'package:vievu/features/explore/domain/entities/comment.dart';
+import 'package:vievu/features/explore/presentation/widgets/locations/comment_card.dart';
 
 class CommentSection extends StatelessWidget {
   final List<Comment> comments;

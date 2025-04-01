@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/chat/data/models/message_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/chat/data/models/message_model.dart';
 
 abstract interface class MessageRemoteDatasource {
   Future<MessageModel> insertMessage({
@@ -128,7 +128,6 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .gte('id', messageId)
           .order('created_at', ascending: false);
 
-  
       return res.map((e) => MessageModel.fromJson(e)).toList();
     } catch (e) {
       throw ServerException(e.toString());

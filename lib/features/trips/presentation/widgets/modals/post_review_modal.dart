@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:vn_travel_companion/core/utils/conversions.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vievu/core/utils/conversions.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_review_bloc.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_review_bloc.dart';
 
 class PostReviewModal extends StatefulWidget {
   final Trip trip;

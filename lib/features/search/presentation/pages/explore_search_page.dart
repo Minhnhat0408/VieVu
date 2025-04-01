@@ -4,12 +4,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
-import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
-import 'package:vn_travel_companion/features/search/presentation/cubit/search_history_cubit.dart';
-import 'package:vn_travel_companion/features/search/presentation/widgets/explore_search_item.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/features/explore/presentation/widgets/filter_options_big.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vievu/features/search/presentation/cubit/search_history_cubit.dart';
+import 'package:vievu/features/search/presentation/widgets/explore_search_item.dart';
 
 class ExploreSearchPage extends StatefulWidget {
   // static route() {

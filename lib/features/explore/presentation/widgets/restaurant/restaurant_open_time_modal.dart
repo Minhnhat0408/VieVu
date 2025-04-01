@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
+import 'package:vievu/core/constants/restaurant_filters.dart';
 
 class RestaurantOpenTimeModal extends StatefulWidget {
   final List<String> currentServices;

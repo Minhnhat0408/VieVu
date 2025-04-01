@@ -1,5 +1,4 @@
-
-import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
+import 'package:vievu/features/user_preference/domain/entities/preference.dart';
 
 class PreferenceModel extends Preference {
   PreferenceModel(

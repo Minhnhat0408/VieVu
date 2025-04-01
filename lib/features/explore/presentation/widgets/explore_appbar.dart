@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/explore_search_button.dart';
+import 'package:vievu/features/explore/presentation/widgets/explore_search_button.dart';
 
 class ExploreAppbar extends StatefulWidget {
   const ExploreAppbar({super.key});

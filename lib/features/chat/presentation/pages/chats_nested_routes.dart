@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/chat/presentation/pages/all_chats_page.dart';
-
+import 'package:vievu/features/chat/presentation/pages/all_chats_page.dart';
 
 class ChatsNestedRoutes extends StatelessWidget {
   const ChatsNestedRoutes({super.key});
@@ -13,8 +12,6 @@ class ChatsNestedRoutes extends StatelessWidget {
         onGenerateRoute: (RouteSettings settings) {
           Widget page;
           switch (settings.name) {
-
-
             default:
               page = const AllMessagesPage();
           }

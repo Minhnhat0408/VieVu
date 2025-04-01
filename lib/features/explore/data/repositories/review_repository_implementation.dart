@@ -1,10 +1,10 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/explore/data/datasources/review_remote_datasource.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/review.dart';
-import 'package:vn_travel_companion/features/explore/domain/repositories/review_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/explore/data/datasources/review_remote_datasource.dart';
+import 'package:vievu/features/explore/domain/entities/review.dart';
+import 'package:vievu/features/explore/domain/repositories/review_repository.dart';
 
 class ReviewRepositoryImpl implements ReviewRepository {
   final ReviewRemoteDataSource reviewRemoteDataSource;

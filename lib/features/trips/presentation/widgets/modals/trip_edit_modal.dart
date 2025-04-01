@@ -7,15 +7,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
-import 'package:vn_travel_companion/core/constants/transport_options.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/image_picker.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/core/utils/validators.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/trip_cover_picker.dart';
+import 'package:vievu/core/constants/transport_options.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/utils/image_picker.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/core/utils/validators.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vievu/features/trips/presentation/cubit/trip_details_cubit.dart';
+import 'package:vievu/features/trips/presentation/widgets/trip_cover_picker.dart';
 
 class TripEditModal extends StatefulWidget {
   final Trip trip;

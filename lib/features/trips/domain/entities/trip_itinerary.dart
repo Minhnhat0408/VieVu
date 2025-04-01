@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
+import 'package:vievu/features/trips/domain/entities/saved_services.dart';
 
 class TripItinerary {
   final int id;

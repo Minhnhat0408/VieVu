@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/common/widgets/slide_indicator.dart';
+import 'package:vievu/core/common/widgets/slide_indicator.dart';
 
 class IntroductionPage extends StatefulWidget {
   static route() {

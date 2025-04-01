@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
 
 class PasswordForgotPage extends StatelessWidget {
   static route() {

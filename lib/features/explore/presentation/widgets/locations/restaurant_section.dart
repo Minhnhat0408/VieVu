@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/restaurant_list_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/restaurant_big_card.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/features/explore/domain/entities/restaurant.dart';
+import 'package:vievu/features/explore/presentation/bloc/location/location_bloc.dart';
+import 'package:vievu/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vievu/features/explore/presentation/pages/restaurant_list_page.dart';
+import 'package:vievu/features/explore/presentation/widgets/locations/restaurant_big_card.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class RestaurantSection extends StatelessWidget {
   final List<Restaurant> restaurants;

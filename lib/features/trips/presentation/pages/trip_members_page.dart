@@ -2,18 +2,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/constants/notification_types.dart';
-import 'package:vn_travel_companion/core/utils/conversions.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
-import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/invite_user_search.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_edit_modal.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/constants/notification_types.dart';
+import 'package:vievu/core/utils/conversions.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/auth/presentation/pages/profile_page.dart';
+import 'package:vievu/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vievu/features/trips/presentation/pages/invite_user_search.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/trip_edit_modal.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TripMembersPage extends StatefulWidget {
@@ -27,7 +27,7 @@ class TripMembersPage extends StatefulWidget {
 class _TripMembersPageState extends State<TripMembersPage> {
   final List<TripMember> tripMembers = [];
   bool isAUthorize = false;
-
+  late TripMember? currentUser;
   @override
   void initState() {
     super.initState();
@@ -42,14 +42,17 @@ class _TripMembersPageState extends State<TripMembersPage> {
       final me = tripMembers.indexWhere(
         (element) => element.user.id == userId,
       );
-
       if (me != -1) {
+        currentUser = tripMembers[me];
+
         if (tripMembers[me].role == 'owner' ||
             tripMembers[me].role == 'moderator') {
           setState(() {
             isAUthorize = true;
           });
         }
+      } else {
+        currentUser = null;
       }
     }
 
@@ -84,21 +87,24 @@ class _TripMembersPageState extends State<TripMembersPage> {
                   )
                 : null,
             actions: [
-              FilledButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => InviteUserSearch(
-                        trip: widget.trip,
+              if (currentUser != null &&
+                  widget.trip.status != 'cancelled' &&
+                  widget.trip.status != 'completed')
+                FilledButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => InviteUserSearch(
+                          trip: widget.trip,
+                        ),
                       ),
-                    ),
-                  );
-                },
-                child: const Text(
-                  'Mời',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                    );
+                  },
+                  child: const Text(
+                    'Mời',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
               const SizedBox(
                 width: 10,
               ),
@@ -188,7 +194,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      if  (tripMember.role == 'owner')
+                                      if (tripMember.role == 'owner')
                                         IconButton(
                                           onPressed: () {
                                             showDialog(
@@ -416,7 +422,8 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                                             .state
                                                         as AppUserLoggedIn)
                                                     .user
-                                                    .id
+                                                    .id &&
+                                            currentUser != null
                                         ? RatingBarIndicator(
                                             rating:
                                                 tripMember.rating.toDouble(),

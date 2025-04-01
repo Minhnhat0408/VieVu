@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/search/domain/entities/home_search_result.dart';
 
 abstract interface class SearchRepository {
   Future<Either<Failure, List<ExploreSearchResult>>> searchAll({

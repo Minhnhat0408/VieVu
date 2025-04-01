@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:vn_travel_companion/features/chat/presentation/pages/chat_details_page.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/trip_details_cubit.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vievu/features/chat/presentation/pages/chat_details_page.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
+import 'package:vievu/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
+import 'package:vievu/features/trips/presentation/cubit/trip_details_cubit.dart';
 
-import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_edit_modal.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/trip_edit_modal.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
 
 final Map<String, String> optionLists = {
   // 'Chỉnh sửa': 'Thay đổi các thông tin hiển thị của chuyến đi',

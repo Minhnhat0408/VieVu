@@ -2,8 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:vn_travel_companion/core/common/pages/image_carousel_page.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/review.dart';
+import 'package:vievu/core/common/pages/image_carousel_page.dart';
+import 'package:vievu/features/explore/domain/entities/review.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ReviewItem extends StatefulWidget {

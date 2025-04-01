@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
 
 List<TravelType> parentTravelTypes = [
   TravelType(id: '70-128', name: 'Tour Ngắm Cảnh'),
@@ -14,4 +14,3 @@ List<TravelType> parentTravelTypes = [
   TravelType(id: '70-165', name: 'Phong Cách Sống'),
   TravelType(id: '70-166', name: 'Thể thao'),
 ];
-

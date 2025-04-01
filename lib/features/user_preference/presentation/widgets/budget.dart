@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/widgets/preferences_option.dart';
+import 'package:vievu/features/user_preference/presentation/widgets/preferences_option.dart';
 
 class Budget extends StatelessWidget {
   final double budget;

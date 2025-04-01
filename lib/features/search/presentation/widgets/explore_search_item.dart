@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/open_url.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/all_nearby_service_page.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/open_url.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/explore/presentation/cubit/location_info/location_info_cubit.dart';
+import 'package:vievu/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vievu/features/explore/presentation/pages/attraction_details_page.dart';
+import 'package:vievu/features/explore/presentation/pages/location_detail_page.dart';
+import 'package:vievu/features/explore/presentation/pages/all_nearby_service_page.dart';
 
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vievu/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class ExploreSearchItem extends StatelessWidget {
   final ExploreSearchResult? result;
@@ -125,11 +125,13 @@ class ExploreSearchItem extends StatelessWidget {
           //           currentPref: currentPref,
           //           action: 'view'));
           //     }
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AttractionDetailPage(
-                attractionId: result!.id,
-                isSearch: true,
-              )));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AttractionDetailPage(
+                        attractionId: result!.id,
+                        isSearch: true,
+                      )));
         } else if (result?.type == 'hotel' ||
             result?.type == 'restaurant' ||
             result?.type == 'shop') {

@@ -1,10 +1,10 @@
-import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
+import 'package:vievu/features/search/domain/entities/home_search_result.dart';
 
 class HomeSearchResultModel extends HomeSearchResult {
   HomeSearchResultModel({
     required super.id,
     required super.name,
-     super.cover,
+    super.cover,
     required super.type,
     super.locations,
   });

@@ -5,14 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/utils/custom_text_editing_controller.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/onboarding_help.dart';
-import 'package:vn_travel_companion/core/utils/overlay_button_builder.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
-import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
-import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vievu/core/utils/custom_text_editing_controller.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/core/utils/onboarding_help.dart';
+import 'package:vievu/core/utils/overlay_button_builder.dart';
+import 'package:vievu/features/chat/domain/entities/chat.dart';
+import 'package:vievu/features/chat/presentation/bloc/message_bloc.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/search/presentation/bloc/search_bloc.dart';
 
 class ChatInput extends StatefulWidget {
   final Chat chat;

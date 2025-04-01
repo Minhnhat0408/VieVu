@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/common/pages/settings.dart';
-import 'package:vn_travel_companion/features/auth/presentation/pages/profile_page.dart';
+import 'package:vievu/core/common/pages/settings.dart';
+import 'package:vievu/features/auth/presentation/pages/profile_page.dart';
 
 class ProfileNestedRoutes extends StatelessWidget {
   const ProfileNestedRoutes({super.key});

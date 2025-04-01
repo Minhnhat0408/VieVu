@@ -1,10 +1,10 @@
-import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
+import 'package:vievu/features/chat/domain/entities/chat.dart';
 
 class ChatModel extends Chat {
   ChatModel({
     required super.id,
     required super.name,
-     super.imageUrl,
+    super.imageUrl,
     super.lastMessage,
     super.lastMessageTime,
     super.tripId,

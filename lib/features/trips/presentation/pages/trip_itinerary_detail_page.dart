@@ -4,15 +4,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/open_url.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/core/utils/open_url.dart';
+import 'package:vievu/features/trips/domain/entities/trip_itinerary.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/modals/add_note_to_itinerary_modal.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
+import 'package:vievu/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/add_note_to_itinerary_modal.dart';
 
 class TripItineraryDetailPage extends StatefulWidget {
   final List<TripItinerary> itineraries;

@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/explore/domain/entities/event.dart';
+import 'package:vievu/features/explore/domain/entities/event.dart';
 
 class EventModel extends Event {
   EventModel(
@@ -44,7 +44,6 @@ class EventModel extends Event {
       deepLink: json['deeplink'] ?? '',
       isSaved: json['isSaved'] ?? false,
       image: json['bannerURL'] ?? '',
-
       name: json['title'] ?? '',
       venue: json['venue'] ?? '',
       address: json['address'] ?? '',

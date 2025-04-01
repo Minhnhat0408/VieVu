@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_manage_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_settings_page.dart';
+import 'package:vievu/features/explore/presentation/pages/attraction_details_page.dart';
+import 'package:vievu/features/explore/presentation/pages/location_detail_page.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_manage_page.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_settings_page.dart';
 
 class TripManageNestedRoutes extends StatelessWidget {
   const TripManageNestedRoutes({super.key});

@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/review.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/reviews/reviews_cubit.dart';
+import 'package:vievu/features/explore/domain/entities/review.dart';
+import 'package:vievu/features/explore/presentation/cubit/reviews/reviews_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:vn_travel_companion/features/explore/presentation/pages/reviews_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/reviews/review_item.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/features/explore/presentation/pages/reviews_page.dart';
+import 'package:vievu/features/explore/presentation/widgets/reviews/review_item.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class ReviewsSection extends StatefulWidget {
   final int serviceId;

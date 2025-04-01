@@ -4,12 +4,12 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
-import 'package:vn_travel_companion/features/chat/presentation/bloc/message_bloc.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
-import 'package:vn_travel_companion/features/search/presentation/bloc/search_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/chat/domain/entities/message.dart';
+import 'package:vievu/features/chat/presentation/bloc/message_bloc.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/search/presentation/bloc/search_bloc.dart';
+import 'package:vievu/features/trips/domain/entities/saved_services.dart';
 
 class AddPlaceByNameModal extends StatefulWidget {
   final String searchKey;

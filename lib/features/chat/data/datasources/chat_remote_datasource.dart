@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
-import 'package:vn_travel_companion/features/chat/data/models/chat_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/auth/data/models/user_model.dart';
+import 'package:vievu/features/chat/data/models/chat_model.dart';
 import 'package:http/http.dart' as http;
 
 abstract class ChatRemoteDatasource {

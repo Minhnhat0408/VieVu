@@ -1,5 +1,5 @@
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_review.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/trips/domain/entities/trip_review.dart';
 
 class TripReviewModel extends TripReview {
   TripReviewModel({

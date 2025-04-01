@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/tripbest.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/tripbest_card.dart';
+import 'package:vievu/features/explore/domain/entities/tripbest.dart';
+import 'package:vievu/features/explore/presentation/widgets/locations/tripbest_card.dart';
 
 class TripbestSection extends StatelessWidget {
   final List<TripBest> tripbests;

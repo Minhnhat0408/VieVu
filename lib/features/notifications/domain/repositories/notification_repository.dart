@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/notifications/domain/entities/notification.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/notifications/domain/entities/notification.dart';
 
 abstract interface class NotificationRepository {
   Future<Either<Failure, List<Notification>>> getNotifications({

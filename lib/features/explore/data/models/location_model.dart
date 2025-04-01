@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
+import 'package:vievu/features/explore/domain/entities/location.dart';
 
 class LocationModel extends Location {
   LocationModel({
@@ -89,6 +89,4 @@ class GeoApiLocationModel extends GeoApiLocation {
       cityName: json['cityName'],
     );
   }
-
-  
 }

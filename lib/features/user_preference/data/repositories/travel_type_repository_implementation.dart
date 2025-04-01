@@ -1,11 +1,9 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/repositories/travel_type_repository.dart';
-
-
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/user_preference/data/datasources/travel_type_remote_datasource.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/features/user_preference/domain/repositories/travel_type_repository.dart';
 
 class TravelTypeRepositoryImpl implements TravelTypeRepository {
   final TravelTypeRemoteDatasource remoteDataSource;

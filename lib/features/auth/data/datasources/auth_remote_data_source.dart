@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/auth/data/models/user_model.dart';
 
 abstract interface class AuthRemoteDataSource {
   Session? get currentUserSession;
@@ -107,7 +107,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .select('*, trips(count)')
           .eq('id', currentUserSession!.user.id)
           .single();
-
 
       return UserModel.fromJson(response).copyWith(
         tripCount: response['trips'].first['count'] as int,

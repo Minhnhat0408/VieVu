@@ -1,11 +1,11 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/chat/data/datasources/chat_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/trip_member_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/domain/repositories/trip_member_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/chat/data/datasources/chat_remote_datasource.dart';
+import 'package:vievu/features/trips/data/datasources/trip_member_remote_datasource.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/domain/repositories/trip_member_repository.dart';
 
 class TripMemberRepositoryImpl implements TripMemberRepository {
   final TripMemberRemoteDatasource tripMemberRemoteDatasource;

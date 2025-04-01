@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
+import 'package:vievu/features/explore/domain/entities/attraction.dart';
 
 class AttractionModel extends Attraction {
   AttractionModel(

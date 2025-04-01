@@ -1,15 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_pref_filter_modal.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/attraction_pref_filter_modal.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
+import 'package:vievu/features/user_preference/domain/entities/preference.dart';
+import 'package:vievu/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 
 class AllRecommendationsPage extends StatefulWidget {
   const AllRecommendationsPage({super.key});

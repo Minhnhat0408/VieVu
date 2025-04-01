@@ -11,14 +11,14 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/hotel.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_price_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_room_info_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_small_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/hotels/hotel_star_modal.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/features/explore/domain/entities/hotel.dart';
+import 'package:vievu/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vievu/features/explore/presentation/widgets/hotels/hotel_price_modal.dart';
+import 'package:vievu/features/explore/presentation/widgets/hotels/hotel_room_info_modal.dart';
+import 'package:vievu/features/explore/presentation/widgets/hotels/hotel_small_card.dart';
+import 'package:vievu/features/explore/presentation/widgets/hotels/hotel_star_modal.dart';
 
 class HotelListPage extends StatefulWidget {
   final String locationName;

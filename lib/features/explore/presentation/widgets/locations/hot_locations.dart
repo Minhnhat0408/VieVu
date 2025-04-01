@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/locations/location_big_card.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/explore/presentation/bloc/location/location_bloc.dart';
+import 'package:vievu/features/explore/presentation/widgets/locations/location_big_card.dart';
 
 class HotLocationsSection extends StatefulWidget {
   const HotLocationsSection({super.key});

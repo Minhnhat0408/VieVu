@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
 
 class Message {
   final int id;
@@ -17,12 +17,10 @@ class Message {
     required this.content,
     required this.user,
     required this.createdAt,
-
     this.metaData,
     this.seenUser,
   });
 }
-
 
 class MessageReaction {
   final int id;

@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
 
 class TripMember {
   final int id;
@@ -6,7 +6,7 @@ class TripMember {
   final String role;
   final bool isBanned;
   final String tripId;
-   bool reviewed;
+  bool reviewed;
   int rating;
 
   TripMember({
@@ -40,7 +40,6 @@ class TripMember {
     };
   }
 }
-
 
 class TripMemberRating {
   final User user;

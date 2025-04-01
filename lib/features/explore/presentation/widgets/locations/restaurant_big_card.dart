@@ -3,15 +3,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/open_url.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/restaurant.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/location/location_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/saved_to_trip_modal.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/core/utils/open_url.dart';
+import 'package:vievu/features/explore/domain/entities/restaurant.dart';
+import 'package:vievu/features/explore/presentation/bloc/location/location_bloc.dart';
+import 'package:vievu/features/explore/presentation/widgets/saved_to_trip_modal.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RestaurantBigCard extends StatefulWidget {
@@ -30,7 +30,7 @@ class _RestaurantBigCardState extends State<RestaurantBigCard> {
   Widget build(BuildContext context) {
     return BlocListener<TripBloc, TripState>(
       listener: (context, state) {
-        // 
+        //
         if (state is SavedToTripLoadedSuccess) {
           currentSavedTripCount =
               state.trips.where((trip) => trip.isSaved).length;
@@ -91,66 +91,56 @@ class _RestaurantBigCardState extends State<RestaurantBigCard> {
                               .user
                               .id;
                           context.read<TripBloc>().add(GetSavedToTrips(
-                              userId: userId,
-                              id: widget.restaurant.id,
-                        ));
-                          displayModal(
-                              context,
-                              SavedToTripModal(
+                                userId: userId,
+                                id: widget.restaurant.id,
+                              ));
+                          displayModal(context, SavedToTripModal(
+                            onTripsChanged: (List<Trip> selectedTrips,
+                                List<Trip> unselectedTrips) {
+                              setState(() {
+                                changeSavedItemCount = selectedTrips.length +
+                                    unselectedTrips.length;
+                                currentSavedTripCount ??= 0;
+                                currentSavedTripCount = currentSavedTripCount! +
+                                    selectedTrips.length -
+                                    unselectedTrips.length;
+                              });
 
-                                onTripsChanged: (List<Trip> selectedTrips,
-                                    List<Trip> unselectedTrips) {
-                                  setState(() {
-                                    changeSavedItemCount =
-                                        selectedTrips.length +
-                                            unselectedTrips.length;
-                                    currentSavedTripCount ??= 0;
-                                    currentSavedTripCount =
-                                        currentSavedTripCount! +
-                                            selectedTrips.length -
-                                            unselectedTrips.length;
-                                  });
+                              for (var item in selectedTrips) {
+                                context
+                                    .read<SavedServiceBloc>()
+                                    .add(InsertSavedService(
+                                      tripId: item.id,
+                                      linkId: widget.restaurant.id,
+                                      cover: widget.restaurant.cover,
+                                      name: widget.restaurant.name,
+                                      locationName: (context
+                                                  .read<LocationBloc>()
+                                                  .state
+                                              as LocationDetailsLoadedSuccess)
+                                          .location
+                                          .name,
+                                      rating: widget.restaurant.avgRating,
+                                      ratingCount:
+                                          widget.restaurant.ratingCount,
+                                      price: widget.restaurant.price,
+                                      tagInfoList: [
+                                        widget.restaurant.cuisineName
+                                      ],
+                                      typeId: 1,
+                                      latitude: widget.restaurant.latitude,
+                                      longitude: widget.restaurant.longitude,
+                                    ));
+                              }
 
-                                  for (var item in selectedTrips) {
-                                    context
-                                        .read<SavedServiceBloc>()
-                                        .add(InsertSavedService(
-                                          tripId: item.id,
-                                          linkId: widget.restaurant.id,
-                                          cover: widget.restaurant.cover,
-                                          name: widget.restaurant.name,
-                                          locationName: (context
-                                                      .read<LocationBloc>()
-                                                      .state
-                                                  as LocationDetailsLoadedSuccess)
-                                              .location
-                                              .name,
-                                          rating: widget.restaurant.avgRating,
-                                          ratingCount:
-                                              widget.restaurant.ratingCount,
-                                          price: widget.restaurant.price,
-                                          tagInfoList: [
-                                            widget.restaurant.cuisineName
-                                          ],
-                                          typeId: 1,
-                                          latitude: widget.restaurant.latitude,
-                                          longitude:
-                                              widget.restaurant.longitude,
-                                        ));
-
-
-                                  }
-
-                                  for (var item in unselectedTrips) {
-                                    context.read<SavedServiceBloc>().add(
-                                        DeleteSavedService(
-                                            linkId: widget.restaurant.id,
-                                            tripId: item.id));
-                                  }
-                                },
-                              ),
-                              null,
-                              false);
+                              for (var item in unselectedTrips) {
+                                context.read<SavedServiceBloc>().add(
+                                    DeleteSavedService(
+                                        linkId: widget.restaurant.id,
+                                        tripId: item.id));
+                              }
+                            },
+                          ), null, false);
                         },
                         style: IconButton.styleFrom(
                           backgroundColor:

@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/widgets/budget.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/widgets/child_travel_types.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/widgets/parent_travel_types.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/features/user_preference/presentation/widgets/budget.dart';
+import 'package:vievu/features/user_preference/presentation/widgets/child_travel_types.dart';
+import 'package:vievu/features/user_preference/presentation/widgets/parent_travel_types.dart';
 
 class PreferencesInquiry extends StatelessWidget {
   final int currentStep;

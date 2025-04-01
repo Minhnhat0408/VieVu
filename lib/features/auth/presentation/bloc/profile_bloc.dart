@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
-import 'package:vn_travel_companion/features/auth/domain/repository/profile_repository.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/auth/domain/repository/profile_repository.dart';
 
 part 'profile_event.dart';
 part 'profile_state.dart';
@@ -17,7 +17,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<ProfileEvent>((event, emit) {});
     on<GetProfile>(_onGetProfile);
     on<UpdateProfile>(_onUpdateProfile);
-
   }
 
   void _onUpdateProfile(UpdateProfile event, Emitter<ProfileState> emit) async {
@@ -36,8 +35,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       (r) => emit(ProfileUpdateSuccess(user: r)),
     );
   }
-
-
 
   void _onGetProfile(GetProfile event, Emitter<ProfileState> emit) async {
     emit(ProfileLoading());

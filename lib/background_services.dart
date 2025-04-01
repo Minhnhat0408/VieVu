@@ -8,7 +8,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/secrets/supabase_secret.dart';
+import 'package:vievu/core/secrets/supabase_secret.dart';
 import 'package:http/http.dart' as http;
 
 // final SupabaseClient client = serviceLocator<SupabaseClient>();

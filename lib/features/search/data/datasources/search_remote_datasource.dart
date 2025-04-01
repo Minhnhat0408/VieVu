@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/features/search/data/models/explore_search_result_model.dart';
+import 'package:vievu/features/search/data/models/explore_search_result_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:vn_travel_companion/features/search/data/models/home_search_result_model.dart';
+import 'package:vievu/features/search/data/models/home_search_result_model.dart';
 
 abstract interface class SearchRemoteDataSource {
   Future<List<ExploreSearchResultModel>> exploreSearch({
@@ -275,7 +275,6 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
           .select('id')
           .eq('user_id', userId)
           .or('keyword.eq.$searchText,and( title.eq.$title, $compareLinkId)');
-
 
       if (response.isEmpty) {
         await supabaseClient.from('search_history').insert({

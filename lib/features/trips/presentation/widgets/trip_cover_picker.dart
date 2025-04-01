@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:vn_travel_companion/core/utils/image_picker.dart';
+import 'package:vievu/core/utils/image_picker.dart';
 
 class TripCoverPicker extends StatefulWidget {
   final File? image;

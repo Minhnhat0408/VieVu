@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:vn_travel_companion/core/constants/parent_traveltypes.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
+import 'package:vievu/core/constants/parent_traveltypes.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
 
 class FilterAllAtrractionModal extends StatefulWidget {
   final TravelType? currentParentTravelType;

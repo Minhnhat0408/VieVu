@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/common/widgets/slide_indicator.dart';
+import 'package:vievu/core/common/widgets/slide_indicator.dart';
 
 class SliderPagination extends StatefulWidget {
   final List<String> imgList;

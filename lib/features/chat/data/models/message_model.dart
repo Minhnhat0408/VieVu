@@ -1,5 +1,5 @@
-import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/message.dart';
+import 'package:vievu/features/auth/data/models/user_model.dart';
+import 'package:vievu/features/chat/domain/entities/message.dart';
 
 class MessageModel extends Message {
   MessageModel({

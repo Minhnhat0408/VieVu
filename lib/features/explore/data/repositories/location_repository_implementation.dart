@@ -1,14 +1,14 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/explore/data/datasources/attraction_remote_datasource.dart';
-import 'package:vn_travel_companion/features/explore/data/datasources/location_remote_datasource.dart';
-import 'package:vn_travel_companion/features/explore/data/models/attraction_model.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/location.dart';
-import 'package:vn_travel_companion/features/explore/domain/repositories/location_repository.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/explore/data/datasources/attraction_remote_datasource.dart';
+import 'package:vievu/features/explore/data/datasources/location_remote_datasource.dart';
+import 'package:vievu/features/explore/data/models/attraction_model.dart';
+import 'package:vievu/features/explore/domain/entities/location.dart';
+import 'package:vievu/features/explore/domain/repositories/location_repository.dart';
+import 'package:vievu/features/trips/data/datasources/saved_service_remote_datasource.dart';
 
 class LocationRepositoryImpl implements LocationRepository {
   final LocationRemoteDatasource locationRemoteDatasource;

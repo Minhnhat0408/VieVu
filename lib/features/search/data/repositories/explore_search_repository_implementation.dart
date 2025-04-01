@@ -1,13 +1,13 @@
 import 'dart:developer';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/search/data/datasources/search_remote_datasource.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
-import 'package:vn_travel_companion/features/search/domain/entities/home_search_result.dart';
-import 'package:vn_travel_companion/features/search/domain/repositories/explore_search_repository.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/search/data/datasources/search_remote_datasource.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/search/domain/entities/home_search_result.dart';
+import 'package:vievu/features/search/domain/repositories/explore_search_repository.dart';
+import 'package:vievu/features/trips/data/datasources/saved_service_remote_datasource.dart';
 
 class SearchRepositoryImpl implements SearchRepository {
   final SearchRemoteDataSource searchRemoteDataSource;
@@ -42,6 +42,7 @@ class SearchRepositoryImpl implements SearchRepository {
       throw left(Failure(e.toString()));
     }
   }
+
   @override
   Future<Either<Failure, List<ExploreSearchResult>>> searchAll({
     required String searchText,

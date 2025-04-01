@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/utils/open_url.dart';
+import 'package:vievu/core/utils/open_url.dart';
 import 'package:intl/intl.dart' as intl;
 
 class SummaryTimeline extends StatelessWidget {

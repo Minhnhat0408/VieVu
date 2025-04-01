@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:vn_travel_companion/core/constants/transport_options.dart';
-import 'package:vn_travel_companion/core/constants/trip_filters.dart';
-import 'package:vn_travel_companion/core/utils/calculate_distance.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vievu/core/constants/transport_options.dart';
+import 'package:vievu/core/constants/trip_filters.dart';
+import 'package:vievu/core/utils/calculate_distance.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
 
 class TripInfoPage extends StatelessWidget {
   final Trip trip;

@@ -1,8 +1,8 @@
 // import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/notifications/domain/entities/notification.dart';
-import 'package:vn_travel_companion/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:vievu/features/notifications/domain/entities/notification.dart';
+import 'package:vievu/features/notifications/domain/repositories/notification_repository.dart';
 
 part 'notification_event.dart';
 part 'notification_state.dart';

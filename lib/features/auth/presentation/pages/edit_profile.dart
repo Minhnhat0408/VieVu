@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:vn_travel_companion/core/constants/vn_province.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/image_picker.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/core/utils/validators.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
-import 'package:vn_travel_companion/features/auth/presentation/bloc/profile_bloc.dart';
-import 'package:vn_travel_companion/features/auth/presentation/widget/avatar_picker.dart';
+import 'package:vievu/core/constants/vn_province.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/utils/image_picker.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/core/utils/validators.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/auth/presentation/bloc/profile_bloc.dart';
+import 'package:vievu/features/auth/presentation/widget/avatar_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   final User user;

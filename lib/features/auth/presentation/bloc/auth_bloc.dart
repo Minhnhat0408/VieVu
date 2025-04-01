@@ -1,17 +1,16 @@
-
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:supabase_flutter/supabase_flutter.dart" as supabase;
-import "package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart";
-import "package:vn_travel_companion/core/usecases/usecase.dart";
-import "package:vn_travel_companion/features/auth/domain/entities/user.dart";
-import "package:vn_travel_companion/features/auth/domain/usecases/current_user.dart";
-import "package:vn_travel_companion/features/auth/domain/usecases/listen_auth_change.dart";
-import "package:vn_travel_companion/features/auth/domain/usecases/send_reset_password_email.dart";
-import "package:vn_travel_companion/features/auth/domain/usecases/update_password.dart";
-import "package:vn_travel_companion/features/auth/domain/usecases/user_login.dart";
-import "package:vn_travel_companion/features/auth/domain/usecases/user_logout.dart";
-import "package:vn_travel_companion/features/auth/domain/usecases/user_signup.dart";
+import "package:vievu/core/common/cubits/app_user/app_user_cubit.dart";
+import "package:vievu/core/usecases/usecase.dart";
+import "package:vievu/features/auth/domain/entities/user.dart";
+import "package:vievu/features/auth/domain/usecases/current_user.dart";
+import "package:vievu/features/auth/domain/usecases/listen_auth_change.dart";
+import "package:vievu/features/auth/domain/usecases/send_reset_password_email.dart";
+import "package:vievu/features/auth/domain/usecases/update_password.dart";
+import "package:vievu/features/auth/domain/usecases/user_login.dart";
+import "package:vievu/features/auth/domain/usecases/user_logout.dart";
+import "package:vievu/features/auth/domain/usecases/user_signup.dart";
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -70,11 +69,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _startUserSubscription() =>
       _listenToAuthChanges(NoParams()).listen((res) {
         if (res.event == supabase.AuthChangeEvent.passwordRecovery) {
-      
           _appUserCubit.resetPassword();
         } else if (res.event == supabase.AuthChangeEvent.signedIn ||
             res.event == supabase.AuthChangeEvent.userUpdated) {
-    
           add(AuthUserLoggedIn());
         } else if (res.event == supabase.AuthChangeEvent.signedOut) {
           _appUserCubit.updateUser(null);
@@ -83,7 +80,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _isUserLoggedIn(AuthUserLoggedIn event, Emitter<AuthState> emit) async {
     final res = await _currentUser(NoParams());
-
 
     res.fold((e) {
       _appUserCubit.updateUser(null);

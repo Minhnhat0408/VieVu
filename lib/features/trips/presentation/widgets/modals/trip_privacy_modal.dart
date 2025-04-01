@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/constants/notification_types.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:vn_travel_companion/features/notifications/presentation/bloc/notification_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vievu/core/constants/notification_types.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:vievu/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/trip/trip_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
+import 'package:vievu/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 
 class TripPrivacyModal extends StatefulWidget {
   final Trip trip;
@@ -124,16 +124,12 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
                                     imageUrl: widget.trip.cover,
                                     name: widget.trip.name,
                                   ));
-
-
                             }
                             context.read<TripBloc>().add(UpdateTrip(
                                   isPublished: _published,
                                   tripId: widget.trip.id,
                                 ));
-                
                           }
-
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

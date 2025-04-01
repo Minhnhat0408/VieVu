@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
 
 abstract interface class TravelTypeRepository {
   Future<Either<Failure, List<TravelType>>> getParentTravelTypes();

@@ -1,5 +1,5 @@
-import 'package:vn_travel_companion/features/auth/data/models/user_model.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/auth/data/models/user_model.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
 
 class TripModel extends Trip {
   TripModel({
@@ -58,6 +58,6 @@ class TripModel extends Trip {
       isPublished: json['is_published'] ?? false,
       locations:
           json['locations'] != null ? List<String>.from(json['locations']) : [],
-    );  
+    );
   }
 }

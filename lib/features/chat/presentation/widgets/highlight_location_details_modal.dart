@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:vn_travel_companion/core/utils/open_url.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_details_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/location_detail_page.dart';
+import 'package:vievu/core/utils/open_url.dart';
+import 'package:vievu/features/explore/presentation/pages/attraction_details_page.dart';
+import 'package:vievu/features/explore/presentation/pages/location_detail_page.dart';
 
 class HighlightLocationDetailsModal extends StatelessWidget {
   final Map<String, dynamic> locationDetails;

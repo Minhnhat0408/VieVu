@@ -1,8 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/features/trips/data/models/trip_model.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/features/trips/data/models/trip_model.dart';
 
 abstract interface class TripRemoteDatasource {
   Future<TripModel> insertTrip({
@@ -294,7 +294,6 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
 
       final tripItem = res;
       tripItem['service_count'] = res['saved_services'][0]['count'];
-
 
       return TripModel.fromJson(tripItem);
     } catch (e) {

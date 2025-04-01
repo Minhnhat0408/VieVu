@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:vn_travel_companion/core/layouts/custom_appbar.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/core/utils/validators.dart';
-import 'package:vn_travel_companion/core/common/widgets/loader.dart';
-import 'package:vn_travel_companion/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:vn_travel_companion/features/auth/presentation/widget/auth_field.dart';
-import 'package:vn_travel_companion/features/auth/presentation/widget/auth_submit_btn.dart';
+import 'package:vievu/core/layouts/custom_appbar.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/core/utils/validators.dart';
+import 'package:vievu/core/common/widgets/loader.dart';
+import 'package:vievu/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:vievu/features/auth/presentation/widget/auth_field.dart';
+import 'package:vievu/features/auth/presentation/widget/auth_submit_btn.dart';
 
 class LogInPage extends StatefulWidget {
   static route() {

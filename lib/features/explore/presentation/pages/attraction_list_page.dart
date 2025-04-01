@@ -9,16 +9,16 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/attraction.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/filter_all_attraction_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/parent_travel_type_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/rating_modal.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/attractions/sort_type_modal.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/features/explore/domain/entities/attraction.dart';
+import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/attraction_med_card.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/filter_all_attraction_modal.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/parent_travel_type_modal.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/rating_modal.dart';
+import 'package:vievu/features/explore/presentation/widgets/attractions/sort_type_modal.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
 
 class AttractionListPage extends StatefulWidget {
   final String? locationName;

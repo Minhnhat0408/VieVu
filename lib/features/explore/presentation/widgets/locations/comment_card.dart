@@ -1,6 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/comment.dart';
+import 'package:vievu/features/explore/domain/entities/comment.dart';
 
 class CommentCard extends StatelessWidget {
   final Comment comment;

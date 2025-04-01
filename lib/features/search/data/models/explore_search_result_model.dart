@@ -1,4 +1,4 @@
-import 'package:vn_travel_companion/features/search/domain/entities/explore_search_result.dart';
+import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
 
 class ExploreSearchResultModel extends ExploreSearchResult {
   ExploreSearchResultModel({

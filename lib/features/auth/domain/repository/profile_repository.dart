@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
 
 abstract interface class ProfileRepository {
   Future<Either<Failure, User>> getProfile({
@@ -19,7 +19,6 @@ abstract interface class ProfileRepository {
     String? bio,
     File? avatar,
   });
-
 }
 
 

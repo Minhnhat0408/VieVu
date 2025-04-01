@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vn_travel_companion/core/constants/restaurant_filters.dart';
-import 'package:vn_travel_companion/core/constants/transport_options.dart';
+import 'package:vievu/core/constants/restaurant_filters.dart';
+import 'package:vievu/core/constants/transport_options.dart';
 
 class TripTransportsModal extends StatefulWidget {
   final List<TransportOption> currentTransports;

@@ -2,14 +2,14 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/constants/parent_traveltypes.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
+import 'package:vievu/core/constants/parent_traveltypes.dart';
+import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vievu/features/user_preference/domain/entities/preference.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
 
 class AttractionPrefFilterModal extends StatefulWidget {
-  final Map<String,double> prefsDF;
+  final Map<String, double> prefsDF;
   const AttractionPrefFilterModal({super.key, required this.prefsDF});
 
   @override
@@ -167,8 +167,7 @@ class _AttractionPrefFilterModalState extends State<AttractionPrefFilterModal> {
                     TextButton(
                         onPressed: () {
                           setState(() {
-                            _prefsDF = Map<String, double>.from(
-                                widget.prefsDF);
+                            _prefsDF = Map<String, double>.from(widget.prefsDF);
                           });
                         },
                         child: const Text("Hủy",

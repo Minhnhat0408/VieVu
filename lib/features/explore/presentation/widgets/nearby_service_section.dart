@@ -2,18 +2,18 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/service.dart';
-import 'package:vn_travel_companion/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/attraction_list_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/hotel_list_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/pages/restaurant_list_page.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/services/service_card.dart';
-import 'package:vn_travel_companion/features/explore/presentation/widgets/filter_options_big.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/explore/domain/entities/service.dart';
+import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
+import 'package:vievu/features/explore/presentation/cubit/attraction_details/attraction_details_cubit.dart';
+import 'package:vievu/features/explore/presentation/cubit/nearby_services/nearby_services_cubit.dart';
+import 'package:vievu/features/explore/presentation/pages/attraction_list_page.dart';
+import 'package:vievu/features/explore/presentation/pages/hotel_list_page.dart';
+import 'package:vievu/features/explore/presentation/pages/restaurant_list_page.dart';
+import 'package:vievu/features/explore/presentation/widgets/services/service_card.dart';
+import 'package:vievu/features/explore/presentation/widgets/filter_options_big.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class NearbyServiceSection extends StatefulWidget {
   final int attractionId;
@@ -77,7 +77,7 @@ class _NearbyServiceSectionState extends State<NearbyServiceSection> {
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     context.read<NearbyServicesCubit>().getServicesNearAttraction(
         attractionId: widget.attractionId,
-        userId: userId  ,
+        userId: userId,
         limit: 5,
         offset: 1,
         serviceType: 2,

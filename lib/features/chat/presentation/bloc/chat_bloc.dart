@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart';
-import 'package:vn_travel_companion/features/chat/domain/entities/chat.dart';
-import 'package:vn_travel_companion/features/chat/domain/repositories/chat_repository.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart';
+import 'package:vievu/features/chat/domain/entities/chat.dart';
+import 'package:vievu/features/chat/domain/repositories/chat_repository.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';

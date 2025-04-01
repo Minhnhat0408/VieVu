@@ -13,14 +13,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vn_travel_companion/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
-import 'package:vn_travel_companion/features/auth/domain/entities/user.dart'
-    as auth;
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_itinerary.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/trip_itinerary_detail_page.dart';
-import 'package:vn_travel_companion/init_dependencies.dart';
+import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/auth/domain/entities/user.dart' as auth;
+import 'package:vievu/features/trips/domain/entities/trip_itinerary.dart';
+import 'package:vievu/features/trips/presentation/pages/trip_itinerary_detail_page.dart';
+import 'package:vievu/init_dependencies.dart';
 
 class LocationSharedMap extends StatefulWidget {
   final List<TripItinerary> tripItineraries;
@@ -123,7 +122,7 @@ class _LocationSharedMapState extends State<LocationSharedMap>
             sharedPosUsers.indexWhere((element) => element.id == user.id);
         if (index == -1) {
           setState(() {
-            sharedPosUsers.add(user); 
+            sharedPosUsers.add(user);
           });
         } else {
           setState(() {
@@ -207,45 +206,45 @@ class _LocationSharedMapState extends State<LocationSharedMap>
         ),
         automaticallyImplyLeading: false,
         actions: [
-          ...usersActive.take(6).map(
-                (e) => GestureDetector(
-                  onTap: () {
-                    _animateMapTo(LatLng(e.latitude!, e.longitude!));
-                  },
-                  child: Align(
-                    widthFactor: 0.6,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: _getMarkerBorderColor(
-                              MarkerPoint(
-                                  LatLng(e.latitude!, e.longitude!), e.id),
-                              context),
-                          width: 2.0,
-                        ),
-                      ),
-                      child: CachedNetworkImage(
-                        imageUrl: e.avatarUrl ?? "",
-                        errorWidget: (context, url, error) => Image.asset(
-                          'assets/images/trip_placeholder.avif', // Fallback if loading fails
-                          fit: BoxFit.cover,
-                        ),
-                        imageBuilder: (context, imageProvider) => CircleAvatar(
-                          backgroundImage: imageProvider,
-                          radius: 16,
-                        ),
-                        // width: 70,
-                        // height: 70,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          const SizedBox(
-            width: 20,
-          )
+          // ...usersActive.take(6).map(
+          //       (e) => GestureDetector(
+          //         onTap: () {
+          //           _animateMapTo(LatLng(e.latitude!, e.longitude!));
+          //         },
+          //         child: Align(
+          //           widthFactor: 0.6,
+          //           child: Container(
+          //             decoration: BoxDecoration(
+          //               shape: BoxShape.circle,
+          //               border: Border.all(
+          //                 color: _getMarkerBorderColor(
+          //                     MarkerPoint(
+          //                         LatLng(e.latitude!, e.longitude!), e.id),
+          //                     context),
+          //                 width: 2.0,
+          //               ),
+          //             ),
+          //             child: CachedNetworkImage(
+          //               imageUrl: e.avatarUrl ?? "",
+          //               errorWidget: (context, url, error) => Image.asset(
+          //                 'assets/images/trip_placeholder.avif', // Fallback if loading fails
+          //                 fit: BoxFit.cover,
+          //               ),
+          //               imageBuilder: (context, imageProvider) => CircleAvatar(
+          //                 backgroundImage: imageProvider,
+          //                 radius: 16,
+          //               ),
+          //               // width: 70,
+          //               // height: 70,
+          //               fit: BoxFit.cover,
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          // const SizedBox(
+          //   width: 20,
+          // )
         ],
       ),
       body: currentUser.latitude != null && currentUser.longitude != null

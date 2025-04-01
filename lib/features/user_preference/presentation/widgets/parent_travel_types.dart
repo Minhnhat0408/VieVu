@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/travel_type.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
-import 'package:vn_travel_companion/features/user_preference/presentation/widgets/preferences_option.dart';
+import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
+import 'package:vievu/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
+import 'package:vievu/features/user_preference/presentation/widgets/preferences_option.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/common/widgets/loader.dart';
-import 'package:vn_travel_companion/core/utils/show_snackbar.dart';
+import 'package:vievu/core/common/widgets/loader.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
 
 class ParentTravelTypes extends StatefulWidget {
   final List<TravelType> travelTypesList;

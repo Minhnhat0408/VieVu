@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vn_travel_companion/core/utils/display_modal.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/trip_member.dart';
-import 'package:vn_travel_companion/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
-import 'package:vn_travel_companion/features/trips/presentation/pages/add_saved_services_page.dart';
-import 'package:vn_travel_companion/features/trips/presentation/widgets/saved_service/saved_service_big_card.dart';
+import 'package:vievu/core/utils/display_modal.dart';
+import 'package:vievu/features/trips/domain/entities/saved_services.dart';
+import 'package:vievu/features/trips/domain/entities/trip.dart';
+import 'package:vievu/features/trips/domain/entities/trip_member.dart';
+import 'package:vievu/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
+import 'package:vievu/features/trips/presentation/pages/add_saved_services_page.dart';
+import 'package:vievu/features/trips/presentation/widgets/saved_service/saved_service_big_card.dart';
 
 class TripSavedServicesPage extends StatefulWidget {
   final Trip trip;

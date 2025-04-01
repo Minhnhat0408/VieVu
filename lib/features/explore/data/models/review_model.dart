@@ -1,5 +1,5 @@
 import 'package:html_unescape/html_unescape.dart';
-import 'package:vn_travel_companion/features/explore/domain/entities/review.dart';
+import 'package:vievu/features/explore/domain/entities/review.dart';
 
 class ReviewModel extends Review {
   ReviewModel({

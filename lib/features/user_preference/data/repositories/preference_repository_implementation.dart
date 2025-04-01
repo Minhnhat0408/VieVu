@@ -1,13 +1,13 @@
 import 'dart:developer';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/user_preference/data/datasources/preferences_remote_datasource.dart';
-import 'package:vn_travel_companion/features/user_preference/data/models/preference_model.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/entities/preference.dart';
-import 'package:vn_travel_companion/features/user_preference/domain/repositories/preference_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/user_preference/data/datasources/preferences_remote_datasource.dart';
+import 'package:vievu/features/user_preference/data/models/preference_model.dart';
+import 'package:vievu/features/user_preference/domain/entities/preference.dart';
+import 'package:vievu/features/user_preference/domain/repositories/preference_repository.dart';
 
 class PreferenceRepositoryImpl implements PreferenceRepository {
   final PreferencesRemoteDataSource remoteDataSource;
@@ -86,8 +86,7 @@ class PreferenceRepositoryImpl implements PreferenceRepository {
 
   @override
   Future<Either<Failure, Preference>> updateUserPreferenceDF({
-      required int attractionId,
-
+    required int attractionId,
     required Preference currentPref,
     required String action,
   }) async {

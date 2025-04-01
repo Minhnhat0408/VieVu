@@ -1,10 +1,10 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:vn_travel_companion/core/error/exceptions.dart';
-import 'package:vn_travel_companion/core/error/failures.dart';
-import 'package:vn_travel_companion/core/network/connection_checker.dart';
-import 'package:vn_travel_companion/features/trips/data/datasources/saved_service_remote_datasource.dart';
-import 'package:vn_travel_companion/features/trips/domain/entities/saved_services.dart';
-import 'package:vn_travel_companion/features/trips/domain/repositories/saved_service_repository.dart';
+import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/error/failures.dart';
+import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/trips/data/datasources/saved_service_remote_datasource.dart';
+import 'package:vievu/features/trips/domain/entities/saved_services.dart';
+import 'package:vievu/features/trips/domain/repositories/saved_service_repository.dart';
 
 class SavedServiceRepositoryImpl implements SavedServiceRepository {
   final SavedServiceRemoteDatasource savedServiceRemoteDatasource;
