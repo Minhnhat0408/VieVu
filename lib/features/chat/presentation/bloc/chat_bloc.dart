@@ -101,6 +101,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _onListenToUpdateChannels(
       ListenToUpdateChannels event, Emitter<ChatState> emit) async {
     _chatRepository.listenToUpdateChannels(
+      chatMemberId: event.chatMemberId,
       callback: (message) {
         add(GetChatHeads());
       },

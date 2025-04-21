@@ -68,10 +68,6 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
     });
 
     service.on('redirecting').listen((data) {
-      log('Redirect: $data');
-      // setState(() {
-      //   _selectedIndex = 4;
-      // });
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return const NotificationPage();
       }));
@@ -84,7 +80,6 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
           schema: 'public',
           table: 'messages',
           callback: (payload) {
-            // log('Payload: $payload');
             context.read<ChatBloc>().add(GetChatHeads());
           },
         )
@@ -135,11 +130,10 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
       extendBody: true,
       body: LazyLoadIndexedStack(
         index: _selectedIndex,
-        preloadIndexes: const [1, 2],
+        preloadIndexes: const [1, 2, 3],
         autoDisposeIndexes: const [4],
         children: screens,
       ),
-      // ),
       bottomNavigationBar: MultiBlocListener(
         listeners: [
           BlocListener<NotificationBloc, NotificationState>(

@@ -79,6 +79,12 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
             }
           }
 
+          if (state is ChatFailure) {
+            if (state.message == "Không có tin nhắn mới để tóm tắt") {
+              showSnackbar(context, state.message, SnackBarState.error);
+            }
+          }
+
           if (state is ChatSummaryLoadedSuccess) {
             chatSummarize = state.chatSummarize;
             if (chatSummarize != null) {
@@ -89,7 +95,6 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
           }
 
           if (state is ChatCreateTripItinerarySuccess) {
-            // Navigator.of(context).pop();
             setState(() {
               chatSummarize = state.chatSummarize;
             });

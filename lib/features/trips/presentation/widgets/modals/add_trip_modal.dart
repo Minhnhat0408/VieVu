@@ -43,6 +43,7 @@ class _AddTripModalState extends State<AddTripModal> {
               ),
             ),
             const SizedBox(height: 10),
+            //TODO: add validate
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               child: TextField(

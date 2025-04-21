@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vievu/core/error/exceptions.dart';
 import 'package:vievu/features/search/data/models/explore_search_result_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:vievu/features/search/data/models/home_search_result_model.dart';
@@ -98,8 +99,15 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
     required int offset,
   }) async {
     try {
+      final user = supabaseClient.auth.currentUser;
+      final session = supabaseClient.auth.currentSession;
+      if (session == null || user == null) {
+        throw const ServerException('Không thể xác thực người dùng');
+      }
+      final token = session.accessToken;
+
       final url =
-          Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/search_all/');
+          Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/search_all');
 
       final body = {
         "search_text": searchText,
@@ -110,9 +118,10 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
       final response = await http.post(
         url,
         headers: {
-          "Content-Type": "application/json", // Specify the content type
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
         },
-        body: jsonEncode(body), // Convert the body to JSON
+        body: jsonEncode(body),
       );
       final jsonResponse = utf8.decode(response.bodyBytes);
       final eventData = json.decode(

@@ -278,9 +278,9 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
       final response = await http.post(
         url,
         headers: {
-          "Content-Type": "application/json", // Specify the content type
+          "Content-Type": "application/json",
         },
-        body: jsonEncode(body), // Convert the body to JSON
+        body: jsonEncode(body),
       );
 
       if (response.statusCode == 200) {
@@ -443,15 +443,17 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
 
     try {
       final user = supabaseClient.auth.currentUser;
-      if (user == null) {
+      final session = supabaseClient.auth.currentSession;
+      if (session == null || user == null) {
         throw const ServerException('Không thể xác thực người dùng');
       }
+      final token = session.accessToken;
+
       final body = {
         "user_preferences": {
-          "user_id": 1,
           "price": userPref.budget,
-          "avg_rating": userPref.avgRating,
-          "rating_count": userPref.ratingCount,
+          "avg_rating": ((userPref.avgRating * userPref.ratingCount) + 1) /
+              (userPref.avgRating + 1),
           ...userPref.prefsDF,
         },
         "attraction_ids": [],
@@ -461,6 +463,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         url,
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
         },
         body: jsonEncode(body),
       );
@@ -477,8 +480,8 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
                 'saved_services.link_id', data.map((e) => e['id']).toList());
         final linkIds = res2
             .expand((item) =>
-                item['saved_services'] ?? []) // Flatten saved_services
-            .map((service) => service['link_id']) // Extract link_id
+                item['saved_services'] ?? [])
+            .map((service) => service['link_id'])
             .toList();
         return data.map((e) {
           return AttractionModel.fromJson(e).copyWith(
@@ -502,6 +505,12 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
     final Uri url = Uri.parse(
         '${dotenv.env['RECOMMENDATION_API_URL']!}/related_attractions');
     try {
+      final user = supabaseClient.auth.currentUser;
+      final session = supabaseClient.auth.currentSession;
+      if (session == null || user == null) {
+        throw const ServerException('Không thể xác thực người dùng');
+      }
+      final token = session.accessToken;
       final body = {
         "attraction_id": attractionId,
         "similarity_weight": 0.7,
@@ -511,6 +520,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         url,
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
         },
         body: jsonEncode(body),
       );

@@ -57,7 +57,13 @@ final class SummarizeItineraries extends ChatEvent {
   });
 }
 
-final class ListenToUpdateChannels extends ChatEvent {}
+final class ListenToUpdateChannels extends ChatEvent {
+  final int chatMemberId;
+
+  ListenToUpdateChannels({
+    required this.chatMemberId,
+  });
+}
 
 final class ListenToChatMembersChannel extends ChatEvent {
   final int chatId;

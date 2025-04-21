@@ -86,8 +86,7 @@ class _MessageItemState extends State<MessageItem> {
                         if (isEmojiOnly)
                           Text(
                             widget.message.content,
-                            style: const TextStyle(
-                                fontSize: 40), // Kích thước lớn hơn cho emoji
+                            style: const TextStyle(fontSize: 40),
                           )
                         else
                           ConstrainedBox(
@@ -124,7 +123,6 @@ class _MessageItemState extends State<MessageItem> {
                     ),
                   ),
                   Positioned(
-                    // the position where to show your reaction
                     bottom: 0,
                     right: !_isMe ? 0 : null,
                     left: _isMe ? 0 : null,
@@ -138,15 +136,12 @@ class _MessageItemState extends State<MessageItem> {
                       },
                       child: StackedReactions(
                         size: 14,
-                        // reactions widget
-
                         reactions: widget.message.reactions.map(
                           (reaction) {
                             return reaction.reaction;
                           },
-                        ).toList(), // list of reaction strings
-                        stackedValue:
-                            -5.0, // Value used to calculate the horizontal offset of each reaction
+                        ).toList(),
+                        stackedValue: -5.0,
                       ),
                     ),
                   ),
@@ -185,185 +180,167 @@ class _MessageItemState extends State<MessageItem> {
       },
     );
   }
+}
 
-  TextSpan _buildHighlightedText(
-    String text,
-    List<Map<String, dynamic>> metaData,
-    Message message,
-    BuildContext context,
-  ) {
-    List<InlineSpan> spans = [];
-    int start = 0;
-
-    final highlights = metaData.map((item) => item['title'] as String).toList();
-    highlights.sort((a, b) => b.length.compareTo(a.length));
-
-    final urlRegex = RegExp(r'(https?:\/\/[^\s]+)', caseSensitive: false);
-
-    while (start < text.length) {
-      int? highlightStart;
-      String? matchedHighlight;
-
-      // Tìm highlight gần nhất
-      for (var highlight in highlights) {
-        final index = text.indexOf(highlight, start);
-        if (index != -1 && (highlightStart == null || index < highlightStart)) {
-          highlightStart = index;
-          matchedHighlight = highlight;
-        }
-      }
-
-      // Nếu có highlight và highlight gần nhất nằm sau vị trí start
-      if (highlightStart != null && highlightStart >= start) {
-        // Trước đoạn highlight kiểm tra có link không
-        final beforeHighlight = text.substring(start, highlightStart);
-        final linkMatches = urlRegex.allMatches(beforeHighlight);
-        int lastPos = 0;
-        for (final match in linkMatches) {
-          if (match.start > lastPos) {
-            spans.add(TextSpan(
-              text: beforeHighlight.substring(lastPos, match.start),
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: GoogleFonts.merriweather().fontFamily,
-              ),
-            ));
-          }
-          final linkText = match.group(0)!;
-          spans.add(WidgetSpan(
-            child: GestureDetector(
-              onTap: () => openDeepLink(linkText),
-              child: Text(
-                linkText,
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Colors.blue,
-                  fontFamily: GoogleFonts.merriweather().fontFamily,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ));
-          lastPos = match.end;
-        }
-        // Thêm phần còn lại nếu sau link không còn gì
-        if (lastPos < beforeHighlight.length) {
-          spans.add(TextSpan(
-            text: beforeHighlight.substring(lastPos),
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: GoogleFonts.merriweather().fontFamily,
-            ),
-          ));
-        }
-
-        // Add highlight
-        final matchedItem =
-            metaData.firstWhere((e) => e['title'] == matchedHighlight);
-        spans.add(WidgetSpan(
-          child: GestureDetector(
-            onTap: () {
-              if (matchedItem['type'] == 'address') {
-                String googleMapsUrl =
-                    "https://www.google.com/maps/search/?api=1&query=$matchedHighlight";
-                openDeepLink(googleMapsUrl);
-              } else if (matchedItem['id'] != null) {
-                displayModal(
-                  context,
-                  HighlightLocationDetailsModal(locationDetails: matchedItem),
-                  null,
-                  false,
-                );
-              } else {
-                final userId =
-                    (context.read<AppUserCubit>().state as AppUserLoggedIn)
-                        .user
-                        .id;
-                if (userId != message.user.id) {
-                  showSnackbar(
-                      context, "Chưa có thông tin chi tiết cho địa điểm này");
-                  return;
-                }
-                displayModal(
-                  context,
-                  AddPlaceByNameModal(
-                    searchKey: matchedHighlight!,
-                    message: message,
-                  ),
-                  null,
-                  true,
-                );
-              }
-            },
-            child: Text(
-              matchedHighlight!,
-              style: TextStyle(
-                fontFamily: GoogleFonts.merriweather().fontFamily,
-                fontSize: 16,
-                height: 1.2,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ),
-        ));
-
-        start = highlightStart + matchedHighlight.length;
-      } else {
-        // Không còn highlight, chỉ check link
-        final remainingText = text.substring(start);
-        final linkMatches = urlRegex.allMatches(remainingText);
-        int lastPos = 0;
-        for (final match in linkMatches) {
-          if (match.start > lastPos) {
-            spans.add(TextSpan(
-              text: remainingText.substring(lastPos, match.start),
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: GoogleFonts.merriweather().fontFamily,
-              ),
-            ));
-          }
-          final linkText = match.group(0)!;
-          spans.add(WidgetSpan(
-            child: GestureDetector(
-              onTap: () => openDeepLink(linkText),
-              child: Text(
-                linkText,
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.blue,
-                  color: Colors.blue,
-                  fontWeight: FontWeight.normal,
-                  height: 1.2,
-                  fontFamily: GoogleFonts.merriweather().fontFamily,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ));
-          lastPos = match.end;
-        }
-        if (lastPos < remainingText.length) {
-          spans.add(TextSpan(
-            text: remainingText.substring(lastPos),
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: GoogleFonts.merriweather().fontFamily,
-            ),
-          ));
-        }
-        break;
-      }
-    }
-
+TextSpan _buildHighlightedText(
+  String text,
+  List<Map<String, dynamic>> metaData,
+  Message message,
+  BuildContext context,
+) {
+  const String retractedMessageText = "Tin nhắn đã bị gỡ";
+  if (text == retractedMessageText) {
     return TextSpan(
-      children: spans,
+      text: retractedMessageText,
       style: TextStyle(
         fontSize: 16,
-        color: Theme.of(context).colorScheme.onSurface,
         fontFamily: GoogleFonts.merriweather().fontFamily,
+        color: Colors.grey,
+        fontStyle: FontStyle.italic,
+        height: 1.2,
       ),
     );
   }
+
+  List<InlineSpan> spans = [];
+  int start = 0;
+
+  final highlights = metaData.map((item) => item['title'] as String).toList();
+  highlights.sort((a, b) => b.length.compareTo(a.length));
+
+  final urlRegex = RegExp(r'(https?:\/\/[^\s]+)', caseSensitive: false);
+
+  final defaultTextStyle = TextStyle(
+    fontSize: 16,
+    fontFamily: GoogleFonts.merriweather().fontFamily,
+    color: Theme.of(context).colorScheme.onSurface,
+    height: 1.2,
+  );
+
+  final linkTextStyle = TextStyle(
+    decoration: TextDecoration.underline,
+    decorationColor: Colors.blue,
+    color: Colors.blue,
+    fontWeight: FontWeight.normal,
+    fontFamily: GoogleFonts.merriweather().fontFamily,
+    fontSize: 16,
+    height: 1.2,
+  );
+
+  final highlightTextStyle = TextStyle(
+    fontFamily: GoogleFonts.merriweather().fontFamily,
+    fontSize: 16,
+    height: 1.2,
+    fontWeight: FontWeight.bold,
+    color: Theme.of(context).colorScheme.primary,
+  );
+
+  while (start < text.length) {
+    int? highlightStart;
+    String? matchedHighlight;
+    int? linkStart;
+    RegExpMatch? matchedLink;
+
+    final firstLinkMatch = urlRegex.firstMatch(text.substring(start));
+    if (firstLinkMatch != null) {
+      linkStart = start + firstLinkMatch.start;
+      matchedLink = firstLinkMatch;
+    }
+
+    for (var highlight in highlights) {
+      final index = text.indexOf(highlight, start);
+      if (index != -1 && (highlightStart == null || index < highlightStart)) {
+        highlightStart = index;
+        matchedHighlight = highlight;
+      }
+    }
+
+    if (highlightStart != null &&
+        (linkStart == null || highlightStart < linkStart)) {
+      if (highlightStart > start) {
+        spans.add(TextSpan(
+          text: text.substring(start, highlightStart),
+          style: defaultTextStyle,
+        ));
+      }
+      final matchedItem =
+          metaData.firstWhere((e) => e['title'] == matchedHighlight);
+      spans.add(WidgetSpan(
+        baseline: TextBaseline.alphabetic,
+        alignment: PlaceholderAlignment.baseline,
+        child: GestureDetector(
+          onTap: () {
+            if (matchedItem['type'] == 'address') {
+              String googleMapsUrl =
+                  "https://www.google.com/maps/search/?api=1&query=$matchedHighlight";
+              openDeepLink(googleMapsUrl);
+            } else if (matchedItem['id'] != null) {
+              displayModal(
+                context,
+                HighlightLocationDetailsModal(locationDetails: matchedItem),
+                null,
+                false,
+              );
+            } else {
+              final userId =
+                  (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                      .user
+                      .id;
+              if (userId != message.user.id) {
+                showSnackbar(
+                    context, "Chưa có thông tin chi tiết cho địa điểm này");
+                return;
+              }
+              displayModal(
+                context,
+                AddPlaceByNameModal(
+                  searchKey: matchedHighlight!,
+                  message: message,
+                ),
+                null,
+                true,
+              );
+            }
+          },
+          child: Text(
+            matchedHighlight!,
+            style: highlightTextStyle,
+          ),
+        ),
+      ));
+      start = highlightStart + matchedHighlight.length;
+    } else if (linkStart != null &&
+        (highlightStart == null || linkStart < highlightStart)) {
+      if (linkStart > start) {
+        spans.add(TextSpan(
+          text: text.substring(start, linkStart),
+          style: defaultTextStyle,
+        ));
+      }
+      final linkText = matchedLink!.group(0)!;
+      spans.add(WidgetSpan(
+        baseline: TextBaseline.alphabetic,
+        alignment: PlaceholderAlignment.baseline,
+        child: GestureDetector(
+          onTap: () => openDeepLink(linkText),
+          child: Text(
+            linkText,
+            style: linkTextStyle,
+          ),
+        ),
+      ));
+      start = linkStart + linkText.length;
+    } else {
+      spans.add(TextSpan(
+        text: text.substring(start),
+        style: defaultTextStyle,
+      ));
+      break; // Kết thúc vòng lặp
+    }
+  }
+
+  return TextSpan(
+    children: spans,
+    style: defaultTextStyle,
+  );
 }

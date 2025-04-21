@@ -17,6 +17,7 @@ class MessageRepositoryImpl implements MessageRepository {
   Future<Either<Failure, Message>> insertMessage({
     required int chatId,
     required String message,
+    required int chatMemberId,
     List<Map<String, dynamic>>? metaData,
   }) async {
     try {
@@ -24,6 +25,7 @@ class MessageRepositoryImpl implements MessageRepository {
         return left(Failure("Không có kết nối mạng"));
       }
       final res = await messageRemoteDatasource.insertMessage(
+        chatMemberId: chatMemberId,
         chatId: chatId,
         message: message,
         metaData: metaData,
@@ -109,10 +111,12 @@ class MessageRepositoryImpl implements MessageRepository {
   @override
   RealtimeChannel listenToMessagesChannel({
     required int chatId,
+        required int chatMemberId,
     required Function(Message?) callback,
   }) {
     return messageRemoteDatasource.listenToMessagesChannel(
       callback: callback,
+      chatMemberId: chatMemberId,
       chatId: chatId,
     );
   }
@@ -129,6 +133,7 @@ class MessageRepositoryImpl implements MessageRepository {
   Future<Either<Failure, MessageReaction>> insertReaction({
     required int messageId,
     required String reaction,
+        required int chatMemberId,
     required int chatId,
   }) async {
     try {
@@ -137,6 +142,7 @@ class MessageRepositoryImpl implements MessageRepository {
       }
       final res = await messageRemoteDatasource.insertReaction(
         messageId: messageId,
+        chatMemberId: chatMemberId,
         reaction: reaction,
         chatId: chatId,
       );
@@ -149,6 +155,7 @@ class MessageRepositoryImpl implements MessageRepository {
   @override
   Future<Either<Failure, Unit>> removeReaction({
     required int messageId,
+        required int chatMemberId,
   }) async {
     try {
       if (!await (connectionChecker.isConnected)) {
@@ -156,6 +163,7 @@ class MessageRepositoryImpl implements MessageRepository {
       }
       await messageRemoteDatasource.removeReaction(
         messageId: messageId,
+        chatMemberId: chatMemberId,
       );
       return right(unit);
     } on ServerException catch (e) {
@@ -166,6 +174,7 @@ class MessageRepositoryImpl implements MessageRepository {
   @override
   RealtimeChannel listenToMessageReactionChannel({
     required int chatId,
+        required int chatMemberId,
     required Function({
       MessageReaction? messageReaction,
       required int reactionId,
@@ -175,6 +184,7 @@ class MessageRepositoryImpl implements MessageRepository {
     return messageRemoteDatasource.listenToMessageReactionChannel(
       callback: callback,
       chatId: chatId,
+      chatMemberId: chatMemberId,
     );
   }
 

@@ -71,7 +71,7 @@ class ExploreSearchItem extends StatelessWidget {
           LocationPermission permission = await Geolocator.requestPermission();
           if (permission == LocationPermission.denied ||
               permission == LocationPermission.deniedForever) {
-            showSnackbar(context, 'Vui lòng bật dịch vụ định vị để sử dụng');
+            showSnackbar(context, 'Vui lòng bật dịch vụ định vị để sử dụng',SnackBarState.warning);
             return;
           } else {
             Navigator.push(

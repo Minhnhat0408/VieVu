@@ -142,9 +142,11 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   RealtimeChannel listenToUpdateChannels({
     required Function(Message?) callback,
+        required int chatMemberId,
   }) {
     return messageRemoteDatasource.listenToMessagesChannel(
       callback: callback,
+      chatMemberId: chatMemberId,
     );
   }
 

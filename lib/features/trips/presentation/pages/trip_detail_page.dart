@@ -310,8 +310,10 @@ class _TripDetailPageState extends State<TripDetailPage>
                               await Geolocator.requestPermission();
                           if (permission == LocationPermission.denied ||
                               permission == LocationPermission.deniedForever) {
-                            showSnackbar(context,
-                                'Vui lòng bật dịch vụ định vị để sử dụng');
+                            showSnackbar(
+                                context,
+                                'Vui lòng bật dịch vụ định vị để sử dụng',
+                                SnackBarState.warning);
                             return;
                           } else {
                             Navigator.push(
@@ -321,9 +323,7 @@ class _TripDetailPageState extends State<TripDetailPage>
                                     tripId: widget.tripId,
                                     tripItineraries:
                                         tripItineraries.where((element) {
-                                      // check the time == today not time
-                                      //get the date tiem of today but 00h 00
-                                      // get the date time of tomorrow but 00h 00
+                            
                                       final now = DateTime.now();
                                       final today = DateTime(now.year,
                                           now.month, now.day, 0, 0, 0);

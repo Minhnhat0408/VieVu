@@ -7,6 +7,7 @@ abstract interface class MessageRepository {
   Future<Either<Failure, Message>> insertMessage({
     required int chatId,
     required String message,
+    required int chatMemberId,
     List<Map<String, dynamic>>? metaData,
   });
 
@@ -29,6 +30,7 @@ abstract interface class MessageRepository {
 
   RealtimeChannel listenToMessagesChannel({
     required int chatId,
+        required int chatMemberId,
     required Function(Message?) callback,
   });
 
@@ -40,11 +42,13 @@ abstract interface class MessageRepository {
   Future<Either<Failure, MessageReaction>> insertReaction({
     required int messageId,
     required String reaction,
+    required int chatMemberId,
     required int chatId,
   });
 
   RealtimeChannel listenToMessageReactionChannel({
     required int chatId,
+        required int chatMemberId,
     required Function({
       MessageReaction? messageReaction,
       required int reactionId,
@@ -58,6 +62,7 @@ abstract interface class MessageRepository {
 
   Future<Either<Failure, Unit>> removeReaction({
     required int messageId,
+        required int chatMemberId,
   });
 
   Future<Either<Failure, Message>> removeMessage({

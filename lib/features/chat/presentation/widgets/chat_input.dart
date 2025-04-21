@@ -226,6 +226,7 @@ class _ChatInputState extends State<ChatInput> {
                     context.read<MessageBloc>().add(
                           InsertMessage(
                             message: message,
+                            chatMemberId: widget.chat.chatMemberId,
                             chatId: widget.chat.id,
                             metaData:
                                 _messageController.searchResults.isNotEmpty

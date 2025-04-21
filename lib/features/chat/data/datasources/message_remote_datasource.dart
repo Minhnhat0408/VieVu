@@ -7,6 +7,7 @@ abstract interface class MessageRemoteDatasource {
   Future<MessageModel> insertMessage({
     required int chatId,
     required String message,
+    required int chatMemberId,
     List<Map<String, dynamic>>? metaData,
   });
 
@@ -27,10 +28,12 @@ abstract interface class MessageRemoteDatasource {
   });
   RealtimeChannel listenToMessageUpdateChannel({
     required int chatId,
+    // required int chatMemberId,
     required Function(Map<String, dynamic>) callback,
   });
   RealtimeChannel listenToMessagesChannel({
     int? chatId,
+    required int chatMemberId,
     required Function(MessageModel?) callback,
   });
 
@@ -41,15 +44,18 @@ abstract interface class MessageRemoteDatasource {
   Future<MessageReactionModel> insertReaction({
     required int messageId,
     required String reaction,
+    required int chatMemberId,
     required int chatId,
   });
 
   Future removeReaction({
     required int messageId,
+    required int chatMemberId,
   });
 
   RealtimeChannel listenToMessageReactionChannel({
     required int chatId,
+    required int chatMemberId,
     required Function({
       MessageReactionModel? messageReaction,
       required int reactionId,
@@ -79,6 +85,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
   Future<MessageModel> insertMessage({
     required int chatId,
     required String message,
+    required int chatMemberId,
     List<Map<String, dynamic>>? metaData,
   }) async {
     try {
@@ -100,11 +107,12 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .from('messages')
           .insert({
             'chat_id': chatId,
+            'chat_member_id': chatMemberId,
             'content': message,
-            'user_id': user.id,
+            // 'user_id': user.id,
             'meta_data': processedMetaData,
           })
-          .select("*, profiles(*)")
+          .select("*, chat_members!messages_chat_member_id_fkey(profiles(*))")
           .single();
       return MessageModel.fromJson(res);
     } catch (e) {
@@ -122,7 +130,8 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
     try {
       final res = await supabaseClient
           .from('messages')
-          .select("*, profiles(*), message_reactions(*, profiles(*))")
+          .select(
+              "*, chat_members!messages_chat_member_id_fkey(profiles(*)), message_reactions(*, chat_members(profiles(*)))")
           .eq('chat_id', chatId)
           .lt('id', lastMessageId)
           .gte('id', messageId)
@@ -191,14 +200,17 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
     try {
       final res = await supabaseClient
           .from('messages')
-          .select("*, profiles(*), message_reactions(*, profiles(*))")
+          .select(
+              "*, chat_members!messages_chat_member_id_fkey(profiles(*)), message_reactions(*, chat_members(profiles(*)))")
           .eq('chat_id', chatId)
           .range(offset, offset + limit)
           .order('created_at', ascending: false);
-      // final userSeen = await getSeenUser(chatId: chatId);
 
-      return res.map((e) => MessageModel.fromJson(e)).toList();
+      return res.map((e) {
+        return MessageModel.fromJson(e);
+      }).toList();
     } catch (e) {
+      log("${e}getMessagesInChat");
       throw ServerException(e.toString());
     }
   }
@@ -206,6 +218,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
   @override
   RealtimeChannel listenToMessagesChannel({
     int? chatId,
+    required int chatMemberId,
     required Function(MessageModel?) callback,
   }) {
     return supabaseClient
@@ -230,15 +243,17 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
               callback(null);
             } else {
               await updateSeenMessage(chatId: chatId, messageId: data['id']);
-              if (data['user_id'] == user.id) {
+              if (data['chat_member_id'] == chatMemberId) {
                 callback(null);
               } else {
                 final user = await supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', data['user_id'])
+                    .from('chat_members')
+                    .select('profiles(*)')
+                    .eq('id', data['chat_member_id'])
                     .single();
-                data['profiles'] = user;
+                data['chat_members'] = {
+                  'profiles': user['profiles'],
+                };
                 final message = MessageModel.fromJson(data);
 
                 callback(message);
@@ -275,6 +290,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
   @override
   RealtimeChannel listenToMessageReactionChannel({
     required int chatId,
+    required int chatMemberId,
     required Function({
       MessageReactionModel? messageReaction,
       required int reactionId,
@@ -300,13 +316,15 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
             if (event == PostgresChangeEvent.insert ||
                 event == PostgresChangeEvent.update) {
               final data = payload.newRecord;
-              if (data['user_id'] != user.id) {
+              if (data['chat_member_id'] != chatMemberId) {
                 final user = await supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', data['user_id'])
+                    .from('chat_members')
+                    .select('profiles(*)')
+                    .eq('id', data['chat_member_id'])
                     .single();
-                data['profiles'] = user;
+                data['chat_members'] = {
+                  'profiles': user['profiles'],
+                };
                 callback(
                   messageReaction: MessageReactionModel.fromJson(data),
                   reactionId: data['id'],
@@ -338,6 +356,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
   Future<MessageReactionModel> insertReaction({
     required int messageId,
     required int chatId,
+    required int chatMemberId,
     required String reaction,
   }) async {
     try {
@@ -350,11 +369,12 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .from('message_reactions')
           .upsert({
             'message_id': messageId,
-            'user_id': user.id,
+            // 'user_id': user.id,
+            'chat_member_id': chatMemberId,
             'reaction': reaction,
             'chat_id': chatId,
           }, onConflict: 'user_id, message_id')
-          .select("*, profiles(*)")
+          .select("*, chat_members(profiles(*))")
           .single();
       return MessageReactionModel.fromJson(res);
     } catch (e) {
@@ -366,6 +386,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
   @override
   Future removeReaction({
     required int messageId,
+    required int chatMemberId,
   }) async {
     try {
       final user = supabaseClient.auth.currentUser;
@@ -377,7 +398,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
           .from('message_reactions')
           .delete()
           .eq('message_id', messageId)
-          .eq('user_id', user.id);
+          .eq('chat_member_id', chatMemberId);
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());
@@ -402,8 +423,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
             'meta_data': [],
           })
           .eq('id', messageId)
-          .eq('user_id', user.id)
-          .select("*, profiles(*)")
+          .select("*, chat_members!messages_chat_member_id_fkey(profiles(*))")
           .single();
       // remove any reactions
       await supabaseClient

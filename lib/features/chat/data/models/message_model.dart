@@ -26,7 +26,7 @@ class MessageModel extends Message {
       metaData: json['meta_data'] != null
           ? List<Map<String, dynamic>>.from(json['meta_data'])
           : null,
-      user: UserModel.fromJson(json['profiles']),
+      user: UserModel.fromJson(json['chat_members']['profiles']),
       seenUser: json['seen_user'] != null
           ? List<UserModel>.from(json['seen_user'])
           : null,
@@ -70,7 +70,7 @@ class MessageReactionModel extends MessageReaction {
   factory MessageReactionModel.fromJson(Map<String, dynamic> json) {
     return MessageReactionModel(
       messageId: json['message_id'],
-      user: UserModel.fromJson(json['profiles']),
+      user: UserModel.fromJson(json['chat_members']['profiles']),
       reaction: json['reaction'],
       id: json['id'],
     );

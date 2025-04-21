@@ -6,10 +6,12 @@ sealed class MessageEvent {}
 final class InsertMessage extends MessageEvent {
   final List<Map<String, dynamic>>? metaData;
   final String message;
+  final int chatMemberId;
   final int chatId;
 
   InsertMessage({
     required this.message,
+    required this.chatMemberId,
     this.metaData,
     required this.chatId,
   });
@@ -29,9 +31,11 @@ final class GetMessagesInChat extends MessageEvent {
 
 final class ListenToMessagesChannel extends MessageEvent {
   final int chatId;
+  final int chatMemberId;
 
   ListenToMessagesChannel({
     required this.chatId,
+    required this.chatMemberId,
   });
 }
 
@@ -91,6 +95,7 @@ final class UnSubcribeToMessagesChannel extends MessageEvent {
 
 final class InsertReaction extends MessageEvent {
   final int messageId;
+  final int chatMemberId;
   final String reaction;
   final int chatId;
 
@@ -98,22 +103,27 @@ final class InsertReaction extends MessageEvent {
     required this.messageId,
     required this.chatId,
     required this.reaction,
+    required this.chatMemberId,
   });
 }
 
 final class RemoveReaction extends MessageEvent {
   final int messageId;
+  final int chatMemberId;
 
   RemoveReaction({
     required this.messageId,
+    required this.chatMemberId,
   });
 }
 
 final class ListenToMessageReactionChannel extends MessageEvent {
   final int chatId;
+  final int chatMemberId;
 
   ListenToMessageReactionChannel({
     required this.chatId,
+    required this.chatMemberId,
   });
 }
 

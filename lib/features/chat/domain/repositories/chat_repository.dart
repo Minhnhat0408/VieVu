@@ -32,6 +32,7 @@ abstract interface class ChatRepository {
 
   RealtimeChannel listenToUpdateChannels({
     required Function(Message?) callback,
+        required int chatMemberId,
   });
 
   Future<Either<Failure, ChatSummarize>> summarizeItineraries({

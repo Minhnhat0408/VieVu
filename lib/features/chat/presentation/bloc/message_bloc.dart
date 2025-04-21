@@ -34,6 +34,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     final res = await _messageRepository.insertMessage(
       message: event.message,
       metaData: event.metaData,
+      chatMemberId: event.chatMemberId,
       chatId: event.chatId,
     );
     res.fold(
@@ -90,6 +91,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
       ListenToMessagesChannel event, Emitter<MessageState> emit) {
     _messageRepository.listenToMessagesChannel(
       chatId: event.chatId,
+      chatMemberId: event.chatMemberId,
       callback: (payload) {
         if (payload != null) add(MessageReceived(message: payload));
       },
@@ -136,6 +138,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     emit(MessageLoading());
     final res = await _messageRepository.insertReaction(
       messageId: event.messageId,
+      chatMemberId: event.chatMemberId,
       chatId: event.chatId,
       reaction: event.reaction,
     );
@@ -150,6 +153,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     emit(MessageLoading());
     final res = await _messageRepository.removeReaction(
       messageId: event.messageId,
+      chatMemberId: event.chatMemberId,
+
     );
     res.fold(
       (l) => emit(MessageFailure(message: l.message)),
@@ -161,6 +166,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
       ListenToMessageReactionChannel event, Emitter<MessageState> emit) {
     _messageRepository.listenToMessageReactionChannel(
       chatId: event.chatId,
+      chatMemberId: event.chatMemberId,
+
       callback: ({messageReaction, required reactionId, required eventType}) {
         add(MessageReactionReceived(
             reaction: messageReaction,

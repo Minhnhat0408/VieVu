@@ -94,9 +94,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
     _chatBloc.add(ListenToChatSummariesChannel(chatId: widget.chat.id));
     _chatBloc.add(GetChatSummary(chatId: widget.chat.id));
-    _messageBloc.add(ListenToMessageReactionChannel(chatId: widget.chat.id));
+    _messageBloc.add(ListenToMessageReactionChannel(
+        chatId: widget.chat.id, chatMemberId: widget.chat.chatMemberId));
     _chatBloc.add(GetSeenUser(chatId: widget.chat.id));
-    _messageBloc.add(ListenToMessagesChannel(chatId: widget.chat.id));
+    _messageBloc.add(ListenToMessagesChannel(
+        chatId: widget.chat.id, chatMemberId: widget.chat.chatMemberId));
     _messageBloc.add(ListenToMessageUpdateChannel(chatId: widget.chat.id));
     _chatBloc.add(ListenToChatMembersChannel(chatId: widget.chat.id));
   }
@@ -104,7 +106,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   void dispose() {
     _pagingController.dispose();
-    // _chatBloc.add(UnSubcribeToSeenUserChannel(chatId: widget.chat.id));
     _chatBloc.add(
         UnSubcribeToChannel(channelName: 'chat_members:${widget.chat.id}'));
     _messageBloc.add(UnSubcribeToMessagesChannel(
@@ -128,6 +129,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           .removeWhere((element) => element.user.id == reaction.user.id);
       context.read<MessageBloc>().add(RemoveReaction(
             messageId: message.id,
+            chatMemberId: widget.chat.chatMemberId,
           ));
     } else {
       message.reactions
@@ -136,6 +138,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       context.read<MessageBloc>().add(InsertReaction(
             messageId: message.id,
             chatId: widget.chat.id,
+            chatMemberId: widget.chat.chatMemberId,
             reaction: reaction.reaction,
           ));
     }

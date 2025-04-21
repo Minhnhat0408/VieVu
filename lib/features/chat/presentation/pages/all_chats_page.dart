@@ -25,7 +25,6 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
     super.initState();
 
     context.read<ChatBloc>().add(GetChatHeads());
-    // context.read<ChatBloc>().add(ListenToUpdateChannels());
 
     _searchController.addListener(() {
       setState(() {
@@ -96,7 +95,7 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
             ),
             BlocConsumer<ChatBloc, ChatState>(
               listener: (context, state) {
-                log(state.toString());
+
                 if (state is ChatsLoadedSuccess) {
                   setState(() {
                     chats = state.chatHeads;

@@ -341,6 +341,14 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     required int chatId,
   }) async {
     try {
+
+           final user = supabaseClient.auth.currentUser;
+      final session = supabaseClient.auth.currentSession;
+      if (session == null || user == null) {
+        throw const ServerException('Không thể xác thực người dùng');
+      }
+      final token = session.accessToken;
+
       final url =
           Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/summarize');
 
@@ -397,9 +405,10 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
       final response = await http.post(
         url,
         headers: {
-          "Content-Type": "application/json", // Specify the content type
+          "Content-Type": "application/json",
+          "Authorization" : "Bearer $token",
         },
-        body: jsonEncode(body), // Convert the body to JSON
+        body: jsonEncode(body),
       );
       final jsonResponse = jsonDecode(
         utf8.decode(response.bodyBytes),
@@ -408,7 +417,6 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
       final List<Map<String, dynamic>> data =
           List<Map<String, dynamic>>.from(jsonResponse['data']);
 
-      //check if metadata .title contain the  data .title from the response if not add it in the metadata
       final res = await supabaseClient
           .from('chat_summaries')
           .upsert({

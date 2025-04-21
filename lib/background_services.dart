@@ -178,8 +178,6 @@ void onStart(ServiceInstance service) async {
               'newRecord': data,
             });
             if (event == PostgresChangeEvent.insert) {
-              // check avatar_url maybe null
-
               final http.Response response = await http.get(Uri.parse(sender !=
                       null
                   ? sender['avatar_url'] ??
