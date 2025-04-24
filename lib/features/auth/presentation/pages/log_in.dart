@@ -59,13 +59,24 @@ class _LogInPageState extends State<LogInPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Text(
+                        //   'VieVu',
+                        //   style: TextStyle(
+                        //     color: Theme.of(context)
+                        //         .colorScheme
+                        //         .primary, // Custom color
+                        //     fontSize: 32,
+                        //     fontWeight:
+                        //         FontWeight.bold, // Optional: adjust weight
+                        //   ),
+                        // ),
                         RichText(
                           text: TextSpan(
-                            text: 'Chào mừng đến với ', // Normal text
+                            text: 'Chào mừng bạn đến với ', // Normal text
                             style: Theme.of(context).textTheme.headlineMedium,
                             children: [
                               TextSpan(
-                                text: 'TravelCompanion', // Styled text
+                                text: 'VieVu', // Styled text
                                 style: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme

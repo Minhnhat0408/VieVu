@@ -105,9 +105,29 @@ class _LocationSharedMapState extends State<LocationSharedMap>
       log(payload.leftPresences.toString());
       log('left id : ${payload.leftPresences.first.payload['data']['id']}');
       log('current id : ${currentUser.id}');
-      final id = payload.leftPresences.first.payload['data']['id'];
-      if (id == currentUser.id) {
-        Navigator.of(context).pop();
+      if (payload.leftPresences.isNotEmpty) {
+        final leftPresence = payload.leftPresences.first;
+        // Ensure payload and data exist
+        if (leftPresence.payload.containsKey('data') &&
+            leftPresence.payload['data'] != null &&
+            leftPresence.payload['data'].containsKey('id')) {
+          final id = leftPresence.payload['data']['id'];
+          log('left id : $id');
+          log('current id : ${currentUser.id}');
+          if (id == currentUser.id) {
+            log('Current user left according to presence, popping.');
+            // Consider adding a small delay or confirmation before popping
+            // Or removing this pop entirely if background service handles lifecycle
+            if (mounted) {
+              // Check if the widget is still in the tree
+              Navigator.of(context).pop();
+            }
+          }
+        } else {
+          log('Left presence payload data or id is missing.');
+        }
+      } else {
+        log('Received onPresenceLeave event with empty leftPresences.');
       }
     }).onPresenceSync((payload) {
       usersActive = _positionChannel.presenceState().map((e) {
@@ -377,10 +397,18 @@ class _LocationSharedMapState extends State<LocationSharedMap>
                               ),
                               child: CachedNetworkImage(
                                 imageUrl: member.avatarUrl ?? "",
+                                // errorWidget: (context, url, error) =>
+                                //     Image.asset(
+                                //   'assets/images/trip_placeholder.avif', // Fallback if loading fails
+                                //   fit: BoxFit.cover,
+                                // ),
                                 errorWidget: (context, url, error) =>
-                                    Image.asset(
-                                  'assets/images/trip_placeholder.avif', // Fallback if loading fails
-                                  fit: BoxFit.cover,
+                                    const CircleAvatar(
+                                  radius: 30,
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 30,
+                                  ), // Change this to your desired border color
                                 ),
                                 imageBuilder: (context, imageProvider) =>
                                     CircleAvatar(
@@ -521,6 +549,10 @@ class _LocationSharedMapState extends State<LocationSharedMap>
                           setState(() {
                             _showItinerary = !_showItinerary;
                           });
+                          // remove pair
+                          _selectedMarker1 = null;
+                          _selectedMarker2 = null;
+                          _distanceBetweenMarkers = null;
                         },
                         iconColor: Theme.of(context).colorScheme.primary,
                       ),
@@ -561,9 +593,12 @@ class _LocationSharedMapState extends State<LocationSharedMap>
                                 child: CachedNetworkImage(
                                   imageUrl: e.avatarUrl ?? "",
                                   errorWidget: (context, url, error) =>
-                                      Image.asset(
-                                    'assets/images/trip_placeholder.avif', // Fallback if loading fails
-                                    fit: BoxFit.cover,
+                                      const CircleAvatar(
+                                    radius: 20,
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 20,
+                                    ),
                                   ),
                                   imageBuilder: (context, imageProvider) =>
                                       CircleAvatar(

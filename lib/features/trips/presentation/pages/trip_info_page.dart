@@ -108,38 +108,6 @@ class TripInfoPage extends StatelessWidget {
                     : const Text('Chưa có phương tiện')),
           ),
         ),
-        // BlocConsumer<SubjectBloc, SubjectState>(
-        //   listener: (context, state) {
-        //     // TODO: implement listener
-        //   },
-        //   builder: (context, state) {
-        //     return SliverToBoxAdapter(
-        //       child: ListTile(
-        //         title: Text(
-        //           'Thành viên',
-        //           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-        //               color: Theme.of(context).colorScheme.primary,
-        //               fontWeight: FontWeight.bold),
-        //         ),
-        //         subtitle: Padding(
-        //           padding: const EdgeInsets.only(top: 4.0),
-        //           child: Row(
-        //             children: [
-        //               Icon(
-        //                 Icons.people,
-        //                 color: Theme.of(context).colorScheme.primary,
-        //               ),
-        //               const SizedBox(width: 6),
-        //               Text(trip.maxMember != null
-        //                   ? '0/${trip.maxMember} thành viên'
-        //                   : 'Chưa có thành viên'),
-        //             ],
-        //           ),
-        //         ),
-        //       ),
-        //     );
-        //   },
-        // ),
         SliverToBoxAdapter(
           child: ListTile(
             title: Text(
@@ -170,7 +138,7 @@ class TripInfoPage extends StatelessWidget {
                       .first
                       .label,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: Colors.black,
                   ),
                 ),
               ),

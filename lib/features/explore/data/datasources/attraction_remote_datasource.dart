@@ -459,6 +459,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
         "attraction_ids": [],
         "top_n": limit,
       };
+      log(token);
       final responseRecommendation = await http.post(
         url,
         headers: {
@@ -479,8 +480,7 @@ class AttractionRemoteDatasourceImpl implements AttractionRemoteDatasource {
             .inFilter(
                 'saved_services.link_id', data.map((e) => e['id']).toList());
         final linkIds = res2
-            .expand((item) =>
-                item['saved_services'] ?? [])
+            .expand((item) => item['saved_services'] ?? [])
             .map((service) => service['link_id'])
             .toList();
         return data.map((e) {

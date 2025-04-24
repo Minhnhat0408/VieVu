@@ -138,7 +138,7 @@ class SettingsPage extends StatelessWidget {
                               } else if (entry.key == 'Phiên bản') {
                                 showAboutDialog(
                                     context: context,
-                                    applicationName: 'Vietnam Travel Companion',
+                                    applicationName: 'VieVu',
                                     applicationVersion: '1.0.0',
                                     applicationIcon: ImageIcon(
                                       const AssetImage(
@@ -149,7 +149,7 @@ class SettingsPage extends StatelessWidget {
                                           Theme.of(context).colorScheme.primary,
                                     ),
                                     applicationLegalese:
-                                        '© 2021 Travel Companion');
+                                        '© 2021 VieVu. All rights reserved.',);
                               } else if (entry.key == 'Hỗ trợ') {
                                 // Navigator.of(context).pushNamed('/support');
                               }

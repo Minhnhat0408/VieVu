@@ -202,14 +202,6 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
           .neq('status', 'cancelled')
           .neq('status', 'completed');
 
-      if (status != null) {
-        query = query.eq('status', status);
-      }
-
-      if (isPublished != null) {
-        query = query.eq('is_published', isPublished);
-      }
-
       final response = await query.order('updated_at', ascending: false);
       return response.map((e) {
         final tripItem = e;
@@ -352,12 +344,16 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         if (res == null) {
           throw const ServerException('Không có quyền cập nhật chuyến đi');
         }
+        // log(res['published_time'].toString());
         if (res['published_time'] == null) {
           updateData['published_time'] = DateTime.now().toIso8601String();
           final users = await supabaseClient
               .from('profiles')
               .select('id')
               .neq('id', user.id);
+
+          log(users.toString());
+
           for (var e in users) {
             await supabaseClient.from('notifications').insert(
               {

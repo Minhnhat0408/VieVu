@@ -124,8 +124,8 @@ void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
   log('Background service started');
   final supabase = await Supabase.initialize(
-    url: SupabaseSecret.supabaseUrl, // Replace with your Supabase URL
-    anonKey: SupabaseSecret.supabaseKey, // Replace with your Supabase anon key
+    url: SupabaseSecret.supabaseUrl,
+    anonKey: SupabaseSecret.supabaseKey,
   );
   final SupabaseClient client = supabase.client;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -274,18 +274,16 @@ void onStart(ServiceInstance service) async {
             });
           }
         });
-        // positionChannel.sendBroadcastMessage(event: 'position', payload: {
-        //   'data': currentUser,
-        // });
+
         Stream<Position> positionStream = Geolocator.getPositionStream(
           locationSettings: const LocationSettings(
             accuracy: LocationAccuracy.high,
             distanceFilter: 5, // Update every 5 meters
           ),
         );
-        positionChannel.track({
-          'data': currentUser,
-        });
+        // positionChannel.track({
+        //   'data': currentUser,
+        // });
         positionStream.listen((Position position) {
           currentUser['latitude'] = position.latitude;
           currentUser['longitude'] = position.longitude;

@@ -104,6 +104,8 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
               listener: (context, state) {
                 if (state is TripActionSuccess) {
                   Navigator.of(context).pop();
+                  showSnackbar(
+                      context, "Đã công khai chuyến đi", SnackBarState.success);
                 }
                 if (state is TripActionFailure) {
                   Navigator.of(context).pop();

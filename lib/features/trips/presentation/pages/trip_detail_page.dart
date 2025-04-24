@@ -107,9 +107,7 @@ class _TripDetailPageState extends State<TripDetailPage>
               );
             }
           }
-          // if (state is TripDetailsLoadedFailure) {
-          //   // showSnackbar(context, state.message, 'error');
-          // }
+
         },
         builder: (context, state) {
           if (state is TripDetailsLoadedFailure) {
@@ -323,9 +321,8 @@ class _TripDetailPageState extends State<TripDetailPage>
                                     tripId: widget.tripId,
                                     tripItineraries:
                                         tripItineraries.where((element) {
-                            
-                                      final now = DateTime.now();
-                                      final today = DateTime(now.year,
+                                      final now = DateTime.now().toUtc();
+                                      final today = DateTime.utc(now.year,
                                           now.month, now.day, 0, 0, 0);
 
                                       return element.time.isAfter(today) &&

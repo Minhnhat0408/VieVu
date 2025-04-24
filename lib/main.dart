@@ -157,7 +157,7 @@ class _MyAppState extends State<MyApp> {
         builder: (context, notifier, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'VietNam Travel Companion App',
+            title: 'VieVu',
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
@@ -208,7 +208,7 @@ class _MyAppState extends State<MyApp> {
                   return BlocConsumer<PreferencesBloc, PreferencesState>(
                     listener: (context, state) {
                       if (state is PreferencesFailure) {
-                        // showSnackbar(context, state.message);
+                        showSnackbar(context, state.message);
                       }
                     },
                     builder: (context, state) {
@@ -219,7 +219,9 @@ class _MyAppState extends State<MyApp> {
                         return const InitialPreferences();
                       }
                       if (state is PreferencesLoadedSuccess) {
-                        if (_pendingUri != null) {
+                        if (_pendingUri != null &&
+                            _pendingUri!.pathSegments.isNotEmpty) {
+                          log(_pendingUri.toString());
                           if (_pendingUri!.pathSegments[0] == 'trip') {
                             final tripId = _pendingUri!.pathSegments.length > 1
                                 ? _pendingUri!.pathSegments[1]

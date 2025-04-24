@@ -60,11 +60,11 @@ class _SignUpPageState extends State<SignUpPage> {
                       children: [
                         RichText(
                           text: TextSpan(
-                            text: 'Đăng ký tài khoản ', // Normal text
+                            text: 'Đăng ký tài khoản mới ', // Normal text
                             style: Theme.of(context).textTheme.headlineMedium,
                             children: [
                               TextSpan(
-                                text: 'TravelCompanion', // Styled text
+                                text: 'VieVu', // Styled text
                                 style: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme

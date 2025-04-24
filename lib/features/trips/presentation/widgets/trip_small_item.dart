@@ -75,7 +75,7 @@ class TripSmallItem extends StatelessWidget {
                           .first
                           .label,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
+                        color: Colors.black,
                       ),
                     ),
                   ),
