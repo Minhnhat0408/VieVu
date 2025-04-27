@@ -139,12 +139,14 @@ class _EditTripItineraryModalState extends State<EditTripItineraryModal> {
                                   horizontal: 10, vertical: 5),
                               child: Column(
                                 children: [
-                                  ..._tripItinerary
-                                      .where((element) =>
-                                          element.time.day == day.day &&
-                                          element.time.month == day.month &&
-                                          element.time.year == day.year)
-                                      .map((e) {
+                                  ..._tripItinerary.where((element) {
+                                    // Convert element.time to local before comparing components
+                                    final localElementTime =
+                                        element.time.toLocal();
+                                    return localElementTime.day == day.day &&
+                                        localElementTime.month == day.month &&
+                                        localElementTime.year == day.year;
+                                  }).map((e) {
                                     return ListTile(
                                       title: Row(
                                         children: [

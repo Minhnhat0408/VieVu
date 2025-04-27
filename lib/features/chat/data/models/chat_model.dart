@@ -11,7 +11,6 @@ class ChatModel extends Chat {
     super.tripId,
     super.lastSeenUserAvatar,
     required super.isSeen,
-
   });
 
   factory ChatModel.fromJson(Map<String, dynamic> json) {
@@ -27,7 +26,7 @@ class ChatModel extends Chat {
       lastMessageTime: json['last_message_time'] != null
           ? DateTime.parse(json['last_message_time'])
           : null,
-      isSeen: json['is_seen'] ?? false,
+      isSeen: json['is_seen'] ?? true,
     );
   }
 }

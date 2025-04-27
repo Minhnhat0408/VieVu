@@ -109,6 +109,8 @@ class _TripReviewPageState extends State<TripReviewPage> {
             }
 
             if (state is TripReviewDeletedSuccess) {
+              widget.currentUser!.reviewed = false;
+
               setState(() {
                 tripReviews.removeWhere((element) => element.id == state.id);
               });

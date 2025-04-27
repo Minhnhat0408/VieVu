@@ -346,7 +346,20 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         }
         // log(res['published_time'].toString());
         if (res['published_time'] == null) {
+          // updateData[''] = true;
           updateData['published_time'] = DateTime.now().toIso8601String();
+         // check if start date is today or in the past
+          if (res['start_date'] != null) {
+            final startDate = DateTime.parse(res['start_date']);
+            if (startDate.isBefore(DateTime.now().toUtc())) {
+              updateData['status'] = 'ongoing';
+            }
+
+            final endDate = DateTime.parse(res['end_date']);
+            if (endDate.isBefore(DateTime.now().toUtc())) {
+              updateData['status'] = 'completed';
+            }
+          }
           final users = await supabaseClient
               .from('profiles')
               .select('id')

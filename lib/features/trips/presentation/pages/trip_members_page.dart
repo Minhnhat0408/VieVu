@@ -188,13 +188,14 @@ class _TripMembersPageState extends State<TripMembersPage> {
 
                                   startActionPane: ActionPane(
                                     motion: const BehindMotion(),
-                                    extentRatio:
-                                        tripMember.role == 'owner' ? 0.4 : 0.28,
+                                    extentRatio: currentUser?.role == 'owner'
+                                        ? 0.4
+                                        : 0.28,
                                     children: [
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      if (tripMember.role == 'owner')
+                                      if (currentUser?.role == 'owner')
                                         IconButton(
                                           onPressed: () {
                                             showDialog(

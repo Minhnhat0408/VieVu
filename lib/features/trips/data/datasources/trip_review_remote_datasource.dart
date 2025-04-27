@@ -99,9 +99,9 @@ class TripReviewRemoteDatasourceImpl implements TripReviewRemoteDataSource {
   }) async {
     try {
       await supabaseClient.from('trip_reviews').delete().eq('id', id);
-      await supabaseClient.from('trip_participants').update({
-        'reviewed': false,
-      }).eq('id', id);
+      // await supabaseClient.from('trip_participants').update({
+      //   'reviewed': false,
+      // }).eq('id', id);
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());
