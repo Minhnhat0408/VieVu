@@ -7,10 +7,8 @@ import 'package:vievu/features/chat/domain/entities/message.dart';
 
 abstract interface class ChatRepository {
   Future<Either<Failure, Chat>> insertChat({
-    String? name,
     String? tripId,
     String? userId,
-    String? imageUrl,
   });
 
   Future<Either<Failure, Chat?>> getSingleChat({

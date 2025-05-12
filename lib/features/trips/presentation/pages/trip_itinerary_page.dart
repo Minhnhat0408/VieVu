@@ -435,7 +435,7 @@ class _TripItineraryPageState extends State<TripItineraryPage>
                                           height: 30,
                                         ),
                                         const Text(
-                                          'Thêm ngày đi để xem lịch trình để sắp xếp các mục đã lưu thành một hành trình',
+                                          'Thêm ngày khởi hành và trở về để bắt đầu tạo lịch trình và cập nhật trạng thái chuyến đi',
                                           style: TextStyle(
                                             fontSize: 16,
                                           ),

@@ -5,6 +5,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:vievu/core/error/exceptions.dart';
 import 'package:vievu/core/error/failures.dart';
 import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/chat/data/datasources/chat_remote_datasource.dart';
 import 'package:vievu/features/trips/data/datasources/trip_member_remote_datasource.dart';
 import 'package:vievu/features/trips/data/datasources/trip_remote_datasource.dart';
 import 'package:vievu/features/trips/domain/entities/trip.dart';
@@ -13,10 +14,15 @@ import 'package:vievu/features/trips/domain/repositories/trip_repository.dart';
 class TripRepositoryImpl implements TripRepository {
   final TripRemoteDatasource tripRemoteDatasource;
   final TripMemberRemoteDatasource tripMemberRemoteDatasource;
+  final ChatRemoteDatasource chatRemoteDatasource;
   final ConnectionChecker connectionChecker;
 
-  TripRepositoryImpl(this.tripRemoteDatasource, this.connectionChecker,
-      this.tripMemberRemoteDatasource);
+  TripRepositoryImpl({
+    required this.tripRemoteDatasource,
+    required this.tripMemberRemoteDatasource,
+    required this.chatRemoteDatasource,
+    required this.connectionChecker,
+  });
 
   @override
   Future<Either<Failure, Unit>> deleteTrip({
@@ -92,6 +98,12 @@ class TripRepositoryImpl implements TripRepository {
         tripId: trip.id,
         userId: userId,
         role: 'owner',
+      );
+
+      await chatRemoteDatasource.insertChat(
+        tripId: trip.id,
+        // imageUrl: trip.cover,
+        // name: trip.name,
       );
       return right(trip);
     } on ServerException catch (e) {

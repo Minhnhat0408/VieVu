@@ -64,8 +64,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _onInsertChat(InsertChat event, Emitter<ChatState> emit) async {
     emit(ChatLoading());
     final res = await _chatRepository.insertChat(
-      name: event.name,
-      imageUrl: event.imageUrl,
+ 
       tripId: event.tripId,
       userId: event.userId,
     );

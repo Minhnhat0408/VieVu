@@ -15,15 +15,19 @@ final class NotificationLoadedSuccess extends NotificationState {
 
 final class NotificationError extends NotificationState {
   final String message;
+  final int? id;
 
-  NotificationError({required this.message});
+  NotificationError({
+    required this.message,
+     this.id,
+  });
 }
 
 final class NotificationDeleted extends NotificationState {}
 
 final class NotificationMarkedAsRead extends NotificationState {}
-final class AllNotificationsMarkedAsRead extends NotificationState {}
 
+final class AllNotificationsMarkedAsRead extends NotificationState {}
 
 final class NotificationSent extends NotificationState {}
 

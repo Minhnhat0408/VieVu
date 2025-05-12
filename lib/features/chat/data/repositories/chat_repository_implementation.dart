@@ -76,9 +76,7 @@ class ChatRepositoryImpl implements ChatRepository {
         return left(Failure("Không có kết nối mạng"));
       }
       final res = await chatRemoteDatasource.insertChat(
-        name: name,
         tripId: tripId,
-        imageUrl: imageUrl,
         userId: userId,
       );
 

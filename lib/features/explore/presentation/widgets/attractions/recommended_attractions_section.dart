@@ -83,7 +83,8 @@ class _RecommendedAttractionSectionState
         BlocConsumer<AttractionBloc, AttractionState>(
           listener: (context, state) {
             if (state is AttractionFailure) {
-              showSnackbar(context, state.message, 'error');
+              // showSnackbar(context, state.message, 'error');
+              log(state.message);
             }
           },
           builder: (context, state) {

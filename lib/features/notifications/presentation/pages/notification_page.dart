@@ -76,6 +76,18 @@ class _NotificationPageState extends State<NotificationPage> {
             setState(() {});
             showSnackbar(context, "Đã đánh dấu tất cả thông báo là đã đọc");
           }
+          if (state is NotificationError) {
+            if (state.id != null) {
+              _pagingController.itemList!
+                  .removeWhere((element) => element.id == state.id);
+              context.read<NotificationBloc>().add(DeleteNotification(
+                    notificationId: state.id!,
+                  ));
+              // _pagingController.refresh();
+            }
+
+            showSnackbar(context, state.message);
+          }
         },
         builder: (context, state) {
           return RefreshIndicator(

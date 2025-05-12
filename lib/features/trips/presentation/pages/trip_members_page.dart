@@ -31,6 +31,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
   @override
   void initState() {
     super.initState();
+
     final userId =
         (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     if (context.read<TripMemberBloc>().state is TripMemberLoadedSuccess) {
@@ -89,7 +90,8 @@ class _TripMembersPageState extends State<TripMembersPage> {
             actions: [
               if (currentUser != null &&
                   widget.trip.status != 'cancelled' &&
-                  widget.trip.status != 'completed')
+                  widget.trip.status != 'completed' &&
+                  widget.trip.maxMember! > tripMembers.length)
                 FilledButton(
                   onPressed: () {
                     Navigator.of(context).push(
@@ -144,6 +146,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
 
             if (state is TripMemberUpdatedSuccess) {
               showSnackbar(context, 'Cập nhật thành công');
+
               setState(() {
                 tripMembers[tripMembers.indexWhere((element) =>
                         element.user.id == state.tripMember.user.id)] =
@@ -168,34 +171,149 @@ class _TripMembersPageState extends State<TripMembersPage> {
                         ),
                       )
                     : tripMembers.isNotEmpty
-                        ? SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final tripMember = tripMembers[index];
+                        ? SlidableAutoCloseBehavior(
+                            child: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final tripMember = tripMembers[index];
 
-                                return Slidable(
-                                  closeOnScroll: true,
-                                  // controller: slidableController,
-                                  enabled: isAUthorize &&
-                                      tripMember.user.id !=
-                                          (context.read<AppUserCubit>().state
-                                                  as AppUserLoggedIn)
-                                              .user
-                                              .id &&
-                                      tripMember.role != 'owner' &&
-                                      widget.trip.status != 'cancelled' &&
-                                      widget.trip.status != 'completed',
+                                  return Slidable(
+                                    closeOnScroll: true,
+                                    enabled: isAUthorize &&
+                                        tripMember.user.id !=
+                                            (context.read<AppUserCubit>().state
+                                                    as AppUserLoggedIn)
+                                                .user
+                                                .id &&
+                                        tripMember.role != 'owner' &&
+                                        widget.trip.status != 'cancelled' &&
+                                        widget.trip.status != 'completed',
+                                    startActionPane: ActionPane(
+                                      motion: const BehindMotion(),
+                                      extentRatio: currentUser?.role == 'owner'
+                                          ? 0.4
+                                          : 0.28,
+                                      children: [
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        if (currentUser?.role == 'owner')
+                                          IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (context) => AlertDialog(
+                                                            title: const Text(
+                                                                'Xác nhận'),
+                                                            content: Text(
+                                                                'Bạn có chắc chắn muốn ${tripMember.role == 'member' ? 'cấp quyền quản trị viên. Thành viên này sẽ có quyền chỉnh sửa lịch trình và quản lý thành viên chuyến đi' : 'thu hồi quyền quản trị viên'}?'),
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                child: const Text(
+                                                                    'Hủy bỏ'),
+                                                              ),
+                                                              FilledButton(
+                                                                onPressed: () {
+                                                                  context.read<TripMemberBloc>().add(UpdateTripMember(
+                                                                      tripId: widget
+                                                                          .trip
+                                                                          .id,
+                                                                      userId: tripMember
+                                                                          .user
+                                                                          .id,
+                                                                      role: tripMember.role ==
+                                                                              'member'
+                                                                          ? 'moderator'
+                                                                          : 'member'));
 
-                                  startActionPane: ActionPane(
-                                    motion: const BehindMotion(),
-                                    extentRatio: currentUser?.role == 'owner'
-                                        ? 0.4
-                                        : 0.28,
-                                    children: [
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      if (currentUser?.role == 'owner')
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                  'Tiếp tục',
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ));
+                                            },
+                                            tooltip: tripMember.role == 'member'
+                                                ? 'Chuyển thành quản trị viên'
+                                                : 'Chuyển thành thành viên',
+                                            style: IconButton.styleFrom(
+                                              backgroundColor: Theme.of(context)
+                                                  .colorScheme
+                                                  .tertiaryContainer,
+                                              foregroundColor: Theme.of(context)
+                                                  .colorScheme
+                                                  .tertiary,
+                                            ),
+                                            icon: Icon(
+                                              tripMember.role == 'member'
+                                                  ? Icons.add_moderator
+                                                  : Icons.person,
+                                            ),
+                                          ),
+                                        IconButton(
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder:
+                                                    (context) => AlertDialog(
+                                                          title: const Text(
+                                                              'Xác nhận'),
+                                                          content: const Text(
+                                                              'Bạn có chắc chắn muốn đuổi thành viên này khỏi chuyến đi?'),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: const Text(
+                                                                  'Hủy bỏ'),
+                                                            ),
+                                                            FilledButton(
+                                                              onPressed: () {
+                                                                context
+                                                                    .read<
+                                                                        TripMemberBloc>()
+                                                                    .add(DeleteTripMember(
+                                                                        tripId: widget
+                                                                            .trip
+                                                                            .id,
+                                                                        userId: tripMember
+                                                                            .user
+                                                                            .id));
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: const Text(
+                                                                  'Xác nhận'),
+                                                            ),
+                                                          ],
+                                                        ));
+                                          },
+                                          tooltip: 'Đuổi khỏi chuyến đi',
+                                          style: IconButton.styleFrom(
+                                            backgroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .secondaryContainer,
+                                            foregroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                          ),
+                                          icon: const Icon(Icons.exit_to_app),
+                                        ),
                                         IconButton(
                                           onPressed: () {
                                             showDialog(
@@ -205,7 +323,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                                           title: const Text(
                                                               'Xác nhận'),
                                                           content: Text(
-                                                              'Bạn có chắc chắn muốn ${tripMember.role == 'member' ? 'chuyển thành quản trị viên' : 'chuyển thành thành viên'}?'),
+                                                              'Bạn có chắc chắn muốn ${tripMember.isBanned ? 'bỏ cấm' : 'cấm'} thành viên này khỏi chuyến đi?'),
                                                           actions: [
                                                             TextButton(
                                                               onPressed: () {
@@ -227,255 +345,86 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                                                         tripMember
                                                                             .user
                                                                             .id,
-                                                                    role: tripMember.role ==
-                                                                            'member'
-                                                                        ? 'moderator'
-                                                                        : 'member'));
+                                                                    isBanned:
+                                                                        !tripMember
+                                                                            .isBanned));
                                                                 Navigator.of(
                                                                         context)
                                                                     .pop();
                                                               },
-                                                              child: const Text(
-                                                                'Tiếp tục',
+                                                              child: Text(
+                                                                tripMember
+                                                                        .isBanned
+                                                                    ? 'Bỏ cấm'
+                                                                    : 'Cấm',
                                                               ),
                                                             ),
                                                           ],
                                                         ));
                                           },
-                                          tooltip: tripMember.role == 'member'
-                                              ? 'Chuyển thành quản trị viên'
-                                              : 'Chuyển thành thành viên',
+                                          tooltip: tripMember.isBanned
+                                              ? 'Bỏ cấm'
+                                              : 'Cấm',
                                           style: IconButton.styleFrom(
                                             backgroundColor: Theme.of(context)
                                                 .colorScheme
-                                                .tertiaryContainer,
+                                                .errorContainer,
                                             foregroundColor: Theme.of(context)
                                                 .colorScheme
-                                                .tertiary,
+                                                .error,
                                           ),
-                                          icon: Icon(
-                                            tripMember.role == 'member'
-                                                ? Icons.add_moderator
-                                                : Icons.person,
-                                          ),
+                                          icon: tripMember.isBanned
+                                              ? const Icon(Icons.check)
+                                              : const Icon(Icons.block),
                                         ),
-                                      IconButton(
-                                        onPressed: () {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                    title:
-                                                        const Text('Xác nhận'),
-                                                    content: const Text(
-                                                        'Bạn có chắc chắn muốn đuổi thành viên này khỏi chuyến đi?'),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        child: const Text(
-                                                            'Hủy bỏ'),
-                                                      ),
-                                                      FilledButton(
-                                                        onPressed: () {
-                                                          context
-                                                              .read<
-                                                                  TripMemberBloc>()
-                                                              .add(DeleteTripMember(
-                                                                  tripId: widget
-                                                                      .trip.id,
-                                                                  userId:
-                                                                      tripMember
-                                                                          .user
-                                                                          .id));
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        child: const Text(
-                                                            'Xác nhận'),
-                                                      ),
-                                                    ],
-                                                  ));
-                                        },
-                                        tooltip: 'Đuổi khỏi chuyến đi',
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .secondaryContainer,
-                                          foregroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                        ),
-                                        icon: const Icon(Icons.exit_to_app),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                    title:
-                                                        const Text('Xác nhận'),
-                                                    content: Text(
-                                                        'Bạn có chắc chắn muốn ${tripMember.isBanned ? 'bỏ cấm' : 'cấm'} thành viên này khỏi chuyến đi?'),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        child: const Text(
-                                                            'Hủy bỏ'),
-                                                      ),
-                                                      FilledButton(
-                                                        onPressed: () {
-                                                          context
-                                                              .read<
-                                                                  TripMemberBloc>()
-                                                              .add(UpdateTripMember(
-                                                                  tripId: widget
-                                                                      .trip.id,
-                                                                  userId:
-                                                                      tripMember
-                                                                          .user
-                                                                          .id,
-                                                                  isBanned:
-                                                                      !tripMember
-                                                                          .isBanned));
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        child: Text(
-                                                          tripMember.isBanned
-                                                              ? 'Bỏ cấm'
-                                                              : 'Cấm',
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ));
-                                        },
-                                        tooltip: tripMember.isBanned
-                                            ? 'Bỏ cấm'
-                                            : 'Cấm',
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .errorContainer,
-                                          foregroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .error,
-                                        ),
-                                        icon: tripMember.isBanned
-                                            ? const Icon(Icons.check)
-                                            : const Icon(Icons.block),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ListTile(
-                                    leading: CachedNetworkImage(
-                                      imageUrl: tripMember.user.avatarUrl ?? '',
-                                      imageBuilder: (context, imageProvider) =>
-                                          CircleAvatar(
-                                        backgroundImage: imageProvider,
-                                      ),
-                                      placeholder: (context, url) =>
-                                          const CircleAvatar(
-                                        child: Icon(Icons.person),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          const CircleAvatar(
-                                        child: Icon(Icons.person),
-                                      ),
+                                      ],
                                     ),
-                                    title: Text(
-                                        "${tripMember.user.lastName} ${tripMember.user.firstName}"),
-                                    subtitle: Text(
-                                        convertRoleToString(tripMember.role),
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurfaceVariant,
-                                            fontSize: 12)),
-                                    onTap: (widget.trip.status == "completed" &&
-                                            tripMember.user.id !=
-                                                (context
-                                                            .read<AppUserCubit>()
-                                                            .state
-                                                        as AppUserLoggedIn)
-                                                    .user
-                                                    .id)
-                                        ? () {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ProfilePage(
-                                                  id: tripMember.user.id,
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        : null,
-                                    trailing: widget.trip.status ==
-                                                'completed' &&
-                                            tripMember.user.id !=
-                                                (context
-                                                            .read<AppUserCubit>()
-                                                            .state
-                                                        as AppUserLoggedIn)
-                                                    .user
-                                                    .id &&
-                                            currentUser != null
-                                        ? RatingBarIndicator(
-                                            rating:
-                                                tripMember.rating.toDouble(),
-                                            itemSize: 24,
-                                            direction: Axis.horizontal,
-                                            itemCount: 5,
-                                            itemBuilder: (context, _) =>
-                                                GestureDetector(
-                                              onTap: () {
-                                                if (tripMember.rating != 0 ||
-                                                    tripMember.rating == _ + 1)
-                                                  return;
-                                                context
-                                                    .read<TripMemberBloc>()
-                                                    .add(RateTripMember(
-                                                        memberId: tripMember.id,
-                                                        rating: _ + 1));
-                                                context
-                                                    .read<NotificationBloc>()
-                                                    .add(SendNotification(
-                                                      userId:
-                                                          tripMember.user.id,
-                                                      type: NotificationType
-                                                          .rating.type,
-                                                      tripId: widget.trip.id,
-                                                      content:
-                                                          "${NotificationType.rating.message} ${_ + 1} sao từ chuyến đi",
-                                                    ));
-
-                                                setState(() {
-                                                  tripMembers[tripMembers
-                                                          .indexWhere(
-                                                              (element) =>
-                                                                  element.id ==
-                                                                  tripMember
-                                                                      .id)]
-                                                      .rating = _ + 1;
-                                                });
-                                              },
-                                              child: const Icon(
-                                                Icons.star,
-                                                color: Colors.amber,
-                                              ),
-                                            ),
-                                          )
-                                        : IconButton(
-                                            icon: const Icon(
-                                              Icons.chevron_right,
-                                              size: 30,
-                                            ),
-                                            onPressed: () {
+                                    child: ListTile(
+                                      tileColor: tripMember.isBanned
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .errorContainer
+                                              .withOpacity(0.6)
+                                          : null,
+                                      leading: CachedNetworkImage(
+                                        imageUrl:
+                                            tripMember.user.avatarUrl ?? '',
+                                        imageBuilder:
+                                            (context, imageProvider) =>
+                                                CircleAvatar(
+                                          backgroundImage: imageProvider,
+                                        ),
+                                        placeholder: (context, url) =>
+                                            const CircleAvatar(
+                                          child: Icon(Icons.person),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            const CircleAvatar(
+                                          child: Icon(Icons.person),
+                                        ),
+                                      ),
+                                      title: Text(
+                                          "${tripMember.user.lastName} ${tripMember.user.firstName}"),
+                                      subtitle: Text(
+                                          tripMember.isBanned
+                                              ? "Đã bị cấm"
+                                              : convertRoleToString(
+                                                  tripMember.role),
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                              fontSize: 12)),
+                                      onTap: (widget.trip.status ==
+                                                  "completed" &&
+                                              tripMember.user.id !=
+                                                  (context
+                                                              .read<AppUserCubit>()
+                                                              .state
+                                                          as AppUserLoggedIn)
+                                                      .user
+                                                      .id)
+                                          ? () {
                                               Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                   builder: (context) =>
@@ -484,12 +433,86 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                                   ),
                                                 ),
                                               );
-                                            },
-                                          ),
-                                  ),
-                                );
-                              },
-                              childCount: tripMembers.length,
+                                            }
+                                          : null,
+                                      trailing: widget.trip.status ==
+                                                  'completed' &&
+                                              tripMember.user.id !=
+                                                  (context
+                                                              .read<AppUserCubit>()
+                                                              .state
+                                                          as AppUserLoggedIn)
+                                                      .user
+                                                      .id &&
+                                              currentUser != null
+                                          ? RatingBarIndicator(
+                                              rating:
+                                                  tripMember.rating.toDouble(),
+                                              itemSize: 24,
+                                              direction: Axis.horizontal,
+                                              itemCount: 5,
+                                              itemBuilder: (context, _) =>
+                                                  GestureDetector(
+                                                onTap: () {
+                                                  if (tripMember.rating != 0 ||
+                                                      tripMember.rating ==
+                                                          _ + 1) return;
+                                                  context
+                                                      .read<TripMemberBloc>()
+                                                      .add(RateTripMember(
+                                                          memberId:
+                                                              tripMember.id,
+                                                          rating: _ + 1));
+                                                  context
+                                                      .read<NotificationBloc>()
+                                                      .add(SendNotification(
+                                                        userId:
+                                                            tripMember.user.id,
+                                                        type: NotificationType
+                                                            .rating.type,
+                                                        tripId: widget.trip.id,
+                                                        content:
+                                                            "${NotificationType.rating.message} ${_ + 1} sao từ chuyến đi",
+                                                      ));
+
+                                                  setState(() {
+                                                    tripMembers[tripMembers
+                                                            .indexWhere(
+                                                                (element) =>
+                                                                    element
+                                                                        .id ==
+                                                                    tripMember
+                                                                        .id)]
+                                                        .rating = _ + 1;
+                                                  });
+                                                },
+                                                child: const Icon(
+                                                  Icons.star,
+                                                  color: Colors.amber,
+                                                ),
+                                              ),
+                                            )
+                                          : IconButton(
+                                              icon: const Icon(
+                                                Icons.chevron_right,
+                                                size: 30,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProfilePage(
+                                                      id: tripMember.user.id,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                    ),
+                                  );
+                                },
+                                childCount: tripMembers.length,
+                              ),
                             ),
                           )
                         : SliverFillRemaining(

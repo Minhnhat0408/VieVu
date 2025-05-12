@@ -77,12 +77,12 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
             },
           ),
         ),
-        ListTile(
-          horizontalTitleGap: 0,
-          subtitle: Text(
-              '(*) Công khai chuyến đi, hệ thống sẽ tự động cập nhật trạng thái chuyến đi phù hợp với ngày lịch trình.',
-              style: TextStyle(fontSize: 12, color: Colors.grey)),
-        ),
+        // ListTile(
+        //   horizontalTitleGap: 0,
+        //   subtitle: Text(
+        //       '(*) Công khai chuyến đi, hệ thống sẽ tự động cập nhật trạng thái chuyến đi phù hợp với ngày lịch trình.',
+        //       style: TextStyle(fontSize: 12, color: Colors.grey)),
+        // ),
         ListTile(
           horizontalTitleGap: 0,
           subtitle: Text(
@@ -120,13 +120,13 @@ class _TripPrivacyModalState extends State<TripPrivacyModal> {
                       ? () {
                           // widget.onStatusChanged(_status);
                           if (_published != widget.trip.isPublished) {
-                            if (_published) {
-                              context.read<ChatBloc>().add(InsertChat(
-                                    tripId: widget.trip.id,
-                                    imageUrl: widget.trip.cover,
-                                    name: widget.trip.name,
-                                  ));
-                            }
+                            // if (_published) {
+                            //   context.read<ChatBloc>().add(InsertChat(
+                            //         tripId: widget.trip.id,
+                            //         imageUrl: widget.trip.cover,
+                            //         name: widget.trip.name,
+                            //       ));
+                            // }
                             context.read<TripBloc>().add(UpdateTrip(
                                   isPublished: _published,
                                   tripId: widget.trip.id,

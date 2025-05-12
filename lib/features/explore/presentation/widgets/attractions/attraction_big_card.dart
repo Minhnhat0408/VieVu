@@ -288,6 +288,7 @@ class _AttractionBigCardState extends State<AttractionBigCard> {
                         spacing: 6,
                         runSpacing: 6,
                         children: widget.attraction.travelTypes!
+                            .take(2)
                             .map<Widget>((travelType) {
                           return Container(
                             padding: const EdgeInsets.symmetric(

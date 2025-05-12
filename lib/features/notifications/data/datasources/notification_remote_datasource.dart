@@ -183,11 +183,14 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       }).eq('id', notificationId);
       final res = await supabaseClient
           .from('trips')
-          .select("max_member, trip_participants(count)")
+          .select("max_member, trip_participants(count), status")
           .eq('id', tripId)
           .single();
       if (res['trip_participants'][0]['count'] >= res['max_member']) {
         throw const ServerException("Số lượng thành viên đã đủ");
+      }
+      if (res['status'] != "planning") {
+        throw const ServerException("Chuyến đi đã không còn khả dụng");
       }
       await supabaseClient.from('trip_participants').insert({
         'trip_id': tripId,

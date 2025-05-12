@@ -369,9 +369,10 @@ void _initTrip() {
     )
     ..registerFactory<TripRepository>(
       () => TripRepositoryImpl(
-        serviceLocator(),
-        serviceLocator(),
-        serviceLocator(),
+        tripRemoteDatasource: serviceLocator(),
+        tripMemberRemoteDatasource: serviceLocator(),
+        chatRemoteDatasource: serviceLocator(),
+        connectionChecker: serviceLocator(),
       ),
     )
     ..registerLazySingleton<TripBloc>(

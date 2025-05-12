@@ -347,11 +347,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 PopupMenuItem(
                   value: "h2",
                   child: ListTile(
-                    leading: const Icon(Icons.delete, color: Colors.red),
+                    leading: const Icon(Icons.report, color: Colors.red),
                     title: Text(
-                      widget.chat.tripId != null
-                          ? 'Thoát khỏi nhóm'
-                          : "Xóa cuộc trò chuyện",
+                      "Báo cáo",
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),

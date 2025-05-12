@@ -200,7 +200,8 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
               '*, trip_participants!inner(user_id), saved_services(name,external_link, link_id, location_name)')
           .eq('trip_participants.user_id', userId)
           .neq('status', 'cancelled')
-          .neq('status', 'completed');
+          .neq('status', 'completed')
+          .eq('trip_participants.is_banned', false);
 
       final response = await query.order('updated_at', ascending: false);
       return response.map((e) {
@@ -234,8 +235,10 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     try {
       var query = supabaseClient
           .from('trips')
-          .select('*, trip_participants!inner(user_id), saved_services(count)')
-          .eq('trip_participants.user_id', userId);
+          .select(
+              '*, trip_participants!inner(user_id, is_banned), saved_services(count)')
+          .eq('trip_participants.user_id', userId)
+          .eq('trip_participants.is_banned', false);
       // .eq('saved_services.type_id', 2);
 
       if (status != null) {
@@ -276,12 +279,24 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       // check if the user is the owner or of the trip
       final res = await supabaseClient
           .from('trips')
-          .select('*,  saved_services(count)')
+          .select(
+              '*,  saved_services(count), trip_participants(user_id, is_banned), notifications(receiver_id,type, is_accepted)')
           .eq('id', tripId)
+          .eq('notifications.type', 'trip_invite')
+          .eq('notifications.receiver_id', user.id)
+          .eq('trip_participants.user_id', user.id)
+          .neq('trip_participants.is_banned', true)
+          .isFilter('notifications.is_accepted', null)
           .single();
-
-      if (res['is_published'] == false && res['owner_id'] != user.id) {
-        throw const ServerException('Chuyến đi chưa được công khai');
+      log(res.toString());
+      // check if the user is the owner of the trip or a participant or trip is public
+      // final isParticipant = (res['trip_participants'] as List).any((element) {
+      //   return element['user_id'] == user.id;
+      // });
+      if (res['trip_participants'].isEmpty &&
+          res['is_published'] == false &&
+          res['notifications'].isEmpty) {
+        throw const ServerException('Không có quyền xem chi tiết chuyến đi');
       }
 
       final tripItem = res;
@@ -348,7 +363,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
         if (res['published_time'] == null) {
           // updateData[''] = true;
           updateData['published_time'] = DateTime.now().toIso8601String();
-         // check if start date is today or in the past
+          // check if start date is today or in the past
           if (res['start_date'] != null) {
             final startDate = DateTime.parse(res['start_date']);
             if (startDate.isBefore(DateTime.now().toUtc())) {
@@ -444,6 +459,7 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
     try {
       await supabaseClient.from('trips').delete().eq('id', tripId);
     } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

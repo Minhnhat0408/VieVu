@@ -15,7 +15,7 @@ abstract interface class TripMemberRemoteDatasource {
     required String role,
   });
 
-  Future updateTripMember({
+  Future<TripMemberModel> updateTripMember({
     required String tripId,
     required String userId,
     String? role,
@@ -155,6 +155,7 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
       await supabaseClient.from('trip_participants').insert({
         'trip_id': tripId,
         'user_id': userId,
+        'is_banned': false,
         'role': role,
       });
     } catch (e) {
@@ -164,7 +165,7 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
   }
 
   @override
-  Future updateTripMember({
+  Future<TripMemberModel> updateTripMember({
     required String tripId,
     required String userId,
     String? role,
@@ -175,11 +176,20 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
         if (role != null) 'role': role,
         if (isBanned != null) 'is_banned': isBanned,
       };
-      await supabaseClient
+      final res = await supabaseClient
           .from('trip_participants')
           .update(buildUpdateObject)
           .eq('trip_id', tripId)
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .select('*, profiles(*), user_ratings(rating)')
+          .order('created_at', ascending: true)
+          .single();
+
+      return TripMemberModel.fromJson(res).copyWith(
+        rating: res['user_ratings'].isNotEmpty
+            ? res['user_ratings'][0]['rating']
+            : 0,
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }

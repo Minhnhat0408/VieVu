@@ -10,10 +10,10 @@ import 'package:http/http.dart' as http;
 
 abstract class ChatRemoteDatasource {
   Future<ChatModel> insertChat({
-    String? name,
+    // String? name,
     String? userId,
     String? tripId,
-    String? imageUrl,
+    // String? imageUrl,
   });
 
   Future insertChatMembers({
@@ -101,7 +101,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           params: {'user_id_param': user.id, 'trip_id_param': tripId},
         );
       }
-      log(res.toString());
+      // log(res.toString());
 
       if (res.isEmpty) {
         return null;
@@ -142,10 +142,10 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
 
   @override
   Future<ChatModel> insertChat({
-    String? name,
+    // String? name,
     String? tripId,
     String? userId,
-    String? imageUrl,
+    // String? imageUrl,
   }) async {
     try {
       log(userId.toString());
@@ -157,8 +157,8 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         final res = await supabaseClient
             .from('chats')
             .insert({
-              'name': name,
-              'avatar': imageUrl,
+              // 'name': name,
+              // 'avatar': imageUrl,
               'trip_id': tripId,
             })
             .select("id")
@@ -341,8 +341,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     required int chatId,
   }) async {
     try {
-
-           final user = supabaseClient.auth.currentUser;
+      final user = supabaseClient.auth.currentUser;
       final session = supabaseClient.auth.currentSession;
       if (session == null || user == null) {
         throw const ServerException('Không thể xác thực người dùng');
@@ -406,7 +405,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         url,
         headers: {
           "Content-Type": "application/json",
-          "Authorization" : "Bearer $token",
+          "Authorization": "Bearer $token",
         },
         body: jsonEncode(body),
       );

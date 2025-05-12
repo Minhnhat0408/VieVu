@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vievu/core/layouts/custom_appbar.dart';
 import 'package:vievu/core/utils/display_modal.dart';
 import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/chat/domain/entities/chat.dart';
 import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vievu/features/chat/presentation/pages/chat_details_page.dart';
 import 'package:vievu/features/trips/domain/entities/trip.dart';
@@ -74,6 +75,9 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
               }
 
               if (state is TripDeletedSuccess) {
+                showSnackbar(context, 'Đã xóa chuyến đi', 'success');
+
+                context.read<ChatBloc>().add(GetChatHeads());
                 Navigator.of(context)
                   ..pop()
                   ..pop();

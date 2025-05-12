@@ -88,7 +88,7 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> updateTripMember({
+  Future<Either<Failure, TripMember>> updateTripMember({
     required String tripId,
     required String userId,
     String? role,
@@ -98,9 +98,9 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       if (!await (connectionChecker.isConnected)) {
         return left(Failure("Không có kết nối mạng"));
       }
-      await tripMemberRemoteDatasource.updateTripMember(
+      final res = await tripMemberRemoteDatasource.updateTripMember(
           tripId: tripId, userId: userId, role: role, isBanned: isBanned);
-      return right(unit);
+      return right(res);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }

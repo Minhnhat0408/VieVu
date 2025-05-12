@@ -4,15 +4,11 @@ part of 'chat_bloc.dart';
 sealed class ChatEvent {}
 
 final class InsertChat extends ChatEvent {
-  final String? name;
-  final String? imageUrl;
   final String? userId;
   final String? tripId;
 
   InsertChat({
-    this.name,
     this.userId,
-    this.imageUrl,
     this.tripId,
   });
 }

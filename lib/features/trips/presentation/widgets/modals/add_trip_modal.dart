@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vievu/core/utils/show_snackbar.dart';
+import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
 
 class AddTripModal extends StatefulWidget {
@@ -26,6 +27,7 @@ class _AddTripModalState extends State<AddTripModal> {
       listener: (context, state) {
         if (state is TripActionSuccess) {
           Navigator.of(context).pop();
+          context.read<ChatBloc>().add(GetChatHeads());
         }
         if (state is TripLoadedFailure) {
           showSnackbar(context, state.message, 'error');

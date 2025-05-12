@@ -16,7 +16,7 @@ abstract interface class TripMemberRepository {
     required String role,
   });
 
-  Future<Either<Failure, Unit>> updateTripMember({
+  Future<Either<Failure, TripMember>> updateTripMember({
     required String tripId,
     required String userId,
     String? role,

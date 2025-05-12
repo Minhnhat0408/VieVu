@@ -56,7 +56,7 @@ class _TripPostsPageState extends State<TripPostsPage> {
       totalRecordCount = 0;
       _pagingController.refresh();
     }
-  }
+}
 
   List<TransportOption> _currentTransports = [];
 

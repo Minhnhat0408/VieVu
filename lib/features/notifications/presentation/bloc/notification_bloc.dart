@@ -120,7 +120,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       userId: event.userId,
     );
     res.fold(
-      (l) => emit(NotificationError(message: l.message)),
+      (l) => emit(NotificationError(message: l.message, id: event.notificationId)),
       (r) => emit(TripInvitationAccepted()),
     );
   }
@@ -136,7 +136,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       userId: event.userId,
     );
     res.fold(
-      (l) => emit(NotificationError(message: l.message)),
+      (l) => emit(NotificationError(message: l.message, id: event.notificationId)),
       (r) => emit(TripInvitationRejected()),
     );
   }

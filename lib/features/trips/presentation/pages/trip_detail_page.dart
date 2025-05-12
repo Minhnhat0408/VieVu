@@ -107,11 +107,36 @@ class _TripDetailPageState extends State<TripDetailPage>
               );
             }
           }
-
         },
         builder: (context, state) {
           if (state is TripDetailsLoadedFailure) {
-            return const Center(child: Text('404 Có lỗi xảy ra'));
+            log(state.message);
+
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('Chi tiết chuyến đi'),
+              ),
+              body: Center(
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.error,
+                        size: 100,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "Không thể truy cập chuyến đi này",
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
           }
 
           return MultiBlocListener(
