@@ -114,7 +114,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       chatId: event.chatId,
     );
     res.fold(
-      (l) => emit(ChatFailure(message: l.message)),
+      (l) => emit(ChatSummarizeFailure(message: l.message)),
       (r) => emit(ChatSummarizedSuccess(chatSummarize: r)),
     );
   }
@@ -157,7 +157,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       chatId: event.chatId,
     );
     res.fold(
-      (l) => emit(ChatFailure(message: l.message)),
+      (l) => emit(ChatSummarizeFailure(message: l.message)),
       (r) => emit(ChatCreateTripItinerarySuccess(chatSummarize: r)),
     );
   }

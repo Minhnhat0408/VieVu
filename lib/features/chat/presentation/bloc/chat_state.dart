@@ -107,3 +107,14 @@ final class ChatMemberUpdatedAvailableSuccess extends ChatState {
     required this.available,
   });
 }
+
+
+final class ChatSummarizeFailure extends ChatState {
+  final String message;
+
+  ChatSummarizeFailure({
+    required this.message,
+  });
+}
+
+

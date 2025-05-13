@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:vievu/core/error/exceptions.dart';
 import 'package:vievu/core/error/failures.dart';
 import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/features/chat/data/datasources/chat_remote_datasource.dart';
 import 'package:vievu/features/notifications/data/datasources/notification_remote_datasource.dart';
 import 'package:vievu/features/notifications/domain/entities/notification.dart';
 import 'package:vievu/features/notifications/domain/repositories/notification_repository.dart';
@@ -11,11 +12,13 @@ class NotificationRepositoryImpl implements NotificationRepository {
   final NotificationRemoteDataSource remoteDataSource;
   final TripMemberRemoteDatasource tripMemberRemoteDatasource;
   final ConnectionChecker connectionChecker;
+  final ChatRemoteDatasource chatRemoteDatasource;
 
   NotificationRepositoryImpl({
     required this.remoteDataSource,
     required this.connectionChecker,
     required this.tripMemberRemoteDatasource,
+    required this.chatRemoteDatasource,
   });
 
   @override
@@ -132,13 +135,15 @@ class NotificationRepositoryImpl implements NotificationRepository {
         tripId: tripId,
         userId: userId,
       );
-      if(res) {
-        await tripMemberRemoteDatasource.insertTripMember(
-          tripId: tripId,
-          userId: userId,
-          role: 'member',
-        );
-      }
+
+      await tripMemberRemoteDatasource.insertTripMember(
+        tripId: tripId,
+        userId: res,
+        role: 'member',
+      );
+       await chatRemoteDatasource.insertChatMembers(
+          tripId: tripId, userId: res);
+
       return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));

@@ -225,47 +225,6 @@ class _LocationSharedMapState extends State<LocationSharedMap>
           },
         ),
         automaticallyImplyLeading: false,
-        actions: [
-          // ...usersActive.take(6).map(
-          //       (e) => GestureDetector(
-          //         onTap: () {
-          //           _animateMapTo(LatLng(e.latitude!, e.longitude!));
-          //         },
-          //         child: Align(
-          //           widthFactor: 0.6,
-          //           child: Container(
-          //             decoration: BoxDecoration(
-          //               shape: BoxShape.circle,
-          //               border: Border.all(
-          //                 color: _getMarkerBorderColor(
-          //                     MarkerPoint(
-          //                         LatLng(e.latitude!, e.longitude!), e.id),
-          //                     context),
-          //                 width: 2.0,
-          //               ),
-          //             ),
-          //             child: CachedNetworkImage(
-          //               imageUrl: e.avatarUrl ?? "",
-          //               errorWidget: (context, url, error) => Image.asset(
-          //                 'assets/images/trip_placeholder.avif', // Fallback if loading fails
-          //                 fit: BoxFit.cover,
-          //               ),
-          //               imageBuilder: (context, imageProvider) => CircleAvatar(
-          //                 backgroundImage: imageProvider,
-          //                 radius: 16,
-          //               ),
-          //               // width: 70,
-          //               // height: 70,
-          //               fit: BoxFit.cover,
-          //             ),
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          // const SizedBox(
-          //   width: 20,
-          // )
-        ],
       ),
       body: currentUser.latitude != null && currentUser.longitude != null
           ? Stack(
@@ -309,10 +268,8 @@ class _LocationSharedMapState extends State<LocationSharedMap>
                       Marker(
                         width: 60,
                         height: 60,
-
                         point: LatLng(
                             currentUser.latitude!, currentUser.longitude!),
-                        //circle avatar with border
                         child: GestureDetector(
                           onLongPress: () => _handleMarkerLongPress(MarkerPoint(
                               LatLng(currentUser.latitude!,
@@ -343,9 +300,13 @@ class _LocationSharedMapState extends State<LocationSharedMap>
                             ),
                             child: CachedNetworkImage(
                               imageUrl: currentUser.avatarUrl ?? "",
-                              errorWidget: (context, url, error) => Image.asset(
-                                'assets/images/trip_placeholder.avif', // Fallback if loading fails
-                                fit: BoxFit.cover,
+                              errorWidget: (context, url, error) =>
+                                  const CircleAvatar(
+                                radius: 30,
+                                child: Icon(
+                                  Icons.person,
+                                  size: 30,
+                                ), 
                               ),
                               imageBuilder: (context, imageProvider) =>
                                   CircleAvatar(

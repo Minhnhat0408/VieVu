@@ -362,10 +362,26 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           .select('trip_id, trips(start_date,end_date), chat_summaries(*)')
           .eq('id', chatId)
           .single();
-      log(chat.toString());
-      final lastSummarizedMessageId = chat['chat_summaries'] != null
+      log('Chat data from Supabase: ${chat.toString()}');
+
+      // Check if trips data is available and if start_date or end_date is null
+      if (chat['trips'] == null) {
+        throw const ServerException(
+            'Thông tin chuyến đi không tồn tại cho cuộc trò chuyện này.');
+      }
+      final String? startDate = chat['trips']['start_date'];
+      final String? endDate = chat['trips']['end_date'];
+
+      if (startDate == null || endDate == null) {
+        throw const ServerException(
+            'Ngày bắt đầu hoặc ngày kết thúc của chuyến đi không được xác định. Vui lòng cập nhật thông tin chuyến đi.');
+      }
+
+      final lastSummarizedMessageId = chat['chat_summaries'] != null &&
+              chat['chat_summaries']['last_message_id'] != null
           ? chat['chat_summaries']['last_message_id']
           : 0;
+
       final message = await supabaseClient
           .from('messages')
           .select('id,content,meta_data, message_reactions(reaction)')
@@ -373,37 +389,57 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           .eq('is_travel_related', true)
           .gt('id', lastSummarizedMessageId)
           .order('created_at', ascending: true);
+
       if (message.isEmpty) {
         throw const ServerException("Không có tin nhắn mới để tóm tắt");
       }
+
       final body = {
         "conversation": message.map((e) {
-          final reactions = (e['message_reactions'] as List).map((react) {
-            return react['reaction'];
-          }).toList();
-          // check if 👍 have more than 👎 or not
+          final List<dynamic> rawReactions =
+              (e['message_reactions'] is List<dynamic>)
+                  ? (e['message_reactions'] as List<dynamic>)
+                  : <dynamic>[];
+
+          final reactions = rawReactions
+              .map((react) {
+                if (react is Map<String, dynamic> &&
+                    react.containsKey('reaction')) {
+                  return react['reaction'];
+                }
+                return null;
+              })
+              .where((reactionValue) => reactionValue != null)
+              .toList();
+
           final isPositive =
               reactions.contains('👎') || reactions.contains('👍')
-                  ? reactions.where((e) => e == '👍').length >
-                          reactions.where((e) => e == '👎').length
+                  ? reactions.where((r) => r == '👍').length >
+                          reactions.where((r) => r == '👎').length
                       ? '|Yes|'
                       : '|No|'
                   : '';
 
-          return e['content'] + isPositive;
+          return (e['content'] as String? ?? '') + isPositive;
         }).toList(),
         "metadata": message
-            .where((e) => e['meta_data'] != null)
-            .expand((e) => e['meta_data'].map((meta) => {
-                  ...meta, // Spread existing metadata
-                  'message_id': e['id'] // Add 'message_id' from parent
-                }))
-            .toList(),
-        "start_date": chat['trips']['start_date'],
-        "end_date": chat['trips']['end_date'],
+            .where((e) =>
+                e['meta_data'] != null && e['meta_data'] is List<dynamic>)
+            .expand((e) {
+          final List<dynamic> metaDataList = e['meta_data'] as List<dynamic>;
+          return metaDataList.map((meta) {
+            if (meta is Map<String, dynamic>) {
+              return {...meta, 'message_id': e['id']};
+            }
+            return null;
+          }).where((metaItem) => metaItem != null);
+        }).toList(),
+        "start_date": startDate, // Use validated startDate
+        "end_date": endDate, // Use validated endDate
       };
 
-      if (chat['chat_summaries'] != null) {
+      if (chat['chat_summaries'] != null &&
+          chat['chat_summaries']['summary'] != null) {
         body['previous_summary'] = chat['chat_summaries']['summary'];
       }
 
@@ -415,6 +451,12 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
         },
         body: jsonEncode(body),
       );
+
+      if (response.statusCode != 200) {
+        throw ServerException(
+            'Lỗi từ API tóm tắt: ${response.statusCode} - ${response.body}');
+      }
+
       final jsonResponse = jsonDecode(
         utf8.decode(response.bodyBytes),
       );
@@ -438,8 +480,12 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
       res['trip_id'] = chat['trip_id'];
       return ChatSummarizeModel.fromJson(res);
     } catch (e) {
-      log(e.toString());
-      throw ServerException(e.toString());
+      log('Error in summarizeItineraries: ${e.toString()}');
+      if (e is ServerException) {
+        rethrow; // Re-throw ServerException directly
+      }
+      throw ServerException(
+          'Đã xảy ra lỗi khi tóm tắt lịch trình: ${e.toString()}');
     }
   }
 

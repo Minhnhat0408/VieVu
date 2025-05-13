@@ -540,6 +540,7 @@ void _initNotification() {
         remoteDataSource: serviceLocator(),
         connectionChecker: serviceLocator(),
         tripMemberRemoteDatasource: serviceLocator(),
+        chatRemoteDatasource: serviceLocator(),
       ),
     )
     ..registerLazySingleton(

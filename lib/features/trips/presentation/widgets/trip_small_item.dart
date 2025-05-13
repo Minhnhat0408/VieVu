@@ -36,7 +36,9 @@ class TripSmallItem extends StatelessWidget {
                 Hero(
                   tag: "${trip.id} small item",
                   child: CachedNetworkImage(
-                    imageUrl: "${trip.cover}",
+                    imageUrl: trip.cover != null
+                        ? "${trip.cover}"
+                        : 'assets/images/trip_placeholder.avif',
                     errorWidget: (context, url, error) => Image.asset(
                       'assets/images/trip_placeholder.avif', // Fallback if loading fails
                       fit: BoxFit.cover,

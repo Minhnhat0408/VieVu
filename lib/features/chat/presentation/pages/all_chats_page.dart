@@ -68,95 +68,100 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
             }
           }
         },
-        child: Column(
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-              child: SearchBar(
-                controller: _searchController,
-                elevation: const WidgetStatePropertyAll(0),
-                onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                leading: const Icon(Icons.search),
-                trailing: _searchController.text.isEmpty
-                    ? null
-                    : [
-                        IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _searchController.clear();
-                          },
-                        )
-                      ],
-                hintText: 'Tìm kiếm liên hệ',
-                padding: const WidgetStatePropertyAll<EdgeInsets>(
-                    EdgeInsets.symmetric(horizontal: 16)),
-              ),
-            ),
-            BlocConsumer<ChatBloc, ChatState>(
-              listener: (context, state) {
-
-                if (state is ChatsLoadedSuccess) {
-                  setState(() {
-                    chats = state.chatHeads;
-                    filteredChats = state.chatHeads;
-                  });
-                }
-
-                if (state is ChatInsertSuccess) {
-                  setState(() {
-                    // add if not exist
-                    if (!chats.contains(state.chat)) {
-                      chats.add(state.chat);
-                    }
-                    filteredChats = chats;
-                  });
-                }
-              },
-              builder: (context, state) {
-                return state is ChatLoading && filteredChats.isEmpty
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : filteredChats.isNotEmpty
-                        ? Expanded(
-                            // <-- Thêm Expanded ở đây
-                            child: ListView.builder(
-                              itemCount: filteredChats.length,
-                              itemBuilder: (context, index) {
-                                return ChatHeadItem(
-                                  chat: filteredChats[index],
-                                  onMessageSeen: () {
-                                    setState(() {
-                                      filteredChats[index].isSeen = true;
-                                    });
-                                  },
-                                );
-                              },
-                            ),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            context.read<ChatBloc>().add(GetChatHeads());
+          },
+          child: Column(
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+                child: SearchBar(
+                  controller: _searchController,
+                  elevation: const WidgetStatePropertyAll(0),
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                  leading: const Icon(Icons.search),
+                  trailing: _searchController.text.isEmpty
+                      ? null
+                      : [
+                          IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                            },
                           )
-                        : Column(
-                            children: [
-                              const SizedBox(height: 200),
-                              Icon(
-                                Icons.folder_open,
-                                size: 100,
-                                color: Theme.of(context).colorScheme.outline,
+                        ],
+                  hintText: 'Tìm kiếm liên hệ',
+                  padding: const WidgetStatePropertyAll<EdgeInsets>(
+                      EdgeInsets.symmetric(horizontal: 16)),
+                ),
+              ),
+              BlocConsumer<ChatBloc, ChatState>(
+                listener: (context, state) {
+                  if (state is ChatsLoadedSuccess) {
+                    setState(() {
+                      chats = state.chatHeads;
+                      filteredChats = state.chatHeads;
+                    });
+                  }
+
+                  if (state is ChatInsertSuccess) {
+                    setState(() {
+                      // add if not exist
+                      if (!chats.contains(state.chat)) {
+                        chats.add(state.chat);
+                      }
+                      filteredChats = chats;
+                    });
+                  }
+                },
+                builder: (context, state) {
+                  return state is ChatLoading && filteredChats.isEmpty
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : filteredChats.isNotEmpty
+                          ? Expanded(
+                              // <-- Thêm Expanded ở đây
+                              child: ListView.builder(
+                                itemCount: filteredChats.length,
+                                itemBuilder: (context, index) {
+                                  return ChatHeadItem(
+                                    chat: filteredChats[index],
+                                    onMessageSeen: () {
+                                      setState(() {
+                                        filteredChats[index].isSeen = true;
+                                      });
+                                    },
+                                  );
+                                },
                               ),
-                              const SizedBox(height: 20),
-                              Text(
-                                'Không có tin nhắn',
-                                style: TextStyle(
+                            )
+                          : Column(
+                              children: [
+                                const SizedBox(height: 200),
+                                Icon(
+                                  Icons.folder_open,
+                                  size: 100,
                                   color: Theme.of(context).colorScheme.outline,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            ],
-                          );
-              },
-            ),
-          ],
+                                const SizedBox(height: 20),
+                                Text(
+                                  'Không có tin nhắn',
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
