@@ -133,9 +133,25 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
           .from('profiles')
           .update(buildUpdateObject)
           .eq('id', user.id)
-          .select()
+          .select('*, trip_participants(count)')
           .single();
-      return UserModel.fromJson(response);
+      final data = await supabaseClient
+          .from('user_ratings')
+          .select('rating, trip_participants!inner(user_id)')
+          .eq('trip_participants.user_id', user.id);
+
+      List<int> ratings =
+          data.map((ratingEntry) => ratingEntry["rating"] as int).toList();
+
+      // Calculate count & average
+      int ratingCount = ratings.length;
+      double avgRating =
+          ratingCount > 0 ? ratings.reduce((a, b) => a + b) / ratingCount : 0.0;
+      return UserModel.fromJson(response).copyWith(
+        tripCount: response['trip_participants'].first['count'] as int,
+        ratingCount: ratingCount,
+        avgRating: avgRating,
+      );
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());

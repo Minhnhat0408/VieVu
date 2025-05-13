@@ -126,13 +126,16 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.check_circle),
+                          Icon(
+                            Icons.check_circle,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
                           const SizedBox(width: 10),
                           Text(
                             'Tạo lịch trình thành công',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontFamily: GoogleFonts.merriweather().fontFamily,
                             ),
                           ),

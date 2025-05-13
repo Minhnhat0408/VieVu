@@ -98,3 +98,12 @@ final class ChatSummaryLoadedSuccess extends ChatState {
     this.chatSummarize,
   });
 }
+
+
+final class ChatMemberUpdatedAvailableSuccess extends ChatState {
+  final bool available;
+
+  ChatMemberUpdatedAvailableSuccess({
+    required this.available,
+  });
+}

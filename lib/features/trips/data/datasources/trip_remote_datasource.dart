@@ -341,6 +341,20 @@ class TripRemoteDatasourceImpl implements TripRemoteDatasource {
       );
 
       if (startDate != null && endDate != null) {
+        if (startDate.isAfter(endDate)) {
+          throw const ServerException(
+              'Thời gian bắt đầu không thể lớn hơn thời gian kết thúc');
+        }
+        // check if start date is today if today then change status to ongoing
+        if (startDate.isBefore(DateTime.now().toUtc())) {
+          updateData['status'] = 'ongoing';
+        }
+
+        // check if end date is today if today then change status to completed
+        if (endDate.isBefore(DateTime.now().toUtc())) {
+          updateData['status'] = 'completed';
+        }
+
         await supabaseClient
             .from('trip_itineraries')
             .delete()

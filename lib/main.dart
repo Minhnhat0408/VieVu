@@ -100,10 +100,12 @@ class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
   Uri? _pendingUri;
   late final StreamSubscription<Uri?> _linkSub;
+
   @override
   void initState() {
     context.read<AuthBloc>().add(AuthUserLoggedIn());
     super.initState();
+
     AppLinks().getInitialLink().then((uri) {
       if (uri != null) {
         setState(() {
@@ -192,13 +194,25 @@ class _MyAppState extends State<MyApp> {
                   context
                       .read<PreferencesBloc>()
                       .add(GetUserPreference(state.user.id));
+                  service.startService();
                   Navigator.popUntil(context, (route) => route.isFirst);
                 }
-
-                if (state is AppUserInitial) {
+                // if(state is)
+                if (state is AppUserNotLoggedIn) {
+                  log('AppUserNotLoggedIn');
+                  setState(() {
+                    _isLoggedIn = false;
+                  });
                   context.read<PreferencesBloc>().add(UserPreferenceSignOut());
-                  showSnackbar(context, 'Tài khoản của bạn đã đăng xuất');
+                  service.invoke('stopService');
                 }
+
+                // if (state is AppUserInitial) {
+                //   log('AppUserInitial');
+                //   context.read<PreferencesBloc>().add(UserPreferenceSignOut());
+                //   // service.invoke('stopService');
+                //   showSnackbar(context, 'Tài khoản của bạn đã đăng xuất');
+                // }
               },
               builder: (context, state) {
                 if (state is AppUserInitial) {

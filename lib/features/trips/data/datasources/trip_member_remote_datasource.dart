@@ -41,6 +41,10 @@ abstract interface class TripMemberRemoteDatasource {
     required String userId,
   });
 
+  Future<List<TripMemberModel>> getBannedUsers({
+    required String tripId,
+  });
+
   Future<List<TripMemberRatingModel>> getRatedUsers({required String userId});
 }
 
@@ -91,6 +95,7 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
           .select('*, profiles(*), user_ratings(rating)')
           .eq('trip_id', tripId)
           .eq('user_ratings.rater_id', user.id)
+          .neq('is_banned', true)
           .order('created_at', ascending: true);
 
       return response
@@ -282,6 +287,34 @@ class TripMemberRemoteDatasourceImpl implements TripMemberRemoteDatasource {
         });
       }
     } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<TripMemberModel>> getBannedUsers({
+    required String tripId,
+  }) async {
+    try {
+      final user = supabaseClient.auth.currentUser;
+      if (user == null) {
+        throw const ServerException("Không tìm thấy người dùng");
+      }
+      final data = await supabaseClient
+          .from('trip_participants')
+          .select('*, profiles(*), user_ratings(rating)')
+          .eq('trip_id', tripId)
+          .eq('is_banned', true)
+          .order('created_at', ascending: true);
+
+      return data.map((e) {
+        return TripMemberModel.fromJson(e).copyWith(
+          rating:
+              e['user_ratings'].isNotEmpty ? e['user_ratings'][0]['rating'] : 0,
+        );
+      }).toList();
+    } catch (e) {
+      log(e.toString());
       throw ServerException(e.toString());
     }
   }

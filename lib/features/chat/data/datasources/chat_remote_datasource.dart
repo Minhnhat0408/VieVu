@@ -22,6 +22,12 @@ abstract class ChatRemoteDatasource {
     required String userId,
   });
 
+  Future updateAvailableChatMember({
+    required String tripId,
+    required String userId,
+    required bool available,
+  });
+
   Future deleteChat({
     required int id,
   });
@@ -493,5 +499,30 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     required String channelName,
   }) {
     supabaseClient.channel(channelName).unsubscribe();
+  }
+
+  @override
+  Future updateAvailableChatMember({
+    required String tripId,
+    required String userId,
+    required bool available,
+  }) async {
+    try {
+      final res = await supabaseClient
+          .from('chat_members')
+          .select('*, chats!inner(trip_id)')
+          .eq('user_id', userId)
+          .eq('chats.trip_id', tripId)
+          .single();
+
+      log(res.toString());
+
+      await supabaseClient.from('chat_members').update({
+        'available': available,
+      }).eq('id', res['id']);
+    } catch (e) {
+      log(e.toString());
+      throw ServerException(e.toString());
+    }
   }
 }

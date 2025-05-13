@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vievu/core/layouts/custom_appbar.dart';
@@ -122,6 +121,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                 backgroundImage: imageProvider,
                               ),
                             ),
+                            cacheManager: CacheManager(
+                              Config(
+                                user?.avatarUrl ?? "",
+                                stalePeriod: const Duration(seconds: 10),
+                              ),
+                            ),
                             errorWidget: (context, url, error) =>
                                 const CircleAvatar(
                               radius: 70,
@@ -135,32 +140,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 140,
                           ),
                           const SizedBox(height: 20),
-                          // if (user?.city != null)
-                          //   Padding(
-                          //     padding: const EdgeInsets.only(bottom: 10.0),
-                          //     child: Row(
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: [
-                          //         const Icon(
-                          //           Icons.location_on,
-                          //           size: 20,
-                          //         ),
-                          //         const SizedBox(width: 5),
-                          //         Text(
-                          //           user?.city ?? '',
-                          //           style: const TextStyle(
-                          //             fontWeight: FontWeight.bold,
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // Text(
-                          //   user?.email ?? '',
-                          //   style: const TextStyle(
-                          //     color: Colors.grey,
-                          //   ),
-                          // ),
                           const SizedBox(height: 20),
                           IntrinsicHeight(
                             child: Row(

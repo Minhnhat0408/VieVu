@@ -77,7 +77,6 @@ class _AddCustomPlaceModalState extends State<AddCustomPlaceModal>
     });
     _animatedMapController.animateTo(
       dest: position,
-      // zoom: zoom ?? 12,
       rotation: 0.0,
     );
   }

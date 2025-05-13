@@ -30,7 +30,7 @@ abstract interface class ChatRepository {
 
   RealtimeChannel listenToUpdateChannels({
     required Function(Message?) callback,
-        required int chatMemberId,
+    required int chatMemberId,
   });
 
   Future<Either<Failure, ChatSummarize>> summarizeItineraries({
@@ -60,5 +60,11 @@ abstract interface class ChatRepository {
   });
   Future<Either<Failure, ChatSummarize>> createItineraryFromSummary({
     required int chatId,
+  });
+
+  Future<Either<Failure, Unit>> updateAvailableChatMember({
+    required String tripId,
+    required String userId,
+    required bool available,
   });
 }

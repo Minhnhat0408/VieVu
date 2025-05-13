@@ -94,6 +94,7 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
         throw const ServerException("Không tìm thấy người dùng");
       }
 
+
       List<Map<String, dynamic>>? processedMetaData = metaData?.map((item) {
         return item.map((key, value) {
           if (value is DateTime) {
@@ -109,10 +110,11 @@ class MessageRemoteDatasourceImpl implements MessageRemoteDatasource {
             'chat_id': chatId,
             'chat_member_id': chatMemberId,
             'content': message,
-            // 'user_id': user.id,
             'meta_data': processedMetaData,
           })
+
           .select("*, chat_members!messages_chat_member_id_fkey(profiles(*))")
+
           .single();
       return MessageModel.fromJson(res);
     } catch (e) {

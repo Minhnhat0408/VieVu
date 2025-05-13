@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_reactions/widgets/stacked_reactions.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -206,6 +205,7 @@ TextSpan _buildHighlightedText(
   int start = 0;
 
   final highlights = metaData.map((item) => item['title'] as String).toList();
+  // Sắp xếp để ưu tiên khớp với chuỗi dài hơn trước
   highlights.sort((a, b) => b.length.compareTo(a.length));
 
   final urlRegex = RegExp(r'(https?:\/\/[^\s]+)', caseSensitive: false);
@@ -221,7 +221,6 @@ TextSpan _buildHighlightedText(
     decoration: TextDecoration.underline,
     decorationColor: Colors.blue,
     color: Colors.blue,
-    fontWeight: FontWeight.normal,
     fontFamily: GoogleFonts.merriweather().fontFamily,
     fontSize: 16,
     height: 1.2,
@@ -236,43 +235,52 @@ TextSpan _buildHighlightedText(
   );
 
   while (start < text.length) {
-    int? highlightStart;
-    String? matchedHighlight;
-    int? linkStart;
-    RegExpMatch? matchedLink;
+    int? highlightResultStartInSubstring;
+    String? matchedHighlightText;
+    int? linkResultStartInSubstring;
+    RegExpMatch? matchedLinkRegexMatch;
 
-    final firstLinkMatch = urlRegex.firstMatch(text.substring(start));
+    String remainingText = text.substring(start);
+
+    // Tìm link đầu tiên trong phần còn lại của text
+    final firstLinkMatch = urlRegex.firstMatch(remainingText);
     if (firstLinkMatch != null) {
-      linkStart = start + firstLinkMatch.start;
-      matchedLink = firstLinkMatch;
+      linkResultStartInSubstring = firstLinkMatch.start;
+      matchedLinkRegexMatch = firstLinkMatch;
     }
 
-    for (var highlight in highlights) {
-      final index = text.indexOf(highlight, start);
-      if (index != -1 && (highlightStart == null || index < highlightStart)) {
-        highlightStart = index;
-        matchedHighlight = highlight;
+    // Tìm highlight đầu tiên trong phần còn lại của text
+    for (var highlightCandidate in highlights) {
+      final index = remainingText.indexOf(highlightCandidate);
+      if (index != -1 &&
+          (highlightResultStartInSubstring == null ||
+              index < highlightResultStartInSubstring)) {
+        highlightResultStartInSubstring = index;
+        matchedHighlightText = highlightCandidate;
       }
     }
 
-    if (highlightStart != null &&
-        (linkStart == null || highlightStart < linkStart)) {
-      if (highlightStart > start) {
+    if (highlightResultStartInSubstring != null &&
+        (linkResultStartInSubstring == null ||
+            highlightResultStartInSubstring < linkResultStartInSubstring)) {
+      // Highlight xuất hiện trước link
+      int actualHighlightStart = start + highlightResultStartInSubstring;
+      if (actualHighlightStart > start) {
         spans.add(TextSpan(
-          text: text.substring(start, highlightStart),
+          text: text.substring(start, actualHighlightStart),
           style: defaultTextStyle,
         ));
       }
       final matchedItem =
-          metaData.firstWhere((e) => e['title'] == matchedHighlight);
-      spans.add(WidgetSpan(
-        baseline: TextBaseline.alphabetic,
-        alignment: PlaceholderAlignment.baseline,
-        child: GestureDetector(
-          onTap: () {
+          metaData.firstWhere((e) => e['title'] == matchedHighlightText);
+      spans.add(TextSpan(
+        text: matchedHighlightText!,
+        style: highlightTextStyle,
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
             if (matchedItem['type'] == 'address') {
               String googleMapsUrl =
-                  "https://www.google.com/maps/search/?api=1&query=$matchedHighlight";
+                  "https://www.google.com/maps/search/?api=1&query=${matchedHighlightText!}";
               openDeepLink(googleMapsUrl);
             } else if (matchedItem['id'] != null) {
               displayModal(
@@ -294,7 +302,7 @@ TextSpan _buildHighlightedText(
               displayModal(
                 context,
                 AddPlaceByNameModal(
-                  searchKey: matchedHighlight!,
+                  searchKey: matchedHighlightText!,
                   message: message,
                 ),
                 null,
@@ -302,45 +310,34 @@ TextSpan _buildHighlightedText(
               );
             }
           },
-          child: Text(
-            matchedHighlight!,
-            style: highlightTextStyle,
-          ),
-        ),
       ));
-      start = highlightStart + matchedHighlight.length;
-    } else if (linkStart != null &&
-        (highlightStart == null || linkStart < highlightStart)) {
-      if (linkStart > start) {
+      start = actualHighlightStart + matchedHighlightText.length;
+    } else if (linkResultStartInSubstring != null) {
+      // Link xuất hiện trước highlight (hoặc chỉ có link)
+      int actualLinkStart = start + linkResultStartInSubstring;
+      if (actualLinkStart > start) {
         spans.add(TextSpan(
-          text: text.substring(start, linkStart),
+          text: text.substring(start, actualLinkStart),
           style: defaultTextStyle,
         ));
       }
-      final linkText = matchedLink!.group(0)!;
-      spans.add(WidgetSpan(
-        baseline: TextBaseline.alphabetic,
-        alignment: PlaceholderAlignment.baseline,
-        child: GestureDetector(
-          onTap: () => openDeepLink(linkText),
-          child: Text(
-            linkText,
-            style: linkTextStyle,
-          ),
-        ),
+      final linkText = matchedLinkRegexMatch!.group(0)!;
+      spans.add(TextSpan(
+        text: linkText,
+        style: linkTextStyle,
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => openDeepLink(linkText),
       ));
-      start = linkStart + linkText.length;
+      start = actualLinkStart + linkText.length;
     } else {
+      // Không còn highlight hay link, thêm phần text còn lại
       spans.add(TextSpan(
         text: text.substring(start),
         style: defaultTextStyle,
       ));
-      break; // Kết thúc vòng lặp
+      break;
     }
   }
 
-  return TextSpan(
-    children: spans,
-    style: defaultTextStyle,
-  );
+  return TextSpan(children: spans);
 }

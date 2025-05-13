@@ -377,176 +377,25 @@ class ChatRepositoryImpl implements ChatRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, Unit>> updateAvailableChatMember({
+    required String tripId,
+    required String userId,
+    required bool available,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      await chatRemoteDatasource.updateAvailableChatMember(
+        tripId: tripId,
+        userId: userId,
+        available: available,
+      );
+      return right(unit);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }
-
-
-// [
-//   {
-//     "day": "2025-02-15",
-//     "events": [
-//       {
-//         "note": "Tập trung tại điểm hẹn",
-//         "time": "2025-02-15T08:00:00",
-//         "place": "83 Xã đàn",
-//         "metaData": {
-//           "type": "address",
-//           "title": "83 Xã đàn"
-//         }
-//       },
-//       {
-//         "note": "Khám phá vẻ đẹp lịch sử và văn hóa",
-//         "time": "2025-02-15T10:00:00",
-//         "place": "Bảo tàng Hà Nội",
-//         "metaData": {
-//           "id": 23032412,
-//           "type": "attractions",
-//           "cover": "https://ak-d.tripcdn.com/images/0ww2112000chq12qm7061.jpg",
-//           "price": null,
-//           "title": "Bảo tàng Hà Nội",
-//           "address": "Phạm Hùng, Mễ Trì, Nam Từ Liêm, Hà Nội 100000, Việt Nam",
-//           "isSaved": true,
-//           "hotScore": 3.9,
-//           "latitude": 21.009923,
-//           "avgRating": 4.3,
-//           "longitude": 105.786302,
-//           "ratingCount": 17,
-//           "externalLink": null,
-//           "locationName": "Hà Nội"
-//         }
-//       },
-//       {
-//         "note": "Thưởng thức ẩm thực Hà Nội",
-//         "time": "2025-02-15T12:00:00",
-//         "place": "Old Hanoi Restaurant",
-//         "metaData": {
-//           "id": 17040314,
-//           "type": "restaurant",
-//           "cover": "https://ak-d.tripcdn.com/images/0101u12000d5zlbzh03DB_R_300_300_R5.jpg?proc=namelogo/d_1",
-//           "price": null,
-//           "title": "Old Hanoi Restaurant",
-//           "address": "Hà Nội · Việt Nam",
-//           "isSaved": true,
-//           "hotScore": null,
-//           "avgRating": 3.7,
-//           "ratingCount": 12,
-//           "externalLink": "https://vn.trip.com/travel-guide/hanoi-181-restaurant/old-hanoi-restaurant-17040314/",
-//           "locationName": null
-//         }
-//       },
-//       {
-//         "note": "Tham quan kiến trúc cổ kính",
-//         "time": "2025-02-15T15:00:00",
-//         "place": "Nhà Thờ Lớn Hà Nội",
-//         "metaData": {
-//           "id": 90605,
-//           "type": "attractions",
-//           "cover": "https://ak-d.tripcdn.com/images/1A0u1b000001a1jcg96FA.jpg",
-//           "price": null,
-//           "title": "Nhà Thờ Lớn Hà Nội",
-//           "address": "40 P. Nhà Chung, Hàng Trống, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
-//           "isSaved": true,
-//           "hotScore": 6.1,
-//           "latitude": 21.028841,
-//           "avgRating": 4.6,
-//           "longitude": 105.849119,
-//           "ratingCount": 632,
-//           "externalLink": null,
-//           "locationName": "Hà Nội"
-//         }
-//       },
-//       {
-//         "note": "Thưởng thức bữa tối ngon miệng",
-//         "time": "2025-02-15T19:00:00",
-//         "place": "The Gourmet Corner",
-//         "metaData": {
-//           "id": 490639,
-//           "type": "restaurant",
-//           "cover": "https://ak-d.tripcdn.com/images/10030n000000e3h39D957_R_300_300_R5.jpg?proc=namelogo/d_1",
-//           "price": null,
-//           "title": "The Gourmet Corner",
-//           "address": "Hà Nội · Việt Nam",
-//           "isSaved": true,
-//           "hotScore": null,
-//           "avgRating": 4.4,
-//           "ratingCount": 14,
-//           "externalLink": "https://vn.trip.com/travel-guide/hanoi-181-restaurant/the-gourmet-corner-490639/",
-//           "locationName": null
-//         }
-//       }
-//     ]
-//   },
-//   {
-//     "day": "2025-02-16",
-//     "events": [
-//       {
-//         "note": "Bắt đầu hành trình đến Tuyên Quang",
-//         "time": "2025-02-16T08:00:00",
-//         "place": "Tuyên Quang",
-//         "metaData": {
-//           "id": 1524609,
-//           "type": "locations",
-//           "cover": "https://ak-d.tripcdn.com/images/0ww2d12000ckt13iw1DB3_D_1180_558.jpg",
-//           "price": null,
-//           "title": "Tuyên Quang",
-//           "address": null,
-//           "isSaved": true,
-//           "hotScore": null,
-//           "latitude": 22.17267,
-//           "avgRating": null,
-//           "longitude": 105.31312,
-//           "ratingCount": null,
-//           "externalLink": null,
-//           "locationName": "Tuyên Quang"
-//         }
-//       },
-//       {
-//         "note": "Nhận phòng và nghỉ ngơi",
-//         "time": "2025-02-16T13:00:00",
-//         "place": "Royal Palace Hotel Tuyên Quang",
-//         "metaData": {
-//           "id": 7596074,
-//           "type": "hotel",
-//           "cover": "https://dimg11.c-ctrip.com/images/02264120009t55yit07C1_R_300_300_R5.jpg?proc=namelogo/d_1",
-//           "price": null,
-//           "title": "Royal Palace Hotel Tuyên Quang",
-//           "address": "Tuyên Quang, Tuyên Quang, Việt Nam",
-//           "isSaved": true,
-//           "hotScore": null,
-//           "avgRating": 4.5,
-//           "ratingCount": 31,
-//           "externalLink": "/hotels/tuyen-quang-hotel-detail-7596074/royal-palace-hotel/",
-//           "locationName": null
-//         }
-//       },
-//       {
-//         "note": "Ngắm cảnh đẹp tự nhiên",
-//         "time": "2025-02-16T17:00:00",
-//         "place": "Thác Khuổi Nhi",
-//         "metaData": {
-//           "id": 137058151,
-//           "type": "attractions",
-//           "cover": "https://lh5.googleusercontent.com/p/AF1QipM7gT_Hgdj48wnu6ihcbTgI-YipgUqa6Ir8REng=w122-h92-k-no",
-//           "price": null,
-//           "title": "Thác Khuổi Nhi",
-//           "address": "F9PF+2V5, Thượng Lâm, Na Hang, Tuyên Quang, Việt Nam",
-//           "isSaved": true,
-//           "hotScore": 2.5,
-//           "latitude": 22.485012,
-//           "avgRating": 4,
-//           "longitude": 105.374725,
-//           "ratingCount": 326,
-//           "externalLink": null,
-//           "locationName": "Tuyên Quang"
-//         }
-//       }
-//     ]
-//   },
-//   {
-//     "day": "2025-02-17",
-//     "events": []
-//   },
-//   {
-//     "day": "2025-02-18",
-//     "events": []
-//   }
-// ]

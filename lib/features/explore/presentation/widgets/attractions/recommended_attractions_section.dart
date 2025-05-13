@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:vievu/core/utils/show_snackbar.dart';
 import 'package:vievu/features/explore/domain/entities/attraction.dart';
 import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vievu/features/explore/presentation/pages/all_recommendations_page.dart';

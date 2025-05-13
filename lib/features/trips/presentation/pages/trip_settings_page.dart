@@ -13,6 +13,7 @@ import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vievu/features/trips/presentation/bloc/trip_member/trip_member_bloc.dart';
 import 'package:vievu/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vievu/features/trips/presentation/cubit/trip_details_cubit.dart';
+import 'package:vievu/features/trips/presentation/widgets/modals/banned_user.dart';
 
 import 'package:vievu/features/trips/presentation/widgets/modals/trip_edit_modal.dart';
 import 'package:vievu/features/trips/presentation/widgets/modals/trip_privacy_modal.dart';
@@ -22,7 +23,7 @@ final Map<String, String> optionLists = {
   // 'Người tham gia': 'Quản lý thành viên trong chuyến đi',
   'Nhóm chat': 'Chat với mọi người trong chuyến đi',
   'Quyền riêng tư': 'Công khai hoặc ẩn chuyến đi',
-  // 'Báo cáo': 'Báo cáo chuyến đi không phù hợp',
+  'Danh sách cấm': 'Danh sách người dùng bị cấm',
 };
 
 final List<TripSettingOptions> tripSettingOptions = [
@@ -168,16 +169,9 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       if (entry.key == 'Nhóm chat') {
-                        if (widget.trip != null && widget.trip!.isPublished) {
-                          context
-                              .read<ChatBloc>()
-                              .add(GetSingleChat(tripId: widget.trip!.id));
-                        } else {
-                          showSnackbar(
-                              context,
-                              'Công khai chuyến đi để bắt đầu chat với mọi người',
-                              'error');
-                        }
+                        context
+                            .read<ChatBloc>()
+                            .add(GetSingleChat(tripId: widget.trip!.id));
                       } else if (entry.key == 'Quyền riêng tư') {
                         if (widget.trip!.status == 'cancelled' ||
                             widget.trip!.status == 'completed') {
@@ -191,6 +185,14 @@ class _TripSettingsPageState extends State<TripSettingsPage> {
                         displayModal(context,
                             TripPrivacyModal(trip: widget.trip!), null, false);
                         // Share trip
+                      } else if (entry.key == 'Danh sách cấm') {
+                        displayModal(
+                            context,
+                            BannedUserModal(
+                              trip: widget.trip!,
+                            ),
+                            null,
+                            true);
                       }
                     },
                   ),

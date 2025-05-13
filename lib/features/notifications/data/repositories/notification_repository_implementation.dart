@@ -5,14 +5,17 @@ import 'package:vievu/core/network/connection_checker.dart';
 import 'package:vievu/features/notifications/data/datasources/notification_remote_datasource.dart';
 import 'package:vievu/features/notifications/domain/entities/notification.dart';
 import 'package:vievu/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:vievu/features/trips/data/datasources/trip_member_remote_datasource.dart';
 
 class NotificationRepositoryImpl implements NotificationRepository {
   final NotificationRemoteDataSource remoteDataSource;
+  final TripMemberRemoteDatasource tripMemberRemoteDatasource;
   final ConnectionChecker connectionChecker;
 
   NotificationRepositoryImpl({
     required this.remoteDataSource,
     required this.connectionChecker,
+    required this.tripMemberRemoteDatasource,
   });
 
   @override
@@ -124,11 +127,18 @@ class NotificationRepositoryImpl implements NotificationRepository {
       if (!await connectionChecker.isConnected) {
         return left(Failure("No internet connection"));
       }
-      await remoteDataSource.acceptTripInvitation(
+      final res = await remoteDataSource.acceptTripInvitation(
         notificationId: notificationId,
         tripId: tripId,
         userId: userId,
       );
+      if(res) {
+        await tripMemberRemoteDatasource.insertTripMember(
+          tripId: tripId,
+          userId: userId,
+          role: 'member',
+        );
+      }
       return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));

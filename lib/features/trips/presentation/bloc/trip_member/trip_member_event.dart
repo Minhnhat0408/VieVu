@@ -74,3 +74,11 @@ class GetRatedUsers extends TripMemberEvent {
     required this.userId,
   });
 }
+
+class GetBannedUsers extends TripMemberEvent {
+  final String tripId;
+
+  GetBannedUsers({
+    required this.tripId,
+  });
+}

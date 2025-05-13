@@ -11,6 +11,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vievu/core/utils/display_modal.dart';
 import 'package:vievu/core/utils/onboarding_help.dart';
+import 'package:vievu/core/utils/show_snackbar.dart';
 import 'package:vievu/features/auth/domain/entities/user.dart';
 import 'package:vievu/features/chat/data/models/message_model.dart';
 import 'package:vievu/features/chat/domain/entities/chat.dart';
@@ -325,6 +326,39 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     scrollToMessage(messageId);
                   }
                 }
+                if (item == "leave") {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: const Text('Xác nhận'),
+                            content: const Text(
+                                'Bạn có chắc chắn muốn thoát khỏi nhóm chat?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Hủy bỏ'),
+                              ),
+                              FilledButton(
+                                onPressed: () {
+                                  context.read<ChatBloc>().add(
+                                      UpdateAvailableChatMember(
+                                          tripId: widget.chat.tripId!,
+                                          userId: (context
+                                                  .read<AppUserCubit>()
+                                                  .state as AppUserLoggedIn)
+                                              .user
+                                              .id,
+                                          available: false));
+
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Xác nhận'),
+                              ),
+                            ],
+                          ));
+                }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry>[
                 if (widget.chat.tripId != null)
@@ -345,11 +379,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     ),
                   ),
                 PopupMenuItem(
-                  value: "h2",
+                  value: "leave",
                   child: ListTile(
-                    leading: const Icon(Icons.report, color: Colors.red),
+                    leading: const Icon(Icons.exit_to_app, color: Colors.red),
                     title: Text(
-                      "Báo cáo",
+                      "Thoát khỏi nhóm",
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),
@@ -377,7 +411,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         _controller.forward();
                       }
                     }
-
+                    if (state is ChatMemberUpdatedAvailableSuccess) {
+                      if (state.available == false) {
+                        Navigator.of(context).pop();
+                        showSnackbar(context, "Bạn đã thoát khỏi nhóm chat");
+                      }
+                    }
                     if (state is ChatSummarizeReceivedSuccess) {
                       markdownText = state.chatSummarize.readings;
                       setState(() {

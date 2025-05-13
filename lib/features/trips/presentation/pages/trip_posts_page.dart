@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
@@ -56,7 +57,7 @@ class _TripPostsPageState extends State<TripPostsPage> {
       totalRecordCount = 0;
       _pagingController.refresh();
     }
-}
+  }
 
   List<TransportOption> _currentTransports = [];
 
@@ -176,6 +177,15 @@ class _TripPostsPageState extends State<TripPostsPage> {
                   ),
                   height: 40,
                   width: 40,
+                  cacheManager: CacheManager(
+                    Config(
+                      (context.read<AppUserCubit>().state as AppUserLoggedIn)
+                              .user
+                              .avatarUrl ??
+                          '',
+                      stalePeriod: const Duration(seconds: 10),
+                    ),
+                  ),
                   placeholder: (context, url) => const CircleAvatar(
                     child: Icon(Icons.person),
                   ),

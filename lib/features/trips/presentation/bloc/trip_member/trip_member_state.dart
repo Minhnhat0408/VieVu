@@ -58,3 +58,11 @@ final class UsersRatedLoadedSuccess extends TripMemberState {
     required this.users,
   });
 }
+
+final class BannedUserLoadedSuccess extends TripMemberState {
+  final List<TripMember> users;
+
+  BannedUserLoadedSuccess({
+    required this.users,
+  });
+}

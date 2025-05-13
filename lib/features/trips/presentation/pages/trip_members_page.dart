@@ -5,7 +5,6 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vievu/core/constants/notification_types.dart';
 import 'package:vievu/core/utils/conversions.dart';
-import 'package:vievu/core/utils/display_modal.dart';
 import 'package:vievu/core/utils/show_snackbar.dart';
 import 'package:vievu/features/auth/presentation/pages/profile_page.dart';
 import 'package:vievu/features/notifications/presentation/bloc/notification_bloc.dart';
@@ -56,8 +55,6 @@ class _TripMembersPageState extends State<TripMembersPage> {
         currentUser = null;
       }
     }
-
-    // context.read<TripMemberBloc>().add(GetTripMembersEvent(widget.trip.id));
   }
 
   @override
@@ -74,7 +71,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
             floating: true,
             title: widget.trip.maxMember != null
                 ? SizedBox(
-                    height: 40, // Giới hạn chiều cao
+                    height: 40,
                     child: Row(
                       children: [
                         Text(
@@ -148,9 +145,20 @@ class _TripMembersPageState extends State<TripMembersPage> {
               showSnackbar(context, 'Cập nhật thành công');
 
               setState(() {
-                tripMembers[tripMembers.indexWhere((element) =>
-                        element.user.id == state.tripMember.user.id)] =
-                    state.tripMember;
+                if (state.tripMember.isBanned) {
+                  tripMembers.removeWhere(
+                      (element) => element.user.id == state.tripMember.user.id);
+                } else {
+                  if (tripMembers.indexWhere((element) =>
+                          element.user.id == state.tripMember.user.id) ==
+                      -1) {
+                    tripMembers.add(state.tripMember);
+                  } else {
+                    tripMembers[tripMembers.indexWhere((element) =>
+                            element.user.id == state.tripMember.user.id)] =
+                        state.tripMember;
+                  }
+                }
               });
             }
 
@@ -348,6 +356,7 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                                                     isBanned:
                                                                         !tripMember
                                                                             .isBanned));
+
                                                                 Navigator.of(
                                                                         context)
                                                                     .pop();
@@ -380,12 +389,6 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                       ],
                                     ),
                                     child: ListTile(
-                                      tileColor: tripMember.isBanned
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .errorContainer
-                                              .withOpacity(0.6)
-                                          : null,
                                       leading: CachedNetworkImage(
                                         imageUrl:
                                             tripMember.user.avatarUrl ?? '',
@@ -454,9 +457,8 @@ class _TripMembersPageState extends State<TripMembersPage> {
                                               itemBuilder: (context, _) =>
                                                   GestureDetector(
                                                 onTap: () {
-                                                  if (tripMember.rating != 0 ||
-                                                      tripMember.rating ==
-                                                          _ + 1) return;
+                                                  if (tripMember.rating ==
+                                                      _ + 1) return;
                                                   context
                                                       .read<TripMemberBloc>()
                                                       .add(RateTripMember(

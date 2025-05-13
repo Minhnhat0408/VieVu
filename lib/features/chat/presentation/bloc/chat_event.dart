@@ -117,3 +117,15 @@ final class ChatSummarizeReceived extends ChatEvent {
     required this.chatSummarize,
   });
 }
+
+final class UpdateAvailableChatMember extends ChatEvent {
+  final String tripId;
+  final String userId;
+  final bool available;
+
+  UpdateAvailableChatMember({
+    required this.tripId,
+    required this.userId,
+    required this.available,
+  });
+}

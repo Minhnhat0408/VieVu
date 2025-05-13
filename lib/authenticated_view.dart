@@ -72,7 +72,21 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
         return const NotificationPage();
       }));
     });
-
+    client
+        .channel('chat_members:$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'chat_members',
+          filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'user_id',
+              value: userId),
+          callback: (payload) async {
+            context.read<ChatBloc>().add(GetChatHeads());
+          },
+        )
+        .subscribe();
     client
         .channel("chat_realtime:$userId")
         .onPostgresChanges(

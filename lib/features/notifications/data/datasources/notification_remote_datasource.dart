@@ -29,7 +29,7 @@ abstract interface class NotificationRemoteDataSource {
 
   Future<int> getUnreadNotificationsCount();
 
-  Future<void> acceptTripInvitation({
+  Future<bool> acceptTripInvitation({
     required int notificationId,
     required String tripId,
     required String userId,
@@ -167,7 +167,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   //TODO: implement in repository
 
   @override
-  Future<void> acceptTripInvitation({
+  Future<bool> acceptTripInvitation({
     required int notificationId,
     required String tripId,
     required String userId,
@@ -192,11 +192,13 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       if (res['status'] != "planning") {
         throw const ServerException("Chuyến đi đã không còn khả dụng");
       }
-      await supabaseClient.from('trip_participants').insert({
-        'trip_id': tripId,
-        'user_id': user.id,
-        'role': 'member',
-      });
+      // await supabaseClient.from('trip_participants').insert({
+      //   'trip_id': tripId,
+      //   'user_id': user.id,
+      //   'role': 'member',
+      // });
+
+
 
       await supabaseClient.from('notifications').insert({
         'content': 'đã chấp nhận lời mời tham gia chuyến đi',
@@ -205,6 +207,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
         'trip_id': tripId,
         'type': 'trip_accept',
       });
+      return true;
     } catch (e) {
       log(e.toString());
       throw ServerException(e.toString());

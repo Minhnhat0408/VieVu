@@ -101,7 +101,6 @@ class LocationDetailMainState extends State<LocationDetailMain>
   void _animateMapTo(LatLng destination) {
     _animatedMapController.animateTo(
       dest: destination,
-      zoom: 15,
       rotation: 0.0,
     );
   }

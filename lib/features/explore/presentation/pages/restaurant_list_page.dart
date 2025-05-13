@@ -106,7 +106,6 @@ class _RestaurantListPageState extends State<RestaurantListPage>
   void _animateMapTo(LatLng destination) {
     _animatedMapController.animateTo(
       dest: destination,
-      zoom: 15,
       rotation: 0.0,
     );
   }

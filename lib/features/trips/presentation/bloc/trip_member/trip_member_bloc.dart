@@ -24,6 +24,7 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
     on<RateTripMember>(_onRateTripMember);
     on<InviteTripMember>(_onInviteTripMember);
     on<GetRatedUsers>(_onGetRatedUsers);
+    on<GetBannedUsers>(_onGetBannedUsers);
   }
 
   void _onInsertTripMember(
@@ -122,6 +123,18 @@ class TripMemberBloc extends Bloc<TripMemberEvent, TripMemberState> {
     res.fold(
       (l) => emit(TripMemberFailure(message: l.message)),
       (r) => emit(UsersRatedLoadedSuccess(users: r)),
+    );
+  }
+
+  void _onGetBannedUsers(
+      GetBannedUsers event, Emitter<TripMemberState> emit) async {
+    emit(TripMemberLoading());
+    final res = await _tripMemberRepository.getBannedUsers(
+      tripId: event.tripId,
+    );
+    res.fold(
+      (l) => emit(TripMemberFailure(message: l.message)),
+      (r) => emit(BannedUserLoadedSuccess(users: r)),
     );
   }
 }

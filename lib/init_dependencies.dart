@@ -539,6 +539,7 @@ void _initNotification() {
       () => NotificationRepositoryImpl(
         remoteDataSource: serviceLocator(),
         connectionChecker: serviceLocator(),
+        tripMemberRemoteDatasource: serviceLocator(),
       ),
     )
     ..registerLazySingleton(

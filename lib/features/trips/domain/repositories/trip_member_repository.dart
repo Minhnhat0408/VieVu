@@ -41,4 +41,8 @@ abstract interface class TripMemberRepository {
   Future<Either<Failure, List<TripMemberRating>>> getRatedUsers({
     required String userId,
   });
+
+  Future<Either<Failure, List<TripMember>>> getBannedUsers({
+    required String tripId,
+  });
 }

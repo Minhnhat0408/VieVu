@@ -43,7 +43,8 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       }
       await tripMemberRemoteDatasource.deleteTripMember(
           tripId: tripId, userId: userId);
-      await chatRemoteDatasource.deleteChatMembers(id: tripId, userId: userId);
+      await chatRemoteDatasource.updateAvailableChatMember(
+          tripId: tripId, userId: userId, available: false);
       return right(unit);
     } on ServerException catch (e) {
       return left(Failure(e.message));
@@ -100,6 +101,14 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       }
       final res = await tripMemberRemoteDatasource.updateTripMember(
           tripId: tripId, userId: userId, role: role, isBanned: isBanned);
+
+      if (isBanned == true) {
+        await chatRemoteDatasource.updateAvailableChatMember(
+            tripId: tripId, userId: userId, available: false);
+      } else if (isBanned == false) {
+        await chatRemoteDatasource.updateAvailableChatMember(
+            tripId: tripId, userId: userId, available: true);
+      }
       return right(res);
     } on ServerException catch (e) {
       return left(Failure(e.message));
@@ -150,6 +159,22 @@ class TripMemberRepositoryImpl implements TripMemberRepository {
       final ratedUsers =
           await tripMemberRemoteDatasource.getRatedUsers(userId: userId);
       return right(ratedUsers);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<TripMember>>> getBannedUsers({
+    required String tripId,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      final bannedUsers =
+          await tripMemberRemoteDatasource.getBannedUsers(tripId: tripId);
+      return right(bannedUsers);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     }
