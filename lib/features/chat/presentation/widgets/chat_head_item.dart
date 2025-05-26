@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vievu/core/utils/display_modal.dart';
 import 'package:vievu/features/chat/domain/entities/chat.dart';
 import 'package:vievu/features/chat/presentation/pages/chat_details_page.dart';
 

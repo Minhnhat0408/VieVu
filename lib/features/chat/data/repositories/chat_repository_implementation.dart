@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:vievu/core/error/exceptions.dart';

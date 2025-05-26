@@ -1,7 +1,5 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vievu/core/layouts/custom_appbar.dart';
 import 'package:vievu/core/utils/display_modal.dart';
 import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';

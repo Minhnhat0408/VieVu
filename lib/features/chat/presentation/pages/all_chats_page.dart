@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -108,7 +107,6 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
 
                   if (state is ChatInsertSuccess) {
                     setState(() {
-                      // add if not exist
                       if (!chats.contains(state.chat)) {
                         chats.add(state.chat);
                       }
@@ -123,7 +121,6 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
                         )
                       : filteredChats.isNotEmpty
                           ? Expanded(
-                              // <-- Thêm Expanded ở đây
                               child: ListView.builder(
                                 itemCount: filteredChats.length,
                                 itemBuilder: (context, index) {
@@ -138,25 +135,49 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
                                 },
                               ),
                             )
-                          : Column(
-                              children: [
-                                const SizedBox(height: 200),
-                                Icon(
-                                  Icons.folder_open,
-                                  size: 100,
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  'Không có tin nhắn',
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                          : LayoutBuilder(
+                              builder: (BuildContext context,
+                                  BoxConstraints constraints) {
+                                return SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      minHeight: constraints.maxHeight,
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.folder_open,
+                                              size: 100,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Text(
+                                              'Không có tin nhắn',
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 100),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                );
+                              },
                             );
                 },
               ),

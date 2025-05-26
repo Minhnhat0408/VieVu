@@ -109,21 +109,14 @@ class _SummarizeChatModalState extends State<SummarizeChatModal> {
                   action: SnackBarAction(
                     label: 'Xem ngay',
                     onPressed: () {
-                      if (state.chatSummarize?.tripId != null) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TripDetailPage(
-                                      tripId: state.chatSummarize!.tripId!,
-                                      initialIndex: 2,
-                                    )));
-                      } else {
-                        showSnackbar(
-                            context,
-                            'Lỗi: Không tìm thấy ID chuyến đi.',
-                            SnackBarState.error);
-                      }
-                    },
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TripDetailPage(
+                                    tripId: state.chatSummarize.tripId,
+                                    initialIndex: 2,
+                                  )));
+                                        },
                   ),
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:vievu/core/error/failures.dart';
 import 'package:vievu/features/auth/domain/entities/user.dart';
 

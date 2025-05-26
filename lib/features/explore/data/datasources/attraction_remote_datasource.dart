@@ -11,7 +11,6 @@ import 'package:vievu/features/explore/data/models/restaurant_model.dart';
 import 'package:vievu/features/explore/data/models/service_model.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:vievu/features/user_preference/data/models/preference_model.dart';
-import 'package:vievu/features/user_preference/domain/entities/preference.dart';
 
 abstract interface class AttractionRemoteDatasource {
   Future<AttractionModel?> getAttraction({

@@ -1,10 +1,7 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vievu/core/constants/parent_traveltypes.dart';
-import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
-import 'package:vievu/features/user_preference/domain/entities/preference.dart';
 import 'package:vievu/features/user_preference/domain/entities/travel_type.dart';
 import 'package:vievu/features/user_preference/presentation/bloc/travel_types/travel_types_bloc.dart';
 

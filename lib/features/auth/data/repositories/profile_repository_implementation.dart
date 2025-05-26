@@ -8,7 +8,6 @@ import 'package:vievu/core/network/connection_checker.dart';
 import 'package:vievu/features/auth/data/datasources/profile_remote_datasource.dart';
 import 'package:vievu/features/auth/domain/entities/user.dart';
 import 'package:vievu/features/auth/domain/repository/profile_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource remoteDataSource;
