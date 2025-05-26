@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vievu/features/explore/domain/entities/attraction.dart';
 import 'package:vievu/features/explore/presentation/bloc/attraction/attraction_bloc.dart';
 import 'package:vievu/features/explore/presentation/pages/all_recommendations_page.dart';
@@ -25,8 +24,6 @@ class _RecommendedAttractionSectionState
   @override
   void initState() {
     super.initState();
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     context.read<AttractionBloc>().add(GetRecommendedAttraction(
         limit: 10,
         userPref:
@@ -37,8 +34,6 @@ class _RecommendedAttractionSectionState
   @override
   Widget build(BuildContext context) {
     if (widget.refresh != null) {
-      final userId =
-          (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
       context.read<AttractionBloc>().add(GetRecommendedAttraction(
           limit: 10,
           userPref: (context.read<PreferencesBloc>().state

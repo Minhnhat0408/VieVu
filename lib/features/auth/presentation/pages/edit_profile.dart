@@ -452,9 +452,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     // check if anything changed
 
                     if ((normalize(firstNameController.text) ?? '') ==
-                            (widget.user.firstName ?? '') &&
+                            (widget.user.firstName) &&
                         (normalize(lastNameController.text) ?? '') ==
-                            (widget.user.lastName ?? '') &&
+                            (widget.user.lastName) &&
                         (normalize(descriptionController.text) ?? '') ==
                             (widget.user.bio ?? '') &&
                         (normalize(phoneController.text) ?? '') ==

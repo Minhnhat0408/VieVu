@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import 'package:timelines/timelines.dart';
 import 'package:vievu/core/utils/conversions.dart';
@@ -14,7 +13,6 @@ import 'package:vievu/features/trips/domain/entities/trip_member.dart';
 import 'package:vievu/features/trips/presentation/bloc/saved_service/saved_service_bloc.dart';
 import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
 import 'package:vievu/features/trips/presentation/bloc/trip_itinerary/trip_itinerary_bloc.dart';
-import 'package:vievu/features/trips/presentation/cubit/current_trip_member_info_cubit.dart';
 import 'package:vievu/features/trips/presentation/widgets/modals/add_custom_place_modal.dart';
 import 'package:vievu/features/trips/presentation/widgets/modals/add_itinerary_options_modal.dart';
 import 'package:vievu/features/trips/presentation/widgets/modals/edit_trip_itinerary_modal.dart';

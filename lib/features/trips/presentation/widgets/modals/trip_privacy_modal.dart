@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vievu/core/constants/notification_types.dart';
 import 'package:vievu/core/utils/show_snackbar.dart';
-import 'package:vievu/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:vievu/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:vievu/features/trips/domain/entities/trip.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vievu/features/trips/domain/entities/trip_member.dart';

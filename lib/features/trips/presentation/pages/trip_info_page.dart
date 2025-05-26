@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:vievu/core/constants/transport_options.dart';
 import 'package:vievu/core/constants/trip_filters.dart';

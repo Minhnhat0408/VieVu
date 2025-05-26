@@ -29,7 +29,6 @@ import 'package:vievu/features/chat/presentation/bloc/message_bloc.dart';
 import 'package:vievu/features/explore/presentation/bloc/event/event_bloc.dart';
 import 'package:vievu/features/explore/presentation/cubit/nearby_attractions/nearby_attractions_cubit.dart';
 import 'package:vievu/features/explore/presentation/pages/attraction_details_page.dart';
-import 'package:vievu/features/explore/presentation/pages/location_detail_page.dart';
 import 'package:vievu/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:vievu/features/notifications/presentation/pages/notification_page.dart';
 import 'package:vievu/features/search/presentation/bloc/search_bloc.dart';
@@ -280,7 +279,7 @@ class _MyAppState extends State<MyApp> {
                                       builder: (context) =>
                                           AttractionDetailPage(
                                         attractionId: int.tryParse(
-                                              attractionId ?? '0',
+                                              attractionId,
                                             ) ??
                                             0,
                                       ),

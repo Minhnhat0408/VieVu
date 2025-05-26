@@ -374,12 +374,7 @@ class LocationRemoteDatasourceImpl implements LocationRemoteDatasource {
   }) async {
     String baseUrl = "https://www.latlong.net/_spm4.php";
 
-    final convertAddressLongLat = Uri.parse(baseUrl);
-    final body = {
-      "action": "gpcm",
-      "c1": address,
-      "cp": "",
-    };
+    Uri.parse(baseUrl);
 
     try {
       // final response = await http.post(

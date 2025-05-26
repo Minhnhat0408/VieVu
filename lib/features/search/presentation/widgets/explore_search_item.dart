@@ -16,7 +16,6 @@ import 'package:vievu/features/explore/presentation/pages/all_nearby_service_pag
 import 'package:vievu/features/search/domain/entities/explore_search_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vievu/features/search/presentation/bloc/search_bloc.dart';
-import 'package:vievu/features/user_preference/presentation/bloc/preference/preference_bloc.dart';
 import 'package:vievu/init_dependencies.dart';
 
 class ExploreSearchItem extends StatelessWidget {

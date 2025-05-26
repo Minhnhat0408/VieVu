@@ -139,7 +139,7 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                "${trip.serviceCount ?? 0} địa điểm", // Use serviceCount, handle null
+                                "${trip.serviceCount} địa điểm", // Use serviceCount, handle null
                                 style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey), // Subdued color

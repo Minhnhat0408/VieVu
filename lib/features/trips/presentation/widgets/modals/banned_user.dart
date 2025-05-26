@@ -1,8 +1,5 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:timeline_tile/timeline_tile.dart';
 import 'package:vievu/features/trips/domain/entities/trip.dart';
 import 'package:vievu/features/trips/domain/entities/trip_member.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -134,7 +131,6 @@ class _BannedUserModalState extends State<BannedUserModal> {
                 },
               );
             }
-            return const SizedBox();
           },
         ),
       ),

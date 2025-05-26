@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vievu/features/trips/domain/entities/trip.dart';
 import 'package:vievu/features/trips/domain/entities/trip_review.dart';
 import 'package:vievu/features/trips/domain/repositories/trip_review_repository.dart';
-import 'package:vievu/features/trips/presentation/bloc/trip/trip_bloc.dart';
 
 part 'trip_review_event.dart';
 part 'trip_review_state.dart';
