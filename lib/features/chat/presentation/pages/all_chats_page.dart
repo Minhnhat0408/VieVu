@@ -37,6 +37,7 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -96,90 +97,123 @@ class _AllMessagesPageState extends State<AllMessagesPage> {
                       EdgeInsets.symmetric(horizontal: 16)),
                 ),
               ),
-              BlocConsumer<ChatBloc, ChatState>(
-                listener: (context, state) {
-                  if (state is ChatsLoadedSuccess) {
-                    setState(() {
-                      chats = state.chatHeads;
-                      filteredChats = state.chatHeads;
-                    });
-                  }
+              // Wrap the BlocConsumer with Expanded
+              Expanded(
+                child: BlocConsumer<ChatBloc, ChatState>(
+                  listener: (context, state) {
+                    if (state is ChatsLoadedSuccess) {
+                      setState(() {
+                        chats = state.chatHeads;
+                        // Apply search filter immediately
+                        if (_searchController.text.isEmpty) {
+                          filteredChats = state.chatHeads;
+                        } else {
+                          filteredChats = chats
+                              .where((element) => element.name
+                                  .toLowerCase()
+                                  .contains(_searchController.text.toLowerCase()))
+                              .toList();
+                        }
+                      });
+                    }
 
-                  if (state is ChatInsertSuccess) {
-                    setState(() {
-                      if (!chats.contains(state.chat)) {
-                        chats.add(state.chat);
-                      }
-                      filteredChats = chats;
-                    });
-                  }
-                },
-                builder: (context, state) {
-                  return state is ChatLoading && filteredChats.isEmpty
-                      ? const Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : filteredChats.isNotEmpty
-                          ? Expanded(
-                              child: ListView.builder(
-                                itemCount: filteredChats.length,
-                                itemBuilder: (context, index) {
-                                  return ChatHeadItem(
-                                    chat: filteredChats[index],
-                                    onMessageSeen: () {
-                                      setState(() {
-                                        filteredChats[index].isSeen = true;
-                                      });
-                                    },
-                                  );
-                                },
+                    if (state is ChatInsertSuccess) {
+                      setState(() {
+                        // Ensure the chat is not already present by ID, then add or update
+                        final existingChatIndex = chats.indexWhere((c) => c.id == state.chat.id);
+                        if (existingChatIndex != -1) {
+                          chats[existingChatIndex] = state.chat; // Update existing
+                        } else {
+                          chats.insert(0, state.chat); // Add new to the beginning
+                        }
+                        // Re-apply filter
+                        if (_searchController.text.isEmpty) {
+                          filteredChats = List.from(chats);
+                        } else {
+                          filteredChats = chats
+                              .where((element) => element.name
+                                  .toLowerCase()
+                                  .contains(_searchController.text.toLowerCase()))
+                              .toList();
+                        }
+                      });
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is ChatLoading && filteredChats.isEmpty) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (filteredChats.isNotEmpty) {
+                      // No need for another Expanded here if BlocConsumer is already Expanded
+                      return ListView.builder(
+                        itemCount: filteredChats.length,
+                        itemBuilder: (context, index) {
+                          return ChatHeadItem(
+                            chat: filteredChats[index],
+                            onMessageSeen: () {
+                               // Update isSeen for both lists if the item exists
+                              final chatInMasterList = chats.firstWhere((c) => c.id == filteredChats[index].id, orElse: () => filteredChats[index] /* Should not happen if lists are in sync */);
+                              setState(() {
+                                chatInMasterList.isSeen = true;
+                                if (filteredChats[index].id == chatInMasterList.id) {
+                                   filteredChats[index].isSeen = true;
+                                }
+                              });
+                            },
+                          );
+                        },
+                      );
+                    } else {
+                      // Empty state
+                      return LayoutBuilder(
+                        builder: (BuildContext context,
+                            BoxConstraints constraints) {
+                          // constraints.maxHeight here will be finite because BlocConsumer is Expanded
+                          return SingleChildScrollView(
+                            physics:
+                                const AlwaysScrollableScrollPhysics(),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight,
                               ),
-                            )
-                          : LayoutBuilder(
-                              builder: (BuildContext context,
-                                  BoxConstraints constraints) {
-                                return SingleChildScrollView(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minHeight: constraints.maxHeight,
-                                    ),
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.folder_open,
-                                              size: 100,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                            ),
-                                            const SizedBox(height: 20),
-                                            Text(
-                                              'Không có tin nhắn',
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 100),
-                                          ],
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.folder_open,
+                                        size: 100,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        'Không có tin nhắn',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    ),
+                                      // const SizedBox(height: 100), // Consider removing if centering is sufficient
+                                    ],
                                   ),
-                                );
-                              },
-                            );
-                },
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
               ),
             ],
           ),

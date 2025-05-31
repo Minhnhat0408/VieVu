@@ -84,7 +84,7 @@ class _TripItineraryDetailPageState extends State<TripItineraryDetailPage> {
                       imageUrl: itineraries[index].service?.cover ?? "",
                       fit: BoxFit.cover,
                       errorWidget: (context, url, error) => Image.asset(
-                        'assets/images/trip_placeholder.avif',
+                        'assets/images/trip_placeholder.webp',
                       ),
                       height: 300,
                       width: double.infinity,

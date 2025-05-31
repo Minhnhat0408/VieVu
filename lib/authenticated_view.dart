@@ -98,6 +98,7 @@ class _AuthenticatedViewState extends State<AuthenticatedView> {
           },
         )
         .subscribe();
+    
   }
 
   @override

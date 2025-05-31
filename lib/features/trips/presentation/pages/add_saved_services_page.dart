@@ -106,7 +106,7 @@ class _AddSavedServicesPageViewState extends State<AddSavedServicesPageView> {
       } else {
         final searchType = _mapFilterToSearchType(_selectedFilter);
         if (searchType == 'all') {
-          context.read<SearchBloc>().add(SearchAll(
+          context.read<SearchBloc>().add(SearchAllLocal(
                 searchText: _keyword,
                 limit: pageSize,
                 offset: pageKey,

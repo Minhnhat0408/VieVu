@@ -117,7 +117,7 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
                                   const Icon(Icons.image, color: Colors.grey),
                             ),
                             errorWidget: (context, url, error) => Image.asset(
-                                'assets/images/trip_placeholder.avif',
+                                'assets/images/trip_placeholder.webp',
                                 width: 60,
                                 height: 60,
                                 fit: BoxFit.cover),

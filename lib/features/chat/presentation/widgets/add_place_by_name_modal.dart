@@ -32,7 +32,7 @@ class _AddPlaceByNameModalState extends State<AddPlaceByNameModal> {
   void _onSearchChanged(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 1000), () async {
-      context.read<SearchBloc>().add(SearchAll(
+      context.read<SearchBloc>().add(SearchAllLocal(
             searchText: keyword,
             limit: 10,
             offset: 0,
@@ -141,7 +141,7 @@ class _AddPlaceByNameModalState extends State<AddPlaceByNameModal> {
                                   imageUrl: result.cover ?? '',
                                   errorWidget: (context, url, error) =>
                                       Image.asset(
-                                    'assets/images/trip_placeholder.avif', // Fallback if loading fails
+                                    'assets/images/trip_placeholder.webp', // Fallback if loading fails
                                     fit: BoxFit.cover,
                                   ),
                                 ),

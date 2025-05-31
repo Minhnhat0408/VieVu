@@ -360,7 +360,7 @@ class _LocationSharedMapState extends State<LocationSharedMap>
                                 imageUrl: member.avatarUrl ?? "",
                                 // errorWidget: (context, url, error) =>
                                 //     Image.asset(
-                                //   'assets/images/trip_placeholder.avif', // Fallback if loading fails
+                                //   'assets/images/trip_placeholder.webp', // Fallback if loading fails
                                 //   fit: BoxFit.cover,
                                 // ),
                                 errorWidget: (context, url, error) =>

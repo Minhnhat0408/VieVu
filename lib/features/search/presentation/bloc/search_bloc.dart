@@ -21,6 +21,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<SearchHistory>(_onSearchHistory);
     on<EventsSearch>(_onEventsSearch);
     on<SearchExternalApi>(_onSearchExternalApi);
+    on<SearchAllLocal>(_onSearchAllLocal);  
     on<SearchHome>(_onSearchHome);
   }
 
@@ -93,6 +94,19 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   void _onSearchAll(SearchAll event, Emitter<SearchState> emit) async {
     final res = await _exploreSearchRepository.searchAll(
+      searchText: event.searchText,
+      limit: event.limit,
+      offset: event.offset,
+      tripId: event.tripId,
+    );
+    res.fold(
+      (l) => emit(SearchError(message: l.message)),
+      (r) => emit(SearchSuccess(results: r)),
+    );
+  }
+
+  void _onSearchAllLocal(SearchAllLocal event, Emitter<SearchState> emit) async {
+    final res = await _exploreSearchRepository.searchAllLocal(
       searchText: event.searchText,
       limit: event.limit,
       offset: event.offset,

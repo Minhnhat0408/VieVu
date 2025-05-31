@@ -11,6 +11,14 @@ abstract interface class SearchRepository {
     String? tripId,
   });
 
+   Future<Either<Failure, List<ExploreSearchResult>>> searchAllLocal({
+    required String searchText,
+    required int limit,
+    required int offset,
+    String? tripId,
+  });
+
+
   Future<Either<Failure, List<HomeSearchResult>>> homeSearch({
     required String searchText,
     required int limit,

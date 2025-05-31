@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_generative_ai/google_generative_ai.dart' as genai;
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vievu/core/constants/prompts.dart';
 import 'package:vievu/core/error/exceptions.dart';
 import 'package:vievu/features/auth/data/models/user_model.dart';
 import 'package:vievu/features/chat/data/models/chat_model.dart';
@@ -342,29 +344,67 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     }
   }
 
+  Future<String?> _callGeminiApiWithSDK({
+    required String modelName,
+    required String promptText,
+    required String systemInstruction,
+  }) async {
+  
+
+    try {
+      // Khởi tạo model với API Key và system instruction
+      log(dotenv.env['GEMINI_API_KEY']!);
+      final model = genai.GenerativeModel(
+        model: modelName,
+        apiKey: dotenv.env['GEMINI_API_KEY']!,
+        systemInstruction: genai.Content.system(systemInstruction), 
+    
+      );
+
+      // log("Calling Gemini SDK: $modelName with prompt (first 100 chars): ${promptText.substring(0, math.min(100, promptText.length))}");
+
+      final content = [
+        //  genai.Content.system(systemInstruction), // Đặt system instruction ở đây
+         genai.Content.text(promptText)
+      ];
+  
+
+      final response = await model.generateContent(content);
+
+      log("Gemini SDK response: ${response.text}");
+
+      if (response.text != null) {
+        return response.text!.trim();
+      } else if (response.promptFeedback?.blockReason != null) {
+        log("Gemini SDK call blocked: ${response.promptFeedback!.blockReason}");
+        return null;
+      }
+      log("Gemini SDK response format unexpected or no text.");
+      return null;
+
+    } catch (e, s) {
+      log("Exception calling Gemini SDK: $e", stackTrace: s);
+      if (e is  genai.GenerativeAIException) { // Bắt lỗi cụ thể từ SDK nếu có
+        log("GenerativeAIException: ${e.message}");
+        throw ServerException("Lỗi từ Gemini SDK: ${e.message}");
+      }
+      throw ServerException("Lỗi khi gọi Gemini SDK: ${e.toString()}");
+    }
+  }
+
   @override
   Future<ChatSummarizeModel> summarizeItineraries({
     required int chatId,
   }) async {
     try {
-      final user = supabaseClient.auth.currentUser;
-      final session = supabaseClient.auth.currentSession;
-      if (session == null || user == null) {
-        throw const ServerException('Không thể xác thực người dùng');
-      }
-      final token = session.accessToken;
-
-      final url =
-          Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/summarize');
-
+      // Lấy thông tin chat, trip dates, previous summary và messages từ Supabase (logic này vẫn giữ)
       final chat = await supabaseClient
           .from('chats')
           .select('trip_id, trips(start_date,end_date), chat_summaries(*)')
           .eq('id', chatId)
           .single();
-      log('Chat data from Supabase: ${chat.toString()}');
+      log('Chat data from Supabase for summarization: ${chat.toString()}');
 
-      // Check if trips data is available and if start_date or end_date is null
       if (chat['trips'] == null) {
         throw const ServerException(
             'Thông tin chuyến đi không tồn tại cho cuộc trò chuyện này.');
@@ -377,12 +417,13 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
             'Ngày bắt đầu hoặc ngày kết thúc của chuyến đi không được xác định. Vui lòng cập nhật thông tin chuyến đi.');
       }
 
-      final lastSummarizedMessageId = chat['chat_summaries'] != null &&
-              chat['chat_summaries']['last_message_id'] != null
-          ? chat['chat_summaries']['last_message_id']
+      final previousSummaryData = chat['chat_summaries'];
+      final lastSummarizedMessageId = previousSummaryData != null &&
+              previousSummaryData['last_message_id'] != null
+          ? previousSummaryData['last_message_id']
           : 0;
 
-      final message = await supabaseClient
+      final messagesToSummarize = await supabaseClient
           .from('messages')
           .select('id,content,meta_data, message_reactions(reaction)')
           .eq('chat_id', chatId)
@@ -390,104 +431,280 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           .gt('id', lastSummarizedMessageId)
           .order('created_at', ascending: true);
 
-      if (message.isEmpty) {
+      if (messagesToSummarize.isEmpty) {
+         if (previousSummaryData != null && previousSummaryData['summary'] != null) {
+             log("No new messages to summarize, returning existing summary if valid.");
+             if (previousSummaryData['chat_id'] == null) previousSummaryData['chat_id'] = chatId;
+             if (previousSummaryData['trip_id'] == null) previousSummaryData['trip_id'] = chat['trip_id'];
+             if (previousSummaryData['summary'] is! List ||
+                (previousSummaryData['summary'] as List).any((item) => item is! Map<String,dynamic>)) {
+                  log("Previous summary is not in the expected format List<Map<String,dynamic>>. Fetching fresh summary.");
+                  if (messagesToSummarize.isEmpty) {
+                     throw const ServerException("Không có tin nhắn mới và tóm tắt cũ không hợp lệ.");
+                  }
+             } else {
+                return ChatSummarizeModel.fromJson(previousSummaryData);
+             }
+           }
         throw const ServerException("Không có tin nhắn mới để tóm tắt");
       }
 
-      final body = {
-        "conversation": message.map((e) {
-          final List<dynamic> rawReactions =
-              (e['message_reactions'] is List<dynamic>)
-                  ? (e['message_reactions'] as List<dynamic>)
-                  : <dynamic>[];
+      // Chuẩn bị prompt cho Gemini
+      final List<String> conversationPayload = messagesToSummarize.map((e) {
+        final List<dynamic> rawReactions =
+            (e['message_reactions'] is List<dynamic>)
+                ? (e['message_reactions'] as List<dynamic>)
+                : <dynamic>[];
+        final reactions = rawReactions
+            .map((react) => (react is Map<String, dynamic> && react.containsKey('reaction')) ? react['reaction'] : null)
+            .where((reactionValue) => reactionValue != null)
+            .toList();
+        final isPositive = reactions.contains('👎') || reactions.contains('👍')
+            ? (reactions.where((r) => r == '👍').length > reactions.where((r) => r == '👎').length ? '|Yes|' : '|No|')
+            : '';
+        return (e['content'] as String? ?? '') + isPositive;
+      }).toList();
 
-          final reactions = rawReactions
-              .map((react) {
-                if (react is Map<String, dynamic> &&
-                    react.containsKey('reaction')) {
-                  return react['reaction'];
-                }
-                return null;
-              })
-              .where((reactionValue) => reactionValue != null)
-              .toList();
+      final List<Map<String, dynamic>> metadataPayload = messagesToSummarize
+          .where((e) => e['meta_data'] != null && e['meta_data'] is List<dynamic>)
+          .expand((e) {
+            final List<dynamic> metaDataList = e['meta_data'] as List<dynamic>;
+            return metaDataList.map((meta) {
+              if (meta is Map<String, dynamic>) {
+                return {...meta, 'message_id': e['id']};
+              }
+              return null;
+            }).where((metaItem) => metaItem != null).cast<Map<String, dynamic>>();
+          }).toList();
 
-          final isPositive =
-              reactions.contains('👎') || reactions.contains('👍')
-                  ? reactions.where((r) => r == '👍').length >
-                          reactions.where((r) => r == '👎').length
-                      ? '|Yes|'
-                      : '|No|'
-                  : '';
-
-          return (e['content'] as String? ?? '') + isPositive;
-        }).toList(),
-        "metadata": message
-            .where((e) =>
-                e['meta_data'] != null && e['meta_data'] is List<dynamic>)
-            .expand((e) {
-          final List<dynamic> metaDataList = e['meta_data'] as List<dynamic>;
-          return metaDataList.map((meta) {
-            if (meta is Map<String, dynamic>) {
-              return {...meta, 'message_id': e['id']};
-            }
-            return null;
-          }).where((metaItem) => metaItem != null);
-        }).toList(),
-        "start_date": startDate, // Use validated startDate
-        "end_date": endDate, // Use validated endDate
-      };
-
-      if (chat['chat_summaries'] != null &&
-          chat['chat_summaries']['summary'] != null) {
-        body['previous_summary'] = chat['chat_summaries']['summary'];
+      // 1. Summarize Conversation
+      String formattedMessagesForSummary =
+          "Conversation:\n${conversationPayload.join('\n')}\nTravel dates: from $startDate to $endDate.\nMetadata: ${jsonEncode(metadataPayload)}.";
+      if (previousSummaryData != null && previousSummaryData['summary'] != null && previousSummaryData['summary'] is List) {
+        formattedMessagesForSummary += "\nPrevious Summary: ${jsonEncode(previousSummaryData['summary'])}.";
       }
 
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-        body: jsonEncode(body),
+      String? summaryTextFromGemini = await _callGeminiApiWithSDK(
+        modelName: 'gemini-2.0-flash',
+        promptText: formattedMessagesForSummary,
+        systemInstruction: summarizeInstruction,
       );
 
-      if (response.statusCode != 200) {
-        throw ServerException(
-            'Lỗi từ API tóm tắt: ${response.statusCode} - ${response.body}');
+      List<Map<String, dynamic>> summaryJson = [];
+      if (summaryTextFromGemini != null) {
+        String processedText = summaryTextFromGemini;
+        if (processedText.startsWith("```json")) {
+          processedText = processedText.substring(7, processedText.length - 3).trim();
+        } else if (processedText.startsWith("```")) {
+          processedText = processedText.substring(3, processedText.length - 3).trim();
+        }
+        try {
+          final decoded = jsonDecode(processedText);
+          if (decoded is List) {
+            summaryJson = decoded.whereType<Map<String, dynamic>>().toList();
+          } else {
+            log("Parsed summary JSON is not a List: $decoded");
+          }
+        } catch (e) {
+          log("Failed to parse summary JSON from Gemini (SDK): $e, Raw text: $processedText");
+        }
+      } else {
+        log("Summarization with Gemini (SDK) returned no text.");
       }
 
-      final jsonResponse = jsonDecode(
-        utf8.decode(response.bodyBytes),
+      // 2. Summarize to Reading
+      final String textForReading = summaryJson.isNotEmpty ? jsonEncode(summaryJson) : (summaryTextFromGemini ?? "No summary available.");
+      String? readingTextFromGemini = await _callGeminiApiWithSDK(
+        modelName: 'gemini-2.0-flash',
+        promptText: textForReading,
+        systemInstruction: readingInstruction, 
       );
 
-      final List<Map<String, dynamic>> data =
-          List<Map<String, dynamic>>.from(jsonResponse['data']);
+      if (readingTextFromGemini != null) {
+        if (readingTextFromGemini.startsWith("```json")) { // Mặc dù reading thường là text, đề phòng
+            readingTextFromGemini = readingTextFromGemini.substring(7, readingTextFromGemini.length - 3).trim();
+        } else if (readingTextFromGemini.startsWith("```")) {
+            readingTextFromGemini = readingTextFromGemini.substring(3, readingTextFromGemini.length - 3).trim();
+        }
+      } else {
+        log("Reading generation with Gemini (SDK) returned no text.");
+        readingTextFromGemini = "Could not generate reading text."; // Default fallback
+      }
 
-      final res = await supabaseClient
+      // Upsert kết quả vào bảng chat_summaries
+      final upsertResult = await supabaseClient
           .from('chat_summaries')
           .upsert({
             'chat_id': chatId,
-            'summary': data,
-            'readings': jsonResponse['reading'],
+            'summary': summaryJson, // summary từ Gemini
+            'readings': readingTextFromGemini, // reading từ Gemini
             'updated_at': DateTime.now().toIso8601String(),
-            'last_message_id': message.last['id'],
+            'last_message_id': messagesToSummarize.last['id'],
             'is_converted': false,
           }, onConflict: 'chat_id')
-          .select("*")
+          .select("*") // Lấy lại tất cả các trường
           .single();
 
-      res['trip_id'] = chat['trip_id'];
-      return ChatSummarizeModel.fromJson(res);
-    } catch (e) {
-      log('Error in summarizeItineraries: ${e.toString()}');
+      upsertResult['trip_id'] = chat['trip_id'];
+
+      return ChatSummarizeModel.fromJson(upsertResult);
+
+    } catch (e, s) {
+      log('Error in summarizeItineraries (Flutter client-side Gemini SDK): ${e.toString()}', stackTrace: s);
       if (e is ServerException) {
-        rethrow; // Re-throw ServerException directly
+        rethrow;
       }
       throw ServerException(
-          'Đã xảy ra lỗi khi tóm tắt lịch trình: ${e.toString()}');
+          'Đã xảy ra lỗi khi tóm tắt lịch trình (Flutter client-side Gemini SDK): ${e.toString()}');
     }
   }
+
+  // @override
+  // Future<ChatSummarizeModel> summarizeItineraries({
+  //   required int chatId,
+  // }) async {
+  //   try {
+  //     final user = supabaseClient.auth.currentUser;
+  //     final session = supabaseClient.auth.currentSession;
+  //     if (session == null || user == null) {
+  //       throw const ServerException('Không thể xác thực người dùng');
+  //     }
+  //     final token = session.accessToken;
+
+  //     final url =
+  //         Uri.parse('${dotenv.env['RECOMMENDATION_API_URL']!}/summarize');
+
+  //     final chat = await supabaseClient
+  //         .from('chats')
+  //         .select('trip_id, trips(start_date,end_date), chat_summaries(*)')
+  //         .eq('id', chatId)
+  //         .single();
+  //     log('Chat data from Supabase: ${chat.toString()}');
+
+  //     // Check if trips data is available and if start_date or end_date is null
+  //     if (chat['trips'] == null) {
+  //       throw const ServerException(
+  //           'Thông tin chuyến đi không tồn tại cho cuộc trò chuyện này.');
+  //     }
+  //     final String? startDate = chat['trips']['start_date'];
+  //     final String? endDate = chat['trips']['end_date'];
+
+  //     if (startDate == null || endDate == null) {
+  //       throw const ServerException(
+  //           'Ngày bắt đầu hoặc ngày kết thúc của chuyến đi không được xác định. Vui lòng cập nhật thông tin chuyến đi.');
+  //     }
+
+  //     final lastSummarizedMessageId = chat['chat_summaries'] != null &&
+  //             chat['chat_summaries']['last_message_id'] != null
+  //         ? chat['chat_summaries']['last_message_id']
+  //         : 0;
+
+  //     final message = await supabaseClient
+  //         .from('messages')
+  //         .select('id,content,meta_data, message_reactions(reaction)')
+  //         .eq('chat_id', chatId)
+  //         .eq('is_travel_related', true)
+  //         .gt('id', lastSummarizedMessageId)
+  //         .order('created_at', ascending: true);
+
+  //     if (message.isEmpty) {
+  //       throw const ServerException("Không có tin nhắn mới để tóm tắt");
+  //     }
+
+  //     final body = {
+  //       "conversation": message.map((e) {
+  //         final List<dynamic> rawReactions =
+  //             (e['message_reactions'] is List<dynamic>)
+  //                 ? (e['message_reactions'] as List<dynamic>)
+  //                 : <dynamic>[];
+
+  //         final reactions = rawReactions
+  //             .map((react) {
+  //               if (react is Map<String, dynamic> &&
+  //                   react.containsKey('reaction')) {
+  //                 return react['reaction'];
+  //               }
+  //               return null;
+  //             })
+  //             .where((reactionValue) => reactionValue != null)
+  //             .toList();
+
+  //         final isPositive =
+  //             reactions.contains('👎') || reactions.contains('👍')
+  //                 ? reactions.where((r) => r == '👍').length >
+  //                         reactions.where((r) => r == '👎').length
+  //                     ? '|Yes|'
+  //                     : '|No|'
+  //                 : '';
+
+  //         return (e['content'] as String? ?? '') + isPositive;
+  //       }).toList(),
+  //       "metadata": message
+  //           .where((e) =>
+  //               e['meta_data'] != null && e['meta_data'] is List<dynamic>)
+  //           .expand((e) {
+  //         final List<dynamic> metaDataList = e['meta_data'] as List<dynamic>;
+  //         return metaDataList.map((meta) {
+  //           if (meta is Map<String, dynamic>) {
+  //             return {...meta, 'message_id': e['id']};
+  //           }
+  //           return null;
+  //         }).where((metaItem) => metaItem != null);
+  //       }).toList(),
+  //       "start_date": startDate, // Use validated startDate
+  //       "end_date": endDate, // Use validated endDate
+  //     };
+
+  //     if (chat['chat_summaries'] != null &&
+  //         chat['chat_summaries']['summary'] != null) {
+  //       body['previous_summary'] = chat['chat_summaries']['summary'];
+  //     }
+
+  //     final response = await http.post(
+  //       url,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //       body: jsonEncode(body),
+  //     );
+
+  //     if (response.statusCode != 200) {
+  //       throw ServerException(
+  //           'Lỗi từ API tóm tắt: ${response.statusCode} - ${response.body}');
+  //     }
+
+  //     final jsonResponse = jsonDecode(
+  //       utf8.decode(response.bodyBytes),
+  //     );
+
+  //     final List<Map<String, dynamic>> data =
+  //         List<Map<String, dynamic>>.from(jsonResponse['data']);
+
+  //     final res = await supabaseClient
+  //         .from('chat_summaries')
+  //         .upsert({
+  //           'chat_id': chatId,
+  //           'summary': data,
+  //           'readings': jsonResponse['reading'],
+  //           'updated_at': DateTime.now().toIso8601String(),
+  //           'last_message_id': message.last['id'],
+  //           'is_converted': false,
+  //         }, onConflict: 'chat_id')
+  //         .select("*")
+  //         .single();
+
+  //     res['trip_id'] = chat['trip_id'];
+  //     return ChatSummarizeModel.fromJson(res);
+  //   } catch (e) {
+  //     log('Error in summarizeItineraries: ${e.toString()}');
+  //     if (e is ServerException) {
+  //       rethrow; // Re-throw ServerException directly
+  //     }
+  //     throw ServerException(
+  //         'Đã xảy ra lỗi khi tóm tắt lịch trình: ${e.toString()}');
+  //   }
+  // }
 
   @override
   RealtimeChannel listenToChatMembersChannel({

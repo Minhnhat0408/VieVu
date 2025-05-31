@@ -3,9 +3,11 @@ import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vievu/core/error/exceptions.dart';
+import 'package:vievu/core/utils/bm25_ranker.dart';
 import 'package:vievu/features/search/data/models/explore_search_result_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:vievu/features/search/data/models/home_search_result_model.dart';
+import 'dart:math' as math; // For Math.log if you use a more standard IDF
 
 abstract interface class SearchRemoteDataSource {
   Future<List<ExploreSearchResultModel>> exploreSearch({
@@ -16,6 +18,12 @@ abstract interface class SearchRemoteDataSource {
   });
 
   Future<List<ExploreSearchResultModel>> searchAll({
+    required String searchText,
+    required int limit,
+    required int offset,
+  });
+
+  Future<List<ExploreSearchResultModel>> searchAllLocal({
     required String searchText,
     required int limit,
     required int offset,
@@ -59,10 +67,143 @@ abstract interface class SearchRemoteDataSource {
 class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
   final SupabaseClient supabaseClient;
   final http.Client client;
+  final BM25Ranker bm25ranker;
   SearchRemoteDataSourceImpl(
     this.supabaseClient,
     this.client,
+    this.bm25ranker,
   );
+
+  @override
+  Future<List<ExploreSearchResultModel>> searchAllLocal({
+    required String searchText,
+    required int limit, // This is the overall limit for the final result
+    required int offset, // This offset is for the *final combined and ranked* list
+  }) async {
+    log('searchAll (Flutter client-side): searchText="$searchText", overallLimit=$limit, overallOffset=$offset');
+    try {
+      // For client-side aggregation, we usually fetch more initially from each source
+      // and then apply offset/limit *after* ranking.
+      // The Python code distributed the limit *before* fetching.
+      // Here, we'll fetch a decent number from each, combine, rank, then apply offset & limit.
+
+      // Define how many items to try fetching from each source.
+      // These are not the final limits, but initial fetch sizes.
+      // Adjust these based on typical result set sizes and performance.
+      const int initialFetchLimitPerSource = 30; // Fetch up to 30 from each source initially
+      const int initialPageForApis = 1; // Fetch from page 1 for APIs
+
+      // Note: The original Python code calculated sub-limits and pages based on the *final* limit/offset.
+      // If you want to strictly adhere to that, you'd need to pass the overall offset and limit
+      // to this function and then calculate sub-limits/offsets for each call.
+      // However, for client-side ranking, it's often better to fetch a bit more, then rank, then paginate.
+      // The current implementation will fetch `initialFetchLimitPerSource` from each.
+      // The provided `offset` and `limit` will be applied *after* combining and ranking.
+
+      final List<Future<List<ExploreSearchResultModel>>> searchFutures = [
+        searchEvents(
+          searchText: searchText,
+          limit: initialFetchLimitPerSource, // Fetch more initially
+          page: initialPageForApis,
+        ).catchError((e) {
+          log("Error in searchEvents for searchAll: $e");
+          return <ExploreSearchResultModel>[];
+        }),
+        exploreSearch( // Supabase RPC
+          searchText: searchText,
+          limit: initialFetchLimitPerSource, // Fetch more initially
+          offset: 0, // Fetch from the beginning for Supabase
+          searchType: "attractions",
+        ).catchError((e) {
+          log("Error in exploreSearch (attractions) for searchAll: $e");
+          return <ExploreSearchResultModel>[];
+        }),
+        exploreSearch( // Supabase RPC
+          searchText: searchText,
+          limit: initialFetchLimitPerSource, // Fetch more initially
+          offset: 0, // Fetch from the beginning
+          searchType: "locations",
+        ).catchError((e) {
+          log("Error in exploreSearch (locations) for searchAll: $e");
+          return <ExploreSearchResultModel>[];
+        }),
+        searchExternalApi( // Trip.com
+          searchText: searchText,
+          limit: initialFetchLimitPerSource, // Fetch more initially
+          page: initialPageForApis,
+          searchType: "hotel",
+        ).catchError((e) {
+          log("Error in searchExternalApi (hotel) for searchAll: $e");
+          return <ExploreSearchResultModel>[];
+        }),
+        searchExternalApi( // Trip.com
+          searchText: searchText,
+          limit: initialFetchLimitPerSource, // Fetch more initially
+          page: initialPageForApis,
+          searchType: "restaurant",
+        ).catchError((e) {
+          log("Error in searchExternalApi (restaurant) for searchAll: $e");
+          return <ExploreSearchResultModel>[];
+        }),
+      ];
+
+      final List<List<ExploreSearchResultModel>> resultsFromAllSources =
+          await Future.wait(searchFutures);
+
+      final List<ExploreSearchResultModel> combinedResults = [];
+      for (final list in resultsFromAllSources) {
+        combinedResults.addAll(list);
+      }
+
+      if (combinedResults.isEmpty) {
+        log('searchAll: No results found from any source.');
+        return [];
+      }
+      log('searchAll: Combined ${combinedResults.length} results before ranking.');
+
+      // Deduplication (simple example based on title and address, make it more robust)
+      final Set<String> uniqueKeys = {};
+      final List<ExploreSearchResultModel> deduplicatedResults = [];
+      for (final item in combinedResults) {
+        String key = "${item.title?.toLowerCase()}_${item.address?.toLowerCase()}";
+        if (item.externalLink != null && item.externalLink!.isNotEmpty) {
+            key = item.externalLink!; // Prefer external link if available for uniqueness
+        } 
+
+        if (uniqueKeys.add(key)) {
+          deduplicatedResults.add(item);
+        }
+      }
+      log('searchAll: Deduplicated to ${deduplicatedResults.length} results.');
+
+
+      List<ExploreSearchResultModel> rankedResults;
+      if (searchText.trim().isNotEmpty) {
+        log('searchAll: Applying BM25 ranking for query: "$searchText"');
+        rankedResults = bm25ranker.rank(query: searchText, documents: deduplicatedResults);
+      } else {
+        rankedResults = List.from(deduplicatedResults); // No query, no specific ranking
+      }
+      log('searchAll: Ranked ${rankedResults.length} results.');
+
+      // Apply overall offset and limit to the ranked results
+      List<ExploreSearchResultModel> finalPaginatedResults = [];
+      if (offset < rankedResults.length) {
+        final int end = math.min(offset + limit, rankedResults.length);
+        finalPaginatedResults = rankedResults.sublist(offset, end);
+      } else if (limit == 0) {
+         finalPaginatedResults = [];
+      }
+
+
+      log('searchAll: Returning ${finalPaginatedResults.length} final paginated results.');
+      return finalPaginatedResults;
+
+    } catch (e, s) {
+      log("Critical error in client-side searchAll: ${e.toString()}", stackTrace: s);
+      throw ServerException("Failed to execute client-side searchAll: ${e.toString()}");
+    }
+  }
 
   @override
   Future<List<HomeSearchResultModel>> searchHome({

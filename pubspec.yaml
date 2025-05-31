@@ -91,7 +91,7 @@ dependencies:
   lazy_load_indexed_stack: ^1.2.1
   geocoding: ^3.0.0
   app_links: ^6.4.0
-
+  google_generative_ai: ^0.4.7  
 
 dev_dependencies:
   flutter_test:

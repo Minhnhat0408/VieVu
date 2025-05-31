@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:vievu/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:vievu/core/network/connection_checker.dart';
+import 'package:vievu/core/utils/bm25_ranker.dart';
 import 'package:vievu/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:vievu/features/auth/data/datasources/profile_remote_datasource.dart';
 import 'package:vievu/features/auth/data/repositories/auth_repository_implementation.dart';
@@ -91,6 +92,8 @@ import 'package:http/http.dart' as http;
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
+  serviceLocator.registerLazySingleton(() => BM25Ranker());
+
   _initAuth();
   _initPreference();
   _initExplore();
@@ -121,6 +124,7 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(
     () => AppUserCubit(),
   );
+
 
   serviceLocator.registerLazySingleton(
     () => NearbyAttractionsCubit(attractionRepository: serviceLocator()),
@@ -327,6 +331,7 @@ void _initSearch() {
   serviceLocator
     ..registerFactory<SearchRemoteDataSource>(
       () => SearchRemoteDataSourceImpl(
+        serviceLocator(),
         serviceLocator(),
         serviceLocator(),
       ),

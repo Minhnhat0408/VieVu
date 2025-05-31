@@ -44,6 +44,49 @@ class SearchRepositoryImpl implements SearchRepository {
   }
 
   @override
+  Future<Either<Failure, List<ExploreSearchResult>>> searchAllLocal({
+    required String searchText,
+    required int limit,
+    String? tripId,
+    required int offset,
+  }) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure("Không có kết nối mạng"));
+      }
+      var searchResults = await searchRemoteDataSource.searchAllLocal(
+        searchText: searchText,
+        limit: limit,
+        offset: offset,
+      );
+
+      if (tripId != null) {
+        log(tripId);
+        final List<int> savedServiceIds = searchResults
+            .map((e) => e.id)
+            .toList()
+            .cast<int>(); // convert to list of int
+        final List<int> savedServiceIdsForTrip =
+            await savedServiceRemoteDatasource.getListSavedServiceIdsForTrip(
+          tripId: tripId,
+          serviceIds: savedServiceIds,
+        );
+
+        searchResults = searchResults.map((e) {
+          if (savedServiceIdsForTrip.contains(e.id)) {
+            return e.copyWith(isSaved: true);
+          }
+          return e;
+        }).toList();
+      }
+
+      return right(searchResults);
+    } catch (e) {
+      throw left(Failure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<ExploreSearchResult>>> searchAll({
     required String searchText,
     required int limit,

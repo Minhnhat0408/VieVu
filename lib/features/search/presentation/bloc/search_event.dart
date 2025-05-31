@@ -17,6 +17,23 @@ class SearchAll extends SearchEvent {
   });
 }
 
+class SearchAllLocal extends SearchEvent {
+  final String searchText;
+  final int limit;
+  final int offset;
+  final String? tripId;
+
+  SearchAllLocal({
+     this.tripId,
+    required this.searchText,
+    required this.limit,
+    required this.offset,
+
+  });
+}
+
+
+
 class ExploreSearch extends SearchEvent {
   final String searchText;
   final int limit;

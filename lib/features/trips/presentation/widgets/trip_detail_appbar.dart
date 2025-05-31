@@ -166,7 +166,7 @@ class _TripDetailAppbarState extends State<TripDetailAppbar> {
                               imageUrl:
                                   widget.tripCover ?? widget.trip?.cover ?? "",
                               errorWidget: (context, url, error) => Image.asset(
-                                'assets/images/trip_placeholder.avif', // Fallback if loading fails
+                                'assets/images/trip_placeholder.webp', // Fallback if loading fails
                                 fit: BoxFit.cover,
                               ),
                               cacheManager: CacheManager(
