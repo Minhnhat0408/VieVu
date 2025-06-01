@@ -92,6 +92,7 @@ dependencies:
   geocoding: ^3.0.0
   app_links: ^6.4.0
   google_generative_ai: ^0.4.7  
+  device_info_plus: ^11.3.0
 
 dev_dependencies:
   flutter_test:

@@ -68,16 +68,16 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
         if (state is TripLoading && _initialLoad) {
           // Show loading only on initial load
           content = const SizedBox(
-            height: 400, // Define a reasonable height for loading state
+            height: 150, // Define a reasonable height for loading state
             child: Center(
               child: CircularProgressIndicator(),
             ),
           );
-        } else if (state is SavedToTripLoadedSuccess) {
+              } else if (state is SavedToTripLoadedSuccess) {
           if (state.trips.isEmpty) {
             // Show message if no trips are available
             content = const SizedBox(
-              height: 150, // Adjust height as needed
+              height: 150, 
               child: Center(
                 child: Text(
                   "Hiện chưa có chuyến đi nào.",
@@ -87,84 +87,81 @@ class _SavedToTripModalState extends State<SavedToTripModal> {
             );
           } else {
             // Build the list of trips
-            content = Flexible(
-              // Use Flexible to allow list to take available space
-              child: ListView.builder(
-                // Use ListView.builder for better performance
-                shrinkWrap: true, // Important with Flexible in a Column
-                itemCount: state.trips.length,
-                itemBuilder: (context, index) {
-                  final trip = state.trips[index];
-                  final bool isSelected = _currentSelectedTrips.contains(trip);
+            content = ListView.builder( 
+              
+              shrinkWrap: true, 
+              itemCount: state.trips.length,
+              itemBuilder: (context, index) {
+                final trip = state.trips[index];
+                final bool isSelected = _currentSelectedTrips.contains(trip);
 
-                  return CheckboxListTile(
-                    value: isSelected,
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 4, horizontal: 20), // Adjust padding
-                    controlAffinity: ListTileControlAffinity.trailing,
-                    title: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: CachedNetworkImage(
-                            imageUrl: trip.cover ?? '',
-                            placeholder: (context, url) => Container(
-                              // Simple placeholder
-                              width: 60,
-                              height: 60,
-                              color: Colors.grey[300],
-                              child:
-                                  const Icon(Icons.image, color: Colors.grey),
-                            ),
-                            errorWidget: (context, url, error) => Image.asset(
-                                'assets/images/trip_placeholder.webp',
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover),
+                return CheckboxListTile(
+                  value: isSelected,
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 4, horizontal: 20), // Adjust padding
+                  controlAffinity: ListTileControlAffinity.trailing,
+                  title: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: trip.cover ?? '',
+                          placeholder: (context, url) => Container(
+                            // Simple placeholder
                             width: 60,
                             height: 60,
-                            fit: BoxFit.cover,
+                            color: Colors.grey[300],
+                            child:
+                                const Icon(Icons.image, color: Colors.grey),
                           ),
+                          errorWidget: (context, url, error) => Image.asset(
+                              'assets/images/trip_placeholder.webp',
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover),
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                trip.name,
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                "${trip.serviceCount} địa điểm", // Use serviceCount, handle null
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey), // Subdued color
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              trip.name,
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              "${trip.serviceCount} địa điểm", // Use serviceCount, handle null
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey), // Subdued color
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    onChanged: (value) {
-                      // Simplified logic using Set
-                      setState(() {
-                        if (value == true) {
-                          _currentSelectedTrips.add(trip);
-                        } else {
-                          _currentSelectedTrips.remove(trip);
-                        }
-                        _checkForChanges(); // Check if changes occurred
-                      });
-                    },
-                  );
-                },
-              ),
+                      ),
+                    ],
+                  ),
+                  onChanged: (value) {
+                    // Simplified logic using Set
+                    setState(() {
+                      if (value == true) {
+                        _currentSelectedTrips.add(trip);
+                      } else {
+                        _currentSelectedTrips.remove(trip);
+                      }
+                      _checkForChanges(); // Check if changes occurred
+                    });
+                  },
+                );
+              },
             );
           }
         } else {

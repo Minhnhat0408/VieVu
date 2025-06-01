@@ -90,9 +90,10 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
       // Define how many items to try fetching from each source.
       // These are not the final limits, but initial fetch sizes.
       // Adjust these based on typical result set sizes and performance.
-      const int initialFetchLimitPerSource = 30; // Fetch up to 30 from each source initially
-      const int initialPageForApis = 1; // Fetch from page 1 for APIs
-
+      int initialFetchLimitPerSource = limit > 1  ? limit~/2 : 1 ; // Fetch up to 30 from each source initially
+       int initialPageForApis = limit > 0 ? ((offset~/limit)+ 1) : 1; // Fetch from page 1 for APIs
+       log('offset: $offset, limit: $limit');
+      log('searchAll: Initial fetch limit per source: $initialFetchLimitPerSource, initial page for APIs: $initialPageForApis');
       // Note: The original Python code calculated sub-limits and pages based on the *final* limit/offset.
       // If you want to strictly adhere to that, you'd need to pass the overall offset and limit
       // to this function and then calculate sub-limits/offsets for each call.
@@ -112,7 +113,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
         exploreSearch( // Supabase RPC
           searchText: searchText,
           limit: initialFetchLimitPerSource, // Fetch more initially
-          offset: 0, // Fetch from the beginning for Supabase
+          offset: offset, // Fetch from the beginning for Supabase
           searchType: "attractions",
         ).catchError((e) {
           log("Error in exploreSearch (attractions) for searchAll: $e");
@@ -121,7 +122,7 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
         exploreSearch( // Supabase RPC
           searchText: searchText,
           limit: initialFetchLimitPerSource, // Fetch more initially
-          offset: 0, // Fetch from the beginning
+          offset: offset, // Fetch from the beginning
           searchType: "locations",
         ).catchError((e) {
           log("Error in exploreSearch (locations) for searchAll: $e");
@@ -163,41 +164,34 @@ class SearchRemoteDataSourceImpl implements SearchRemoteDataSource {
 
       // Deduplication (simple example based on title and address, make it more robust)
       final Set<String> uniqueKeys = {};
-      final List<ExploreSearchResultModel> deduplicatedResults = [];
-      for (final item in combinedResults) {
-        String key = "${item.title?.toLowerCase()}_${item.address?.toLowerCase()}";
-        if (item.externalLink != null && item.externalLink!.isNotEmpty) {
-            key = item.externalLink!; // Prefer external link if available for uniqueness
-        } 
+      // final List<ExploreSearchResultModel> deduplicatedResults = [];
+      // for (final item in combinedResults) {
+      //   String key = "${item.title?.toLowerCase()}_${item.address?.toLowerCase()}";
+      //   if (item.externalLink != null && item.externalLink!.isNotEmpty) {
+      //       key = item.externalLink!; // Prefer external link if available for uniqueness
+      //   } 
 
-        if (uniqueKeys.add(key)) {
-          deduplicatedResults.add(item);
-        }
-      }
-      log('searchAll: Deduplicated to ${deduplicatedResults.length} results.');
+      //   if (uniqueKeys.add(key)) {
+      //     deduplicatedResults.add(item);
+      //   }
+      // }
+      // log('searchAll: Deduplicated to ${deduplicatedResults.length} results.');
 
 
       List<ExploreSearchResultModel> rankedResults;
       if (searchText.trim().isNotEmpty) {
         log('searchAll: Applying BM25 ranking for query: "$searchText"');
-        rankedResults = bm25ranker.rank(query: searchText, documents: deduplicatedResults);
+        rankedResults = bm25ranker.rank(query: searchText, documents: combinedResults);
       } else {
-        rankedResults = List.from(deduplicatedResults); // No query, no specific ranking
+        rankedResults = List.from(combinedResults); // No query, no specific ranking
       }
       log('searchAll: Ranked ${rankedResults.length} results.');
 
-      // Apply overall offset and limit to the ranked results
-      List<ExploreSearchResultModel> finalPaginatedResults = [];
-      if (offset < rankedResults.length) {
-        final int end = math.min(offset + limit, rankedResults.length);
-        finalPaginatedResults = rankedResults.sublist(offset, end);
-      } else if (limit == 0) {
-         finalPaginatedResults = [];
-      }
+ 
+        
+     
 
-
-      log('searchAll: Returning ${finalPaginatedResults.length} final paginated results.');
-      return finalPaginatedResults;
+      return rankedResults.take(limit).toList();
 
     } catch (e, s) {
       log("Critical error in client-side searchAll: ${e.toString()}", stackTrace: s);

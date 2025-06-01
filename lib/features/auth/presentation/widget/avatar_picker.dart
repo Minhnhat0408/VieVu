@@ -25,7 +25,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
     final pickedImage = await pickImage();
 
     if (pickedImage != null) {
-      widget.onImageSelected(File(pickedImage.path));
+      widget.onImageSelected(pickedImage);
     }
   }
 

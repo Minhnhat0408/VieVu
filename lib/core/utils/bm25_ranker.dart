@@ -105,16 +105,16 @@ class BM25Ranker {
 
     // Filter out documents with a score of 0 if there are others with scores > 0
     // This can happen if none of the query terms match the document after cleaning.
-    bool hasPositiveScores = scoredDocuments.any((entry) => entry.value > 0);
-    List<MapEntry<ExploreSearchResultModel, double>> relevantScoredDocuments = scoredDocuments;
-    if(hasPositiveScores){
-        relevantScoredDocuments = scoredDocuments.where((entry) => entry.value > 0).toList();
-    }
+    // bool hasPositiveScores = scoredDocuments.any((entry) => entry.value > 0);
+    // List<MapEntry<ExploreSearchResultModel, double>> relevantScoredDocuments = scoredDocuments;
+    // if(hasPositiveScores){
+    //     relevantScoredDocuments = scoredDocuments.where((entry) => entry.value > 0).toList();
+    // }
 
 
-    relevantScoredDocuments.sort((a, b) => b.value.compareTo(a.value));
+    scoredDocuments.sort((a, b) => b.value.compareTo(a.value));
 
-    log("BM25: Ranked ${relevantScoredDocuments.length} documents.");
-    return relevantScoredDocuments.map((e) => e.key).toList();
+    log("BM25: Ranked ${scoredDocuments.length} documents."); // Now logs the total number of documents
+    return scoredDocuments.map((e) => e.key).toList();
   }
 }
